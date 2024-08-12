@@ -1,0 +1,1 @@
+export type IsLegallyDuePayload =  { documentNumber: string }

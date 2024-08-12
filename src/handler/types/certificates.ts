@@ -1,0 +1,1 @@
+export type StatusPayload = {status?: string, investigationStatus?: string}

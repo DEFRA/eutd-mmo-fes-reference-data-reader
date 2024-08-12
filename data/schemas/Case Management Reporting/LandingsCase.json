@@ -1,0 +1,489 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "array",
+  "title": "Landing Detail",
+  "description": "Schema for sending updated landings to case management.",
+  "examples": [
+    [
+      {
+        "status": "Validation Success",
+        "id": "landing12345",
+        "is14DayLimitReached": false,
+        "documentNumber": "document12345",
+        "documentDate": "2020-06-20",
+        "landingDate": "2020-06-01",
+        "numberOfFailedSubmissions": 5,
+        "species": "Cod",
+        "state": "Fresh",
+        "presentation": "Filletted",
+        "cnCode": "some commodity code",
+        "commodityCodeDescription": "some decriptions",
+        "adminCommodityCode": "03062190",
+        "scientificName": "scientific name",
+        "weight": 1000,
+        "speciesAlias": "Y",
+        "speciesAnomaly": "CAA",
+        "numberOfTotalSubmissions": 1,
+        "dataEverExpected": true,
+        "landingDataExpectedDate": "2023-05-26",
+        "landingDataEndDate": "2023-06-05",
+        "vesselAdministration": "England",
+        "adminSpecies": "Sand smelt (ATP)",
+        "adminState": "Fresh",
+        "adminPresentation": "Whole",
+        "speciesOverriddenByAdmin": true,
+        "validation": {
+          "liveExportWeight": 529,
+          "rawLandingsUrl": "http://www.google.co.uk",
+          "salesNoteUrl": "http://www.google.co.uk",
+          "totalLiveForExportSpecies": 529,
+          "isLegallyDue": false
+        },
+        "risking": {
+          "vessel": "0.5",
+          "speciesRisk": "0.5",
+          "exporterRiskScore": "0.5",
+          "landingRiskScore": "0.5",
+          "highOrLowRisk": "Low",
+          "overuseInfo": ["GBR-2020-CC-06E48913F”,”GBR-2020-CC-649E9E6F9"],
+          "isSpeciesRiskEnabled" : true
+        },
+        "vesselName" : "the vessel name",
+        "vesselPln": "vessel12345",
+        "vesselLength": 10,
+        "licenceHolder": "The vessel Master",
+        "exporter": {
+          "contactId": "a contact id",
+          "accountId": "an account id",
+          "dynamicsAddress": {
+            "defra_addressid": "00185463-69c2-e911-a97a-000d3a2cbad9",
+            "defra_buildingname": "Lancaster House",
+            "defra_fromcompanieshouse": false,
+            "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": "No",
+            "defra_postcode": "NE4 7YJ",
+            "defra_premises": "23",
+            "defra_street": "Newcastle upon Tyne",
+            "defra_towntext": "Newcastle upon Tyne",
+            "_defra_country_value": "f49cf73a-fa9c-e811-a950-000d3a3a2566",
+            "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": "defra_Country",
+            "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": "defra_country",
+            "_defra_country_value_OData_Community_Display_V1_FormattedValue": "United Kingdom of Great Britain and Northern Ireland"
+          },
+          "fullName": "Bob",
+          "companyName": "FISH LTD",
+          "address": {
+            "building_number": "123",
+            "sub_building_name": "Unit 1",
+            "building_name": "CJC Fish Ltd",
+            "street_name": "17  Old Edinburgh Road",
+            "county": "West Midlands",
+            "country": "England",
+            "line1": "123 Unit 1 CJC Fish Ltd 17 Old Edinburgh Road",
+            "city": "ROWTR",
+            "postCode": "WN90 23A"
+          }
+        },
+        "source": "LANDING_DECLARATION",
+        "documentUrl": "TBC",
+        "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
+        "requestedByAdmin": false,
+        "exportedTo": {
+          "officialCountryName": "Nigeria",
+          "isoCodeAlpha2": "NG",
+          "isoCodeAlpha3": "NGR"
+        }
+      }
+    ]
+  ],
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties" : {
+        "line1": { "type": "string" },
+        "sub_building_name": { "type": ["string", "null"] },
+        "building_number": { "type": ["string", "null"] },
+        "building_name": { "type": ["string", "null"] },
+        "street_name": { "type": ["string", "null"]},
+        "county": { "type": ["string", "null"] },
+        "country": { "type": ["string", "null"] },
+        "city"  : { "type": "string" },
+        "postCode" : { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": [
+        "line1",
+        "city",
+        "postCode"
+      ]
+    },
+    "dynamicsAddress": {
+      "type": "object",
+      "properties": {
+        "defra_addressid": { "type": "string" },
+        "defra_buildingname": { "type": ["string", "null"] },
+        "defra_county": { "type": "string" },
+        "defra_dependentlocality": { "type": ["string", "null"] },
+        "defra_fromcompanieshouse": { "type": "boolean" },
+        "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": { "type": "string" },
+        "defra_internationalpostalcode": { "type": ["string", "null"] },
+        "defra_locality": { "type": ["string", "null"] },
+        "defra_postcode": { "type": "string" },
+        "defra_premises": { "type": "string" },
+        "defra_street": { "type": "string" },
+        "defra_subbuildingname": { "type": ["string", "null"] },
+        "defra_towntext": { "type": "string" },
+        "defra_uprn": { "type": ["string", "null"] },
+        "_defra_country_value": { "type": "string" },
+        "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": { "type": "string" },
+        "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname" : { "type": "string" },
+        "_defra_country_value_OData_Community_Display_V1_FormattedValue": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": [
+        "defra_addressid",
+        "defra_buildingname",
+        "defra_postcode",
+        "defra_premises",
+        "defra_street",
+        "defra_towntext"
+      ]
+    },
+    "landingValidation": {
+      "type": "object",
+      "properties": {
+        "liveExportWeight": {
+          "type": "number",
+          "description": "The live export weight"
+        },
+        "totalWeightForSpecies": {
+          "type": "number",
+          "description": "Total Landing Dec. Weight for Exported Species"
+        },
+        "totalLiveForExportSpecies": {
+          "type": "number",
+          "description": "Total Live Weight for Exported Species"
+        },
+        "totalEstimatedForExportSpecies": {
+          "type": "number",
+          "description": "Total Estimated Weight for Exported Species"
+        },
+        "totalEstimatedWithTolerance": {
+          "type": "number",
+          "description": "Total Estimated Weight + Tolerance for Exported Species"
+        },
+        "totalRecordedAgainstLanding": {
+          "type": "number"
+        },
+        "landedWeightExceededBy": {
+          "type": "number"
+        },
+        "rawLandingsUrl": {
+          "type": "string"
+        },
+        "salesNoteUrl": {
+          "type": "string"
+        },
+        "isLegallyDue":{
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "liveExportWeight",
+        "rawLandingsUrl",
+        "salesNoteUrl",
+        "isLegallyDue"
+      ]
+    },
+    "risking": {
+      "type": "object",
+      "properties": {
+        "vessel": {
+          "type": "string"
+        },
+        "speciesRisk": {
+          "type": "string"
+        },
+        "exporterRiskScore": {
+          "type": "string"
+        },
+        "landingRiskScore": {
+          "type": "string"
+        },
+        "highOrLowRisk": {
+          "type": "string",
+          "enum": [
+            "High",
+            "Low"
+          ]
+        },
+        "overuseInfo": {
+          "type": "array",
+          "items":{
+            "type":"string"
+          }
+        },
+        "isSpeciesRiskEnabled" : {
+          "type": "boolean"
+        }
+      }
+    },
+    "landing": {
+      "description": "A Landing",
+      "type": "object",
+      "properties": {
+        "status": {
+          "description": "Current status of the landing",
+          "type": "string",
+          "enum": [
+            "Validation Success",
+            "Validation Failure - Overuse",
+            "Validation Failure - Weight",
+            "Validation Failure - Species",
+            "Validation Failure - No Landing Data",
+            "Pending Landing Data",
+            "Data never expected"
+          ]
+        },
+        "speciesOverriddenByAdmin": {
+          "type": "boolean",
+          "description": "Indicates that an unlicensed vessel has been added to a landing on this certitificate"
+        },
+        "id": {
+          "description": "Unique ID for this landing",
+          "type": "string"
+        },
+        "landingDate": {
+          "description": "Date of landing",
+          "type": "string"
+        },
+        "numberOfFailedSubmissions": {
+          "description": "The total number of failed submission attempts executed by the user",
+          "type": "number"
+        },
+        "is14DayLimitReached": {
+          "description": "Has the 14 day limit been reached?",
+          "type": "boolean",
+          "default": false
+        },
+        "species": {
+          "description": "Export species",
+          "type": "string"
+        },
+        "state": {
+          "description": "Export state",
+          "type": "string"
+        },
+        "presentation": {
+          "description": "Export presentation",
+          "type": "string"
+        },
+        "cnCode": {
+          "type": "string"
+        },
+        "adminCommodityCode": {
+          "description": "commoditycode changed by admin",
+          "type": "string"
+        },
+        "commodityCodeDescription": {
+          "type": "string"
+        },
+        "scientificName": {
+          "type": "string"
+        },
+        "vesselName": {
+          "description": "Name of the vessel",
+          "type": "string"
+        },
+        "vesselPln": {
+          "description": "PLN of the vessel",
+          "type": "string"
+        },
+        "vesselLength": {
+          "description": "Length of the vessel",
+          "type": "number"
+        },
+        "licenceHolder": {
+          "description": "Name of the licence holder for the license period corresponding to date when the catch was landed",
+          "type": "string"
+        },
+        "source": {
+          "description": "Source of the landing information used for validation",
+          "type": "string",
+          "enum": [
+            "LANDING_DECLARATION",
+            "CATCH_RECORDING",
+            "ELOG"
+          ]
+        },
+        "weight": {
+          "description": "The weight to be exported, as entered by the user",
+          "type": "number"
+        },
+        "speciesAlias": {
+          "description": "status (Y/N) of certain species mismatching during real-time validation and retrospective validation",
+          "type": "string"
+        },
+        "speciesAnomaly": {
+          "description": "The species code when species mismatching occurs during real-time validation and retrospective validation",
+          "type": "string"
+        },
+        "numberOfTotalSubmissions": {
+          "type": "number",
+          "description": "Number of times this landing has been submitted at real time"
+        },
+        "dataEverExpected": {
+          "type": "boolean",
+          "description": "Is data ever expected for this landing"
+        },
+        "landingDataExpectedDate": {
+          "type": "string",
+          "description": "The date that landing data is expected for this landing"
+        },
+        "landingDataEndDate": {
+          "type": "string",
+          "description": "The date at which landing data is assumed unavailable for this landing"
+        },
+         "landingDataExpectedAtSubmission": {
+          "type": "boolean",
+          "description": "Is Landing data expected at submission"
+        },
+        "isLate": {
+          "type": "boolean",
+          "description": "Is Landing data received late"
+        },
+        "dateDataReceived": {
+          "type": "string",
+          "description": "The date at which landing data is received"
+        },
+        "adminSpecies": {
+          "type": "string",
+          "description": "The species added from admin app"
+        },
+        "adminState": {
+          "type": "string",
+          "description": "The state added from admin app"
+        },
+        "adminPresentation": {
+          "type": "string",
+          "description": "The presentation added from admin app"
+        },
+        "vesselAdministration": {
+          "type": "string",
+          "description": "Devolved administration of the vessel",
+          "enum": [
+            "England",
+            "Scotland",
+            "Wales",
+            "Northern Ireland",
+            "Isle of Man",
+            "Jersey",
+            "Guernsey"
+          ]
+        },
+        "validation": {
+          "type": "object",
+          "items": {
+            "$ref": "#/definitions/landingValidation"
+          }
+        },
+        "risking": {
+          "type": "object",
+          "items": {
+            "$ref": "#/definitions/risk"
+          }
+        },
+        "exporter": {
+          "description": "Exporter details for this landing",
+          "type": "object",
+          "required": [
+            "contactId",
+            "fullName",
+            "companyName",
+            "address",
+            "dynamicsAddress"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "contactId": {
+              "type": "string"
+            },
+            "accountId": {
+              "type": "string"
+            },
+            "fullName": {
+              "type": "string"
+            },
+            "companyName": {
+              "type": "string"
+            },
+            "address": {
+              "$ref": "#/definitions/address"
+            },
+            "dynamicsAddress": {
+              "$ref": "#/definitions/dynamicsAddress"
+            }
+          }
+        },
+        "documentUrl": {
+          "description": "TBC",
+          "type": "string"
+        },
+        "documentNumber": {
+          "description": "Unique ID for the document this landing is for",
+          "type": "string"
+        },
+        "documentDate": {
+          "description": "Date the document this landing is for was created",
+          "type": "string"
+        },
+        "_correlationId": {
+          "description": "Unique ID to improve the end to end traceability of an event",
+          "type": "string"
+        },
+        "requestedByAdmin": {
+          "type": "boolean",
+          "definition": "Flag to identify applications made by an EACC"
+        },
+        "exportedTo": {
+          "type": "object",
+          "required": [
+            "officialCountryName",
+            "isoCodeAlpha2",
+            "isoCodeAlpha3"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "officialCountryName": {
+              "type": "string"
+            },
+            "isoCodeAlpha2": {
+              "type": "string"
+            },
+            "isoCodeAlpha3": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "id",
+        "_correlationId",
+        "requestedByAdmin",
+        "numberOfFailedSubmissions",
+        "numberOfTotalSubmissions",
+        "exportedTo",
+        "cnCode",
+        "commodityCodeDescription",
+        "scientificName",
+        "dataEverExpected",
+        "vesselAdministration"
+      ]
+    }
+  },
+  "items": {
+    "$ref": "#/definitions/landing"
+  },
+  "minItems": 1
+}

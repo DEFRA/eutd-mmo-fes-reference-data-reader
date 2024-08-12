@@ -1,0 +1,51 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Local - Reference svc reader",
+            "program": "${workspaceRoot}/src/start.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "console": "integratedTerminal",
+            "env": {
+                "DB_CONNECTION_URI": "mongodb://localhost:27017",
+                "PORT": "9000",
+                "NODE_ENV": "development",
+                "CRON_STRING": "*/5 * * * *",
+                "BOOMI_URL": "https://stub-fish.herokuapp.com"
+
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Remote - Reference svc reader",
+            "program": "${workspaceRoot}/src/start.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "console": "integratedTerminal",
+            "env": {
+                "DB_CONNECTION_URI": "mongodb://localhost:27017",
+                "PORT": "9000",
+                "CRON_STRING": "30,40,50,59 12 * * *"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+        {
+            "name": "Debug Jest Tests",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/jest/bin/jest.js", "--runInBand", "--coverage", "false"],
+            "console": "integratedTerminal",
+            "autoAttachChildProcesses": true,
+            "internalConsoleOptions": "neverOpen",
+            "port": 9229
+        }
+
+    ]
+}

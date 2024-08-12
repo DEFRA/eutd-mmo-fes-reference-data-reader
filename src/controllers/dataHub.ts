@@ -1,0 +1,427 @@
+import * as DefraMapper from "../landings/transformations/defraValidation";
+import * as CaseManagement from "../landings/orchestration/caseManagement";
+import * as StrategicReporting from "../landings/orchestration/strategicReporting";
+import * as DefraTrade from "../landings/orchestration/defraTrade";
+import {
+  insertPsDefraValidationReport,
+  insertSdDefraValidationReport,
+  insertCcDefraValidationReport
+} from "../landings/persistence/defraValidation";
+import { CaseTwoType, IDynamicsCatchCertificateCase } from "../landings/types/dynamicsCcCase";
+import { IDynamicsStorageDocumentCase, SdPsCaseTwoType, IDynamicsProcessingStatementCase } from "../landings/types/dynamicsSdPsCase";
+import { DocumentStatuses, IDocument } from "../landings/types/document";
+import { getCertificateByDocumentNumberWithNumberOfFailedAttempts } from "../landings/persistence/catchCert";
+import { getExtendedValidationData } from "../landings/extendedValidationDataService";
+import { ISdPsQueryResult } from "../landings/types/query";
+import { MessageLabel, ICcQueryResult } from "mmo-shared-reference-data";
+import { refreshRiskingData } from "../data/cache";
+import { v4 as uuidv4 } from 'uuid';
+import { isEmpty } from 'lodash';
+
+import logger from "../logger";
+import moment from "moment";
+import { toDynamicsCcCase } from "../landings/transformations/dynamicsValidation";
+import { commoditySearch } from "./species";
+import { ICommodityCodeExtended } from "../interfaces/products.interfaces";
+
+export const reportDraft = async (certificateId: string) => {
+  const correlationId = uuidv4();
+  logger.info(`[REPORTING-DRAFT][Getting certificate with number of failed attempts]`);
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+  logger.info(`[REPORTING-DRAFT][Getting certificate with number of failed attempts][COMPLETE]`);
+
+  if (certificate) {
+    if (certificateId.toUpperCase().includes('-PS-')) {
+      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][Getting report]`);
+      const requestByAdmin = certificate.requestByAdmin;
+      const processingStatementReport = DefraMapper.toPsDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
+
+      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][REPORT-ID][${processingStatementReport ._correlationId}]`);
+      await insertPsDefraValidationReport(processingStatementReport);
+      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][REPORT-ID][${processingStatementReport ._correlationId}][REPORT SAVED]`);
+    }
+    else if (certificateId.toUpperCase().includes('-SD-')) {
+      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][Getting report]`);
+      const requestByAdmin = certificate.requestByAdmin;
+      const storageDocumentReport = DefraMapper.toSdDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
+
+      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][REPORT-ID][${storageDocumentReport ._correlationId}]`);
+      await insertSdDefraValidationReport(storageDocumentReport);
+      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][REPORT-ID][${storageDocumentReport ._correlationId}][REPORT SAVED]`);
+    }
+    else {
+      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][Getting report]`);
+      const requestByAdmin = certificate.requestByAdmin;
+      const catchCertificateReport = DefraMapper.toCcDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
+
+      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport ._correlationId}]`);
+      await insertCcDefraValidationReport(catchCertificateReport);
+      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport ._correlationId}][REPORT SAVED]`);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * @method reportDelete
+ * @param certificateId
+ * DELETE has been intentionally hardcoded because this status is not applicable in the application
+ * however it is for Strategic Reporting
+ */
+export const reportDelete = async (certificateId: string) => {
+  const correlationId = uuidv4();
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+
+  if (certificate) {
+    if (certificateId.toUpperCase().includes('-PS-')) {
+      const requestByAdmin = certificate.requestByAdmin;
+      const processingStatementReport = DefraMapper.toPsDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
+
+      if (certificate.exportData && certificate.exportData.exporterDetails)
+        processingStatementReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
+
+      logger.info(`[REPORTING-PS-DELETE][${certificateId}][REPORT-ID][${processingStatementReport ._correlationId}]`);
+      await insertPsDefraValidationReport(processingStatementReport);
+    }
+    else if (certificateId.toUpperCase().includes('-SD-')) {
+      const requestByAdmin = certificate.requestByAdmin;
+      const storageDocumentReport = DefraMapper.toSdDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
+
+      if (certificate.exportData && certificate.exportData.exporterDetails)
+        storageDocumentReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
+
+      logger.info(`[REPORTING-SD-DELETE][${certificateId}][REPORT-ID][${storageDocumentReport ._correlationId}]`);
+      await insertSdDefraValidationReport(storageDocumentReport);
+    }
+    else {
+      const requestByAdmin = certificate.requestByAdmin;
+      const catchCertificateReport = DefraMapper.toCcDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
+
+      if (certificate.exportData && certificate.exportData.exporterDetails)
+        catchCertificateReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
+
+      logger.info(`[REPORTING-CC-DELETE][${certificateId}][REPORT-ID][${catchCertificateReport ._correlationId}]`);
+      await insertCcDefraValidationReport(catchCertificateReport);
+    }
+  }
+}
+
+export const reportVoid = async (certificateId: string, isFromExporter = false) => {
+  const correlationId = uuidv4();
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+
+  if (certificate) {
+    if (certificateId.toUpperCase().includes('-PS-')) {
+      const requestByAdmin = certificate.requestByAdmin;
+      const psReport = DefraMapper.toPsDefraReport(
+        certificateId,
+        correlationId,
+        DocumentStatuses.Void,
+        requestByAdmin,
+        certificate
+      );
+
+      logger.info(`[REPORTING-PS-VOID][${certificateId}][REPORT-ID][${psReport._correlationId}]`);
+      await insertPsDefraValidationReport(psReport);
+
+        logger.info(`[REPORTING-PS-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${psReport._correlationId}]`);
+        const processingStatementCase: IDynamicsProcessingStatementCase =  await CaseManagement.reportPs(
+          null,
+          certificate,
+          correlationId,
+          MessageLabel.PROCESSING_STATEMENT_VOIDED,
+          isFromExporter ? SdPsCaseTwoType.VoidByExporter : SdPsCaseTwoType.VoidByAdmin
+        );
+        await DefraTrade.reportPsToTrade(certificate, MessageLabel.PROCESSING_STATEMENT_VOIDED, processingStatementCase, null);
+    }
+    else if (certificateId.toUpperCase().includes('-SD-')) {
+      const requestByAdmin = certificate.requestByAdmin;
+      const sdReport = DefraMapper.toSdDefraReport(
+        certificateId,
+        correlationId,
+        DocumentStatuses.Void,
+        requestByAdmin,
+        certificate
+      );
+
+      logger.info(`[REPORTING-SD-VOID][${certificateId}][REPORT-ID][${sdReport ._correlationId}]`);
+      await insertSdDefraValidationReport(sdReport);
+
+        logger.info(`[REPORTING-SD-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${sdReport._correlationId}]`);
+        const storageDocumentCase: IDynamicsStorageDocumentCase = await CaseManagement.reportSd(
+          null,
+          certificate,
+          correlationId,
+          MessageLabel.STORAGE_DOCUMENT_VOIDED,
+          isFromExporter ? SdPsCaseTwoType.VoidByExporter : SdPsCaseTwoType.VoidByAdmin
+        );
+        await DefraTrade.reportSdToTrade(certificate, MessageLabel.STORAGE_DOCUMENT_VOIDED, storageDocumentCase, null);
+    }
+    else {
+      const requestByAdmin = certificate.requestByAdmin;
+      const ccReport = DefraMapper.toCcDefraReport(
+        certificateId,
+        correlationId,
+        DocumentStatuses.Void,
+        requestByAdmin,
+        certificate
+      );
+
+      logger.info(`[REPORTING-CC-VOID][${certificateId}][REPORT-ID][${ccReport._correlationId}]`);
+      await insertCcDefraValidationReport(ccReport);
+
+      logger.info(`[REPORTING-CC-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${ccReport ._correlationId}]`);
+
+      const result: IDynamicsCatchCertificateCase = await CaseManagement.reportCc(null, certificate, ccReport._correlationId, MessageLabel.CATCH_CERTIFICATE_VOIDED, isFromExporter ? CaseTwoType.VoidByExporter : CaseTwoType.VoidByAdmin);
+      await DefraTrade.reportCcToTrade(certificate, MessageLabel.CATCH_CERTIFICATE_VOIDED, result, null);
+    }
+  }
+}
+
+export const reportSdPsSubmitted = async (sdpsValidationData: ISdPsQueryResult[]): Promise<void> => {
+  if (sdpsValidationData.length > 0) {
+    const certificateId = sdpsValidationData[0].documentNumber;
+    const correlationId = uuidv4();
+
+    logger.info(`[DATA-HUB][REPORT-SDPS-SUBMITTED][${certificateId}]`);
+
+    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+
+    if (certificate && certificate.documentNumber) {
+      logger.info(`[DATA-HUB][REPORT-SDPS-SUBMITTED][${certificateId}][FOUND]`);
+
+      if (certificateId.toUpperCase().includes('-PS-')) {
+        await StrategicReporting.reportPs(sdpsValidationData, certificate, correlationId);
+        const processingStatementCase: IDynamicsProcessingStatementCase = await CaseManagement.reportPs(sdpsValidationData, certificate, correlationId, MessageLabel.PROCESSING_STATEMENT_SUBMITTED);
+        await DefraTrade.reportPsToTrade(certificate, MessageLabel.PROCESSING_STATEMENT_SUBMITTED, processingStatementCase, sdpsValidationData);
+      }
+      else {
+        await StrategicReporting.reportSd(sdpsValidationData, certificate, correlationId);
+        const storageDocumentCase: IDynamicsStorageDocumentCase = await CaseManagement.reportSd(sdpsValidationData, certificate, correlationId, MessageLabel.STORAGE_DOCUMENT_SUBMITTED);
+        await DefraTrade.reportSdToTrade(certificate, MessageLabel.STORAGE_DOCUMENT_SUBMITTED, storageDocumentCase, sdpsValidationData);
+      }
+    }
+    else {
+      logger.info(`[DATA-HUB][REPORT-SDPS-SUBMITTED][${certificateId}][NOT-FOUND]`);
+    }
+  }
+};
+
+export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]) : Promise<void> => {
+  try {
+    logger.info(`[REPORT-CC-SUBMITTED][ccValidationData][${ccValidationData.length}]`);
+    if (ccValidationData.length > 0) {
+      let ccReport, catchCertificate;
+      const certificateId = ccValidationData[0].documentNumber;
+      const correlationId = uuidv4();
+
+      logger.info(`[LANDINGS][REPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
+
+      try {
+        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+        logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}]`);
+      }
+      catch (e) {
+        logger.warn(`[REPORT-CC-SUBMITTED][ERROR][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${e}]`);
+        throw e;
+      }
+
+      const requestByAdmin = catchCertificate.requestByAdmin;
+      try {
+        ccReport = DefraMapper.toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, catchCertificate);
+        logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][toCcDefraReport][${certificateId}]`);
+      }
+      catch (e) {
+        logger.warn(`[REPORT-CC-SUBMITTED][ERROR][toCcDefraReport][${e}]`);
+        throw e;
+      }
+
+      try {
+        ccReport.landings = DefraMapper.toLandings(ccValidationData);
+        logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][toLandings][${certificateId}]`);
+      }
+      catch (e) {
+        logger.warn(`[REPORT-CC-SUBMITTED][ERROR][toLandings][${e}]`);
+        throw e;
+      }
+
+      try {
+        await insertCcDefraValidationReport(ccReport);
+        logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][insertCcDefraValidationReport][${certificateId}]`);
+      }
+      catch (e) {
+        logger.warn(`[REPORT-CC-SUBMITTED][ERROR][insertCcDefraValidationReport][${e}]`);
+        throw e;
+      }
+
+      await refreshRiskingData()
+        .catch(e => logger.error(`[REPORT-CC-SUBMITTED][REFRESH-RISKING-DATA][ERROR][${e}]`));
+
+      if (Object.prototype.hasOwnProperty.call(catchCertificate, 'exportData') && catchCertificate.exportData.exporterDetails !== undefined) {
+
+        for (const landing of ccValidationData) {
+          const requestedDate = moment.utc(landing.dateLanded);
+          const requestedDateISO = requestedDate.format('YYYY-MM-DD')
+
+          if (!requestedDate.isValid() || isEmpty(landing.rssNumber)) {
+            logger.info(`[REPORT-CC-SUBMITTED][${landing.extended.landingId}][NO-SALES-NOTE]`);
+            continue;
+          }
+
+          const salesNote = await getExtendedValidationData(requestedDateISO, landing.rssNumber, 'salesNotes');
+          const _hasSaveNote = !isEmpty(salesNote);
+          logger.info(`[REPORT-CC-SUBMITTED][${landing.extended.landingId}][HAS-SALES-NOTE][${_hasSaveNote}]`);
+          landing.hasSalesNote = _hasSaveNote;
+        }
+
+        const result: IDynamicsCatchCertificateCase = await CaseManagement.reportCc(ccValidationData, catchCertificate, correlationId, MessageLabel.CATCH_CERTIFICATE_SUBMITTED);
+        logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][${certificateId}]`);
+
+        await DefraTrade.reportCcToTrade(catchCertificate, MessageLabel.CATCH_CERTIFICATE_SUBMITTED, result, ccValidationData);
+      } else {
+        logger.error(`[REPORT-CC-SUBMITTED][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
+      }
+    }
+  } catch (e) {
+    logger.warn(`[REPORT-CC-SUBMITTED][ERROR][${e}]`);
+    throw e;
+  }
+};
+
+const getUpdatedValidationData = (ccValidationData: ICcQueryResult[]): ICcQueryResult[] => {
+  for (const validationData of ccValidationData) {
+    const commodities: ICommodityCodeExtended[] = commoditySearch(validationData.species, validationData.extended.state, validationData.extended.presentation);
+    const commodity: ICommodityCodeExtended = commodities.find((c: ICommodityCodeExtended) => c.code === validationData.extended.commodityCode);
+    if (commodity && !validationData.extended.commodityCodeDescription) {
+      logger.info(`[LANDINGS][COMMODITY-CODE-SEARCH-FOR][${validationData.species}][FOUND][${commodity.description}]`);
+      validationData.extended.commodityCodeDescription = commodity.description;
+    }
+  }
+
+  return ccValidationData;
+}
+
+const sendCctoTrade = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
+  let catchCertificate: IDocument
+  const certificateId = ccValidationData[0].documentNumber;
+  const correlationId = uuidv4();
+
+  logger.info(`[LANDINGS][REREPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
+
+  try {
+    catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+    logger.info(`[REREPORT-CC-SUBMITTED][SUCCESS][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}]`);
+  }
+  catch (e) {
+    logger.warn(`[REREPORT-CC-SUBMITTED][ERROR][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${e}]`);
+    throw e;
+  }
+
+  if (catchCertificate.exportData?.exporterDetails !== undefined) {
+    const dynamicsCatchCertificateCase: IDynamicsCatchCertificateCase = toDynamicsCcCase(
+      ccValidationData,
+      catchCertificate,
+      correlationId
+    );
+
+    if (!dynamicsCatchCertificateCase.clonedFrom) {
+      delete dynamicsCatchCertificateCase.clonedFrom;
+      delete dynamicsCatchCertificateCase.landingsCloned;
+      delete dynamicsCatchCertificateCase.parentDocumentVoid;
+    }
+
+    logger.info(`[REREPORT-CC-SUBMITTED][GENERATED-CC][${certificateId}][${JSON.stringify(catchCertificate)}]`);
+    await DefraTrade.reportCcToTrade(catchCertificate, MessageLabel.CATCH_CERTIFICATE_SUBMITTED, dynamicsCatchCertificateCase, getUpdatedValidationData(ccValidationData));
+  } else {
+    logger.error(`[REREPORT-CC-SUBMITTED][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
+  }
+}
+
+export const resendCcToTrade = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
+  try {
+    logger.info(`[REPORT-CC-RESUBMITTED][ccValidationData][${ccValidationData.length}]`);
+
+    if (ccValidationData.length > 0) {
+      await sendCctoTrade(ccValidationData);
+    }
+  } catch (e) {
+    logger.error(`[REREPORT-CC-SUBMITTED][ERROR][${e}]`);
+    throw e;
+  }
+};
+
+export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
+  try {
+    logger.info(`[ONLINE-VALIDATION-REPORT][VALIDATIONS][${ccValidationData.length}]`);
+    if (ccValidationData.length > 0) {
+      let ccReport, catchCertificate;
+      const certificateId = ccValidationData[0].documentNumber;
+      const correlationId = uuidv4();
+
+      logger.info(`[ONLINE-VALIDATION-REPORT][REPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
+
+      try {
+        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+        logger.info(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}][SUCCESS]`);
+      }
+      catch (e) {
+        logger.warn(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${e}][ERROR]`);
+        throw e;
+      }
+
+      const requestByAdmin = catchCertificate.requestByAdmin;
+      try {
+        ccReport = DefraMapper.toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, catchCertificate);
+        logger.info(`[ONLINE-VALIDATION-REPORT][toCcDefraReport][${certificateId}][SUCCESS]`);
+      }
+      catch (e) {
+        logger.warn(`[ONLINE-VALIDATION-REPORT][toCcDefraReport][${e}][ERROR]`);
+        throw e;
+      }
+
+      try {
+        ccReport.landings = DefraMapper.toLandings(ccValidationData);
+        logger.info(`[ONLINE-VALIDATION-REPORT][toLandings][${certificateId}][SUCCESS]`);
+      }
+      catch (e) {
+        logger.warn(`[ONLINE-VALIDATION-REPORT][toLandings][${e}][ERROR]`);
+        throw e;
+      }
+
+      try {
+        await insertCcDefraValidationReport(ccReport);
+        logger.info(`[ONLINE-VALIDATION-REPORT][insertCcDefraValidationReport][${certificateId}][SUCCESS]`);
+      }
+      catch (e) {
+        logger.warn(`[ONLINE-VALIDATION-REPORT][insertCcDefraValidationReport][${e}][ERROR]`);
+        throw e;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(catchCertificate, 'exportData') && catchCertificate.exportData.exporterDetails !== undefined) {
+
+        for (const landing of ccValidationData) {
+          const requestedDate = moment.utc(landing.dateLanded);
+          const requestedDateISO = requestedDate.format('YYYY-MM-DD')
+
+          if (!requestedDate.isValid() || isEmpty(landing.rssNumber)) {
+            logger.info(`[ONLINE-VALIDATION-REPORT][${landing.extended.landingId}][NO-SALES-NOTE]`);
+            continue;
+          }
+
+          const salesNote = await getExtendedValidationData(requestedDateISO, landing.rssNumber, 'salesNotes');
+          const _hasSaveNote = !isEmpty(salesNote);
+          logger.info(`[ONLINE-VALIDATION-REPORT][${landing.extended.landingId}][HAS-SALES-NOTE][${_hasSaveNote}]`);
+          landing.hasSalesNote = _hasSaveNote;
+        }
+
+        await CaseManagement.reportCcLandingUpdate(ccValidationData, catchCertificate, correlationId, MessageLabel.NEW_LANDING);
+        logger.info(`[ONLINE-VALIDATION-REPORT][SUCCESS][${certificateId}]`);
+      } else {
+        logger.error(`[ONLINE-VALIDATION-REPORT][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
+      }
+    }
+  } catch (e) {
+    logger.error(`[ONLINE-VALIDATION-REPORT][ERROR][${e.stack || e}]`);
+  }
+};

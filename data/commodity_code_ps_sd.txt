@@ -1,0 +1,483 @@
+code	description
+03021180	Fresh or chilled trout "Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita, Oncorhynchus gilae" (excl. of the species "Oncorhynchus mykiss", with heads on and gills on, gutted, weighing > 1,2 kg each, or with heads off, gilled and gutted, weighing > 1 kg each)
+03021300	Fresh or chilled Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus"
+03021400	Fresh or chilled Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho"
+03021900	Fresh or chilled salmonidae (excl. trout "Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita, Oncorhynchus gilae, Oncorhynchus apache and Oncorhynchus chrysogaster", Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus", Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho")
+03022110	Fresh or chilled lesser or Greenland halibut "Reinhardtius hippoglossoides"
+03022130	Fresh or chilled Atlantic halibut "Hippoglossus hippoglossus"
+03022190	Fresh or chilled Pacific halibut "Hippoglossus stenolepis"
+03022200	Fresh or chilled plaice "Pleuronectes platessa"
+03022300	Fresh or chilled sole "Solea spp."
+03022400	Fresh or chilled turbot "Psetta maxima"
+03022910	Fresh or chilled megrim "Lepidorhombus spp."
+03022980	Fresh or chilled flat fish "Pleuronectidae, Bothidae, Cynoglossidae, Soleidae, Scophthalmidae and Catharidae" (excl. lesser or Greenland halibut, Atlantic halibut, Pacific halibut, plaice, sole, turbot and megrim)
+03023110	Fresh or chilled albacore or longfinned tunas "Thunnus alalunga" for industrial processing or preservation
+03023190	Fresh or chilled albacore or longfinned tunas "Thunnus alalunga" (excl. for industrial processing or preservation)
+03023210	Fresh or chilled yellowfin tunas "Thunnus albacares" for industrial processing or preservation
+03023290	Fresh or chilled yellowfin tunas "Thunnus albacares" (excl. for industrial processing or preservation)
+03023310	Fresh or chilled skipjack or stripe-bellied bonito for industrial processing or preservation
+03023390	Fresh or chilled skipjack or stripe-bellied bonito (excl. for industrial processing or preservation)
+03023410	Fresh or chilled bigeye tunas "Thunnus obesus" for industrial processing or preservation
+03023490	Fresh or chilled bigeye tunas "Thunnus obesus" (excl. tunas for industrial processing or preservation)
+03023511	Fresh or chilled Atlantic bluefin tuna "Thunnus thynnus", for industrial processing or preservation
+03023519	Fresh or chilled Atlantic bluefin tuna "Thunnus thynnus" (excl. for industrial processing or preservation)
+03023591	Fresh or chilled Pacific bluefin tuna "Thunnus orientalis", for industrial processing or preservation
+03023599	Fresh or chilled Pacific bluefin tuna "Thunnus orientalis" (excl. for industrial processing or preservation)
+03023610	Fresh or chilled Southern bluefin tunas "Thunnus maccoyii" for industrial processing or preservation
+03023690	Fresh or chilled Southern bluefin tunas "Thunnus maccoyii" (excl. tunas for industrial processing or preservation)
+03023920	Fresh or chilled tunas of the genus "Thunnus" for industrial processing or preservation (excl. Thunnus alalunga, Thunnus albacares, Thunnus obesus, Thunnus thynnus, Thunnus orientalis and Thunnus maccoyii)
+03023980	Fresh or chilled tunas of the genus "Thunnus" (excl. tunas for industrial processing or preservation and Thunnus alalunga, Thunnus albacares, Thunnus obesus, Thunnus thynnus, Thunnus orientalis and Thunnus maccoyii)
+03024100	Fresh or chilled herring "Clupea harengus, clupea pallasii"
+03024200	Fresh or chilled anchovies "Engraulis spp."
+03024310	Fresh or chilled sardines "Sardina pilchardus"
+03024330	Fresh or chilled sardines "Sardinops spp." and sardinella "Sardinella spp."
+03024390	Fresh or chilled brisling or sprats "Sprattus sprattus"
+03024400	Fresh or chilled mackerel "Scomber scombrus, Scomber australasicus, Scomber japonicus"
+03024510	Fresh or chilled Atlantic horse mackerel "Trachurus trachurus"
+03024530	Fresh or chilled Chilean jack mackerel "Trachurus murphyi"
+03024590	Fresh or chilled jack and horse mackerel "Trachurus spp." "(excl. Atlantic horse mackerel and Chilean jack mackerel)
+03024600	Fresh or chilled cobia "Rachycentron canadum"
+03024700	Fresh or chilled swordfish "Xiphias gladius"
+03024911	Fresh or chilled Kawakawa "Euthynnus affinis" for industrial processing or preservation
+03024919	Fresh or chilled Kawakawa "Euthynnus affinis" (excl. for industrial processing or preservation)
+03024990	Fresh or chilled Indian mackerels "Rastrelliger spp.", seerfishes "Scomberomorus spp.", jacks, crevalles "Caranx spp.", silver pomfrets "Pampus spp.", Pacific saury "Cololabis saira", scads "Decapterus spp.", capelin "Mallotus villosus", bonitos "Sarda spp.", marlins, sailfishes and spearfish "Istiophoridae"
+03025110	Fresh or chilled cod "Gadus morhua"
+03025190	Fresh or chilled cod "Gadus ogac, Gadus macrocephalus"
+03025200	Fresh or chilled haddock "Melanogrammus aeglefinus"
+03025300	Fresh or chilled coalfish "Pollachius virens"
+03025411	Fresh or chilled Cape hake "shallow-water hake" "Merluccius capensis" and deepwater hake "deepwater Cape hake" "Merluccius paradoxus"
+03025415	Fresh or chilled southern hake "Merluccius australis"
+03025419	Fresh or chilled hake "Merluccius spp." (excl. cape hake, deepwater hake and southern hake)
+03025490	Fresh or chilled hake "Urophycis spp."
+03025500	Fresh or chilled Alaska pollack "Theragra chalcogramma"
+03025600	Fresh or chilled blue whiting "Micromesistius poutassou, Micromesistius australis"
+03025910	Fresh or chilled fish of the species Boreogadus saida
+03025920	Fresh or chilled whiting "Merlangius merlangus"
+03025930	Fresh or chilled pollack "Pollachius pollachius"
+03025940	Fresh or chilled ling "Molva spp."
+03025990	Fresh or chilled fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. cod, haddock, coalfish, hake, Alaska pollack, blue whitings, Boreogadus saida, whiting, pollack and ling)
+03027100	Fresh or chilled tilapia "Oreochromis spp."
+03027200	Fresh or chilled catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp."
+03027300	Fresh or chilled carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp."
+03027400	Fresh or chilled eels "Anguilla spp."
+03028115	Fresh or chilled picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp."
+03028130	Fresh or chilled porbeagle shark "Lamna nasus"
+03028140	Fresh or chilled blue shark "Prionace glauca"
+03028180	Fresh or chilled dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03028200	Fresh or chilled, rays and skates "Rajidae"
+03028300	Fresh or chilled toothfish "Dissostichus spp."
+03028410	Fresh or chilled European sea bass "Dicentrarchus labrax"
+03028490	Fresh or chilled sea bass "Dicentrarchus spp." (excl. European sea bass)
+03028510	Fresh or chilled sea bream of the species Dentex dentex or Pagellus spp.
+03028530	Fresh or chilled gilt-head sea bream "Sparus aurata"
+03028590	Fresh or chilled sea bream "Sparidae" (excl. gilt-head sea bream, Dentex dentex and Pagellus spp.)
+03028921	Fresh or chilled fish of the genus Euthynnus, for industrial processing or preservation (excl. skipjack or stripe-bellied bonito and Kawakawa)
+03028929	Fresh or chilled fish of the genus Euthynnus (excl. skipjack or stripe-bellied bonito and Kawakawa, and fish for industrial processing or preservation)
+03028931	Fresh or chilled redfish "Sebastes marinus"
+03028939	Fresh or chilled redfish "Sebastes spp." (excl. Sebastes marinus)
+03028940	Fresh or chilled ray's bream "Brama spp."
+03028950	Fresh or chilled monkfish "Lophius spp."
+03028960	Fresh or chilled pink cusk-eel "Genypterus blacodes"
+03028990	Fresh or chilled fish, n.e.s.
+03029100	Fresh or chilled fish livers, roes and milt
+03029200	Fresh or chilled shark fins
+03029900	Fresh or chilled fish fins, heads, tails, maws and other edible fish offal (excl. livers, roes, milt and shark fins)
+03031100	Frozen sockeye salmon [red salmon] "Oncorhynchus nerka"
+03031200	Frozen Pacific salmon (excl. sockeye salmon "red salmon")
+03031300	Frozen, Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho"
+03031410	Frozen trout "Oncorhynchus apache and Oncorhynchus chrysogaster"
+03031490	Frozen trout "Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita and Oncorhynchus gilae" (excl. Oncorhynchus mykiss with heads and gills on, gutted, weighing more than 1,2 kg each, or with heads off, gilled and gutted, weighing more than 1 kg each)
+03031900	Frozen salmonidae (excl. trout and Pacific, Atlantic and Danube salmon)
+03032300	Frozen tilapia "Oreochromis spp."
+03032400	Frozen catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp."
+03032500	Frozen carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp."
+03032600	Frozen eels "Anguilla spp."
+03033110	Frozen lesser or Greenland halibut "Reinhardtius hippoglossoides"
+03033130	Frozen Atlantic halibut "Hippoglossus hippoglossus"
+03033190	Frozen Pacific halibut "Hippoglossus stenolepis"
+03033200	Frozen plaice "Pleuronectes platessa"
+03033300	Frozen sole "Solea spp."
+03033400	Frozen turbot "Psetta maxima"
+03033910	Frozen flounder "Platichthys flesus"
+03033930	Frozen fish of the genus Rhombosolea
+03033950	Frozen fish "Pelotreis flavilatus or Peltorhamphus novaezelandiae"
+03033985	Frozen flat fish "Pleuronectidae, Bothidae, Cynoglossidae, Soleidae, Scophthalmidae and Citharidae" (excl. halibut, plaice, sole, turbot, flounder, Rhombosolea spp., Pelotreis flavilatus and Peltorhamphus novaezelandiae)
+03034110	Frozen albacore or longfinned tunas "Thunnus alalunga" for industrial manufacture of products of 1604
+03034190	Frozen albacore or longfinned tunas "Thunnus alalunga" (excl. for industrial processing or preservation)
+03034220	Frozen yellowfin tuna "Thunnus albacares" for industrial manufacture of products of 1604
+03034290	Frozen yellowfin tunas "Thunnus albacares" (excl. for industrial manufacture of products of 1604)
+03034310	Frozen skipjack or stripe-bellied bonito "Euthynnus -Katsuwonus- pelamis" for industrial processing or preservation
+03034390	Frozen skipjack or stripe-bellied bonito "Euthynnus -Katsuwonus- pelamis" (excl. for industrial processing or preservation)
+03034410	Frozen bigeye tunas "Thunnus obesus" for industrial processing or preservation
+03034490	Frozen bigeye tunas "Thunnus obesus" (excl. for industrial processing or preservation)
+03034512	Frozen Atlantic bluefin tuna "Thunnus thynnus", for industrial processing or preservation
+03034518	Frozen Atlantic bluefin tuna "Thunnus thynnus" (excl. for industrial processing or preservation)
+03034591	Frozen Pacific bluefin tuna "Thunnus orientalis", for industrial processing or preservation
+03034599	Frozen Pacific bluefin tuna "Thunnus orientalis" (excl. for industrial processing or preservation)
+03034610	Frozen Southern bluefin tunas "Thunnus maccoyii" for industrial processing or preservation
+03034690	Frozen Southern bluefin tunas "Thunnus maccoyii" (excl. for industrial processing or preservation)
+03034920	Frozen tunas of the genus "Thunnus" for industrial processing or preservation (excl. Thunnus alalunga, Thunnus albacares, Thunnus obesus, Thunnus thynnus, Thunnus orientalis and Thunnus maccoyii)
+03034985	Frozen tunas of the genus "Thunnus" (excl. tunas for industrial processing or preservation and Thunnus alalunga, Thunnus albacares, Thunnus obesus, Thunnus thynnus, Thunnus orientalis and Thunnus maccoyii)
+03035100	Frozen herrings "Clupea harengus, Clupea pallasii"
+03035310	Frozen sardines "Sardina pilchardus"
+03035330	Frozen sardines "Sardinops spp." and sardinella "Sardinella spp."
+03035390	Frozen brisling or sprats "Sprattus sprattus"
+03035410	Frozen mackerel "Scomber scombrus, Scomber japonicus"
+03035490	Frozen mackerel "Scomber australasicus"
+03035510	Frozen Atlantic horse mackerel "Trachurus trachurus"
+03035530	Frozen Chilean jack mackerel "Trachurus murphyi"
+03035590	Frozen jack and horse mackerel "Trachurus spp." "(excl. Atlantic horse mackerel and Chilean jack mackerel)
+03035600	Frozen cobia "Rachycentron canadum"
+03035700	Frozen swordfish "Xiphias gladius"
+03035910	Frozen anchovies "Engraulis spp."
+03035921	Frozen Kawakawa "Euthynnus affinis" for industrial processing or preservation
+03035929	Frozen Kawakawa "Euthynnus affinis" (excl. for industrial processing or preservation)
+03035990	Frozen Indian mackerels "Rastrelliger spp.", seerfishes "Scomberomorus spp.", jacks, crevalles "Caranx spp.", silver pomfrets "Pampus spp.", Pacific saury "Cololabis saira", scads "Decapterus spp.", capelin "Mallotus villosus", bonitos "Sarda spp.", marlins, sailfishes and spearfish "Istiophoridae"
+03036310	Frozen cod "Gadus morhua"
+03036330	Frozen cod "Gadus ogac"
+03036390	Frozen cod "Gadus macrocephalus"
+03036400	Frozen haddock "Melanogrammus aeglefinus"
+03036500	Frozen coalfish "Pollachius virens"
+03036611	Frozen Cape hake "shallow-water hake" "Merluccius capensis" and deepwater hake "deepwater Cape hake" "Merluccius paradoxus"
+03036612	Frozen Argentine hake "Southwest Atlantic hake" "Merluccius hubbsi"
+03036613	Frozen southern hake "Merluccius australis"
+03036619	Frozen hake "Merluccius spp." (excl. cape hake, deepwater hake, Argentine hake and southern hake)
+03036690	Frozen hake "Urophycis spp."
+03036700	Frozen Alaska pollack "Theragra chalcogramma"
+03036810	Frozen blue whiting "Micromesistius poutassou"
+03036890	Frozen southern blue whiting "Micromesistius australis"
+03036910	Frozen fish of the species Boreogadus saida
+03036930	Frozen whiting "Merlangius merlangus"
+03036950	Frozen pollack "Pollachius pollachius"
+03036970	Frozen blue grenadier "Macruronus novaezelandiae"
+03036980	Frozen ling "Molva spp."
+03036990	Frozen fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. cod, haddock, coalfish, hake, Alaska pollack, blue whitings, Boreogadus saida, whiting, pollack, blue grenadier and ling)
+03038115	Frozen picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp."
+03038130	Frozen porbeagle shark "Lamna nasus"
+03038140	Frozen blue shark "Prionace glauca"
+03038190	Frozen dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03038200	Frozen rays and skates "Rajidae"
+03038300	Frozen toothfish "Dissostichus spp."
+03038410	Frozen European sea bass "Dicentrarchus labrax"
+03038490	Frozen sea bass "Dicentrarchus spp." (excl. European sea bass)
+03038921	Frozen fish of the genus Euthynnus, for industrial processing or preservation (excl. skipjack or stripe-bellied bonito and Kawakawa)
+03038929	Frozen fish of the genus Euthynnus (excl. skipjack or stripe-bellied bonito and Kawakawa, and fish for industrial processing or preservation)
+03038931	Frozen redfish "Sebastes marinus"
+03038939	Frozen redfish "Sebastes spp." (excl. Sebastes marinus)
+03038940	Frozen fish of the species Orcynopsis unicolor
+03038950	Frozen sea bream of the species Dentex dentex or Pagellus spp.
+03038955	Frozen gilt-head sea bream "Sparus aurata"
+03038960	Frozen ray's bream "Brama spp."
+03038965	Frozen monkfish "Lophius spp."
+03038970	Frozen pink cusk-eel "Genypterus blacodes"
+03038990	Frozen fish, n.e.s.
+03039110	Frozen hard and soft roes for the manufacture of deoxyribonucleic acid or protamine sulphate
+03039190	Frozen fish livers, roes and milt (excl. hard and soft roes for the manufacture of deoxyribonucleic acid or protamine sulphate)
+03039200	Frozen shark fins
+03039900	Frozen fish fins, heads, tails, maws and other edible fish offal (excl. livers, roes, milt and shark fins)
+03043100	Fresh or chilled fillets of tilapia "Oreochromis spp."
+03043200	Fresh or chilled fillets of catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp."
+03043900	Fresh or chilled fillets of carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp." and snakeheads "Channa spp."
+03044100	Fresh or chilled fillets of Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus", Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho"
+03044250	Fresh or chilled fillets of trout "Oncorhynchus apache and Oncorhynchus chrysogaster"
+03044290	Fresh or chilled fillets of trout "Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita and Oncorhynchus gilae" (excl. of Oncorhynchus mykiss weighing > 400 g each)
+03044300	Fresh or chilled fillets of flat fish "Pleuronectidae, Bothidae, Cynoglossidae, Soleidae, Scophthalmidae and Citharidae"
+03044410	Fresh or chilled fillets of cod "Gadus morhua, Gadus ogac, Gadus macrocephalus" and of Boreogadus saida
+03044430	Fresh or chilled fillets of coalfish "Pollachius virens"
+03044490	Fresh or chilled fillets of fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. cod, coalfish and Boreogadus saida)
+03044500	Fresh or chilled fillets of swordfish "Xiphias gladius"
+03044600	Fresh or chilled fillets of toothfish "Dissostichus spp."
+03044710	Fresh or chilled fillets of picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp."
+03044720	Fresh or chilled fillets of porbeagle shark "Lamna nasus"
+03044730	Fresh or chilled fillets of blue shark "Prionace glauca"
+03044790	Fresh or chilled fillets of dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03044800	Fresh or chilled fillets of rays and skates "Rajidae"
+03044950	Fresh or chilled fillets of redfish "Sebastes spp."
+03044990	Fresh or chilled fillets of fish, n.e.s.
+03045100	Fresh or chilled meat, whether or not minced, of tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp.", Nile perch "Lates niloticus" and snakeheads "Channa spp." (excl. fillets)
+03045200	Fresh or chilled meat, whether or not minced, of salmonidae (excl. fillets)
+03045300	Fresh or chilled meat, whether or not minced, of fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. fillets)
+03045400	Fresh or chilled meat, whether or not minced, of swordfish "Xiphias gladius" (excl. fillets)
+03045500	Fresh or chilled meat, whether or not minced, of toothfish "Dissostichus spp." (excl. fillets)
+03045610	Fresh or chilled meat, whether or not minced, of picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp." (excl. fillets)
+03045620	Fresh or chilled meat, whether or not minced, of porbeagle shark "Lamna nasus" (excl. fillets)
+03045630	Fresh or chilled meat, whether or not minced, of blue shark "Prionace glauca" (excl. fillets)
+03045690	Fresh or chilled meat, whether or not minced, of dogfish and other sharks (excl. fillets, picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03045700	Fresh or chilled meat, whether or not minced, of rays and skates "Rajidae" (excl. fillets)
+03045950	Fresh or chilled flaps of herring
+03046100	Frozen fillets of tilapia "Oreochromis spp."
+03046200	Frozen fillets of catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp."
+03046900	Frozen fillets of carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp." and snakeheads "Channa spp."
+03047110	Frozen fillets of cod "Gadus macrocephalus"
+03047190	Frozen fillets of cod "Gadus morhua, Gadus ogac"
+03047200	Frozen fillets of haddock "Melanogrammus aeglefinus"
+03047300	Frozen fillets of coalfish "Pollachius virens"
+03047411	Frozen fillets of Cape hake "shallow-water hake" "Merluccius capensis" and deepwater hake "deepwater Cape hake" "Merluccius paradoxus"
+03047415	Frozen fillets of Argentine hake "Southwest Atlantic hake" "Merluccius hubbsi"
+03047419	Frozen fillets of hake "Merluccius spp." (excl. cape hake, deepwater hake and Argentine hake)
+03047490	Frozen fillets of hake "Urophycis spp."
+03047500	Frozen fillets of Alaska pollack "Theragra chalcogramma"
+03047910	Frozen fillets of Boreogadus saida
+03047930	Frozen fillets of whiting "Merlangius merlangus"
+03047950	Frozen fillets of blue grenadier "Macruronus novaezelandiae"
+03047980	Frozen fillets of ling "Molva spp."
+03047990	Frozen fillets of fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. cod, haddock, coalfish, hake, Alaska pollack, Boreogadus saida, whiting, blue grenadier and ling)
+03048100	Frozen fillets of Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus", Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho"
+03048250	Frozen fillets of trout "Oncorhynchus apache and Oncorhynchus chrysogaster"
+03048290	Frozen fillets of trout "Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita and Oncorhynchus gilae" (excl. of Oncorhynchus mykiss weighing > 400 g each)
+03048310	Frozen fillets of plaice "Pleuronectes platessa"
+03048330	Frozen fillets of flounder "Platichthys flesus"
+03048350	Frozen fillets of megrim "Lepidorhombus spp."
+03048390	Frozen fillets of flat fish "Pleuronectidae, Bothidae, Cynoglossidae, Soleidae, Scophthalmidae and Citharidae" (excl. plaice, flounder and megrim)
+03048400	Frozen fillets of swordfish "Xiphias gladius"
+03048500	Frozen fillets of toothfish "Dissostichus spp."
+03048600	Frozen fillets of herring "Clupea harengus, Clupea pallasii"
+03048700	Frozen fillets of tuna "of the genus Thunnus", skipjack or stripe-bellied bonito "Euthynnus [Katsuwonus] pelamis"
+03048811	Frozen fillets of picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp."
+03048815	Frozen fillets of porbeagle shark "Lamna nasus"
+03048818	Frozen fillets of blue shark "Prionace glauca"
+03048819	Frozen fillets of dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03048890	Frozen fillets of rays and skates "Rajidae"
+03048921	Frozen fillets of redfish "Sebastes marinus"
+03048929	Frozen fillets of redfish "Sebastes spp." (excl. Sebastes marinus)
+03048930	Frozen fillets of fish of the genus Euthynnus (excl. skipjack or stripe-bellied bonito)
+03048941	Frozen fillets of mackerel "Scomber australasicus"
+03048949	Frozen fillets of mackerel "Scomber scombrus, Scomber japonicus" and fish of the species Orcynopsis unicolor
+03048960	Frozen fillets of monkfish "Lophius spp."
+03048990	Frozen fish fillets, n.e.s.
+03049100	Frozen meat, whether or not minced, of swordfish "Xiphias gladius" (excl. fillets)
+03049200	Frozen meat, whether or not minced, of toothfish "Dissostichus spp." (excl. fillets)
+03049310	Frozen surimi of tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp.", Nile perch "Lates niloticus" or snakeheads "Channa spp."
+03049390	Frozen meat, whether or not minced, of tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp.", Nile perch "Lates niloticus" and snakeheads "Channa spp." (excl. fillets and surimi)
+03049410	Frozen surimi of Alaska pollack "Theragra chalcogramma"
+03049490	Frozen meat, whether or not minced, of Alaska pollack "Theragra chalcogramma" (excl. fillets and surimi)
+03049510	Frozen surimi of fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. Alaska pollack "Theragra chalcogramma")
+03049521	Frozen meat, whether or not minced, of cod "Gadus macrocephalus" (excl. fillets and surimi)
+03049525	Frozen meat, whether or not minced, of cod "Gadus morhua" (excl. fillets and surimi)
+03049529	Frozen meat, whether or not minced, of cod "Gadus ogac" and of fish of the species Boreogadus saida (excl. fillets and surimi)
+03049530	Frozen meat, whether or not minced, of haddock "Melanogrammus aeglefinus" (excl. fillets and surimi)
+03049540	Frozen meat, whether or not minced, of coalfish "Pollachius virens" (excl. fillets and surimi)
+03049550	Frozen meat, whether or not minced, of hake "Merluccius spp." (excl. fillets and surimi)
+03049560	Frozen meat, whether or not minced, of blue whiting "Micromesistius poutassou" (excl. fillets and surimi)
+03049590	Frozen meat, whether or not minced, of fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. fillets, surimi, Alaska pollack "Theragra chalcogramma", cod, haddock, coalfish, hake "Merluccius spp." and blue whiting)
+03049610	Frozen meat, whether or not minced, of picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp."
+03049620	Frozen meat, whether or not minced, of porbeagle shark "Lamna nasus"
+03049630	Frozen meat, whether or not minced, of blue shark "Prionace glauca"
+03049690	Frozen meat, whether or not minced, of dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03049700	Frozen meat, whether or not minced, of rays and skates "Rajidae"
+03049910	Frozen surimi of fish n.e.s.
+03049923	Frozen meat "whether or not minced" of herring "Clupea harengus, Clupea pallasii" (excl. fillets)
+03049929	Frozen meat "whether or not minced" of redfish "Sebastes spp." (excl. fillets)
+03049955	Frozen meat "whether or not minced" of megrim (excl. fillets)
+03049961	Frozen meat "whether or not minced" of Ray's bream "Brama spp." (excl. fillets)
+03049965	Frozen meat "whether or not minced" of monkfish "Lophius spp." (excl. fillets)
+03049999	Frozen meat of saltwater fish n.e.s. (excl. fillets and surimi)
+03052000	Fish livers, roes and milt, dried, smoked, salted or in brine
+03053100	Fillets, dried, salted or in brine, but not smoked, of tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp.", Nile perch "Lates niloticus" and snakeheads "Channa spp."
+03053211	Fillets, dried, salted or in brine, but not smoked, of cod "Gadus macrocephalus"
+03053219	Fillets, dried, salted or in brine, but not smoked, of cod "Gadus morhua, Gadus ogac" and of fish of the species Boreogadus saida
+03053290	Fillets, dried, salted or in brine, but not smoked, of fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. cod and Boreogadus saida)
+03053910	Fillets of Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus", Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho", salted or in brine, but not smoked
+03053950	Fillets of lesser or Greenland halibut "Reinhardtius hippoglossoides", salted or in brine, but not smoked
+03053990	Fillets of fish, dried, salted or in brine, but not smoked (excl. tilapia, catfish, carp, eels, Nile perch, snakeheads, fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae, and fish fillets, salted or in brine of Pacific salmon, Atlantic salmon, Danube salmon and lesser or Greenland halibut)
+03054100	Smoked Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus", Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho", incl. fillets (excl. offal)
+03054200	Smoked herring "Clupea harengus, Clupea pallasii", incl. fillets (excl. offal)
+03054300	Smoked trout "Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita, Oncorhynchus gilae, Oncorhynchus apache and Oncorhynchus chrysogaster", incl. fillets (excl. offal)
+03054410	Smoked eels "Anguilla spp.", incl. fillets (excl. offal)
+03054490	Smoked tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", Nile perch "Lates niloticus" and snakeheads "Channa spp.", incl. fillets (excl. offal)
+03054910	Smoked lesser or Greenland halibut "Reinhardtius hippoglossoides", incl. fillets (excl. offal)
+03054920	Smoked Atlantic halibut "Hippoglossus hippoglossus", incl. fillets (excl. offal)
+03054930	Smoked mackerel "Scomber scombrus, Scomber australasicus, Scomber japonicus", incl. fillets (excl. offal)
+03054980	Smoked fish, incl. fillets (excl. offal, Pacific salmon, Atlantic salmon, Danube salmon, herring, lesser or Greenland halibut, Atlantic halibut, mackerel, trout, tilapia, catfish, carp, eels, Nile perch and snakeheads)
+03055110	Cod "Gadus morhua, Gadus ogac, Gadus macrocephalus", dried, unsalted, not smoked stockfish (excl. fillets and offal)
+03055190	Cod "Gadus morhua, Gadus ogac, Gadus macrocephalus", dried, salted, not smoked clipfish (excl. fillets and offal)
+03055200	Dried tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp.", Nile perch "Lates niloticus" and snakeheads "Channa spp.", even salted but not smoked (excl. fillets and offal)
+03055310	Dried polar cod "Boreogadus saida", even salted but not smoked (excl. fillets and offal)
+03055390	Dried fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae, even salted but not smoked (excl. fillets, offal, cod "Gadus morhua, Gadus ogac, Gadus macrocephalus" and polar cod "Boreogadus saida")
+03055430	Dried herrings "Clupea harengus, Clupea pallasii", even salted but not smoked (excl. fillets and offal)
+03055450	Dried anchovies "Engraulis spp.", even salted but not smoked (excl. fillets and offal)
+03055490	Dried sardines "Sardina pilchardus, Sardinops spp.", sardinella "Sardinella spp.", brisling or sprats "Sprattus sprattus", mackerel "Scomber scombrus, Scomber australasicus, Scomber japonicus", Indian mackerels "Rastrelliger spp.", seerfishes "Scomberomorus spp.", jack and horse mackerel "Trachurus spp.", jacks, crevalles "Caranx spp.", cobia "Rachycentron canadum", silver pomfrets "Pampus spp.", Pacific saury "Cololabis saira", scads "Decapterus spp.", capelin "Mallotus villosus", swordfish "Xiphias gladius", Kawakawa "Euthynnus affinis", bonitos "Sarda spp.", marlins, sailfishes and spearfish "Istiophoridae", even salted but not smoked (excl. fillets and offal)
+03055970	Atlantic Halibut "Hippoglossus Hippoglossus", dried, even salted, not smoked (excl. fillets and offal)
+03055985	Fish, dried, even salted but not smoked, n.e.s. (excl. fillets and offal)
+03056100	Herring (Clupea harengus, Clupea pallasii), only salted or in brine (excl. fillets and offal)
+03056200	Cod "Gadus morhua, Gadus ogac, Gadus macrocephalus", salted or in brine only (excl. fillets and offal)
+03056300	Anchovies "Engraulis spp.", salted or in brine only (excl. fillets and offal)
+03056400	Tilapia "Oreochromis spp.", catfish "Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.", carp "Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.", eels "Anguilla spp.", Nile perch "Lates niloticus" and snakeheads "Channa spp.", salted or in brine only (excl. fillets and offal)
+03056910	Fish of the species Boreogadus saida, salted or in brine only (excl. fillets and offal)
+03056930	Atlantic halibut "Hippoglossus hippoglossus", salted or in brine only (excl. fillets and offal)
+03056950	Pacific salmon "Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou and Oncorhynchus rhodurus", Atlantic salmon "Salmo salar" and Danube salmon "Hucho hucho", only salted or in brine (excl. fillets and offal)
+03056980	Fish, only salted or in brine (excl. herring, cod, anchovies, tilapia, catfish, carp, eels, Nile perch, snakeheads, Boreogadus saida, Atlantic halibut, Pacific salmon, Atlantic salmon, Danube salmon and fillets and offal)
+03057100	Shark fins, smoked, dried, salted or in brine
+03057200	Fish heads, tails and maws, smoked, dried, salted or in brine
+03057900	Fish fins and other edible fish offal, smoked, dried, salted or in brine (excl. heads, tails, maws and shark fins)
+03061110	Frozen crawfish tails "Palinurus spp., Panulirus spp., Jasus spp.", even smoked, whether in shell or not, incl. crawfish tails in their shell, cooked by steaming or by boiling in water
+03061190	Frozen rock lobster and other sea crawfish "Palinurus spp., Panulirus spp. and Jasus spp.", even smoked, whether in shell or not, incl. ones in shell, cooked by steaming or by boiling in water (excl. crawfish tails)
+03061210	Frozen lobsters "Homarus spp.", whole, even smoked or cooked by steaming or by boiling in water
+03061290	Frozen lobsters "Homarus spp.", even smoked, whether in shell or not, incl. lobsters in shell, cooked by steaming or by boiling in water (excl. whole)
+03061410	Frozen crabs "Paralithodes camchaticus, Chionoecetes spp. and Callinectes sapidus", even smoked, whether in shell or not, incl. crabs in shell, cooked by steaming or by boiling in water
+03061430	Frozen crabs "Cancer pagurus", even smoked, whether in shell or not, incl. crabs in shell, cooked by steaming or by boiling in water
+03061490	Frozen crabs, even smoked, whether in shell or not, incl. crabs in shell, cooked by steaming or by boiling in water (excl. "Paralithodes camchaticus", "Chionoecetes spp.", "Callinectes sapidus" and "Cancer pagurus")
+03061500	Frozen Norway lobsters "Nephrops norvegicus", even smoked, whether in shell or not, incl. lobsters in shell, cooked by steaming or by boiling in water
+03061691	Frozen cold-water shrimps "Crangon crangon", even smoked, whether in shell or not, incl. shrimps in shell, cooked by steaming or by boiling in water
+03061699	Frozen cold-water shrimps and prawns "Pandalus spp.", even smoked, whether in shell or not, incl. shrimps and prawns in shell, cooked by steaming or by boiling in water
+03061791	Frozen deepwater rose shrimps "Parapenaeus longirostris", even smoked, whether in shell or not, incl. shrimps in shell, cooked by steaming or by boiling in water
+03061792	Frozen shrimps of the genus "Penaeus", even smoked, whether in shell or not, incl. shrimps in shell, cooked by steaming or by boiling in water
+03061793	Frozen shrimps of the family Pandalidae, even smoked, whether in shell or not, incl. shrimps in shell, cooked by steaming or by boiling in water (excl. Pandalus)
+03061794	Frozen shrimps of the genus Crangon, even smoked, whether in shell or not, incl. shrimps in shell, cooked by steaming or by boiling in water (excl. "Crangon crangon")
+03061799	Frozen shrimps and prawns, even smoked, whether in shell or not, incl. shrimps and prawns in shell, cooked by steaming or by boiling in water (excl. "Pandalidae", "Crangon", deepwater rose shrimps "Parapenaeus longirostris" and "Penaeus")
+03061990	Frozen crustaceans, fit for human consumption, even smoked, whether in shell or not, incl. crustaceans in shell, cooked by steaming or by boiling in water (excl. rock lobster and other sea crawfish, lobsters, shrimps, prawns, crabs, freshwater crayfish and Norway lobsters "Nephrops norvegicus")
+03063100	Rock lobster and other sea crawfish "Palinurus spp., Panulirus spp. and Jasus spp.", whether in shell or not, live, fresh or chilled
+03063210	Live lobsters "Homarus spp."
+03063291	Whole lobsters "Homarus spp.", fresh or chilled
+03063299	Parts of lobsters "Homarus spp.", fresh or chilled, whether in shell or not
+03063310	Crabs "Cancer pagurus", whether in shell or not, live, fresh or chilled
+03063390	Crabs, whether in shell or not, live, fresh or chilled (excl. "Cancer pagurus")
+03063400	Norway lobsters "Nephrops norvegicus", whether in shell or not, live, fresh or chilled
+03063510	Shrimps "Crangon crangon", whether in shell or not, fresh or chilled
+03063550	Live shrimps "Crangon crangon"
+03063590	Cold-water shrimps and prawns "Pandalus spp.", whether in shell or not, live, fresh or chilled
+03063610	Shrimps of the family Pandalidae, whether in shell or not, live, fresh or chilled (excl. "Pandalus spp.")
+03063650	Shrimps of the genus Crangon, whether in shell or not, live, fresh or chilled (excl. "Crangon crangon")
+03063690	Shrimps and prawns, whether in shell or not, live, fresh or chilled (excl. "Pandalidae" and "Crangon")
+03063990	Crustaceans, fit for human consumption, whether in shell or not, live, fresh or chilled (excl. rock lobster and other sea crawfish, lobsters, crabs, Norway lobsters, shrimps, prawns and freshwater crayfish)
+03069100	Rock lobster and other sea crawfish "Palinurus spp., Panulirus spp. and Jasus spp.", whether in shell or not, dried, salted, smoked or in brine, incl. in shell, cooked by steaming or by boiling in water
+03069210	Whole lobsters "Homarus spp.", dried, salted, smoked or in brine, incl. lobsters in shell, cooked by steaming or by boiling in water
+03069290	Parts of lobsters "Homarus spp.", whether in shell or not, dried, salted, smoked or in brine, incl. parts in shell, cooked by steaming or by boiling in water
+03069310	Crabs "Cancer pagurus", whether in shell or not, dried, salted, smoked or in brine, incl. crabs in shell, cooked by steaming or by boiling in water
+03069390	Crabs, whether in shell or not, dried, salted, smoked or in brine, incl. crabs in shell, cooked by steaming or by boiling in water (excl. "Cancer pagurus")
+03069400	Norway lobsters "Nephrops norvegicus", whether in shell or not, dried, salted, smoked or in brine, incl. lobsters in shell, cooked by steaming or by boiling in water
+03069511	Shrimps "Crangon crangon", whether in shell or not, dried, salted, smoked or in brine, cooked by steaming or by boiling in water
+03069519	Shrimps "Crangon crangon", whether in shell or not, dried, salted, smoked or in brine (excl. cooked by steaming or by boiling in water)
+03069520	Shrimps and prawns "Pandalus spp.", whether in shell or not, dried, salted, smoked or in brine, incl. ones in shell, cooked by steaming or by boiling in water
+03069530	Shrimps of the family Pandalidae, whether in shell or not, dried, salted, smoked or in brine, incl. shrimps in shell, cooked by steaming or by boiling in water (excl. "Pandalus spp.")
+03069540	Shrimps of the genus Crangon, whether in shell or not, dried, salted, smoked or in brine, incl. shrimps in shell, cooked by steaming or by boiling in water (excl. "Crangon crangon")
+03069590	Shrimps and prawns, whether in shell or not, dried, salted, smoked or in brine, incl. ones in shell, cooked by steaming or by boiling in water (excl. "Pandalidae" and "Crangon")
+03069990	Crustaceans, fit for human consumption, whether in shell or not, dried, salted, smoked or in brine, incl. crustaceans in shell, cooked by steaming or by boiling in water (excl. rock lobster and other sea crawfish, lobsters, crabs, Norway lobsters, shrimps, prawns and freshwater crayfish)
+03071110	Live flat oysters "Ostrea" weighing "incl. shell" <= 40 g
+03071190	Oysters, even in shell, live, fresh or chilled (excl. live flat oysters "Ostrea" weighing "incl. shell" <= 40 g)
+03071200	Oysters, even in shell, frozen
+03071900	Oysters, even in shell, smoked, dried, salted or in brine
+03072110	Live, fresh or chilled, scallops, incl. queen scallops,of the genera Pecten, Chlamys or Placopecten, even in shell
+03072190	Live, fresh or chilled, scallops and other molluscs of the family Pectinidae, even in shell (excl. genera Pecten, Chlamys and Placopecten)
+03072210	Coquilles St Jacques "Pecten maximus", frozen, even in shell
+03072290	Scallops, incl. queen scallops, of the genera Pecten, Chlamys or Placopecten, frozen, even in shell (excl. Coquilles St Jacques "Pecten maximus")
+03072295	Scallops and other molluscs of the family Pectinidae, frozen, even in shell (excl. genera Pecten, Chlamys and Placopecten)
+03072910	Scallops, incl. queen scallops, of the genera Pecten, Chlamys or Placopecten, smoked, dried, salted or in brine, even in shell
+03072990	Scallops and other molluscs of the family Pectinidae, smoked, dried, salted or in brine, even in shell (excl. genera Pecten, Chlamys and Placopecten)
+03073110	Mussels "Mytilus spp.", live, fresh or chilled, with or without shell
+03073190	Mussels "Perna spp.", live, fresh or chilled, with or without shell
+03073210	Mussels "Mytilus spp.", frozen, even in shell
+03073290	Mussels "Perna spp.", frozen, even in shell
+03073920	Mussels "Mytilus spp.", smoked, dried, salted or in brine, even in shell
+03073980	Mussels "Perna spp.", smoked, dried, salted or in brine, even in shell
+03074210	Cuttle fish "Sepia officinalis, Rossia macrosoma, Sepiola spp.", live, fresh or chilled, with or without shell
+03074220	Squid "Loligo spp.", live, fresh or chilled
+03074230	Squid "Ommastrephes spp., Nototodarus spp., Sepioteuthis spp.", live, fresh or chilled
+03074240	European flying squid "Todarodes sagittatus", live, fresh or chilled
+03074290	Cuttle fish and squid, live, fresh or chilled, with or without shell (excl. "Sepia officinalis, Rossia macrosoma, Sepiola spp., Loligo spp., Ommastrephes spp., Nototodarus spp., Sepioteuthis spp., Todarodes sagittatus")
+03074321	Lesser cuttle fish "Sepiola rondeleti", frozen, with or without shell
+03074325	Cuttle fish "Sepiola spp.", frozen, with or without shell (excl. "Sepiola rondeleti")
+03074329	Cuttle fish "Sepia officinalis, Rossia macrosoma", frozen, with or without shell
+03074331	Squid "Loligo vulgaris", frozen
+03074333	Squid "Loligo pealei", frozen
+03074335	Squid "Loligo gahi", frozen
+03074338	Squid "Loligo spp.", frozen (excl. "Loligo vulgaris, pealei and gahi")
+03074391	Squid "Ommastrephes spp., Nototodarus spp., Sepioteuthis spp.", frozen (excl. "Ommastrephes sagittatus")
+03074392	Squid "Illex spp.", frozen
+03074395	European flying squid "Todarodes sagittatus, Ommastrephes sagittatus", frozen
+03074399	Cuttle fish and squid, frozen, with or without shell (excl. "Sepia officinalis, Rossia macrosoma, Sepiola spp., Loligo spp., Ommastrephes spp., Nototodarus spp., Sepioteuthis spp., Illex spp., Todarodes sagittatus")
+03074920	Cuttle fish "Sepia officinalis, Rossia macrosoma, Sepiola spp.", smoked, dried, salted or in brine, with or without shell
+03074940	Squid "Loligo spp.", smoked, dried, salted or in brine
+03074950	Squid "Ommastrephes spp., Nototodarus spp., Sepioteuthis spp.", smoked, dried, salted or in brine (excl. "Ommastrephes sagittatus")
+03074960	European flying squid "Todarodes sagittatus, Ommastrephes sagittatus", smoked, dried, salted or in brine
+03074980	Cuttle fish and squid, smoked, dried, salted or in brine, with or without shell (excl. "Sepia officinalis, Rossia macrosoma, Sepiola spp., Loligo spp., Ommastrephes spp., Nototodarus spp., Sepioteuthis spp., Todarodes sagittatus")
+03075100	Octopus "Octopus spp.", live, fresh or chilled
+03075200	Octopus "Octopus spp.", frozen
+03075900	Octopus "Octopus spp.", smoked, dried, salted or in brine
+03077100	Live, fresh or chilled, even in shell, clams, cockles and ark shells "families Arcidae, Arcticidae, Cardiidae, Donacidae, Hiatellidae, Mactridae, Mesodesmatidae, Myidae, Semelidae, Solecurtidae, Solenidae, Tridacnidae and Veneridae"
+03077210	Striped venus or other "Veneridae", even in shell, frozen
+03077290	Frozen, even in shell, clams, cockles and ark shells "families Arcidae, Arcticidae, Cardiidae, Donacidae, Hiatellidae, Mactridae, Mesodesmatidae, Myidae, Semelidae, Solecurtidae, Solenidae, Tridacnidae"
+03077900	Smoked, dried, salted or in brine, even in shell, clams, cockles and ark shells "families Arcidae, Arcticidae, Cardiidae, Donacidae, Hiatellidae, Mactridae, Mesodesmatidae, Myidae, Semelidae, Solecurtidae, Solenidae, Tridacnidae and Veneridae"
+03078100	Live, fresh or chilled, even in shell, abalone "Haliotis spp."
+03078200	Live, fresh or chilled, even in shell, stromboid conchs "Strombus spp."
+03078300	Frozen, even in shell, abalone "Haliotis spp."
+03078400	Frozen, even in shell, stromboid conchs "Strombus spp."
+03078700	Smoked, dried, salted or in brine, even in shell, abalone "Haliotis spp."
+03078800	Smoked, dried, salted or in brine, even in shell, stromboid conchs "Strombus spp."
+03079100	Live, fresh or chilled molluscs, even in shell (excl. oysters, scallops of the genera Pecten, Chlamys or Placopecten, mussels "Mytilus spp., Perna spp.", cuttle fish and squid, octopus "Octopus spp.", snails other than sea snails, clams, cockles and ark shells, abalone and stromboid conchs)
+03079200	Molluscs, even in shell, frozen (excl. oysters, scallops of the genera Pecten, Chlamys or Placopecten, mussels "Mytilus spp., Perna spp.", cuttle fish and squid, octopus "Octopus spp.", snails other than sea snails, clams, cockles and ark shells, abalone and stromboid conchs)
+03079900	Molluscs, even in shell, smoked, dried, salted or in brine (excl. oysters, scallops of the genera Pecten, Chlamys or Placopecten, mussels "Mytilus spp., Perna spp.", cuttle fish and squid, octopus "Octopus spp.", snails other than sea snails, clams, cockles and ark shells, abalone and stromboid conchs)
+03081100	Live, fresh or chilled, sea cucumbers "Stichopus japonicus, Holothurioidea"
+03081200	Frozen sea cucumbers "Stichopus japonicus, Holothuroidea"
+03081900	Smoked, dried, salted or in brine, sea cucumbers "Stichopus japonicus, Holothuroidea"
+03082100	Live, fresh or chilled, sea urchins "Strongylocentrotus spp., Paracentrotus lividus, Loxechinus albus, Echichinus esculentus"
+03082200	Frozen sea urchins "Strongylocentrotus spp., Paracentrotus lividus, Loxechinus albus, Echinus esculentus"
+03082900	Smoked, dried, salted or in brine, sea urchins "Strongylocentrotus spp., Paracentrotus lividus, Loxechinus albus, Echinus esculentus"
+03083050	Frozen jellyfish "Rhopilema spp." (excl. smoked)
+03083080	Live, fresh, chilled, smoked, dried, salted or in brine, jellyfish "Rhopilema spp."
+03089010	Live, fresh or chilled, aquatic invertebrates (excl. crustaceans, molluscs, sea cucumbers, sea urchins and jellyfish); all fresh or chilled flours, meals and pellets of aquatic invertebrates other than crustaceans and molluscs, fit for human consumption
+03089050	Frozen aquatic invertebrates (excl. crustaceans, molluscs, sea cucumbers, sea urchins and jellyfish); all frozen flours, meals and pellets of aquatic invertebrates other than crustaceans and molluscs, fit for human consumption
+03089090	Smoked, dried, salted or in brine, aquatic invertebrates (excl. crustaceans, molluscs, sea cucumbers, sea urchins and jellyfish)
+16041100	Prepared or preserved salmon, whole or in pieces (excl. minced)
+16041210	Fillets of herring, raw, merely coated with butter or breadcrumbs, whether or not pre-fried in oil, frozen
+16041291	Herrings, prepared or preserved, whole or in pieces, in airtight containers (excl. minced herrings and herring fillets, raw, merely coated with batter or breadcrumbs, whether or not pre-fried in oil, frozen)
+16041299	Herrings, prepared or preserved, whole or in pieces (excl. minced herrings and herring fillets, raw, merely coated with batter or breadcrumbs, whether or not pre-fried in oil, frozen and in airtight containers)
+16041311	Sardines, prepared or preserved, whole or in pieces, in olive oil (excl. minced sardines)
+16041319	Sardines, prepared or preserved, whole or in pieces (excl. minced sardines and sardines in olive oil)
+16041390	Prepared or preserved sardinella, brisling or sprats, whole or in pieces (excl. minced)
+16041421	Prepared or preserved skipjack, whole or in pieces, in vegetable oil (excl. minced)
+16041426	Fillets known as "loins" of skipjack, prepared or preserved, whole or in pieces (excl. such products in vegetable oil or minced)
+16041428	Prepared or preserved skipjack, whole or in pieces (excl. minced, fillets known as "loins" and such products in vegetable oil)
+16041431	Prepared or preserved Yellowfin tuna "Thunnus albacares", whole or in pieces, in vegetable oil (excl. minced)
+16041436	Fillets known as "loins" of Yellowfin tuna "Thunnus albacares", prepared or preserved, whole or in pieces (excl. such products in vegetable oil or minced)
+16041438	Prepared or preserved Yellowfin tuna "Thunnus albacares", whole or in pieces (excl. minced, fillets known as "loins" and such products in vegetable oil)
+16041441	Prepared or preserved tunas, whole or in pieces, in vegetable oil (excl. minced, skipjack and Yellowfin tuna "Thunnus albacares")
+16041446	Fillets known as "loins" of tuna, prepared or preserved, whole or in pieces (excl. such products in vegetable oil or minced, skipjack and Yellowfin tuna "Thunnus albacares")
+16041448	Prepared or preserved tuna, whole or in pieces (excl. minced, fillets known as "loins" and such products in vegetable oil, skipjack and Yellowfin tuna "Thunnus albacares")
+16041490	Prepared or preserved bonito "sarda spp.", whole or in pieces (excl. minced)
+16041511	Fillets of mackerel of the species Scomber scombrus and Scomber japonicus, prepared or preserved
+16041519	Mackerel of the species Scomber scombrus and Scomber japonicus, prepared or preserved, whole or in pieces (excl. minced mackerel and fillets of mackerel)
+16041590	Prepared or preserved mackerel of species Scomber australasicus, whole or in pieces (excl. minced)
+16041600	Prepared or preserved anchovies, whole or in pieces (excl. minced)
+16041700	Prepared or preserved eels, whole or in pieces (excl. minced)
+16041800	Prepared or preserved shark fins, whole or in pieces (excl. minced)
+16041910	Prepared or preserved salmonidae, whole or in pieces (excl. salmon and minced)
+16041931	Fillets known as "loins" of fish of the genus "Euthynnus" prepared or preserved (excl. of skipjack [Euthynnus Katsuwonus pelamis])
+16041939	Prepared or preserved fish of the genus "Euthynnus", whole or in pieces (excl. minced, fillets known as "loins" and of skipjack [Euthynnus Katsuwonus pelamis])
+16041950	Prepared or preserved fish of species Orcynopsis unicolor, whole or in pieces (excl. minced)
+16041991	Frozen raw fish fillets, coated with batter or breadcrumbs, whether or not pre-fried in oil (excl. salmonidae, herrings, sardines, sardinella, brisling or sprats, tunas, skipjack and Atlantic bonito, bonito "sarda spp.", mackerel, anchovies, fish of species Euthynnus and fish of species Orcynopsis unicolor)
+16041992	Cod of the species Gadus morhua, Gadus ogac, Gadus macrocephalus, prepared or preserved, whole or in pieces (excl. finely minced and fillets, raw, merely coated with batter or breadcrumbs, whether or not pre-fried in oil, frozen)
+16041993	Coalfish "Pollachius virens", prepared or preserved, whole or in pieces (excl. finely minced and fillets, raw, merely coated with batter or breadcrumbs, whether or not pre-fried in oil, frozen)
+16041994	Hake "Merluccius spp., Urophycis spp.", prepared or preserved, whole or in pieces (excl. finely minced and fillets, raw, merely coated with batter or breadcrumbs, whether or not pre-fried in oil, frozen)
+16041995	Alaska pollock "Theragra chalcogramma" and pollack "Pollachius pollachius", prepared or preserved, whole or in pieces (excl. finely minced and fillets, raw, merely coated with batter or breadcrumbs, whether or not pre-fried in oil, frozen)
+16041997	Fish, prepared or preserved, whole or in pieces (excl. minced, merely smoked, and salmonidae, herrings, sardines, sardinella, anchovies, brisling, sprats, tunas, bonito "Sarda spp.", mackerel, eels, shark fins, Euthynnus spp., Orcynopsis unicolor, cod, coalfish, hake, Alaska pollock and pollack; fillets, raw, merely coated with batter or breadcrumbs, even pre-fried in oil, frozen)
+16042005	Preparations of surimi
+16042010	Prepared or preserved salmon (excl. whole or in pieces)
+16042030	Prepared or preserved salmonidae (excl. salmon and whole or in pieces)
+16042040	Prepared or preserved anchovies (excl. whole or in pieces)
+16042050	Prepared or preserved sardines, bonito, mackerel of species Scomber scombrus and japonicus and fish of species Orcynopsis unicolor (excl. whole or in pieces)
+16042070	Prepared or preserved tunas, skipjack or other fish of genus Euthynnus (excl. whole or in pieces)
+16042090	Fish, prepared or preserved (excl. fish whole or in pieces, preparations of surimi and salmonidae, anchovies, sardines, bonito, mackerel of the species Scomber scombrus and of the species Scomber japonicus and fish of the species Orcynopsis unicolor, tunas, skipjack and other fish of the species Euthynnus)
+16043100	Caviar
+16043200	Caviar substitutes prepared from fish eggs
+16051000	Crab, prepared or preserved (excl. smoked)
+16052110	Shrimps and prawns, prepared or preserved, in immediate packings of a net content of <= 2 kg (excl. merely smoked, and in airtight containers)
+16052190	Shrimps and prawns, prepared or preserved, in immediate packings of a net content of > 2 kg (excl. merely smoked, and in airtight containers)
+16052900	Shrimps and prawns, prepared or preserved, in airtight containers (excl. smoked)
+16053010	Lobster meat, cooked, for the manufacture of lobster butter or of lobster pastes, pates, soups or sauces
+16053090	Lobster, prepared or preserved (excl. merely smoked; lobster meat, cooked, for the manufacture of lobster butter or of lobster pastes, pates, soups or sauces)
+16054000	Crustaceans, prepared or preserved (excl. smoked, crabs, shrimps, prawns and lobster)
+16055100	Oysters, prepared or preserved (excl. smoked)
+16055200	Scallops, incl. queen scallops, prepared or preserved (excl. smoked)
+16055310	Mussels, prepared or preserved, in airtight containers (excl. merely smoked)
+16055390	Mussels, prepared or preserved (excl. in airtight containers, and merely smoked)
+16055400	Cuttlefish and squid, prepared or preserved (excl. smoked)
+16055500	Octopus, prepared or preserved (excl. smoked)
+16055600	Clams, cockles and arkshells, prepared or preserved (excl. smoked)
+16055700	Abalone, prepared or preserved (excl. smoked)
+16055800	Snails, prepared or preserved (excl. smoked and sea snails)
+16055900	Molluscs, prepared or preserved (excl. smoked, oysters, scallops, mussels, cuttle fish, squid, octopus, abalone, snails, and clams, cockles and arkshells)
+16056100	Sea cucumbers, prepared or preserved (excl. smoked)
+16056200	Sea urchins, prepared or preserved (excl. smoked)
+16056300	Jellyfish, prepared or preserved (excl. smoked)
+16056900	Aquatic invertebrates, prepared or preserved (excl. smoked, crustaceans, molluscs, sea cucumbers, sea urchins and jellyfish)

@@ -1,0 +1,387 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "title": "Processing Statement Case",
+  "description": "Schema for Processing Statement Cases data transfer to Case Management.",
+  "examples": [
+    {
+      "exporter": {
+        "contactId": "a contact id",
+        "accountId": "an account id",
+        "dynamicsAddress": {
+          "defra_addressid": "00185463-69c2-e911-a97a-000d3a2cbad9",
+          "defra_buildingname": "Lancaster House",
+          "defra_fromcompanieshouse": false,
+          "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": "No",
+          "defra_postcode": "NE4 7YJ",
+          "defra_premises": "23",
+          "defra_street": "Newcastle upon Tyne",
+          "defra_towntext": "Newcastle upon Tyne",
+          "_defra_country_value": "f49cf73a-fa9c-e811-a950-000d3a3a2566",
+          "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": "defra_Country",
+          "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": "defra_country",
+          "_defra_country_value_OData_Community_Display_V1_FormattedValue": "United Kingdom of Great Britain and Northern Ireland"
+        },
+        "companyName": "FISH LTD",
+        "address": {
+          "building_number": "123",
+          "sub_building_name": "Unit 1",
+          "building_name": "CJC Fish Ltd",
+          "street_name": "17  Old Edinburgh Road",
+          "county": "West Midlands",
+          "country": "England",
+          "line1": "123 Unit 1 CJC Fish Ltd 17 Old Edinburgh Road",
+          "city": "ROWTR",
+          "postCode": "WN90 23A"
+        }
+      },
+      "documentUrl": "http://tst-gov.uk/asfd9asdfasdf0jsaf.pdf",
+      "documentDate": "2019-01-01 05:05:05",
+      "caseType1": "PS",
+      "caseType2": "Real Time Validation - Overuse Failure",
+      "numberOfFailedSubmissions": 4,
+      "documentNumber": "GBR-PS-234234-234-234",
+      "plantName": "Bob's Fisheries LTD",
+      "personResponsible": "Mr. Bob",
+      "processedFisheryProducts": "Cooked Squid Rings (1605540090), Cooked Atlantic Cold Water Prawns (1605211096),",
+      "clonedFrom": "GBR-PS-234234-234-234",
+      "parentDocumentVoid": false,
+      "exportedTo": {
+        "officialCountryName": "Nigeria",
+        "isoCodeAlpha2": "NG",
+        "isoCodeAlpha3": "NGR"
+      },
+      "catches": [
+        {
+          "foreignCatchCertificateNumber": "FR-PS-234234-23423-234234",
+          "species": "HER",
+          "cnCode": "324234324432234",
+          "scientificName": "scientific name",
+          "importedWeight": 500,
+          "usedWeightAgainstCertificate": 700,
+          "processedWeight": 800,
+          "isDocumentIssuedInUK": true,
+          "validation": {
+            "status": "Validation Failure - Overuse",
+            "totalUsedWeightAgainstCertificate": 700,
+            "weightExceededAmount": 300,
+            "overuseInfo": ["GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"]
+          }
+        },
+        {
+          "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
+          "species": "SAL",
+          "cnCode": "523842358",
+          "scientificName": "scientific name",
+          "importedWeight": 200,
+          "usedWeightAgainstCertificate": 100,
+          "isDocumentIssuedInUK": false,
+          "processedWeight": 150,
+          "validation": {
+            "status": "Validation Success",
+            "totalUsedWeightAgainstCertificate": 200
+          }
+        }
+      ],
+      "da": "Northern Ireland",
+      "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
+      "requestedByAdmin": true
+    },
+    {
+      "exporter": {
+        "contactId": "a contact id",
+        "accountId": "an account id",
+        "dynamicsAddress": {
+          "defra_addressid": "00185463-69c2-e911-a97a-000d3a2cbad9",
+          "defra_buildingname": "Lancaster House",
+          "defra_fromcompanieshouse": false,
+          "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": "No",
+          "defra_postcode": "NE4 7YJ",
+          "defra_premises": "23",
+          "defra_street": "Newcastle upon Tyne",
+          "defra_towntext": "Newcastle upon Tyne",
+          "_defra_country_value": "f49cf73a-fa9c-e811-a950-000d3a3a2566",
+          "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": "defra_Country",
+          "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": "defra_country",
+          "_defra_country_value_OData_Community_Display_V1_FormattedValue": "United Kingdom of Great Britain and Northern Ireland"
+        },
+        "companyName": "IVI'S FISH",
+        "address": {
+          "line1": "Baker street",
+          "line2": "221B",
+          "city": "London",
+          "postCode": "W4 1SE"
+        }
+      },
+      "documentUrl": "http://tst-gov.uk/asfd9asdfasdf0jsaf.pdf",
+      "documentDate": "2019-01-01 05:05:05",
+      "caseType1": "PS",
+      "caseType2": "Void by an Exporter",
+      "numberOfFailedSubmissions": 1,
+      "plantName": "Liosis",
+      "personResponsible": "Andrea",
+      "exportedTo": {
+        "officialCountryName": "Nigeria",
+        "isoCodeAlpha2": "NG",
+        "isoCodeAlpha3": "NGR"
+      },
+      "documentNumber": "GBR-PS-234234-234-234",
+      "clonedFrom": "GBR-PS-234234-234-234",
+      "parentDocumentVoid": false,
+      "da": "Northern Ireland",
+      "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
+      "requestedByAdmin": false
+    }
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "line1": { "type": "string" },
+        "sub_building_name": { "type": ["string", "null"] },
+        "building_number": { "type": ["string", "null"] },
+        "building_name": { "type": ["string", "null"] },
+        "street_name": { "type": ["string", "null"] },
+        "county": { "type": ["string", "null"] },
+        "country": { "type": ["string", "null"] },
+        "city": { "type": "string" },
+        "postCode": { "type": "string" }
+      },
+      "required": ["line1", "city", "postCode"]
+    },
+    "dynamicsAddress": {
+      "type": "object",
+      "properties": {
+        "defra_addressid": { "type": "string" },
+        "defra_buildingname": { "type": ["string", "null"] },
+        "defra_county": { "type": "string" },
+        "defra_dependentlocality": { "type": ["string", "null"] },
+        "defra_fromcompanieshouse": { "type": "boolean" },
+        "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": {
+          "type": "string"
+        },
+        "defra_internationalpostalcode": { "type": ["string", "null"] },
+        "defra_locality": { "type": ["string", "null"] },
+        "defra_postcode": { "type": "string" },
+        "defra_premises": { "type": ["string", "null"] },
+        "defra_street": { "type": "string" },
+        "defra_subbuildingname": { "type": ["string", "null"] },
+        "defra_towntext": { "type": "string" },
+        "defra_uprn": { "type": ["string", "null"] },
+        "_defra_country_value": { "type": "string" },
+        "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": {
+          "type": "string"
+        },
+        "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": {
+          "type": "string"
+        },
+        "_defra_country_value_OData_Community_Display_V1_FormattedValue": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "defra_addressid",
+        "defra_buildingname",
+        "defra_postcode",
+        "defra_premises",
+        "defra_street",
+        "defra_towntext"
+      ]
+    },
+    "catchValidation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "Validation Success",
+            "Validation Failure - Overuse",
+            "Validation Failure - Weight"
+          ]
+        },
+        "totalUsedWeightAgainstCertificate": {
+          "type": "number",
+          "description": "The total amount used against the certificate"
+        },
+        "weightExceededAmount": {
+          "type": "number"
+        },
+        "overuseInfo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["status", "totalUsedWeightAgainstCertificate"]
+    },
+    "catch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "foreignCatchCertificateNumber": {
+          "type": "string"
+        },
+        "species": {
+          "type": "string"
+        },
+        "cnCode": {
+          "type": "string"
+        },
+        "scientificName": {
+          "type": "string"
+        },
+        "importedWeight": {
+          "type": "number"
+        },
+        "usedWeightAgainstCertificate": {
+          "type": "number",
+          "description": "the total amound of the imported weight used before processing"
+        },
+        "processedWeight": {
+          "type": "number",
+          "description": "used weight after processing"
+        },
+        "isDocumentIssuedInUK": {
+          "type": "boolean",
+          "description": "Flag to identify whether the catch certificate was issued in the UK"
+        },
+        "validation": {
+          "type": "object",
+          "items": {
+            "$ref": "#/definitions/catchValidation"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "foreignCatchCertificateNumber",
+        "species",
+        "cnCode",
+        "importedWeight",
+        "usedWeightAgainstCertificate",
+        "processedWeight",
+        "isDocumentIssuedInUK",
+        "validation"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "exporter": {
+      "type": "object",
+      "required": ["companyName", "address", "dynamicsAddress"],
+      "additionalProperties": false,
+      "properties": {
+        "contactId": {
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "dynamicsAddress": {
+          "$ref": "#/definitions/dynamicsAddress"
+        }
+      }
+    },
+    "caseType1": {
+      "type": "string",
+      "enum": ["CC", "PS", "SD"]
+    },
+    "caseType2": {
+      "type": "string",
+      "enum": [
+        "Real Time Validation - Successful",
+        "Real Time Validation - Overuse Failure",
+        "Real Time Validation - Weight Failure",
+        "Void by an Exporter",
+        "Void by SMO/PMO"
+      ]
+    },
+    "numberOfFailedSubmissions": {
+      "type": "number",
+      "description": "The total number of failed submission attempts executed by the user"
+    },
+    "documentNumber": {
+      "type": "string"
+    },
+    "documentUrl": {
+      "type": "string"
+    },
+    "documentDate": {
+      "type": "string"
+    },
+    "plantName": {
+      "type": "string"
+    },
+    "personResponsible": {
+      "type": "string"
+    },
+    "clonedFrom": {
+      "type": "string",
+      "description": "Indicates from which document it is cloned from"
+    },
+    "parentDocumentVoid": {
+      "type": "boolean",
+      "description": "Indicates if the original document is voided or not during cloning the document"
+    },
+    "exportedTo": {
+      "type": "object",
+      "required": ["officialCountryName", "isoCodeAlpha2", "isoCodeAlpha3"],
+      "additionalProperties": false,
+      "properties": {
+        "officialCountryName": {
+          "type": "string"
+        },
+        "isoCodeAlpha2": {
+          "type": "string"
+        },
+        "isoCodeAlpha3": {
+          "type": "string"
+        }
+      }
+    },
+    "processedFisheryProducts": {
+      "type": "string",
+      "description": "description and commodity code"
+    },
+    "catches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/catch"
+      }
+    },
+    "da": {
+      "type": "string"
+    },
+    "_correlationId": {
+      "description": "Unique ID to improve the end to end traceability of an event",
+      "type": "string"
+    },
+    "requestedByAdmin": {
+      "type": "boolean",
+      "description": "Flag to identify applications made by an EACC"
+    }
+  },
+  "required": [
+    "exporter",
+    "caseType1",
+    "caseType2",
+    "numberOfFailedSubmissions",
+    "documentNumber",
+    "plantName",
+    "personResponsible",
+    "da",
+    "_correlationId",
+    "requestedByAdmin"
+  ]
+}

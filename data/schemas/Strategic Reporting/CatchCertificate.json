@@ -1,0 +1,585 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "Catch Certificate",
+    "description": "Schema for Catch Certificate data transfer to Reporting Hub.",
+    "default": {},
+    "examples": [{
+        "documentType": "catchCert",
+        "documentNumber": "GBR-CC-234234-234234",
+        "lastUpdated": "2019-01-01 05:05:05",
+        "status": "DRAFT",
+        "_correlationId" : "476ec752-bce3-4f38-aa96-089187f6bc40",
+        "requestedByAdmin" : false
+      },{
+        "documentType": "catchCert",
+        "documentNumber": "GBR-CC-234234-234234",
+        "clonedFrom": "GBR-2023-CC-C3A82642B",
+        "landingsCloned": false,
+        "parentDocumentVoid": false,
+        "lastUpdated": "2019-01-01 05:05:05",
+        "status": "BLOCKED",
+        "devolvedAuthority": "Northern Ireland",
+        "dateCreated": "2019-01-01 05:05:05",
+        "created": {
+          "id": "Ut dolor nostrud",
+          "email": "test@test.com",
+          "firstName": "John",
+          "lastName": "Doe"
+        },
+        "userReference": "234523452345",
+        "exportedFrom" : "Isle of Man",
+        "exportedTo": {
+            "officialCountryName": "SPAIN",
+            "isoCodeAlpha2": "A1",
+            "isoCodeAlpha3": "A3",
+            "isoNumericCode": "SP"
+        },
+        "_correlationId" : "c03483ba-86ed-49be-ba9d-695ea27b3951",
+        "requestedByAdmin" : false,
+        "audits": [
+          {
+            "auditOperation": "INVESTIGATED",
+            "user": "in eu",
+            "auditAt": "dolore",
+            "investigationStatus": "MINOR_VERBAL"
+          },
+          {
+            "auditOperation": "INVESTIGATED",
+            "user": "pariatur culpa consequat aliquip",
+            "auditAt": "nulla dolore eu sint culpa",
+            "investigationStatus": "USER_EDUCATION_PROVIDED"
+          },
+          {
+            "auditOperation": "PREAPPROVED",
+            "user": "ad dolor ipsum deserunt",
+            "auditAt": "minim enim",
+            "investigationStatus": "UNDER_INVESTIGATION"
+          }
+        ],
+        "exporterDetails": {
+          "exporterNumber": "23423j32324lkj43",
+          "dynamicsAddress" : {
+            "defra_addressid": "00185463-69c2-e911-a97a-000d3a2cbad9",
+            "defra_buildingname": "Lancaster House",
+            "defra_fromcompanieshouse": false,
+            "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": "No",
+            "defra_postcode": "NE4 7YJ",
+            "defra_premises": "23",
+            "defra_street": "Newcastle upon Tyne",
+            "defra_towntext": "Newcastle upon Tyne",
+            "_defra_country_value": "f49cf73a-fa9c-e811-a950-000d3a3a2566",
+            "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": "defra_Country",
+            "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname" : "defra_country",
+            "_defra_country_value_OData_Community_Display_V1_FormattedValue": "United Kingdom of Great Britain and Northern Ireland"
+          },
+          "fullName": "John Doe",
+          "companyName": "FISH LTD",
+          "address": {
+            "building_number": "123",
+            "sub_building_name": "Unit 1",
+            "building_name": "CJC Fish Ltd",
+            "street_name": "17  Old Edinburgh Road",
+            "county": "West Midlands",
+            "country": "England",
+            "line1": "123 Unit 1 CJC Fish Ltd 17 Old Edinburgh Road",
+            "city": "ROWTR",
+            "postCode": "WN90 23A"
+          }
+        },
+        "landings": [
+          {
+            "date": "2019-01-01 05:05:05",
+            "species": {
+              "name": "commodo aute",
+              "code": "HER",
+              "scientificName": "some scientific name"
+            },
+            "state": {
+              "name": "commodo aute",
+              "code": "HER"
+            },
+            "presentation": {
+              "name": "commodo aute",
+              "code": "HER"
+            },
+            "cnCode": "magna ex",
+            "cnCodeDesc": "some description",
+            "vessel": {
+              "name": "sed magna",
+              "pln": "qui",
+              "length": 12,
+              "fao": "sed nostrud amet non labore",
+              "flag": "GBR",
+              "cfr": "GBRC1121091"
+            },
+            "exportWeight": 5,
+            "isDirectLanding": true,
+            "isValidationFailed": false,
+            "isSpeciesMisMatch": true,
+            "isExporterLandingOveruse": true,
+            "isOveruse": true,
+            "landingBreakdown" : [{
+            	"factor" : 50
+            }],
+            "isLandingDataAvailable": true,
+            "rss": "eiusmod magna dolor aute",
+            "exportWeightFactor": 2,
+            "totalWeightRecordedAgainstLanding": 5,
+            "isNoLandingDataTimeExceeded": true,
+            "daysWithNoLandingData": "5.1.2.3",
+            "landedWeightExceededAmount": 5,
+            "totalWeightExported": 5,
+            "rawLandingDataUrl": "http://www.google.co.uk",
+            "rawSalesNotesDataUrl": "http://www.google.co.uk",
+            "isLegallyDue": true,
+            "vesselAdministration": "England",
+            "dataEverExpected": true,
+            "landingDataExpectedDate": "2023-05-26",
+            "landingDataEndDate": "2023-06-05",
+            "isLate": false,
+            "dateDataReceived": "2023-05-26",
+            "landingDataExpectedAtSubmission": true,
+            "adminSpecies": "Sand smelt (ATP)",
+            "adminState": "Fresh",
+            "adminPresentation": "Whole",
+            "speciesOverriddenByAdmin": true,
+            "adminCommodityCode": "admin commodity code"
+          },
+          {
+            "date": "2019-01-01 05:05:05",
+            "species": {
+              "name": "SAL",
+              "code": "id",
+              "scientificName": "some scientific name"
+            },
+            "state": {
+              "name": "commodo aute",
+              "code": "HER"
+            },
+            "presentation": {
+              "name": "commodo aute",
+              "code": "HER"
+            },
+            "cnCode": "voluptate occaecat in officia deserunt",
+            "cnCodeDesc": "some description",
+            "vessel": {
+              "name": "dolore sed aute",
+              "pln": "Duis laboris dolore reprehenderit ad",
+              "length": 8,
+              "fao": "ut sunt aliqua aute",
+              "flag": "GBR",
+              "cfr": "GBRC1121091"
+            },
+            "exportWeight": 2,
+            "isDirectLanding": false,
+            "isValidationFailed": false,
+            "isSpeciesMisMatch": false,
+            "isExporterLandingOveruse": false,
+            "isOveruse": true,
+            "isLandingDataAvailable": true,
+            "rss": "ex culpa pariatur quis Ut",
+            "exportWeightFactor": 2,
+            "totalWeightRecordedAgainstLanding": 2,
+            "isNoLandingDataTimeExceeded": false,
+            "daysWithNoLandingData": "0.0.0.0",
+            "landedWeightExceededAmount": 2,
+            "totalWeightExported": 2,
+            "rawLandingDataUrl": "http://www.google.co.uk",
+            "rawSalesNotesDataUrl": "http://www.google.co.uk",
+            "isLegallyDue":true,
+            "vesselAdministration": "England",
+            "dataEverExpected": true,
+            "landingDataExpectedDate": "2023-05-26",
+            "landingDataEndDate": "2023-06-05",
+            "isLate": false,
+            "dateDataReceived": "2023-05-26",
+            "landingDataExpectedAtSubmission": true,
+            "adminSpecies": "Sand smelt (ATP)",
+            "adminState": "Fresh",
+            "adminPresentation": "Whole",
+            "speciesOverriddenByAdmin": true,
+            "adminCommodityCode": "admin commodity code"
+          }
+        ],
+        "conservationReference": "dolore sint mollit anim",
+        "documentUri": "http://www.google.co.uk",
+        "transportation": {
+            "modeofTransport" : "vessel",
+            "name":"consequat",
+            "flag":"consequat cupidatat labore esse anim",
+            "containerId":"velit quis commodo aliqua sint",
+            "exportLocation":"DOVER"
+        },
+        "failedSubmissions": 5
+    }],
+    "required": [
+        "documentType",
+        "documentNumber",
+        "lastUpdated",
+        "status",
+        "_correlationId",
+        "requestedByAdmin"
+    ],
+    "additionalProperties": false,
+    "definitions" : {
+        "audit" : {
+            "type" : "object",
+            "properties" : {
+                "auditOperation": {
+                    "type": "string",
+                    "enum" : ["INVESTIGATED","VOIDED","PREAPPROVED"]
+                },
+                "investigationStatus" : {
+                    "type" : "string",
+                    "enum" : ["DATA_ERROR_NFA","MINOR_VERBAL","MINOR_WRITTEN","UNDER_INVESTIGATION","OPEN_UNDER_ENQUIRY","CLOSED_NFA","USER_EDUCATION_PROVIDED"]
+                },
+                "user": { "type": "string" },
+                "auditAt": { "type": "string" }
+            },
+            "required" : ["auditOperation","user","auditAt"]
+        },
+        "address" : {
+            "type" : "object",
+            "properties" : {
+                "line1": { "type": "string" },
+                "sub_building_name": { "type": ["string", "null"] },
+                "building_number": { "type": ["string", "null"] },
+                "building_name": { "type": ["string", "null"] },
+                "street_name": { "type": ["string", "null"]},
+                "county": { "type": ["string", "null"] },
+                "country": { "type": ["string", "null"] },
+                "city"  : { "type": "string" },
+                "postCode" : { "type": "string" }
+            },
+            "required": [
+                "line1",
+                "city",
+                "postCode"
+            ]
+        },
+        "dynamicsAddress" : {
+            "type" : "object",
+            "properties": {
+              "defra_addressid": { "type": "string" },
+              "defra_buildingname": { "type": ["string", "null"] },
+              "defra_county": { "type": "string" },
+              "defra_dependentlocality": { "type": ["string", "null"] },
+              "defra_fromcompanieshouse": { "type": "boolean" },
+              "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": { "type": "string" },
+              "defra_internationalpostalcode": { "type": ["string", "null"] },
+              "defra_locality": { "type": ["string", "null"] },
+              "defra_postcode": { "type": "string" },
+              "defra_premises": { "type": "string" },
+              "defra_street": { "type": "string" },
+              "defra_subbuildingname": { "type": ["string", "null"] },
+              "defra_towntext": { "type": "string" },
+              "defra_uprn": { "type": ["string", "null"] },
+              "_defra_country_value": { "type": "string" },
+              "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": { "type": "string" },
+              "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname" : { "type": "string" },
+              "_defra_country_value_OData_Community_Display_V1_FormattedValue": { "type": "string" }
+            },
+            "required"  : [
+              "defra_addressid",
+              "defra_buildingname",
+              "defra_postcode",
+              "defra_premises",
+              "defra_street",
+              "defra_towntext"
+            ]
+        },
+        "fishDefinition" : {
+            "type" : "object",
+            "properties" : {
+                "name": { "type": "string" },
+                "code" : { "type" : "string" },
+                "scientificName" : { "type": "string" }
+            },
+            "required" : ["name","code"]
+        },
+        "landingVessel" : {
+            "type" : "object",
+            "properties" : {
+                "name": { "type": "string" },
+                "pln" : { "type" : "string" },
+                "fao" : { "type" : "string" },
+                "length" : { "type" : "number" },
+                "flag": { "type" : "string" },
+                "cfr": { "type" : "string" }
+            },
+            "required" : ["name","pln","length","flag","cfr"]
+        },
+        "landing" : {
+            "type" : "object",
+            "properties" : {
+                "date" : {"type" : "string"},
+                "species": { "$ref": "#/definitions/fishDefinition" },
+                "state" : { "$ref": "#/definitions/fishDefinition" },
+                "presentation" : { "$ref": "#/definitions/fishDefinition" },
+                "cnCode": { "type": "string" },
+                "cnCodeDesc": { "type": "string" },
+                "vessel" : { "$ref": "#/definitions/landingVessel" },
+                "exportWeight" : {"type" : "number"},
+                "isDirectLanding" : {"type" : "boolean"},
+                "isValidationFailed" : {"type": "boolean"},
+                "isSpeciesMisMatch" : {
+                  "type" : "boolean",
+                  "description" : "Indicates if the species inputted by the exporter and the species in the landing retrieved doesn't match"
+                },
+                "isExporterLandingOveruse" :{
+                  "type" : "boolean",
+                  "description": "Indicates if the weight of the fish for the exporter landing exceeds the fish weight recorded against ELog/Landing Dec/ Catch Recording"
+                },
+                "isOveruse" : {
+                  "type" : "boolean",
+                  "description": "Indicates if the weight of the exporter inputs plus any other certificates that reference the same landing exceeds the weight recorded against eLog/Landing Dec/Catch Recording"
+                },
+                "isLandingDataAvailable" : {"type" : "boolean"},
+                "rss" : {"type" : "string"},
+                "exportWeightFactor" : {"type" : "number"},
+                "landingBreakdown" : {
+                  "type" : "array",
+                  "description": "Array containing the breakdown that makes up the aggregated sum for the total landings. It also includes the source of each landing."
+                },
+                "totalWeightRecordedAgainstLanding" : {"type" : "number"},
+                "isNoLandingDataTimeExceeded" : {
+                    "type" : "boolean",
+                    "description": "Quarantine breach without landing data"
+                },
+                "daysWithNoLandingData" : {
+                  "type" : "string",
+                  "description" : "The length of time with no landing data, in DEFRA format ({days}.{hours}.{minutes}.{seconds}. If the length of time exceeds 40 days, then the message will be `40 days+`"
+                },
+                "landedWeightExceededAmount" : {"type" : "number"},
+                "totalWeightExported" : {
+                    "type" : "number",
+                    "description": "the total amount exported of the current species for all catch certificates"
+                },
+                "rawLandingDataUrl" : {"type" : "string"},
+                "rawSalesNotesDataUrl" : {"type" : "string"},
+                "isLegallyDue": {
+                  "type": "boolean"
+                },
+                "vesselAdministration": {
+                  "description": "The administration of the vessel",
+                  "type": "string"
+                },
+                "dataEverExpected": {
+                  "type": "boolean",
+                  "description": "Is data ever expected for this landing"
+                },
+                "landingDataExpectedDate": {
+                  "type": "string",
+                  "description": "The date that landing data is expected for this landing"
+                },
+                "landingDataEndDate": {
+                  "type": "string",
+                  "description": "The date at which landing data is assumed unavailable for this landing"
+                },
+                "landingDataExpectedAtSubmission": {
+                  "type": "boolean",
+                  "description": "Is Landing data expected at submission"
+                },
+                "isLate": {
+                  "type": "boolean",
+                  "description": "Is Landing data received late"
+                },
+                "dateDataReceived": {
+                  "type": "string",
+                  "description": "The date at which landing data is received"
+                },
+                "adminSpecies": {
+                  "type": "string",
+                  "description": "The species added from admin app"
+                },
+                "adminState": {
+                  "type": "string",
+                  "description": "The state added from admin app"
+                },
+                "adminPresentation": {
+                  "type": "string",
+                  "description": "The presentation added from admin app"
+                },
+                "adminCommodityCode": {
+                  "description": "commoditycode changed by admin",
+                  "type": "string"
+                },
+                "speciesOverriddenByAdmin": {
+                  "type": "boolean",
+                  "description": "species details are overridden once details has been updated from admin"
+                }
+            },
+            "required" : [
+                "date",
+                "species",
+                "state",
+                "presentation",
+                "cnCode",
+                "vessel",
+                "exportWeight",
+                "isDirectLanding"
+            ]
+        }
+    },
+    "properties": {
+        "documentType": { "type": "string" },
+        "documentNumber": { "type": "string" },
+        "clonedFrom": {
+          "type": "string",
+          "description": "Indicates from which document it is cloned from"
+        },
+        "landingsCloned": {
+          "type" : "boolean",
+          "description": "Indicates if landings are cloned or not"
+        },
+        "parentDocumentVoid": {
+          "type": "boolean",
+          "description": "Indicates if the original document is voided or not during cloning the document"
+        },
+        "devolvedAuthority": { "type" : "string" },
+        "dateCreated": { "type": "string" },
+        "lastUpdated": {
+            "type": "string",
+            "description": "The last time the document was updated, used to understand what needs to be processed within each 12 hour window"
+        },
+        "created": {
+          "type": "object",
+          "required": [
+            "id",
+            "email"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string" },
+            "email": { "type": "string" },
+            "firstName": { "type": "string" },
+            "lastName": { "type": "string" }
+          }
+        },
+        "status": {
+            "type": "string",
+            "enum" : ["DRAFT","VOID","COMPLETE","BLOCKED","DELETED"]
+        },
+        "userReference": { "type": "string" },
+        "exportedFrom": { "type": "string" },
+        "exportedTo": {
+            "type": "object",
+            "required": [
+                "officialCountryName",
+                "isoCodeAlpha2",
+                "isoCodeAlpha3"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "officialCountryName": { "type": "string" },
+                "isoCodeAlpha2": { "type": "string" },
+                "isoCodeAlpha3": { "type": "string" },
+                "isoNumericCode": { "type": "string" }
+            }
+        },
+        "_correlationId": {
+          "type": "string",
+          "description": "Unique ID to improve the end to end traceability of an event"
+        },
+        "audits": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/audit" }
+        },
+        "exporterDetails": {
+            "type": "object",
+            "required": [
+                "exporterNumber",
+                "fullName",
+                "companyName",
+                "address",
+                "dynamicsAddress"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "exporterNumber": { "type": "string" },
+                "fullName": { "type": "string"},
+                "companyName": {"type" : "string"},
+                "address": {"$ref" : "#/definitions/address"},
+                "dynamicsAddress" : { "$ref" : "#/definitions/dynamicsAddress" }
+            }
+        },
+        "landings": {
+            "type": "array",
+            "additionalItems": false,
+            "items": { "$ref": "#/definitions/landing" }
+        },
+        "conservationReference": { "type": "string" },
+        "documentUri": { "type": "string" },
+        "transportation": {
+          "type": "object",
+          "required": [
+            "modeofTransport"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "modeofTransport": {
+              "enum": [
+                "truck",
+                "train",
+                "plane",
+                "vessel"
+              ]
+            },
+            "hasRoadTransportDocument": { "type": "boolean" },
+            "nationality": { "type": "string" },
+            "registration": { "type": "string" },
+            "exportLocation": { "type": "string" },
+            "billNumber": { "type": "string" },
+            "flightNumber": { "type": "string" },
+            "containerId": { "type": "string" },
+            "name": { "type": "string" },
+            "flag": { "type": "string" }
+          },
+          "anyOf": [{
+              "properties": {
+                "modeofTransport": { "const": "truck" }
+              },
+              "required": [
+                "hasRoadTransportDocument"
+              ]
+            },
+            {
+              "properties": {
+                "modeOfTransport": { "const": "train" }
+              },
+              "required": [
+                "billNumber",
+                "exportLocation"
+              ]
+            },
+            {
+              "properties": {
+                "modeOfTransport": { "const": "plane" }
+              },
+              "required": [
+                "flightNumber",
+                "containerId",
+                "exportLocation"
+              ]
+            },
+            {
+              "properties": {
+                "modeOfTransport": { "const": "vessel" }
+              },
+              "required": [
+                "name",
+                "flag",
+                "containerId",
+                "exportLocation"
+              ]
+            }
+          ]
+        },
+        "failedSubmissions": { "type": "integer" },
+        "requestedByAdmin": {
+          "type": "boolean",
+          "definition": "Flag to identify applications made by an EACC"
+        }
+    }
+}

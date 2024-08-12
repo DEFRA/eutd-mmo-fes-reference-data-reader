@@ -1,0 +1,72 @@
+import { ICountry } from "./appConfig/countries";
+import { IDynamicsProcessingStatementValidation, IDynamicsStorageDocumentValidation, SdPsCaseTwoType } from "./dynamicsSdPsCase";
+import { CertificateAddress, CertificateAuthority, CertificateCompany, CertificateStorageFacility, CertificateTransport } from "./defraValidation";
+
+export interface IDefraTradeProcessingStatementCatch {
+  foreignCatchCertificateNumber: string;
+  id: string;
+  species: string;
+  cnCode: string;
+  scientificName: string;
+  importedWeight: number;
+  usedWeightAgainstCertificate: number;
+  processedWeight: number;
+  validation: IDynamicsProcessingStatementValidation;
+}
+
+export interface IDefraTradeProcessingStatement {
+    exporter: CertificateCompany;
+    documentUrl: string;
+    documentDate: string;
+    caseType1: string;
+    caseType2: SdPsCaseTwoType;
+    numberOfFailedSubmissions: number;
+    documentNumber: string;
+    plantName: string;
+    plantAddress: CertificateAddress;
+    plantApprovalNumber: string;
+    plantDateOfAcceptance: string;
+    personResponsible : string;
+    exportedTo: ICountry;
+    processedFisheryProducts: string;
+    catches?: IDefraTradeProcessingStatementCatch[];
+    healthCertificateNumber: string;
+    healthCertificateDate: string;
+    da: string;
+    _correlationId: string;
+    requestedByAdmin: boolean;
+    authority: CertificateAuthority;
+}
+
+export interface IDefraTradeStorageDocumentProduct {
+  foreignCatchCertificateNumber: string;
+  species: string;
+  id: string;
+  cnCode: string;
+  scientificName: string;
+  importedWeight: number;
+  exportedWeight: number;
+  validation: IDynamicsStorageDocumentValidation;
+  dateOfUnloading: string,
+  placeOfUnloading: string,
+  transportUnloadedFrom: string,
+}
+
+export interface IDefraTradeStorageDocument {
+  exporter: CertificateCompany;
+  documentUrl: string;
+  documentDate: string;
+  caseType1: string;
+  caseType2: SdPsCaseTwoType;
+  numberOfFailedSubmissions: number;
+  documentNumber: string;
+  companyName: string;
+  exportedTo: ICountry;
+  products?: IDefraTradeStorageDocumentProduct[];
+  _correlationId: string;
+  da: string;
+  requestedByAdmin: boolean;
+  transportation: CertificateTransport;
+  storageFacilities: CertificateStorageFacility[];
+  authority: CertificateAuthority;
+}

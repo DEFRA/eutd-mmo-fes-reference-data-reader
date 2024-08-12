@@ -1,0 +1,487 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "title": "Processing Statements",
+  "description": "Schema for Processing Statements data transfer to Reporting Hub.",
+  "default": {},
+  "examples": [
+    {
+      "documentType": "processingStatement",
+      "documentNumber": "GBR-32423-423423-423-423",
+      "clonedFrom": "GBR-PS-234234-234-234",
+      "parentDocumentVoid": false,
+      "devolvedAuthority": "England",
+      "dateCreated": "2019-01-01 05:05:05",
+      "lastUpdated": "2019-01-01 05:05:05",
+      "created": {
+        "id": "2352350-23523-5235-235235",
+        "email": "test@test.com",
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "status": "COMPLETE",
+      "userReference": "Reference Test 1",
+      "exportedTo": {
+        "officialCountryName": "SPAIN",
+        "isoCodeAlpha2": "A1",
+        "isoCodeAlpha3": "A3",
+        "isoNumericCode": "SP"
+      },
+      "audits": [
+        {
+          "auditOperation": "INVESTIGATED",
+          "investigationStatus": "MINOR_WRITTEN",
+          "user": "John Doe",
+          "auditAt": "2019-01-01 05:05:05"
+        },
+        {
+          "auditOperation": "PREAPPROVED",
+          "user": "Mark Loavan",
+          "auditAt": "2019-01-02 05:05:05"
+        },
+        {
+          "auditOperation": "VOIDED",
+          "user": "Stephen Quirry",
+          "auditAt": "2019-01-02 05:05:05"
+        }
+      ],
+      "exporterDetails": {
+        "companyName": "Bob Company",
+        "address": {
+          "building_number": "123",
+          "sub_building_name": "Unit 1",
+          "building_name": "CJC Fish Ltd",
+          "street_name": "17  Old Edinburgh Road",
+          "county": "West Midlands",
+          "country": "England",
+          "line1": "123 Unit 1 CJC Fish Ltd 17 Old Edinburgh Road",
+          "city": "Baureport",
+          "postCode": "NE40 3AJ"
+        },
+        "exporterNumber": "52352359235205235325",
+        "dynamicsAddress": {
+          "defra_addressid": "00185463-69c2-e911-a97a-000d3a2cbad9",
+          "defra_buildingname": "Lancaster House",
+          "defra_county": null,
+          "defra_dependentlocality": null,
+          "defra_fromcompanieshouse": false,
+          "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": "No",
+          "defra_internationalpostalcode": null,
+          "defra_locality": null,
+          "defra_postcode": "NE4 7YJ",
+          "defra_premises": "23",
+          "defra_street": "Newcastle upon Tyne",
+          "defra_subbuildingname": null,
+          "defra_towntext": "Newcastle upon Tyne",
+          "defra_uprn": null,
+          "_defra_country_value": "f49cf73a-fa9c-e811-a950-000d3a3a2566",
+          "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": "defra_Country",
+          "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": "defra_country",
+          "_defra_country_value_OData_Community_Display_V1_FormattedValue": "United Kingdom of Great Britain and Northern Ireland"
+        }
+      },
+      "catches": [
+        {
+          "species": "Atlantic Herring (HER)",
+          "scientificName": "some scientific name",
+          "catchCertificateNumber": "GBR-3423-4234234942-234",
+          "totalWeightLanded": 1000,
+          "exportWeightBeforeProcessing": 1000,
+          "exportWeightAfterProcessing": 1000,
+          "isOverUse": true,
+          "hasWeightMismatch": true,
+          "importWeightExceededAmount": 50,
+          "isDocumentIssuedInUK": true
+        }
+      ],
+      "consignment": {
+        "description": "Wild Atlantic Herring",
+        "personResponsible": "john@test.com"
+      },
+      "healthCertificate": {
+        "number": "23523509823502385",
+        "date": "2019-01-01"
+      },
+      "plant": {
+        "approvalNumber": "32423940234234",
+        "name": "Fish Food LTD.",
+        "address": {
+          "building_number": "123",
+          "sub_building_name": "Unit 1",
+          "building_name": "CJC Fish Ltd",
+          "street_name": "17  Old Edinburgh Road",
+          "county": "West Midlands",
+          "country": "England",
+          "line1": "123 Unit 1 CJC Fish Ltd 17 Old Edinburgh Road",
+          "city": "Baureport",
+          "postCode": "NE40 3AJ"
+        },
+        "dateOfAcceptance": "2019-01-01"
+      },
+      "documentUri": "https://ukecc-snd.azure.defra.cloud/qr/export-certificates/_cc8a2e09-d16f-4fe5-a490-a31d430523b3.pdf",
+      "failedSubmissions": 5,
+      "_correlationId": "476ec752-bce3-4f38-aa96-089187f6bc40",
+      "requestedByAdmin": false
+    },
+    {
+      "documentType": "processingStatement",
+      "documentNumber": "GBR-32423-423423-423-423",
+      "lastUpdated": "2019-01-01 05:05:05",
+      "status": "DRAFT",
+      "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
+      "requestedByAdmin": false
+    }
+  ],
+  "required": [
+    "documentType",
+    "documentNumber",
+    "lastUpdated",
+    "status",
+    "_correlationId",
+    "requestedByAdmin"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "audit": {
+      "type": "object",
+      "properties": {
+        "auditOperation": {
+          "type": "string",
+          "enum": ["INVESTIGATED", "VOIDED", "PREAPPROVED"]
+        },
+        "investigationStatus": {
+          "type": "string",
+          "enum": [
+            "DATA_ERROR_NFA",
+            "MINOR_VERBAL",
+            "MINOR_WRITTEN",
+            "UNDER_INVESTIGATION",
+            "OPEN_UNDER_ENQUIRY",
+            "CLOSED_NFA",
+            "USER_EDUCATION_PROVIDED"
+          ]
+        },
+        "user": {
+          "type": "string"
+        },
+        "auditAt": {
+          "type": "string"
+        }
+      },
+      "required": ["auditOperation", "user", "auditAt"]
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "line1": {
+          "type": "string"
+        },
+        "sub_building_name": {
+          "type": ["string", "null"]
+        },
+        "building_number": {
+          "type": ["string", "null"]
+        },
+        "building_name": {
+          "type": ["string", "null"]
+        },
+        "street_name": {
+          "type": ["string", "null"]
+        },
+        "county": {
+          "type": ["string", "null"]
+        },
+        "country": {
+          "type": ["string", "null"]
+        },
+        "city": {
+          "type": "string"
+        },
+        "postCode": {
+          "type": "string"
+        }
+      },
+      "required": ["line1", "city", "postCode"]
+    },
+    "dynamicsAddress": {
+      "type": "object",
+      "properties": {
+        "defra_addressid": {
+          "type": "string"
+        },
+        "defra_buildingname": {
+          "type": ["string", "null"]
+        },
+        "defra_county": {
+          "type": "string"
+        },
+        "defra_dependentlocality": {
+          "type": ["string", "null"]
+        },
+        "defra_fromcompanieshouse": {
+          "type": "boolean"
+        },
+        "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": {
+          "type": "string"
+        },
+        "defra_internationalpostalcode": {
+          "type": ["string", "null"]
+        },
+        "defra_locality": {
+          "type": ["string", "null"]
+        },
+        "defra_postcode": {
+          "type": "string"
+        },
+        "defra_premises": {
+          "type": "string"
+        },
+        "defra_street": {
+          "type": "string"
+        },
+        "defra_subbuildingname": {
+          "type": ["string", "null"]
+        },
+        "defra_towntext": {
+          "type": "string"
+        },
+        "defra_uprn": {
+          "type": ["string", "null"]
+        },
+        "_defra_country_value": {
+          "type": "string"
+        },
+        "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": {
+          "type": "string"
+        },
+        "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": {
+          "type": "string"
+        },
+        "_defra_country_value_OData_Community_Display_V1_FormattedValue": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "defra_addressid",
+        "defra_buildingname",
+        "defra_postcode",
+        "defra_premises",
+        "defra_street",
+        "defra_towntext"
+      ]
+    },
+    "catch": {
+      "type": "object",
+      "properties": {
+        "species": {
+          "type": "string"
+        },
+        "scientificName": {
+          "type": "string"
+        },
+        "catchCertificateNumber": {
+          "type": "string"
+        },
+        "totalWeightLanded": {
+          "type": "number"
+        },
+        "exportWeightBeforeProcessing": {
+          "type": "number"
+        },
+        "exportWeightAfterProcessing": {
+          "type": "number"
+        },
+        "isOverUse": {
+          "type": "boolean"
+        },
+        "hasWeightMismatch": {
+          "type": "boolean"
+        },
+        "importWeightExceededAmount": {
+          "type": "number"
+        },
+        "cnCode": {
+          "type": "string"
+        },
+        "isDocumentIssuedInUK": {
+          "type": "boolean",
+          "description": "Flag to identify whether the certificate was issued in the UK"
+        }
+      },
+      "required": [
+        "species",
+        "catchCertificateNumber",
+        "totalWeightLanded",
+        "exportWeightAfterProcessing",
+        "exportWeightBeforeProcessing"
+      ]
+    }
+  },
+  "properties": {
+    "documentType": {
+      "type": "string"
+    },
+    "documentNumber": {
+      "type": "string"
+    },
+    "devolvedAuthority": {
+      "type": "string"
+    },
+    "dateCreated": {
+      "type": "string"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "The last time the document was updated, used to understand what needs to be processed within each 12 hour window"
+    },
+    "created": {
+      "type": "object",
+      "required": ["id", "email"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "VOID", "COMPLETE", "BLOCKED", "DELETED"]
+    },
+    "userReference": {
+      "type": "string"
+    },
+    "exportedTo": {
+      "type": "object",
+      "required": ["officialCountryName", "isoCodeAlpha2", "isoCodeAlpha3"],
+      "additionalProperties": false,
+      "properties": {
+        "officialCountryName": {
+          "type": "string"
+        },
+        "isoCodeAlpha2": {
+          "type": "string"
+        },
+        "isoCodeAlpha3": {
+          "type": "string"
+        },
+        "isoNumericCode": {
+          "type": "string"
+        }
+      }
+    },
+    "audits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/audit"
+      }
+    },
+    "exporterDetails": {
+      "type": "object",
+      "required": [
+        "companyName",
+        "address",
+        "exporterNumber",
+        "dynamicsAddress"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "companyName": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "exporterNumber": {
+          "type": "string"
+        },
+        "dynamicsAddress": {
+          "$ref": "#/definitions/dynamicsAddress"
+        }
+      }
+    },
+    "catches": {
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$ref": "#/definitions/catch"
+      }
+    },
+    "consignment": {
+      "type": "object",
+      "required": ["description", "personResponsible"],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "personResponsible": {
+          "type": "string"
+        }
+      }
+    },
+    "healthCertificate": {
+      "type": "object",
+      "required": ["number", "date"],
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        }
+      }
+    },
+    "plant": {
+      "type": "object",
+      "required": ["approvalNumber", "name", "address", "dateOfAcceptance"],
+      "additionalProperties": false,
+      "properties": {
+        "approvalNumber": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "dateOfAcceptance": {
+          "type": "string"
+        }
+      }
+    },
+    "documentUri": {
+      "type": "string"
+    },
+    "failedSubmissions": {
+      "type": "integer"
+    },
+    "_correlationId": {
+      "type": "string",
+      "description": "Unique ID to improve the end to end traceability of an event"
+    },
+    "requestedByAdmin": {
+      "type": "boolean",
+      "definition": "Flag to identify applications made by an EACC"
+    },
+    "clonedFrom": {
+      "type": "string",
+      "description": "Indicates from which document it is cloned from"
+    },
+    "parentDocumentVoid": {
+      "type": "boolean",
+      "description": "Indicates if the original document is voided or not during cloning the document"
+    }
+  }
+}

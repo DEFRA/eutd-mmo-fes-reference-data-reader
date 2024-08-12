@@ -1,0 +1,13 @@
+node_modules
+.DS_Store
+bundle.js
+dev.js
+.idea
+dist
+test-results.xml
+.nyc_output/
+coverage/
+githash
+junit.xml
+service_bus
+/.env

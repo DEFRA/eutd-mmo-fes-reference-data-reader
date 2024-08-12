@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Vessel And Licence Data",
+  "description": "",
+  "type": "object",
+  "required": [
+    "fishingVesselName",
+    "ircs",
+    "flag",
+    "homePort",
+    "registrationNumber",
+    "imo",
+    "fishingLicenceNumber",
+    "fishingLicenceValidTo",
+    "fishingLicenceValidFrom",
+    "adminPort",
+    "rssNumber",
+    "vesselLength"
+  ],
+  "properties": {
+    "fishingVesselName": {
+      "type": "string"
+    },
+    "ircs": {
+      "type": "string"
+    },
+    "flag": {
+      "type": "string"
+    },
+    "homePort": {
+      "type": "string"
+    },
+    "registrationNumber": {
+      "type": "string"
+    },
+    "imo": {
+      "type": ["number", "null"]
+    },
+    "fishingLicenceNumber": {
+      "type": "integer"
+    },
+    "fishingLicenceValidTo": {
+      "type": ["string"]
+    },
+    "fishingLicenceValidFrom": {
+      "type": ["string"]
+    },
+    "adminPort": {
+      "type": "string"
+    },
+    "rssNumber": {
+      "type": "string"
+    },
+    "vesselLength": {
+      "type": "number"
+    }
+  }
+}
