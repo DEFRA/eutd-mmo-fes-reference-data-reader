@@ -308,7 +308,10 @@
           ]
         },
         "defra_postcode": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_premises": {
           "type": [
@@ -353,7 +356,6 @@
       "required": [
         "defra_addressid",
         "defra_buildingname",
-        "defra_postcode",
         "defra_premises",
         "defra_street",
         "defra_towntext"
@@ -548,10 +550,7 @@
     "exportedTo": {
       "type": "object",
       "required": [
-        "officialCountryName",
-        "isoCodeAlpha2",
-        "isoCodeAlpha3",
-        "isoNumericCode"
+        "officialCountryName"
       ],
       "additionalProperties": false,
       "properties": {

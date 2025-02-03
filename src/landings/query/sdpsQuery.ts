@@ -102,11 +102,11 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
 
 export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
 
-  const voidedEvent = (doc.audit && doc.audit.length)
+  const voidedEvent = (doc.audit?.length)
       ? getLastAuditEvent(doc.audit, AuditEventTypes.Voided)
       : undefined;
 
-  const preApprovedEvent = (doc.audit && doc.audit.length)
+  const preApprovedEvent = (doc.audit?.length)
       ? getLastAuditEvent(doc.audit, AuditEventTypes.PreApproved)
       : undefined;
 
@@ -154,8 +154,8 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
       url: doc.documentUri,
       exporterCompanyName: doc.exportData.exporterDetails ? doc.exportData.exporterDetails.exporterCompanyName : undefined,
       investigation: doc.investigation,
-      voidedBy : (voidedEvent && voidedEvent.triggeredBy) ? voidedEvent.triggeredBy : undefined,
-      preApprovedBy: (preApprovedEvent && preApprovedEvent.triggeredBy) ? preApprovedEvent.triggeredBy : undefined,
+      voidedBy : (voidedEvent?.triggeredBy) ? voidedEvent.triggeredBy : undefined,
+      preApprovedBy: (preApprovedEvent?.triggeredBy) ? preApprovedEvent.triggeredBy : undefined,
       id: cat.id,
     }
 

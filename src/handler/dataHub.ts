@@ -85,7 +85,7 @@ export const dataHubRoutes = (server: Hapi.Server) => {
       handler: async (req: Hapi.Request, h: ResponseToolkit) => {
         try {
           const payload = req.payload as DataHubPayloadVoid
-          await Controller.reportVoid(payload.certificateId,payload.isFromExporter);
+          await Controller.reportVoid(payload.certificateId, payload.isFromExporter);
 
           logger.info(`[DATA-HUB][VOID-DOCUMENT][SUCCESS][${payload.certificateId}]`);
           return h.response().code(204);
@@ -143,31 +143,6 @@ export const dataHubRoutes = (server: Hapi.Server) => {
         }
         catch (e) {
           logger.error(`[DATA-HUB][SUBMIT-DOCUMENT][CC][ERROR][${e}]`);
-          return h.response().code(500);
-        }
-      },
-        options: {
-          security: true,
-          validate: {
-            payload: Joi.object({
-              validationData: Joi.array().min(1).required()
-            })
-          }
-        }
-    },
-    {
-      method: 'POST',
-      path: '/v1/catchcertificates/data-hub/resubmit',
-      handler: async (req: Hapi.Request, h: ResponseToolkit) => {
-        try {
-          const payload = req.payload as DataHubPayloadValidationDataCC
-          await Controller.resendCcToTrade(payload.validationData)
-
-          logger.info(`[DATA-HUB][RESUBMIT-DOCUMENT][CC][SUCCESS]`);
-          return h.response().code(204);
-        }
-        catch (e) {
-          logger.error(`[DATA-HUB][RESUBMIT-DOCUMENT][CC][ERROR][${e}]`);
           return h.response().code(500);
         }
       },

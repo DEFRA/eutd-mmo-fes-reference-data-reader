@@ -14,13 +14,11 @@ import logger from '../../src/logger';
 const moment = require('moment')
 moment.suppressDeprecationWarnings = true
 
-const sinon = require('sinon');
-
-const dataMock = sinon.stub(cache, 'getVesselsData')
+const dataMock = jest.spyOn(cache, 'getVesselsData')
 
 // stub out expensive call
-const generateIndex = sinon.stub(sharedReferenceData, 'generateIndex')
-generateIndex.returns( () => undefined )
+const generateIndex = jest.spyOn(sharedReferenceData, 'generateIndex')
+generateIndex.mockReturnValue( () => undefined )
 
 const mockSeedConversionFactors = jest.spyOn(conversionFactors, 'loadConversionFactorsFromLocalFile');
 mockSeedConversionFactors.mockResolvedValue([]);
@@ -71,10 +69,8 @@ afterAll(async () => {
 });
 
 describe("To Support Vessels Autocomplete", () => {
-
-  it('GET /v1/vessels/search happy path with known test data', async () => {
-
-    dataMock.returns(
+  beforeEach(() => {
+    dataMock.mockReturnValue(
       [{
         fishingVesselName:"CARALISA",
         ircs:"VSLJ3",
@@ -85,13 +81,9 @@ describe("To Support Vessels Autocomplete", () => {
         fishingLicenceNumber:"1234",
         fishingLicenceValidTo:"2017-12-20T00:00:00",
         fishingLicenceValidFrom:"2010-12-31T00:00:00",
-        inmarsatNo:null,
-        telefaxNo:null,
-        telephoneNo:null,
-        emailAddress:null,
-        rssNumber: null,
-        vesselLength: null,
-        adminPort: null,
+        rssNumber: '',
+        vesselLength: 0,
+        adminPort: '',
         licenceHolderName: "I am the Licence Holder name for this fishing boat"
       },
       {
@@ -104,15 +96,31 @@ describe("To Support Vessels Autocomplete", () => {
         fishingLicenceNumber:"1234",
         fishingLicenceValidTo:"2027-12-31T00:00:00",
         fishingLicenceValidFrom: "2018-12-20T00:00:00",
-        inmarsatNo:null,
-        telefaxNo:null,
-        telephoneNo:null,
-        emailAddress:null,
-        rssNumber: null,
-        vesselLength: null,
-        adminPort: null,
+        rssNumber: '',
+        vesselLength: 0,
+        adminPort: '',
         licenceHolderName: "I am the Licence Holder name for this fishing boat"
-      }]);
+      },
+      {
+        fishingVesselName: "ANOTHER LADY II",
+        ircs: null,
+        cfr: "GBR000C20766",
+        flag: "GBR",
+        homePort: "BRIXHAM",
+        registrationNumber: "E576",
+        imo: null,
+        fishingLicenceNumber: "25295",
+        fishingLicenceValidFrom: "2016-11-01T00:00:00",
+        fishingLicenceValidTo: "2030-12-31T00:00:00",
+        adminPort: "BRIXHAM",
+        rssNumber: "C20766",
+        vesselLength: 5.8,
+        licenceHolderName: "MR L GRAVES "
+      }
+    ]);
+  });
+
+  it('GET /v1/vessels/search happy path with known test data', async () => {
 
     const response = await Server.inject({
       url: '/v1/vessels/search?searchTerm=CA&landedDate=2019-01-01'
@@ -122,6 +130,39 @@ describe("To Support Vessels Autocomplete", () => {
     expect(result[0].licenceNumber).toEqual("1234");
     expect(result[0].licenceHolder).toBe("I am the Licence Holder name for this fishing boat")
     expect(response.statusCode).toBe(200);
+  });
+
+  it('GET /v1/vessels/search with vessel name having spaces', async () => {
+
+    const response = await Server.inject({
+      url: '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II&landedDate=2024-6-18'
+    });
+
+    const result = JSON.parse(response.payload);
+    expect(response.statusCode).toBe(200);
+    expect(result[0].vesselName).toEqual("ANOTHER LADY II");
+  });
+
+  it('GET /v1/vessels/search with vessel name having spaces with an open parenthsis', async () => {
+
+    const response = await Server.inject({
+      url: '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II%20(E576&landedDate=2024-6-18'
+    });
+
+    const result = JSON.parse(response.payload);
+    expect(response.statusCode).toBe(200);
+    expect(result[0].vesselName).toEqual("ANOTHER LADY II");
+  });
+
+  it('GET /v1/vessels/search with vessel name having spaces with a close parenthsis', async () => {
+
+    const response = await Server.inject({
+      url: '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II%20(E576)&landedDate=2024-6-18'
+    });
+
+    const result = JSON.parse(response.payload);
+    expect(response.statusCode).toBe(200);
+    expect(result[0].vesselName).toEqual("ANOTHER LADY II");
   });
 
   it('should return a 400 error if special characters are passed into the query', async() => {
@@ -157,7 +198,7 @@ describe("To Support Vessels Autocomplete", () => {
 describe("To Support Vessels Autocomplete- without mocking", () => {
 
   beforeAll(async() => {
-    dataMock.restore();
+    dataMock.mockRestore();
     await cache.loadLocalFishCountriesAndSpecies();
     await cache.loadVessels();
   })
@@ -399,7 +440,7 @@ describe("Routes", () => {
 
   it('should GET UK Species', async () => {
     const response = await Server.inject({
-      url: '/v1/species?UK=Y'
+      url: '/v1/species?uk=Y'
     });
 
     expect(response.statusCode).toBe(200);
@@ -515,7 +556,7 @@ describe("Routes", () => {
   });
 
   it('should GET All Countries', async () => {
-    const getDataMock = sinon.stub(cache, 'getCountries');
+    const getDataMock = jest.spyOn(cache, 'getCountries');
 
     const data = [
       {
@@ -544,7 +585,7 @@ describe("Routes", () => {
       }
     ];
 
-    getDataMock.returns(data);
+    getDataMock.mockReturnValue(data);
 
     const response = await Server.inject({
       url: '/v1/countries'

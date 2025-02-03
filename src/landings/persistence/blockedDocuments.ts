@@ -27,7 +27,7 @@ export const getBlockedCatchCerts = async (
     }
   }
 
-  if (areas && areas.length) {
+  if (areas?.length) {
     query['da'] = {$in: areas};
   }
 
@@ -64,7 +64,7 @@ export const getBlockedSdPs = async (
     }
   }
 
-  if (areas && areas.length) {
+  if (areas?.length) {
     query['da'] = {$in: areas};
   }
 

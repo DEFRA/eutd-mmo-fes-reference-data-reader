@@ -3,10 +3,8 @@ import csv from 'csvtojson';
 import logger from '../logger';
 import { type IConversionFactor } from 'mmo-shared-reference-data';
 import { IExporterBehaviour } from '../landings/types/appConfig/exporterBehaviour';
-import { IVesselOfInterest } from '../landings/types/appConfig/risking';
-import { IWeighting } from '../landings/types/appConfig/risking';
+import { IVesselOfInterest, IWeighting } from '../landings/types/appConfig/risking';
 import { IVessel } from '../landings/types/appConfig/vessels';
-
 
 export const getSpeciesDataFromFile = async (speciesFilePath: string): Promise<any[]> => {
   try {

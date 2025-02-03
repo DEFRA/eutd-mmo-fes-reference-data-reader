@@ -9,7 +9,7 @@ import {
 } from "../landings/persistence/defraValidation";
 import { CaseTwoType, IDynamicsCatchCertificateCase } from "../landings/types/dynamicsCcCase";
 import { IDynamicsStorageDocumentCase, SdPsCaseTwoType, IDynamicsProcessingStatementCase } from "../landings/types/dynamicsSdPsCase";
-import { DocumentStatuses, IDocument } from "../landings/types/document";
+import { DocumentStatuses } from "../landings/types/document";
 import { getCertificateByDocumentNumberWithNumberOfFailedAttempts } from "../landings/persistence/catchCert";
 import { getExtendedValidationData } from "../landings/extendedValidationDataService";
 import { ISdPsQueryResult } from "../landings/types/query";
@@ -20,9 +20,6 @@ import { isEmpty } from 'lodash';
 
 import logger from "../logger";
 import moment from "moment";
-import { toDynamicsCcCase } from "../landings/transformations/dynamicsValidation";
-import { commoditySearch } from "./species";
-import { ICommodityCodeExtended } from "../interfaces/products.interfaces";
 
 export const reportDraft = async (certificateId: string) => {
   const correlationId = uuidv4();
@@ -36,27 +33,27 @@ export const reportDraft = async (certificateId: string) => {
       const requestByAdmin = certificate.requestByAdmin;
       const processingStatementReport = DefraMapper.toPsDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
 
-      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][REPORT-ID][${processingStatementReport ._correlationId}]`);
+      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][REPORT-ID][${processingStatementReport._correlationId}]`);
       await insertPsDefraValidationReport(processingStatementReport);
-      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][REPORT-ID][${processingStatementReport ._correlationId}][REPORT SAVED]`);
+      logger.info(`[REPORTING-PS-DRAFT][${certificateId}][REPORT-ID][${processingStatementReport._correlationId}][REPORT SAVED]`);
     }
     else if (certificateId.toUpperCase().includes('-SD-')) {
       logger.info(`[REPORTING-SD-DRAFT][${certificateId}][Getting report]`);
       const requestByAdmin = certificate.requestByAdmin;
       const storageDocumentReport = DefraMapper.toSdDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
 
-      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][REPORT-ID][${storageDocumentReport ._correlationId}]`);
+      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][REPORT-ID][${storageDocumentReport._correlationId}]`);
       await insertSdDefraValidationReport(storageDocumentReport);
-      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][REPORT-ID][${storageDocumentReport ._correlationId}][REPORT SAVED]`);
+      logger.info(`[REPORTING-SD-DRAFT][${certificateId}][REPORT-ID][${storageDocumentReport._correlationId}][REPORT SAVED]`);
     }
     else {
       logger.info(`[REPORTING-CC-DRAFT][${certificateId}][Getting report]`);
       const requestByAdmin = certificate.requestByAdmin;
       const catchCertificateReport = DefraMapper.toCcDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
 
-      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport ._correlationId}]`);
+      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport._correlationId}]`);
       await insertCcDefraValidationReport(catchCertificateReport);
-      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport ._correlationId}][REPORT SAVED]`);
+      logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport._correlationId}][REPORT SAVED]`);
     }
   }
 
@@ -78,30 +75,30 @@ export const reportDelete = async (certificateId: string) => {
       const requestByAdmin = certificate.requestByAdmin;
       const processingStatementReport = DefraMapper.toPsDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
 
-      if (certificate.exportData && certificate.exportData.exporterDetails)
+      if (certificate.exportData?.exporterDetails)
         processingStatementReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
 
-      logger.info(`[REPORTING-PS-DELETE][${certificateId}][REPORT-ID][${processingStatementReport ._correlationId}]`);
+      logger.info(`[REPORTING-PS-DELETE][${certificateId}][REPORT-ID][${processingStatementReport._correlationId}]`);
       await insertPsDefraValidationReport(processingStatementReport);
     }
     else if (certificateId.toUpperCase().includes('-SD-')) {
       const requestByAdmin = certificate.requestByAdmin;
       const storageDocumentReport = DefraMapper.toSdDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
 
-      if (certificate.exportData && certificate.exportData.exporterDetails)
+      if (certificate.exportData?.exporterDetails)
         storageDocumentReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
 
-      logger.info(`[REPORTING-SD-DELETE][${certificateId}][REPORT-ID][${storageDocumentReport ._correlationId}]`);
+      logger.info(`[REPORTING-SD-DELETE][${certificateId}][REPORT-ID][${storageDocumentReport._correlationId}]`);
       await insertSdDefraValidationReport(storageDocumentReport);
     }
     else {
       const requestByAdmin = certificate.requestByAdmin;
       const catchCertificateReport = DefraMapper.toCcDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
 
-      if (certificate.exportData && certificate.exportData.exporterDetails)
+      if (certificate.exportData?.exporterDetails)
         catchCertificateReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
 
-      logger.info(`[REPORTING-CC-DELETE][${certificateId}][REPORT-ID][${catchCertificateReport ._correlationId}]`);
+      logger.info(`[REPORTING-CC-DELETE][${certificateId}][REPORT-ID][${catchCertificateReport._correlationId}]`);
       await insertCcDefraValidationReport(catchCertificateReport);
     }
   }
@@ -125,15 +122,15 @@ export const reportVoid = async (certificateId: string, isFromExporter = false) 
       logger.info(`[REPORTING-PS-VOID][${certificateId}][REPORT-ID][${psReport._correlationId}]`);
       await insertPsDefraValidationReport(psReport);
 
-        logger.info(`[REPORTING-PS-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${psReport._correlationId}]`);
-        const processingStatementCase: IDynamicsProcessingStatementCase =  await CaseManagement.reportPs(
-          null,
-          certificate,
-          correlationId,
-          MessageLabel.PROCESSING_STATEMENT_VOIDED,
-          isFromExporter ? SdPsCaseTwoType.VoidByExporter : SdPsCaseTwoType.VoidByAdmin
-        );
-        await DefraTrade.reportPsToTrade(certificate, MessageLabel.PROCESSING_STATEMENT_VOIDED, processingStatementCase, null);
+      logger.info(`[REPORTING-PS-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${psReport._correlationId}]`);
+      const processingStatementCase: IDynamicsProcessingStatementCase = await CaseManagement.reportPs(
+        null,
+        certificate,
+        correlationId,
+        MessageLabel.PROCESSING_STATEMENT_VOIDED,
+        isFromExporter ? SdPsCaseTwoType.VoidByExporter : SdPsCaseTwoType.VoidByAdmin
+      );
+      await DefraTrade.reportPsToTrade(certificate, MessageLabel.PROCESSING_STATEMENT_VOIDED, processingStatementCase, null);
     }
     else if (certificateId.toUpperCase().includes('-SD-')) {
       const requestByAdmin = certificate.requestByAdmin;
@@ -145,18 +142,18 @@ export const reportVoid = async (certificateId: string, isFromExporter = false) 
         certificate
       );
 
-      logger.info(`[REPORTING-SD-VOID][${certificateId}][REPORT-ID][${sdReport ._correlationId}]`);
+      logger.info(`[REPORTING-SD-VOID][${certificateId}][REPORT-ID][${sdReport._correlationId}]`);
       await insertSdDefraValidationReport(sdReport);
 
-        logger.info(`[REPORTING-SD-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${sdReport._correlationId}]`);
-        const storageDocumentCase: IDynamicsStorageDocumentCase = await CaseManagement.reportSd(
-          null,
-          certificate,
-          correlationId,
-          MessageLabel.STORAGE_DOCUMENT_VOIDED,
-          isFromExporter ? SdPsCaseTwoType.VoidByExporter : SdPsCaseTwoType.VoidByAdmin
-        );
-        await DefraTrade.reportSdToTrade(certificate, MessageLabel.STORAGE_DOCUMENT_VOIDED, storageDocumentCase, null);
+      logger.info(`[REPORTING-SD-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${sdReport._correlationId}]`);
+      const storageDocumentCase: IDynamicsStorageDocumentCase = await CaseManagement.reportSd(
+        null,
+        certificate,
+        correlationId,
+        MessageLabel.STORAGE_DOCUMENT_VOIDED,
+        isFromExporter ? SdPsCaseTwoType.VoidByExporter : SdPsCaseTwoType.VoidByAdmin
+      );
+      await DefraTrade.reportSdToTrade(certificate, MessageLabel.STORAGE_DOCUMENT_VOIDED, storageDocumentCase, null);
     }
     else {
       const requestByAdmin = certificate.requestByAdmin;
@@ -171,7 +168,7 @@ export const reportVoid = async (certificateId: string, isFromExporter = false) 
       logger.info(`[REPORTING-CC-VOID][${certificateId}][REPORT-ID][${ccReport._correlationId}]`);
       await insertCcDefraValidationReport(ccReport);
 
-      logger.info(`[REPORTING-CC-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${ccReport ._correlationId}]`);
+      logger.info(`[REPORTING-CC-VOID][CASE-MANAGEMENT][${certificateId}][REPORT-ID][${ccReport._correlationId}]`);
 
       const result: IDynamicsCatchCertificateCase = await CaseManagement.reportCc(null, certificate, ccReport._correlationId, MessageLabel.CATCH_CERTIFICATE_VOIDED, isFromExporter ? CaseTwoType.VoidByExporter : CaseTwoType.VoidByAdmin);
       await DefraTrade.reportCcToTrade(certificate, MessageLabel.CATCH_CERTIFICATE_VOIDED, result, null);
@@ -188,7 +185,7 @@ export const reportSdPsSubmitted = async (sdpsValidationData: ISdPsQueryResult[]
 
     const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
 
-    if (certificate && certificate.documentNumber) {
+    if (certificate?.documentNumber) {
       logger.info(`[DATA-HUB][REPORT-SDPS-SUBMITTED][${certificateId}][FOUND]`);
 
       if (certificateId.toUpperCase().includes('-PS-')) {
@@ -208,7 +205,7 @@ export const reportSdPsSubmitted = async (sdpsValidationData: ISdPsQueryResult[]
   }
 };
 
-export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]) : Promise<void> => {
+export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
   try {
     logger.info(`[REPORT-CC-SUBMITTED][ccValidationData][${ccValidationData.length}]`);
     if (ccValidationData.length > 0) {
@@ -227,7 +224,11 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]) : Pr
         throw e;
       }
 
+      await refreshRiskingData()
+        .catch(e => logger.error(`[REPORT-CC-SUBMITTED][REFRESH-RISKING-DATA][ERROR][${e}]`));
+
       const requestByAdmin = catchCertificate.requestByAdmin;
+
       try {
         ccReport = DefraMapper.toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, catchCertificate);
         logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][toCcDefraReport][${certificateId}]`);
@@ -255,10 +256,7 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]) : Pr
         throw e;
       }
 
-      await refreshRiskingData()
-        .catch(e => logger.error(`[REPORT-CC-SUBMITTED][REFRESH-RISKING-DATA][ERROR][${e}]`));
-
-      if (Object.prototype.hasOwnProperty.call(catchCertificate, 'exportData') && catchCertificate.exportData.exporterDetails !== undefined) {
+      if (catchCertificate.exportData?.exporterDetails !== undefined) {
 
         for (const landing of ccValidationData) {
           const requestedDate = moment.utc(landing.dateLanded);
@@ -285,68 +283,6 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]) : Pr
     }
   } catch (e) {
     logger.warn(`[REPORT-CC-SUBMITTED][ERROR][${e}]`);
-    throw e;
-  }
-};
-
-const getUpdatedValidationData = (ccValidationData: ICcQueryResult[]): ICcQueryResult[] => {
-  for (const validationData of ccValidationData) {
-    const commodities: ICommodityCodeExtended[] = commoditySearch(validationData.species, validationData.extended.state, validationData.extended.presentation);
-    const commodity: ICommodityCodeExtended = commodities.find((c: ICommodityCodeExtended) => c.code === validationData.extended.commodityCode);
-    if (commodity && !validationData.extended.commodityCodeDescription) {
-      logger.info(`[LANDINGS][COMMODITY-CODE-SEARCH-FOR][${validationData.species}][FOUND][${commodity.description}]`);
-      validationData.extended.commodityCodeDescription = commodity.description;
-    }
-  }
-
-  return ccValidationData;
-}
-
-const sendCctoTrade = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
-  let catchCertificate: IDocument
-  const certificateId = ccValidationData[0].documentNumber;
-  const correlationId = uuidv4();
-
-  logger.info(`[LANDINGS][REREPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
-
-  try {
-    catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
-    logger.info(`[REREPORT-CC-SUBMITTED][SUCCESS][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}]`);
-  }
-  catch (e) {
-    logger.warn(`[REREPORT-CC-SUBMITTED][ERROR][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${e}]`);
-    throw e;
-  }
-
-  if (catchCertificate.exportData?.exporterDetails !== undefined) {
-    const dynamicsCatchCertificateCase: IDynamicsCatchCertificateCase = toDynamicsCcCase(
-      ccValidationData,
-      catchCertificate,
-      correlationId
-    );
-
-    if (!dynamicsCatchCertificateCase.clonedFrom) {
-      delete dynamicsCatchCertificateCase.clonedFrom;
-      delete dynamicsCatchCertificateCase.landingsCloned;
-      delete dynamicsCatchCertificateCase.parentDocumentVoid;
-    }
-
-    logger.info(`[REREPORT-CC-SUBMITTED][GENERATED-CC][${certificateId}][${JSON.stringify(catchCertificate)}]`);
-    await DefraTrade.reportCcToTrade(catchCertificate, MessageLabel.CATCH_CERTIFICATE_SUBMITTED, dynamicsCatchCertificateCase, getUpdatedValidationData(ccValidationData));
-  } else {
-    logger.error(`[REREPORT-CC-SUBMITTED][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
-  }
-}
-
-export const resendCcToTrade = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
-  try {
-    logger.info(`[REPORT-CC-RESUBMITTED][ccValidationData][${ccValidationData.length}]`);
-
-    if (ccValidationData.length > 0) {
-      await sendCctoTrade(ccValidationData);
-    }
-  } catch (e) {
-    logger.error(`[REREPORT-CC-SUBMITTED][ERROR][${e}]`);
     throw e;
   }
 };
@@ -398,7 +334,7 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
         throw e;
       }
 
-      if (Object.prototype.hasOwnProperty.call(catchCertificate, 'exportData') && catchCertificate.exportData.exporterDetails !== undefined) {
+      if (catchCertificate.exportData?.exporterDetails !== undefined) {
 
         for (const landing of ccValidationData) {
           const requestedDate = moment.utc(landing.dateLanded);

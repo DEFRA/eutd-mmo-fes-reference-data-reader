@@ -10,25 +10,6 @@ jest.mock("@azure/storage-blob");
 
 const vesselsJson = require(__dirname + '/../../data/vessels.json');
 const fs = require('fs');
-const sinon = require('sinon');
-const fakeReadFileSync = sinon.fake.returns(JSON.stringify([
-  {
-    "fishingVesselName": "MARLENA",
-    "ircs": null,
-    "flag": "GBR",
-    "homePort": "WESTRAY",
-    "registrationNumber": "K529",
-    "imo": null,
-    "fishingLicenceNumber": "30117",
-    "fishingLicenceValidFrom": "2006-06-07T00:00:00",
-    "fishingLicenceValidTo": "2006-06-30T00:00:00",
-    "adminPort": "STORNOWAY",
-    "rssNumber": "A12032",
-    "vesselLength": 8.84,
-    "cfr": "GBRA12032",
-    "licenceHolderName": "I am the Licence Holder name for this fishing boat"
-  }
-]));
 const path = `${__dirname}/../../data/vessels.json`;
 const connectionString: string = 'connection-string';
 const expected: IVessel[] = [
@@ -51,20 +32,35 @@ const expected: IVessel[] = [
 ];
 
 describe('When getting vessels data', () => {
-    let mockLoggerInfo;
-    let mockLoggerError;
+    let mockLoggerInfo: jest.SpyInstance;
+    let mockLoggerError: jest.SpyInstance;
 
     beforeEach(() => {
-        mockLoggerInfo = sinon.spy(logger, 'info');
-        mockLoggerError = sinon.spy(logger, 'error');
-        sinon.replace(fs, 'readFileSync', fakeReadFileSync);
+        mockLoggerInfo = jest.spyOn(logger, 'info');
+        mockLoggerError = jest.spyOn(logger, 'error');
+        jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify([
+          {
+            "fishingVesselName": "MARLENA",
+            "ircs": null,
+            "flag": "GBR",
+            "homePort": "WESTRAY",
+            "registrationNumber": "K529",
+            "imo": null,
+            "fishingLicenceNumber": "30117",
+            "fishingLicenceValidFrom": "2006-06-07T00:00:00",
+            "fishingLicenceValidTo": "2006-06-30T00:00:00",
+            "adminPort": "STORNOWAY",
+            "rssNumber": "A12032",
+            "vesselLength": 8.84,
+            "cfr": "GBRA12032",
+            "licenceHolderName": "I am the Licence Holder name for this fishing boat"
+          }
+        ]))
     });
 
     afterEach(() => {
-        mockLoggerInfo.restore();
-        mockLoggerError.restore();
-
-        sinon.restore();
+        mockLoggerInfo.mockRestore();
+        mockLoggerError.mockRestore();
     });
 
     describe('When getting vessels from a local file', () => {
@@ -75,11 +71,12 @@ describe('When getting vessels data', () => {
         });
 
         it('will return an error if getVesselsFromLocalFile throws a parse error', () => {
-            const fake = sinon.fake.throws('parse error');
-            sinon.replace(JSON, 'parse', fake);
+            jest.spyOn(JSON, 'parse').mockImplementationOnce(() => {
+             throw new Error('parse error');
+            });
 
             expect(() => getVesselsDataFromFile(path)).toThrow('parse error');
-            expect(mockLoggerError.getCall(0).args[0]).toEqual('Could not load vessels data from file');
+            expect(mockLoggerError).toHaveBeenNthCalledWith(1, 'Could not load vessels data from file', expect.anything());
         });
 
         it('will check if the loadVesselsDataFromLocalFile is returning the correct data', async () => {
@@ -92,27 +89,29 @@ describe('When getting vessels data', () => {
     describe('When getting vessels from a blob storage', () => {
         it('will check if the loadVesselsData is returning the correct data', async () => {
 
-            const dataMock = sinon.stub(blob, 'getVesselsData');
-            dataMock.resolves(expected);
+            const dataMock = jest.spyOn(blob, 'getVesselsData');
+            dataMock.mockResolvedValue(expected);
 
             const result = await loadVesselsData(connectionString);
 
-            expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[BLOB-STORAGE-DATA-LOAD][VESSELS]');
-            expect(dataMock.getCall(0).args[0]).toEqual('connection-string');
+            expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[BLOB-STORAGE-DATA-LOAD][VESSELS]');
+            expect(dataMock).toHaveBeenNthCalledWith(1, 'connection-string');
             expect(result).toEqual(expected);
 
-            dataMock.restore();
+            dataMock.mockRestore();
         })
 
         it('will fail if the loadVesselsData is not returning the correct data', async () => {
             const fakeError =  {};
-            let dataMock = sinon.stub(blob, 'getVesselsData');
+            let dataMock = jest.spyOn(blob, 'getVesselsData');
 
-            dataMock.throws(fakeError);
+            dataMock.mockImplementationOnce(() => {
+              throw fakeError;
+            })
 
             await expect(loadVesselsData(connectionString)).rejects.toThrow(`[BLOB-STORAGE-LOAD-ERROR][VESSELS] ${fakeError}`);
 
-            dataMock.restore();
+            dataMock.mockRestore();
         });
     });
 });

@@ -12,10 +12,10 @@ export const vesselSearch = (searchTerm: string, landedDateISO: string): IVessel
       {
         "$or": [
           {
-            registrationNumber: { $regex: searchTerm, $options: 'i' }
+            registrationNumber: { $regex: searchTerm.includes('(') ? searchTerm.substring(searchTerm.indexOf('(') + 1, searchTerm.length).replace(')', '') : searchTerm, $options: 'i' }
           },
           {
-            fishingVesselName: { $regex: searchTerm, $options: 'i' }
+            fishingVesselName: { $regex: searchTerm.includes('(') ? searchTerm.replace(/%20/g, ' ').substring(0, searchTerm.indexOf('(')) : searchTerm.replace(/%20/g, ' ') , $options: 'i' }
           }
         ]
       },

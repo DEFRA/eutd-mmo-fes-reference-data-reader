@@ -5,6 +5,8 @@ import { getRssNumber } from '../handler/vesselService';
 import { fetchLandings, fetchSalesNote } from '../landings/orchestration/landingsRefresh';
 import { isLandingDataAvailable } from '../landings/persistence/eodSettings';
 import { LandingsQueuePayload } from './types/landingQueue';
+import { ILicence, vesselLookup } from 'mmo-shared-reference-data';
+import { getVesselsIdx } from '../data/cache';
 
 export const landingQueueRoutes = (server: Hapi.Server) => {
 
@@ -48,7 +50,9 @@ export const landingQueueRoutes = (server: Hapi.Server) => {
             return h.response().code(400)
           }
 
-          const landingDataExpected: boolean = await isLandingDataAvailable(rssNumber, dateLanded, isLegallyDue);
+          const licenceLookup = vesselLookup(getVesselsIdx());
+          const licence: ILicence = licenceLookup(pln, dateLanded);
+          const landingDataExpected: boolean = await isLandingDataAvailable(licence, dateLanded, isLegallyDue);
 
           if (!landingDataExpected) {
             logger.info(`[POST /landings/queue][FETCHING-SALES-NOTE][PLN: ${pln}][DATE-LANDED: ${dateLanded}]`);

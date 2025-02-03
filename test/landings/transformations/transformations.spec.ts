@@ -1006,7 +1006,13 @@ describe('map from the structure in orchestrator to cc', () => {
                 "exportWeight": 78,
                 "faoArea": "FAO27",
                 "numberOfSubmissions": 0,
-                "isLegallyDue": false
+                "isLegallyDue": false,
+                "riskScore": 0.25,
+                "threshold": 1,
+                "speciesRiskScore": 0.5,
+                "vesselRiskScore": 0.5,
+                "exporterRiskScore": 1,
+                "isSpeciesRiskEnabled": false,
               }
             },
             {
@@ -1031,7 +1037,13 @@ describe('map from the structure in orchestrator to cc', () => {
                 "exportWeight": 78,
                 "faoArea": "FAO27",
                 "numberOfSubmissions": 1,
-                "isLegallyDue": true
+                "isLegallyDue": true,
+                "riskScore": 0.04,
+                "threshold": 1,
+                "speciesRiskScore": 0.2,
+                "vesselRiskScore": 0.2,
+                "exporterRiskScore": 1,
+                "isSpeciesRiskEnabled": false,
               }
             }
           ]
@@ -1061,8 +1073,8 @@ describe('map from the structure in orchestrator to cc', () => {
           "presentation": { "code": "FIS", "name": "Filleted and skinned", "admin": undefined },
           "factor": 5,
           "caughtBy": [
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "date": "2019-10-06", "weight": 78, "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false },
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "date": "2019-07-01", "weight": 78, "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true }
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "date": "2019-10-06", "weight": 78, "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5},
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "date": "2019-07-01", "weight": 78, "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.04, "speciesRiskScore": 0.2, "threshold": 1, "vesselRiskScore": 0.2 }
           ]
         }],
       "exporterDetails": {
@@ -1465,7 +1477,7 @@ describe('When mapping from a raw catch cert output to an online validation repo
       mockIsLegallyDue = jest.spyOn(IsLegallyDue, 'isLegallyDue');
       mockIsQuotaSpecies = jest.spyOn(Cache, 'isQuotaSpecies');
       mockGetVesselDetails = jest.spyOn(VesselService, 'getVesselDetails');
-      mockIsSpeciesFailure = jest.spyOn(IsHighRisk, 'isSpeciesFailure');
+      mockIsSpeciesFailure = jest.spyOn(Shared, 'isSpeciesFailure');
       mockIsHighRisk = jest.spyOn(IsHighRisk, 'isHighRisk');
       mockIsRiskEnabled = jest.spyOn(IsHighRisk, 'isRiskEnabled');
 

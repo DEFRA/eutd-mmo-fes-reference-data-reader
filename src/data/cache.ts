@@ -243,7 +243,7 @@ export const updateCache = (
   seasonalFish: any[] | undefined,
   countries: ICountry[] | undefined,
   factors: IConversionFactor[] | undefined,
-  speciesAliases?: any | undefined,
+  speciesAliases?: any,
   commodityCodes?: any[] | undefined
 ) => {
   if (species) {
@@ -368,9 +368,11 @@ export const getLandingDataRuleDate = (landingDate: string, licence: ILicence, r
     .filter((setting: IEodRule) => setting.ruleType === rule)
     .find((setting: IEodRule) => setting.vesselSize.includes(group));
 
-  return daysFromFoundRule
-    ? moment.utc(rule === 'expectedDate' ? landingDate : landingDataExpectedDate).add(daysFromFoundRule.numberOfDays, 'day').format('YYYY-MM-DD')
-    : getDefaultDates();
+  if (daysFromFoundRule) {
+    return moment.utc(rule === 'expectedDate' ? landingDate : landingDataExpectedDate).add(daysFromFoundRule.numberOfDays, 'day').format('YYYY-MM-DD');
+  }
+
+  return getDefaultDates();
 }
 
 export const refreshRiskingData = async () => {

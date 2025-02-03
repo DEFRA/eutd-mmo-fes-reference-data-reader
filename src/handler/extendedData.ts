@@ -15,8 +15,8 @@ export const extendedDataRoutes = (server: Hapi.Server) => {
 
       handler: async (req, h) => {
         const query = req.query;
-        const dateLanded =query && query.dateLanded;
-        const rssNumber = query && query.rssNumber;
+        const dateLanded = query.dateLanded;
+        const rssNumber = query.rssNumber;
 
         return await _executeExtendedDataRequest('rawLandings',dateLanded,rssNumber,h)
       }
@@ -31,8 +31,8 @@ export const extendedDataRoutes = (server: Hapi.Server) => {
       handler: async (req, h) => {
 
         const query = req.query;
-        const dateLanded =query && query.dateLanded;
-        const rssNumber = query && query.rssNumber;
+        const dateLanded = query.dateLanded;
+        const rssNumber = query.rssNumber;
 
         return await _executeExtendedDataRequest('salesNotes', dateLanded,rssNumber,h)
       }
@@ -45,15 +45,15 @@ async function _executeExtendedDataRequest(typeOfExtendedData,dateLanded,rssNumb
         if (dateLanded && rssNumber) {
             const requestedDate = moment.utc(dateLanded);
             const requestedDateISO = requestedDate.format('YYYY-MM-DD')
-            
+
             if (!requestedDate.isValid() || rssNumber === "") return h.response().code(400);
-            
+
             const payload = await getExtendedValidationData(requestedDateISO,rssNumber,typeOfExtendedData)
 
             return h.response(payload).code(200)
         } else {
             return h.response().code(400)
-        }      
+        }
     } catch(e) {
         logger.info(`[EXTENDED-DATA][GET][${typeOfExtendedData}][ERROR][${e.stack || e}]`)
         return h.response(e.message).code(500)

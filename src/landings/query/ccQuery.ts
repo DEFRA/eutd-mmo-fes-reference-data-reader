@@ -51,10 +51,15 @@ export const missingLandingInvestigationRefreshQuery = (
 
 export const runUpdateForLandings = async (rawValidatedCertificates: ICcQueryResult[], documentNumber: string): Promise<void> => {
   const certificate = await getCertificateByDocumentNumber(documentNumber);
+  if (!certificate) {
+    logger.info(`[RUN-UPDATE-FOR-LANDINGS][${documentNumber}][UNAVAILABLE]`);
+    return;
+  }
+
   const { exportData = {} } = certificate;
 
   logger.info(`[RUN-UPDATE-FOR-LANDINGS][${documentNumber}]`);
-  if (exportData.products && exportData.products.length) {
+  if (exportData.products?.length) {
     rawValidatedCertificates
       .filter(c => c.documentNumber === documentNumber)
       .forEach((validation: ICcQueryResult) => {

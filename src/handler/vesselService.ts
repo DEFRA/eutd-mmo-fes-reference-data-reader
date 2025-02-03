@@ -1,10 +1,9 @@
-import { getVesselsData } from '../data/cache';
-import mingo from 'mingo';
-import logger from '../logger';
-import { getVesselsIdx } from '../data/cache';
-import { ILanding } from '../landings/types/landing';
 import moment from 'moment';
+import mingo from 'mingo';
+import { getVesselsData, getVesselsIdx } from '../data/cache';
+import { ILanding } from '../landings/types/landing';
 import { IVessel } from '../landings/types/appConfig/vessels';
+import logger from '../logger';
 
 export const getVesselDetails = (rssNumber: string) => {
 
@@ -85,7 +84,7 @@ export const getVesselLength = (pln: string, date: string): number => {
   if (vesselRss) {
      const vesselDetails = getVesselDetails(vesselRss);
 
-     if (vesselDetails && vesselDetails.vesselLength) {
+     if (vesselDetails?.vesselLength) {
         return vesselDetails.vesselLength;
      }
   }

@@ -5,9 +5,7 @@ import { seasonalFishRoutes } from '../../src/handler/seasonalFish';
 const moment = require('moment')
 moment.suppressDeprecationWarnings = true
 
-const sinon = require('sinon');
-
-const seasonalFishMock = sinon.stub(cache, 'getSeasonalFish')
+const seasonalFishMock = jest.spyOn(cache, 'getSeasonalFish');
 
 let server;
 
@@ -30,7 +28,7 @@ afterAll(async () => {
 describe('When retrieving seasonal fish', () => {
 
   it('will return 200 if all goes OK', async () => {
-    seasonalFishMock.returns([])
+    seasonalFishMock.mockReturnValue([])
 
     const req = {
         method: 'GET',
@@ -45,8 +43,10 @@ describe('When retrieving seasonal fish', () => {
   });
 
   it('will throw an internal server error when something unexpected happens', async () => {
-    seasonalFishMock.reset()
-    seasonalFishMock.throws()
+    seasonalFishMock.mockReset()
+    seasonalFishMock.mockImplementation(() => {
+      throw new Error('something has gone wrong');
+    })
 
     const req = {
       method: 'GET',

@@ -61,7 +61,7 @@
           "exportedWeight" : 700,
           "isDocumentIssuedInUK": true,
           "validation" : {
-            "status" : "Validation Failure - Overuse",
+            "status" : "Overuse Failure",
             "totalWeightExported" : 700,
             "weightExceededAmount" : 200,
             "overuseInfo" : ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
@@ -197,8 +197,8 @@
           "type": "string",
           "enum": [
             "Validation Success",
-            "Validation Failure - Overuse",
-            "Validation Failure - Weight"
+            "Overuse Failure",
+            "Weight Failure"
           ]
         },
         "totalWeightExported": {
@@ -350,9 +350,7 @@
     "exportedTo": {
       "type": "object",
       "required": [
-        "officialCountryName",
-        "isoCodeAlpha2",
-        "isoCodeAlpha3"
+        "officialCountryName"
       ],
       "additionalProperties": false,
       "properties": {

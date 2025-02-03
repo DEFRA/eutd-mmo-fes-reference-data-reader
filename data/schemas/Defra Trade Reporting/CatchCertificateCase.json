@@ -55,7 +55,7 @@
       "multiVesselSchedule": false,
       "landings": [
         {
-          "status": "Pending Landing Data",
+          "status": "Pending landing data - Data Not Yet Expected",
           "id": "2342340-24513aga-adfrewbf",
           "landingDate": "2023-06-10 01:34:05",
           "is14DayLimitReached": false,
@@ -106,7 +106,8 @@
           },
           "dataEverExpected": true,
           "landingDataExpectedDate": "2023-05-26",
-          "landingDataEndDate": "2023-06-05"
+          "landingDataEndDate": "2023-06-05",
+          "landingDataExpectedAtSubmission": false
         }
       ],
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
@@ -345,7 +346,10 @@
           ]
         },
         "defra_postcode": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_premises": {
           "type": [
@@ -390,7 +394,6 @@
       "required": [
         "defra_addressid",
         "defra_buildingname",
-        "defra_postcode",
         "defra_premises",
         "defra_street",
         "defra_towntext"
@@ -487,8 +490,11 @@
             "Validation Failure - Species",
             "Validation Failure - No Landing Data",
             "Validation Failure - No Licence Holder",
-            "Pending Landing Data",
-            "Data Never Expected"
+            "Data Never Expected",
+            "Pending Landing Data - Data Not Yet Expected",
+            "Pending Landing Data - Data Expected",
+            "Pending Landing Data - Elog Species",
+            "Validation Failure - Weight And Overuse"
           ]
         },
         "id": {
@@ -898,10 +904,7 @@
     "exportedTo": {
       "type": "object",
       "required": [
-        "officialCountryName",
-        "isoCodeAlpha2",
-        "isoCodeAlpha3",
-        "isoNumericCode"
+        "officialCountryName"
       ],
       "additionalProperties": false,
       "properties": {

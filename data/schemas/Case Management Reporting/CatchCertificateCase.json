@@ -39,6 +39,9 @@
       "da": "Northern Ireland",
       "caseType1": "CC",
       "caseType2": "Pending Landing Data",
+      "caseStatusAtSubmission": "Validation Success",
+      "caseRiskAtSubmission": "Low",
+      "caseOutcomeAtSubmission": "Issued",
       "documentNumber": "GBR-2023-CC-C3A82641B",
       "documentUrl": "http://tst-gov.uk/asfd9asdfasdf0jsaf.pdf",
       "documentDate": "2019-01-01 05:05:05",
@@ -54,7 +57,7 @@
       },
       "landings": [
         {
-          "status": "Pending Landing Data",
+          "status": "Pending landing data - Elog Species",
           "id": "2342340-24513aga-adfrewbf",
           "landingDate": "2023-06-10 01:34:05",
           "is14DayLimitReached": false,
@@ -96,7 +99,10 @@
           },
           "dataEverExpected": true,
           "landingDataExpectedDate": "2023-05-26",
-          "landingDataEndDate": "2023-06-05"
+          "landingDataEndDate": "2023-06-05",
+          "landingDataExpectedAtSubmission": false,
+          "landingOutcomeAtSubmission": "Success",
+          "landingOutcomeAtRetrospectiveCheck": "Success"
         }
       ],
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
@@ -278,12 +284,16 @@
           "type": "string",
           "enum": [
             "Validation Success",
-            "Validation Failure - Overuse",
-            "Validation Failure - Weight",
-            "Validation Failure - Species",
-            "Validation Failure - No Landing Data",
-            "Pending Landing Data",
-            "Data never expected"
+            "Overuse Failure",
+            "Weight Failure",
+            "Species Failure",
+            "No Landing Data Failure",
+            "Validation Failure - No Licence Holder",
+            "Data Never Expected",
+            "Pending Landing Data - Data Not Yet Expected",
+            "Pending Landing Data - Data Expected",
+            "Pending Landing Data - Elog Species",
+            "Weight and Overuse Failure"
           ]
         },
         "id": {
@@ -395,6 +405,14 @@
           "type": "boolean",
           "description": "Is Landing data expected at submission"
         },
+        "landingOutcomeAtSubmission": {
+          "type": "string",
+          "enum": ["Success", "Rejected"]
+        },
+        "landingOutcomeAtRetrospectiveCheck": {
+          "type": "string",
+          "enum": ["Success", "Failure"]
+        },
         "isLate": {
           "type": "boolean",
           "description": "Is Landing data received late"
@@ -495,6 +513,17 @@
         "Void by SMO/PMO"
       ]
     },
+    "caseStatusAtSubmission": {
+      "type": "string",
+      "enum": [
+        "No Landing Data Failure",
+        "Validation Failure",
+        "Pending Landing Data - Data Expected",
+        "Pending Landing Data - Data Not Yet Expected",
+        "Data Never Expected",
+        "Validation Success"
+      ]
+    },
     "isUnblocked" : {
       "type": "boolean",
       "definition": "Flag to identify when an application has been pre approved by an IUU officer"
@@ -526,6 +555,20 @@
       "type": "boolean",
       "description": "Indicates if the original document is voided or not during cloning the document"
     },
+    "caseRiskAtSubmission": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Low"
+      ]
+    },
+    "caseOutcomeAtSubmission": {
+      "type": "string",
+      "enum": [
+        "Issued",
+        "Rejected"
+      ]
+    },
     "documentUrl": {
       "type": "string"
     },
@@ -535,9 +578,7 @@
     "exportedTo": {
       "type": "object",
       "required": [
-        "officialCountryName",
-        "isoCodeAlpha2",
-        "isoCodeAlpha3"
+        "officialCountryName"
       ],
       "additionalProperties": false,
       "properties": {

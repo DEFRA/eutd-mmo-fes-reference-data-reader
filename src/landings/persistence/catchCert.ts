@@ -1,7 +1,6 @@
 import moment from 'moment'
-import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery } from 'mmo-shared-reference-data';
+import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus } from 'mmo-shared-reference-data';
 import { DocumentModel, DocumentStatuses, IDocument } from '../types/document';
-import { LandingStatus } from '../types/document';
 import { ICountry } from '../types/appConfig/countries';
 import logger from '../../logger'
 
@@ -42,7 +41,7 @@ export const upsertCertificate = async (documentNumber: string, parametersToUpda
   return response;
 }
 
-export const upsertProductsByIgnore = async (products: any, documentNumber: String) => {
+export const upsertProductsByIgnore = async (products: any, documentNumber: string) => {
   const query : any = {documentNumber: documentNumber};
   const update = {
     $set: { 'exportData.products': products },
@@ -89,6 +88,12 @@ export interface Catch {
   landingDataExpectedDate?: string;
   landingDataEndDate?: string;
   isLegallyDue?: boolean;
+  vesselRiskScore?: number;
+  exporterRiskScore?: number;
+  speciesRiskScore?: number;
+  threshold?: number;
+  riskScore?: number;
+  isSpeciesRiskEnabled?: boolean;
 }
 
 export interface State {

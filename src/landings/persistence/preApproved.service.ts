@@ -44,7 +44,7 @@ export const isDocumentPreApproved = async (documentNumber: string, certificateD
 
     const preApprovedDocument = await getPreApprovedDocumentByDocumentNumber(documentNumber);
 
-    if (preApprovedDocument && preApprovedDocument.certificateData) {
+    if (preApprovedDocument?.certificateData) {
         logger.info(`[PREAPPROVAL-CHECK][${documentNumber}][COMPARING][${hashedCertificate}][${JSON.stringify(preApprovedDocument)}]`);
 
         const isPreApproved = hashedCertificate === preApprovedDocument.certificateData;

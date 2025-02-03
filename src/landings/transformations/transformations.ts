@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const moment = require('moment');
-import { isWithinDeminimus, isElog, ICcQueryResult } from 'mmo-shared-reference-data';
+import { isWithinDeminimus, isElog, ICcQueryResult, isSpeciesFailure } from 'mmo-shared-reference-data';
 import {
   IOnlineValidationReportItem,
   IOnlineValidationReportItemKey,
@@ -9,7 +9,7 @@ import {
 import { ISdPsQueryResult } from '../types/query'
 import { AuditEventTypes, IAuditEvent } from '../types/auditEvent';
 import { DocumentStatuses } from '../types/document';
-import { isHighRisk, getTotalRiskScore, isSpeciesFailure, isRiskEnabled } from '../query/isHighRisk';
+import { isHighRisk, getTotalRiskScore, isRiskEnabled } from '../query/isHighRisk';
 import { getToLiveWeightFactor, getDataEverExpected, getLandingDataRuleDate, getVesselsIdx } from '../../data/cache';
 
 import logger from '../../logger';
@@ -24,11 +24,11 @@ export function* unwindCatchCerts(catchCerts) {
   for (const catchCert of catchCerts) {
     const exportData = catchCert.exportData;
 
-    const voidedEvent = (catchCert.audit && catchCert.audit.length)
+    const voidedEvent = (catchCert.audit?.length)
       ? getLastAuditEvent(catchCert.audit, AuditEventTypes.Voided)
       : undefined;
 
-    const preApprovedEvent = (catchCert.audit && catchCert.audit.length)
+    const preApprovedEvent = (catchCert.audit?.length)
       ? getLastAuditEvent(catchCert.audit, AuditEventTypes.PreApproved)
       : undefined;
 
@@ -70,9 +70,9 @@ export function* unwindCatchCerts(catchCerts) {
             commodityCodeDescription: product.commodityCodeDescription,
             url: catchCert.documentUri,
             investigation: catchCert.investigation,
-            voidedBy: (voidedEvent && voidedEvent.triggeredBy) ? voidedEvent.triggeredBy : undefined,
-            preApprovedBy: (preApprovedEvent && preApprovedEvent.triggeredBy) ? preApprovedEvent.triggeredBy : undefined,
-            transportationVehicle: exportData.transportation && exportData.transportation.vehicle ? exportData.transportation.vehicle : undefined,
+            voidedBy: (voidedEvent?.triggeredBy) ? voidedEvent.triggeredBy : undefined,
+            preApprovedBy: (preApprovedEvent?.triggeredBy) ? preApprovedEvent.triggeredBy : undefined,
+            transportationVehicle: exportData.transportation?.vehicle ? exportData.transportation.vehicle : undefined,
             numberOfSubmissions: caughtBy.numberOfSubmissions,
             vesselOverriddenByAdmin: caughtBy.vesselOverriddenByAdmin,
             speciesOverriddenByAdmin: !!product.speciesAdmin || !!product.state?.admin || !!product.presentation?.admin || !!product.commodityCodeAdmin,
@@ -80,7 +80,13 @@ export function* unwindCatchCerts(catchCerts) {
             dataEverExpected: caughtBy.dataEverExpected,
             landingDataExpectedDate: caughtBy.landingDataExpectedDate,
             landingDataEndDate: caughtBy.landingDataEndDate,
-            isLegallyDue: caughtBy.isLegallyDue
+            isLegallyDue: caughtBy.isLegallyDue,
+            vesselRiskScore: caughtBy.vesselRiskScore,
+            exporterRiskScore: caughtBy.exporterRiskScore,
+            speciesRiskScore: caughtBy.speciesRiskScore,
+            threshold: caughtBy.threshold,
+            riskScore: caughtBy.riskScore,
+            isSpeciesRiskEnabled: caughtBy.isSpeciesRiskEnabled
           }
         }
       }
@@ -367,6 +373,12 @@ export function mapExportPayloadToCC(redisData) {
         vesselOverriddenByAdmin: landing.model.vessel.vesselOverriddenByAdmin,
         licenceHolder: landing.model.vessel.licenceHolder,
         isLegallyDue: landing.model.isLegallyDue,
+        vesselRiskScore: landing.model.vesselRiskScore,
+        exporterRiskScore: landing.model.exporterRiskScore,
+        speciesRiskScore: landing.model.speciesRiskScore,
+        threshold: landing.model.threshold,
+        riskScore: landing.model.riskScore,
+        isSpeciesRiskEnabled: landing.model.isSpeciesRiskEnabled,
         dataEverExpected,
         landingDataExpectedDate,
         landingDataEndDate

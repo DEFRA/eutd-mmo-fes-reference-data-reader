@@ -144,7 +144,19 @@
             "adminState": "Fresh",
             "adminPresentation": "Whole",
             "speciesOverriddenByAdmin": true,
-            "adminCommodityCode": "admin commodity code"
+            "adminCommodityCode": "admin commodity code",
+            "risking": {
+              "vessel": "0.5",
+              "speciesRisk": "0.5",
+              "exporterRiskScore": "0.5",
+              "landingRiskScore": "0.5",
+              "highOrLowRisk": "Low",
+              "isSpeciesRiskEnabled": false
+            },
+            "landingOutcomeAtSubmission": "Success",
+            "landingOutcomeAtRetrospectiveCheck": "Success",
+            "landingValidationstatusAtSubmission": "Validation Success",
+            "landingValidationstatusAtRetrospective": "Validation Success"
           },
           {
             "date": "2019-01-01 05:05:05",
@@ -310,6 +322,33 @@
             },
             "required" : ["name","pln","length","flag","cfr"]
         },
+        "risk": {
+          "type": "object",
+          "properties": {
+            "vessel": {
+              "type": "string"
+            },
+            "speciesRisk": {
+              "type": "string"
+            },
+            "exporterRiskScore": {
+              "type": "string"
+            },
+            "landingRiskScore": {
+              "type": "string"
+            },
+            "highOrLowRisk": {
+              "type": "string",
+              "enum": [
+                "High",
+                "Low"
+              ]
+            },
+            "isSpeciesRiskEnabled": {
+              "type": "boolean"
+            }
+          }
+        },
         "landing" : {
             "type" : "object",
             "properties" : {
@@ -408,6 +447,52 @@
                 "speciesOverriddenByAdmin": {
                   "type": "boolean",
                   "description": "species details are overridden once details has been updated from admin"
+                },
+                "risking": {
+                  "type": ["object", "null"],
+                  "items": {
+                    "$ref": "#/definitions/risk"
+                  }
+                },
+                "landingOutcomeAtSubmission": {
+                  "type": "string",
+                  "enum": ["Success", "Rejected"]
+                },
+                "landingOutcomeAtRetrospectiveCheck": {
+                  "type": "string",
+                  "enum": ["Success", "Failure"]
+                },
+                "landingValidationstatusAtSubmission": {
+                  "type": "string",
+                  "enum": [
+                    "Validation Success",
+                    "Validation Failure - Overuse",
+                    "Validation Failure - Weight",
+                    "Validation Failure - Species",
+                    "Validation Failure - No Landing Data",
+                    "Validation Failure - No Licence Holder",
+                    "Data Never Expected",
+                    "Pending Landing Data - Data Not Yet Expected",
+                    "Pending Landing Data - Data Expected",
+                    "Pending Landing Data - Elog Species",
+                    "Validation Failure - Weight And Overuse"
+                  ]
+                },
+                "landingValidationstatusAtRetrospective": {
+                  "type": "string",
+                  "enum": [
+                    "Validation Success",
+                    "Validation Failure - Overuse",
+                    "Validation Failure - Weight",
+                    "Validation Failure - Species",
+                    "Validation Failure - No Landing Data",
+                    "Validation Failure - No Licence Holder",
+                    "Data Never Expected",
+                    "Pending Landing Data - Data Not Yet Expected",
+                    "Pending Landing Data - Data Expected",
+                    "Pending Landing Data - Elog Species",
+                    "Validation Failure - Weight And Overuse"
+                  ]
                 }
             },
             "required" : [
@@ -466,9 +551,7 @@
         "exportedTo": {
             "type": "object",
             "required": [
-                "officialCountryName",
-                "isoCodeAlpha2",
-                "isoCodeAlpha3"
+                "officialCountryName"
             ],
             "additionalProperties": false,
             "properties": {

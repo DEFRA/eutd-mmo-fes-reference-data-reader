@@ -3,8 +3,6 @@ import * as file from "../../src/data/local-file";
 import * as conversionFactorService from '../../src/landings/persistence/conversionFactors';
 import * as cacheService from '../../src/data/cache';
 
-const sinon = require('sinon');
-
 const testData = {
     species: 'ANE',
     state: 'FRE',
@@ -22,30 +20,30 @@ const testData2 = {
 };
 
 describe('get conversion factors', () => {
-    let mockGetAllConversionFactors;
-    let mockGetToLiveWeightFactor;
+    let mockGetAllConversionFactors: jest.SpyInstance;
+    let mockGetToLiveWeightFactor: jest.SpyInstance;
 
-    let mockLoggerInfo;
-    let mockLoggerError;
+    let mockLoggerInfo: jest.SpyInstance;
+    let mockLoggerError: jest.SpyInstance;
 
     beforeEach(() => {
-        mockLoggerInfo = sinon.spy(logger, 'info');
-        mockLoggerError = sinon.spy(logger, 'error');
+        mockLoggerInfo = jest.spyOn(logger, 'info');
+        mockLoggerError = jest.spyOn(logger, 'error');
 
-        mockGetAllConversionFactors = sinon.stub(cacheService, 'getAllConversionFactors');
-        mockGetToLiveWeightFactor = sinon.stub(cacheService, 'getToLiveWeightFactor');
+        mockGetAllConversionFactors = jest.spyOn(cacheService, 'getAllConversionFactors');
+        mockGetToLiveWeightFactor = jest.spyOn(cacheService, 'getToLiveWeightFactor');
     });
 
     afterEach(() => {
-        mockLoggerInfo.restore();
-        mockLoggerError.restore();
+        mockLoggerInfo.mockRestore();
+        mockLoggerError.mockRestore();
 
-        mockGetAllConversionFactors.restore();
-        mockGetToLiveWeightFactor.restore();
+        mockGetAllConversionFactors.mockRestore();
+        mockGetToLiveWeightFactor.mockRestore();
     });
 
     it('should return one conversion factor', async () => {
-        mockGetToLiveWeightFactor.returns(1);
+        mockGetToLiveWeightFactor.mockReturnValue(1);
 
         const products = [{
             species: 'ANE',
@@ -56,12 +54,12 @@ describe('get conversion factors', () => {
         const result = conversionFactorService.getConversionFactors(products);
 
         expect(result.length).toEqual(1);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
     });
 
     it('should return two conversion factors', async () => {
-        mockGetToLiveWeightFactor.onCall(0).returns(1.04);
-        mockGetToLiveWeightFactor.onCall(1).returns(1);
+        mockGetToLiveWeightFactor.mockReturnValueOnce(1.04);
+        mockGetToLiveWeightFactor.mockReturnValueOnce(1);
 
         const products = [{
             species: 'ANE',
@@ -78,15 +76,15 @@ describe('get conversion factors', () => {
         const result = conversionFactorService.getConversionFactors(products);
 
         expect(result.length).toEqual(2);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
-        expect(mockLoggerInfo.getCall(1).args[0]).toEqual('[GET-CONVERSION-FACTOR][species:BSF state:FRO presentation:GUT][SUCCESS]');
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, '[GET-CONVERSION-FACTOR][species:BSF state:FRO presentation:GUT][SUCCESS]');
 
         expect(result[0]).toEqual(testData);
         expect(result[1]).toEqual(testData2);
     });
 
     it('should return toLiveWeightFactor=1 if conversion factor if not found', async () => {
-        mockGetToLiveWeightFactor.returns(1);
+        mockGetToLiveWeightFactor.mockReturnValue(1);
 
         const products = [{
             species: 'ANE',
@@ -103,16 +101,16 @@ describe('get conversion factors', () => {
             presentation: 'GUT',
             toLiveWeightFactor: 1
         }]);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
     });
 
     it('should return all conversion factors if no products are passed in', async () => {
-        mockGetAllConversionFactors.onCall(0).returns(testData)
+        mockGetAllConversionFactors.mockReturnValueOnce(testData)
 
         const result = conversionFactorService.getConversionFactors();
 
         expect(result).toEqual(testData);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTOR][GETTING-ALL-FACTORS][SUCCESS]');
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTOR][GETTING-ALL-FACTORS][SUCCESS]');
     });
 });
 

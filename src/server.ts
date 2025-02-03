@@ -1,9 +1,9 @@
 import appInsights from './app-insights';
 import { updateIgnoreFlagName } from './landings/updateIgnoreFlagName';
+import { Boom } from '@hapi/boom';
 
 import * as fs from 'fs';
 import * as Hapi from '@hapi/hapi';
-import { Boom } from '@hapi/boom';
 import * as cron from 'node-cron';
 const mongoose = require('mongoose');
 
@@ -31,7 +31,7 @@ import { virusCheckerRoutes } from './handler/virusChecker';
 import { uploadValidatorRoutes } from './handler/uploadValidator';
 import { eodRoutes } from './handler/eod';
 import { isLegallyDueRoute } from './handler/isLegallyDue';
-import { purgeRoutes } from './handler/purge'; 
+import { purgeRoutes } from './handler/purge';
 
 const Joi = require('joi');
 
@@ -123,9 +123,11 @@ export class Server {
       const permissions =
         'accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), layout-animations=(), legacy-image-formats=*, magnetometer=(), microphone=(), midi=(), oversized-images=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=*, usb=(), vr=(), screen-wake-lock=(), web-share=(), xr-spatial-tracking=()';
 
-      Object.prototype.hasOwnProperty.call(response, "isBoom")
-        ? ((response as Boom).output.headers['Permissions-Policy'] = permissions)
-        : (response as Hapi.ResponseObject).header('Permissions-Policy', permissions);
+      if (response instanceof Boom) {
+        response.output.headers['Permissions-Policy'] = permissions;
+      } else {
+        response.header('Permissions-Policy', permissions);
+      }
 
       return h.continue;
     });

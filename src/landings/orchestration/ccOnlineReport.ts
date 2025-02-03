@@ -123,9 +123,9 @@ export function findLandingsToUpdate(rawValidatedCertificates: ICcQueryResult[],
 }
 
 async function isBlocking(report: IOnlineValidationReportItem[]) {
-  const isBlocking3CEnabled: Boolean = await getBlockingStatus(ValidationRules.THREE_C);
-  const isBlocking3DEnabled: Boolean = await getBlockingStatus(ValidationRules.THREE_D);
-  const isBlocking4AEnabled: Boolean = await getBlockingStatus(ValidationRules.FOUR_A);
+  const isBlocking3CEnabled: boolean = await getBlockingStatus(ValidationRules.THREE_C);
+  const isBlocking3DEnabled: boolean = await getBlockingStatus(ValidationRules.THREE_D);
+  const isBlocking4AEnabled: boolean = await getBlockingStatus(ValidationRules.FOUR_A);
 
   return (validationFailedOn("3C", report) && isBlocking3CEnabled) ||
     (validationFailedOn("3D", report) && isBlocking3DEnabled) ||

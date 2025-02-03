@@ -27,6 +27,9 @@
         "dataEverExpected": true,
         "landingDataExpectedDate": "2023-05-26",
         "landingDataEndDate": "2023-06-05",
+        "landingDataExpectedAtSubmission": false,
+        "landingOutcomeAtSubmission": "Success",
+        "landingOutcomeAtRetrospectiveCheck": "Success",
         "vesselAdministration": "England",
         "adminSpecies": "Sand smelt (ATP)",
         "adminState": "Fresh",
@@ -236,12 +239,16 @@
           "type": "string",
           "enum": [
             "Validation Success",
-            "Validation Failure - Overuse",
-            "Validation Failure - Weight",
-            "Validation Failure - Species",
-            "Validation Failure - No Landing Data",
-            "Pending Landing Data",
-            "Data never expected"
+            "Overuse Failure",
+            "Weight Failure",
+            "Species Failure",
+            "No Landing Data Failure",
+            "Validation Failure - No Licence Holder",
+            "Data Never Expected",
+            "Pending Landing Data - Data Not Yet Expected",
+            "Pending Landing Data - Data Expected",
+            "Pending Landing Data - Elog Species",
+            "Weight and Overuse Failure"
           ]
         },
         "speciesOverriddenByAdmin": {
@@ -347,6 +354,14 @@
           "type": "boolean",
           "description": "Is Landing data expected at submission"
         },
+        "landingOutcomeAtSubmission": {
+          "type": "string",
+          "enum": ["Success", "Rejected"]
+        },
+        "landingOutcomeAtRetrospectiveCheck": {
+          "type": "string",
+          "enum": ["Success", "Failure"]
+        },
         "isLate": {
           "type": "boolean",
           "description": "Is Landing data received late"
@@ -447,9 +462,7 @@
         "exportedTo": {
           "type": "object",
           "required": [
-            "officialCountryName",
-            "isoCodeAlpha2",
-            "isoCodeAlpha3"
+            "officialCountryName"
           ],
           "additionalProperties": false,
           "properties": {

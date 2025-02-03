@@ -19,11 +19,11 @@ export const vesselRoutes = (server: Hapi.Server) => {
       handler: async (request, h) => {
         try {
           const query = request.query;
-          const searchTerm = query && query.searchTerm;
+          const searchTerm = query.searchTerm;
 
           const allVessels: IVessel[] = [];
 
-          if (query && query.landedDate) {
+          if (query.landedDate) {
 
             const landedDate = moment.utc(query.landedDate);
             const landedDateISO = landedDate.toISOString();
@@ -39,7 +39,6 @@ export const vesselRoutes = (server: Hapi.Server) => {
 
         } catch(e) {
           if (e.message.includes('Invalid regular expression')) {
-            logger.error(e);
             return h.response([]).code(400);
           } else {
             logger.error(e);
@@ -94,8 +93,8 @@ export const vesselRoutes = (server: Hapi.Server) => {
       handler: async (request, h) => {
         try {
           const query = request.query;
-          const vesselPln = query && query.vesselPln;
-          const vesselName = query && query.vesselName;
+          const vesselPln = query.vesselPln;
+          const vesselName = query.vesselName;
           const vesselsData = getVesselsData();
           const vessel = mingo.find(vesselsData,
             { "registrationNumber": vesselPln, "fishingVesselName": vesselName }
@@ -136,16 +135,16 @@ export const vesselRoutes = (server: Hapi.Server) => {
       handler: async (request, h) => {
         try {
           const query = request.query;
-          const vesselPln = query && query.vesselPln;
-          const vesselName = query && query.vesselName;
+          const vesselPln = query.vesselPln;
+          const vesselName = query.vesselName;
           const landedDate = moment.utc(query.landedDate);
           const landedDateISO = landedDate.toISOString();
-          const vesselFlag = query?.flag;
-          const vesselCfr = query?.cfr;
-          const vesselHomePort = query?.homePort;
-          const vesselNumber = query?.licenceNumber;
-          const vesselImoNumber: number = (query?.imo === null || query?.imo === undefined) ? null : parseInt(query?.imo);
-          const vesselLicenceValidTo = query?.licenceValidTo;
+          const vesselFlag = query.flag;
+          const vesselCfr = query.cfr;
+          const vesselHomePort = query.homePort;
+          const vesselNumber = query.licenceNumber;
+          const vesselImoNumber: number = (query.imo === null || query.imo === undefined) ? null : parseInt(query.imo);
+          const vesselLicenceValidTo = query.licenceValidTo;
 
           if (!moment.utc(vesselLicenceValidTo).isValid() || vesselNumber === undefined)
             return h.response(null).code(404);

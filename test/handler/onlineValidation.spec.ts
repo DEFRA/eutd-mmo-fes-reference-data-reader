@@ -3,13 +3,12 @@ import * as SdpsReporting from "../../src/landings/orchestration/sdpsOnlineRepor
 import { IOnlineValidationReportItem,
   ValidationRules,
   IForeignCatchCertificateValidationResult } from '../../src/landings/types/onlineValidationReport'
-import moment = require('moment');
+const moment = require('moment');
 import { onlineValidationRoutes } from '../../src/handler/onlineValidation';
 import * as Hapi from '@hapi/hapi';
 
-const sinon = require('sinon');
-const ccReportingMock = sinon.stub(CcReporting, 'generateOnlineValidationReport');
-const sdpsReportingMock = sinon.stub(SdpsReporting, 'generateForeignCatchCertOnlineValidationReport');
+const ccReportingMock = jest.spyOn(CcReporting, 'generateOnlineValidationReport');
+const sdpsReportingMock = jest.spyOn(SdpsReporting, 'generateForeignCatchCertOnlineValidationReport');
 
 let server;
 
@@ -53,13 +52,13 @@ describe('When getting a catch certificate', () => {
         }
     };
 
-    ccReportingMock.reset();
-    ccReportingMock.returns(onlineReportResponse);
+    ccReportingMock.mockReset();
+    ccReportingMock.mockResolvedValue({ report: onlineReportResponse, rawData: [] });
 
     const response = await server.inject(req);
 
     expect(response.statusCode).toBe(200);
-    expect(response.payload).toBe(`[{"species":"LBE","presentation":"FIS","state":"BAD","failures":["3D"],"vessel":"MR BOB","date":"${date}"}]`);
+    expect(response.payload).toBe(`{"report":[{"species":"LBE","presentation":"FIS","state":"BAD","failures":["3D"],"vessel":"MR BOB","date":"${date}"}],"rawData":[]}`);
 
   });
 
@@ -106,8 +105,10 @@ describe('When getting a catch certificate', () => {
 
   it('will return a 500 if an unexpected error occurs in the report generation', async () => {
 
-    ccReportingMock.reset();
-    ccReportingMock.throws();
+    ccReportingMock.mockReset();
+    ccReportingMock.mockImplementation(() => {
+      throw Error()
+    })
 
     const req = {
         method: 'POST',
@@ -159,13 +160,13 @@ describe('When getting a storage document/ processing statement', () => {
         }
     };
 
-    sdpsReportingMock.reset();
-    sdpsReportingMock.returns(onlineReportResponse);
+    sdpsReportingMock.mockReset();
+    sdpsReportingMock.mockResolvedValue(onlineReportResponse[0]);
 
     const response = await server.inject(req);
 
     expect(response.statusCode).toBe(200);
-    expect(response.payload).toBe(JSON.stringify(onlineReportResponse));
+    expect(response.payload).toBe(JSON.stringify(onlineReportResponse[0]));
   });
 
   it('will return a 400 if there is no payload', async () => {
@@ -197,8 +198,10 @@ describe('When getting a storage document/ processing statement', () => {
 
   it('will return a 500 if an unexpected error occurs in the report generation', async () => {
 
-    sdpsReportingMock.reset();
-    sdpsReportingMock.throws();
+    sdpsReportingMock.mockReset();
+    sdpsReportingMock.mockImplementation(() => {
+      throw Error("")
+    })
 
     const req = {
         method: 'POST',

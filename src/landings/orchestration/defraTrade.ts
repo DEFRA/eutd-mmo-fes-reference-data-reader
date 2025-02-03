@@ -4,8 +4,7 @@ import  addFormats from "ajv-formats";
 import { readFileSync } from "fs";
 import { v4 as uuidv4 } from 'uuid';
 import { ServiceBusMessage } from "@azure/service-bus";
-import { MessageLabel, addToReportQueue, ICcQueryResult } from "mmo-shared-reference-data";
-import { CertificateStatus, IDefraTradeCatchCertificate } from "../types/defraTradeCatchCertificate";
+import { MessageLabel, addToReportQueue, ICcQueryResult, IDefraTradeCatchCertificate, CertificateStatus } from "mmo-shared-reference-data";
 import { IDefraTradeProcessingStatement, IDefraTradeStorageDocument } from "../types/defraTradeSdPsCase";
 import { IDocument } from "../types/document";
 import { toDefraTradeCc, toDefraTradePs, toDefraTradeSd } from "../transformations/defraTradeValidation";
@@ -44,6 +43,9 @@ export const reportCcToTrade = async (
   delete catchCertificateCase.clonedFrom;
   delete catchCertificateCase.landingsCloned;
   delete catchCertificateCase.parentDocumentVoid;
+  delete catchCertificateCase.caseRiskAtSubmission;
+  delete catchCertificateCase.caseStatusAtSubmission;
+  delete catchCertificateCase.caseOutcomeAtSubmission;
 
   if (!config.azureTradeQueueEnabled) {
     logger.info(`[DEFRA-TRADE-CC][DOCUMENT-NUMBER][${certificate.documentNumber}][CHIP-DISABLED]`);
@@ -69,6 +71,7 @@ export const reportCcToTrade = async (
 
   const validate_cc_defra_trade = getValidator('CatchCertificateCase.json')
   const valid: boolean = validate_cc_defra_trade(ccDefraTrade);
+
   if (!valid) {
     logger.error(`[DEFRA-TRADE-CC][DOCUMENT-NUMBER][${certificate.documentNumber}][INVALID-PAYLOAD][${JSON.stringify(validate_cc_defra_trade.errors)}]`);
     return;
@@ -144,6 +147,13 @@ export const reportPsToTrade = async (processingStatement: IDocument, caselabel:
     return;
   }
 
+  let status: CertificateStatus;
+  if (!Array.isArray(psQueryResults)) {
+    status = CertificateStatus.VOID
+  } else {
+    status = psQueryResults?.some((_: ISdPsQueryResult) => _.status === CertificateStatus.BLOCKED) ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE
+  }
+
   const messageId = uuidv4();
   const message: ServiceBusMessage = {
     body: psDefraTrade,
@@ -157,7 +167,7 @@ export const reportPsToTrade = async (processingStatement: IDocument, caselabel:
       UserId: psDefraTrade.exporter.contactId ?? null,
       SchemaVersion: parseInt(validate_ps_defra_trade.schema.properties.version.const),
       Type: Type.INTERNAL,
-      Status: Array.isArray(psQueryResults) ? psQueryResults?.some((_: ISdPsQueryResult) => _.status === CertificateStatus.BLOCKED) ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE : CertificateStatus.VOID ,
+      Status: status,
       TimestampUtc: moment.utc().toISOString()
     },
     subject: `${caselabel}-${processingStatement.documentNumber}`,
@@ -215,6 +225,13 @@ export const reportSdToTrade = async (storageDocument: IDocument, caselabel: Mes
     return;
   }
 
+  let status: CertificateStatus;
+  if (!Array.isArray(sdQueryResults)) {
+    status = CertificateStatus.VOID
+  } else {
+    status = sdQueryResults?.some((_: ISdPsQueryResult) => _.status === CertificateStatus.BLOCKED) ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE
+  }
+
   const messageId = uuidv4();
   const message: ServiceBusMessage = {
     body: sdDefraTrade,
@@ -228,7 +245,7 @@ export const reportSdToTrade = async (storageDocument: IDocument, caselabel: Mes
       UserId: sdDefraTrade.exporter.contactId ?? null,
       SchemaVersion: parseInt(validate_sd_defra_trade.schema.properties.version.const),
       Type: Type.INTERNAL,
-      Status: Array.isArray(sdQueryResults) ? sdQueryResults?.some((_: ISdPsQueryResult) => _.status === CertificateStatus.BLOCKED) ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE : CertificateStatus.VOID ,
+      Status: status,
       TimestampUtc: moment.utc().toISOString()
     },
     subject: `${caselabel}-${storageDocument.documentNumber}`,

@@ -1,6 +1,6 @@
 import { BlockingStatusModel, ValidationRules } from '../landings/types/systemBlock';
 
-export const getBlockingStatus = async (name: string) : Promise<Boolean> => {
+export const getBlockingStatus = async (name: string) : Promise<boolean> => {
     const data : any = await BlockingStatusModel.findOne( {name} );
 
     return data ? data.status : false;

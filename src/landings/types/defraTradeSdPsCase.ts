@@ -1,6 +1,13 @@
 import { ICountry } from "./appConfig/countries";
-import { IDynamicsProcessingStatementValidation, IDynamicsStorageDocumentValidation, SdPsCaseTwoType } from "./dynamicsSdPsCase";
+import { SdPsCaseTwoType } from "./dynamicsSdPsCase";
 import { CertificateAddress, CertificateAuthority, CertificateCompany, CertificateStorageFacility, CertificateTransport } from "./defraValidation";
+
+export interface IDefraTradeProcessingStatementValidation {
+  status: IDefraTradeSdPsStatus;
+  totalUsedWeightAgainstCertificate: number;
+  weightExceededAmount?: number;
+  overuseInfo?: string[];
+}
 
 export interface IDefraTradeProcessingStatementCatch {
   foreignCatchCertificateNumber: string;
@@ -11,7 +18,7 @@ export interface IDefraTradeProcessingStatementCatch {
   importedWeight: number;
   usedWeightAgainstCertificate: number;
   processedWeight: number;
-  validation: IDynamicsProcessingStatementValidation;
+  validation: IDefraTradeProcessingStatementValidation;
 }
 
 export interface IDefraTradeProcessingStatement {
@@ -38,6 +45,13 @@ export interface IDefraTradeProcessingStatement {
     authority: CertificateAuthority;
 }
 
+export interface IDefraTradeStorageDocumentValidation {
+  status: IDefraTradeSdPsStatus;
+  totalWeightExported: number;
+  weightExceededAmount?: number;
+  overuseInfo?: string[];
+}
+
 export interface IDefraTradeStorageDocumentProduct {
   foreignCatchCertificateNumber: string;
   species: string;
@@ -46,7 +60,7 @@ export interface IDefraTradeStorageDocumentProduct {
   scientificName: string;
   importedWeight: number;
   exportedWeight: number;
-  validation: IDynamicsStorageDocumentValidation;
+  validation: IDefraTradeStorageDocumentValidation;
   dateOfUnloading: string,
   placeOfUnloading: string,
   transportUnloadedFrom: string,
@@ -69,4 +83,10 @@ export interface IDefraTradeStorageDocument {
   transportation: CertificateTransport;
   storageFacilities: CertificateStorageFacility[];
   authority: CertificateAuthority;
+}
+
+export enum IDefraTradeSdPsStatus {
+  Success = 'Validation Success',
+  Overuse = "Validation Failure - Overuse",
+  Weight = "Validation Failure - Weight",
 }

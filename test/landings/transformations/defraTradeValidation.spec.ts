@@ -1,14 +1,13 @@
 import moment from 'moment';
 import * as SUT from '../../../src/landings/transformations/defraTradeValidation';
 import * as VesselService from '../../../src/handler/vesselService';
-import { ICcQueryResult, LandingStatusType, LevelOfRiskType } from 'mmo-shared-reference-data';
-import { CatchArea, CertificateStatus, IDefraTradeCatchCertificate } from '../../../src/landings/types/defraTradeCatchCertificate';
+import { ICcQueryResult, DefraCcLandingStatusType, LevelOfRiskType, LandingStatusType, IDefraTradeCatchCertificate, CatchArea, CertificateStatus } from 'mmo-shared-reference-data';
 import { IDocument } from '../../../src/landings/types/document';
 import { CaseOneType, CaseTwoType, IDynamicsCatchCertificateCase } from '../../../src/landings/types/dynamicsCcCase';
 import { ISdPsQueryResult } from '../../../src/landings/types/query';
 import { LandingSources } from '../../../src/landings/types/landing';
 import { InvestigationStatus } from '../../../src/landings/types/auditEvent';
-import { IDefraTradeStorageDocument } from '../../../src/landings/types/defraTradeSdPsCase';
+import { IDefraTradeSdPsStatus, IDefraTradeStorageDocument } from '../../../src/landings/types/defraTradeSdPsCase';
 import { IDynamicsStorageDocumentCase, SdPsCaseTwoType, SdPsStatus } from '../../../src/landings/types/dynamicsSdPsCase';
 
 describe('when transforming Catch Certificate data from IDocument, ICcQuery to IDefraTradeCatchCertificate', () => {
@@ -410,7 +409,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       },
       landings: [
         {
-          status: LandingStatusType.ValidationFailure_Species,
+          status: DefraCcLandingStatusType.ValidationFailure_Species,
           id: "GBR-2023-CC-C58DF9A73-1777642314",
           landingDate: "2023-08-31",
           species: "Lobster",
@@ -495,16 +494,20 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
   });
 
   it('will return a IDefraTradeCatchCertificate payload with direct landing', () => {
-    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc({ ...exampleCc, exportData: { ...exampleCc.exportData, transportation: {
-      exportedFrom: "United Kingdom",
-      exportedTo: {
-        officialCountryName: "France",
-        isoCodeAlpha2: "FR",
-        isoCodeAlpha3: "FRA",
-        isoNumericCode: "250"
-      },
-      vehicle: "directLanding"
-    },} }, dynamicsCatchCertificateCase, ccQueryResults);
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc({
+      ...exampleCc, exportData: {
+        ...exampleCc.exportData, transportation: {
+          exportedFrom: "United Kingdom",
+          exportedTo: {
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          },
+          vehicle: "directLanding"
+        },
+      }
+    }, dynamicsCatchCertificateCase, ccQueryResults);
 
     const expected: IDefraTradeCatchCertificate = {
       documentNumber: "GBR-2023-CC-C58DF9A73",
@@ -554,7 +557,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       },
       landings: [
         {
-          status: LandingStatusType.ValidationFailure_Species,
+          status: DefraCcLandingStatusType.ValidationFailure_Species,
           id: "GBR-2023-CC-C58DF9A73-1777642314",
           landingDate: "2023-08-31",
           species: "Lobster",
@@ -996,7 +999,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
                 _status: "PENDING_LANDING_DATA"
               }
             ]
-          },          {
+          }, {
             speciesId: "GBR-2023-CC-C58DF9A73-35f724fd-b026-4ba7-80cf-4f458a780486",
             species: "Black scabbardfish (BSF)",
             speciesCode: "BSF",
@@ -1342,7 +1345,7 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     commodityCode: "03089090",
     weightOnDoc: 100,
     extended: {
-      id:  'GBR-2023-CC-0123456789-1693931464',
+      id: 'GBR-2023-CC-0123456789-1693931464',
     },
     weightOnAllDocs: 100,
     weightOnFCC: 100,
@@ -1390,31 +1393,31 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     },
     "documentUrl": "http://tst-gov.uk/asfd9asdfasdf0jsaf.pdf",
     "documentDate": "2019-01-01 05:05:05",
-    "caseType1" : "SD",
-    "caseType2"	: SdPsCaseTwoType.RealTimeValidation_Overuse,
-    "numberOfFailedSubmissions" : 4,
-    "documentNumber" : "GBR-SD-234234-234-234",
-    "companyName" : "Bob's Fisheries LTD",
+    "caseType1": "SD",
+    "caseType2": SdPsCaseTwoType.RealTimeValidation_Overuse,
+    "numberOfFailedSubmissions": 4,
+    "documentNumber": "GBR-SD-234234-234-234",
+    "companyName": "Bob's Fisheries LTD",
     "exportedTo": {
       "officialCountryName": "Nigeria",
       "isoCodeAlpha2": "NG",
       "isoCodeAlpha3": "NGR"
     },
-    "products" : [
+    "products": [
       {
         "id": "some-product-id",
-        "foreignCatchCertificateNumber" : "FR-SD-234234-23423-234234",
+        "foreignCatchCertificateNumber": "FR-SD-234234-23423-234234",
         "isDocumentIssuedInUK": false,
-        "species" : "HER",
-        "cnCode" : "324234324432234",
+        "species": "HER",
+        "cnCode": "324234324432234",
         "scientificName": "scientific name",
-        "importedWeight" : 500,
-        "exportedWeight" : 700,
-        "validation" : {
-          "status" : SdPsStatus.Overuse,
-          "totalWeightExported" : 700,
-          "weightExceededAmount" : 200,
-          "overuseInfo" : ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
+        "importedWeight": 500,
+        "exportedWeight": 700,
+        "validation": {
+          "status": SdPsStatus.Overuse,
+          "totalWeightExported": 700,
+          "weightExceededAmount": 200,
+          "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
 
         }
       }
@@ -1500,6 +1503,489 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     };
 
     expect(result.products?.[0]).toStrictEqual(expected);
+  });
+
+});
+
+describe('When mapping from an ISdPsQueryResult to a IDefraTradeProcessingStatementCatch', () => {
+  const input: ISdPsQueryResult = {
+    documentNumber: "PS1",
+    catchCertificateNumber: "PS2",
+    catchCertificateType: "uk",
+    documentType: "PS",
+    createdAt: "2020-01-01",
+    status: "COMPLETE",
+    species: "Atlantic cod (COD)",
+    scientificName: "Gadus morhua",
+    commodityCode: "FRESHCOD",
+    weightOnDoc: 100,
+    weightOnAllDocs: 150,
+    weightOnFCC: 200,
+    weightAfterProcessing: 80,
+    isOverAllocated: false,
+    overUsedInfo: [],
+    isMismatch: false,
+    overAllocatedByWeight: 0,
+    da: null,
+    extended: {
+      id: 'PS2-1610018839',
+    }
+  };
+
+  it('will map the foreignCatchCertificateNumber', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.foreignCatchCertificateNumber).toEqual("PS2");
+  });
+
+  it('will map the species code', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.species).toEqual("Atlantic cod (COD)");
+  });
+
+  it('will map the commodity code', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.cnCode).toEqual("FRESHCOD");
+  })
+
+  it('will map the importedWeight', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.importedWeight).toEqual(200);
+  });
+
+  it('will map usedWeightAgainstCertificate', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.usedWeightAgainstCertificate).toEqual(100)
+  });
+
+  it('will map processedWeight', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.processedWeight).toEqual(80)
+  });
+
+  it('will map a scientific name', () => {
+    const result = SUT.toDefraTradePsCatch(input);
+
+    expect(result.scientificName).toBe("Gadus morhua");
+  });
+
+  describe("The validation within IDynamicsProcessingStatementCatch", () => {
+    it('will contain totalUsedWeightAgainstCertificate', () => {
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.totalUsedWeightAgainstCertificate).toEqual(150)
+    });
+
+    it('will highlight `Success` if there is no failure', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "PS1",
+        catchCertificateNumber: "PS2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 100,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        isMismatch: false,
+        overAllocatedByWeight: 0,
+        overUsedInfo: [],
+        da: null,
+        extended: {
+          id: 'PS2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.status).toEqual(SdPsStatus.Success)
+    });
+
+    it('will highlight when the failure reason is the weight', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "PS1",
+        catchCertificateNumber: "PS2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: [],
+        isMismatch: true,
+        overAllocatedByWeight: 0,
+        da: null,
+        extended: {
+          id: 'PS2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.status).toEqual(IDefraTradeSdPsStatus.Weight);
+    });
+
+    it('will highlight when the failure reason is overuse', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "PS1",
+        catchCertificateNumber: "PS2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: true,
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        overUsedInfo: [],
+        da: null,
+        extended: {
+          id: 'PS2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.weightExceededAmount).toEqual(50)
+    });
+
+    it('will have the over use array when the failure reason is overuse', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "PS1",
+        catchCertificateNumber: "PS2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: ["PS3"],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'PS2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.overuseInfo).toEqual(["PS3"])
+    });
+
+    it('will not have an overuse array when the failure overuse occurs on this document', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "PS1",
+        catchCertificateNumber: "PS2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: ["PS1"],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'PS2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.overuseInfo).toBeUndefined();
+    });
+
+    it('will not include current document number in overuseInfo array when the failure overuse occurs on this document', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "PS1",
+        catchCertificateNumber: "PS2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: ["PS1", "PS2"],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'PS2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradePsCatch(input);
+
+      expect(result.validation.overuseInfo).toStrictEqual(["PS2"]);
+    });
+  });
+});
+
+describe('When mapping fron an ISdPsQueryResult to a IDefraTradeStorageDocumentProduct', () => {
+  const input: ISdPsQueryResult = {
+    documentNumber: "SD1",
+    catchCertificateNumber: "SD2",
+    catchCertificateType: "uk",
+    documentType: "SD",
+    createdAt: "2020-01-01",
+    status: "COMPLETE",
+    species: "Atlantic cod (COD)",
+    scientificName: "Gadus morhua",
+    commodityCode: "FRESHCOD",
+    weightOnDoc: 100,
+    weightOnAllDocs: 150,
+    weightOnFCC: 200,
+    weightAfterProcessing: 80,
+    isOverAllocated: false,
+    overUsedInfo: [],
+    isMismatch: false,
+    overAllocatedByWeight: 0,
+    da: null,
+    extended: {
+      id: 'SD2-1610018839',
+    }
+  };
+
+  it('will map the foreignCatchCertificateNumber', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.foreignCatchCertificateNumber).toEqual("SD2");
+  });
+
+  it('will map the species code', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.species).toEqual("Atlantic cod (COD)");
+  });
+
+  it('will map the commodity code', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.cnCode).toEqual("FRESHCOD");
+  })
+
+  it('will map the importedWeight', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.importedWeight).toEqual(200);
+  });
+
+  it('will map exportedWeight', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.exportedWeight).toEqual(100)
+  });
+
+  it('will map a scientific name', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.scientificName).toBe("Gadus morhua");
+  });
+
+  describe("The validation within IDynamicsStorageDocumentProduct", () => {
+    it('will contain totalUsedWeightAgainstCertificate', () => {
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.totalWeightExported).toEqual(150)
+    });
+
+    it('will highlight when the failure reason is the weight', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        documentType: "SD",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: [],
+        isMismatch: true,
+        overAllocatedByWeight: 0,
+        da: null,
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.status).toEqual(IDefraTradeSdPsStatus.Weight)
+    });
+
+    it('will highlight when the failure reason is overuse', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        documentType: "PS",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: true,
+        overUsedInfo: [],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.status).toEqual(IDefraTradeSdPsStatus.Overuse)
+    });
+
+    it('will highlight the weight exceeded amount when the failure reason is overuse', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        documentType: "SD",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: [],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.weightExceededAmount).toEqual(50)
+    });
+
+    it('will have over use array when the failure reason is overuse', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        documentType: "SD",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: ["SD3"],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.overuseInfo).toEqual(["SD3"])
+    });
+
+    it('will not have an overuse array when the failure overuse occurs on this document', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        documentType: "SD",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: ["SD1"],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.overuseInfo).toBeUndefined();
+    });
+
+    it('will not include current document number in overuseInfo array when the failure overuse occurs on this document', () => {
+      const input: ISdPsQueryResult = {
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        documentType: "SD",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "COD",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: ["SD1", "SD2"],
+        isMismatch: false,
+        overAllocatedByWeight: 50,
+        da: null,
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      };
+
+      const result = SUT.toDefraTradeSdProduct(input);
+
+      expect(result.validation.overuseInfo).toStrictEqual(["SD2"]);
+    });
   });
 
 });

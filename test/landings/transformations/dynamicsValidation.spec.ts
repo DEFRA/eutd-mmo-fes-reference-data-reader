@@ -37,7 +37,7 @@ describe('toLanding', () => {
     documentNumber: '',
     documentType: '',
     status: 'COMPLETE',
-    createdAt: '2019-01-01',
+    createdAt: '2023-05-27',
     rssNumber: '',
     da: 'England',
     dateLanded: '2019-01-01',
@@ -258,14 +258,23 @@ describe('toLanding', () => {
     expect(result.landingDataEndDate).toBe('2023-06-05');
   });
 
-  it('should set landingDataExpectedAtSubmission when dataEverExpected is true', async () => {
+  it('should set landingDataExpectedAtSubmission to true when isLegallyDue is true', async () => {
     const result = toLanding(sampleICcQueryResult);
 
-    expect(result.landingDataExpectedAtSubmission).toBe(false);
+    expect(result.landingDataExpectedAtSubmission).toBe(true);
+  });
+
+  it('should set landingDataExpectedAtSubmission when dataEverExpected is true', async () => {
+    sampleICcQueryResult.extended.isLegallyDue = false;
+    const result = toLanding(sampleICcQueryResult);
+
+    expect(result.landingDataExpectedAtSubmission).toBe(true);
   });
 
   it('should set landingDataExpectedAtSubmission when dataEverExpected is undefined', async () => {
+    sampleICcQueryResult.createdAt = "2019-05-30";
     sampleICcQueryResult.extended.dataEverExpected = undefined;
+    sampleICcQueryResult.extended.isLegallyDue = false;
     const result = toLanding(sampleICcQueryResult);
 
     expect(result.landingDataExpectedAtSubmission).toBe(false);
@@ -279,27 +288,28 @@ describe('toLanding', () => {
   });
 
   it('should set landingDataExpectedAtSubmission=true when expecteddate is before date of submission', async () => {
-    sampleICcQueryResult.createdAt="2023-05-30";
+    sampleICcQueryResult.createdAt = "2023-05-30";
     sampleICcQueryResult.extended.dataEverExpected = true;
-    sampleICcQueryResult.extended.landingDataExpectedDate="2023-05-27";
+    sampleICcQueryResult.extended.landingDataExpectedDate = "2023-05-27";
 
     const result = toLanding(sampleICcQueryResult);
     expect(result.landingDataExpectedAtSubmission).toBe(true);
   });
 
   it('should set landingDataExpectedAtSubmission=false when expecteddate is after date of submission', async () => {
-    sampleICcQueryResult.createdAt="2023-05-30";
+    sampleICcQueryResult.createdAt = "2023-05-30";
     sampleICcQueryResult.extended.dataEverExpected = true;
-    sampleICcQueryResult.extended.landingDataExpectedDate="2023-06-01";
+    sampleICcQueryResult.extended.landingDataExpectedDate = "2023-06-01";
+    sampleICcQueryResult.extended.isLegallyDue = false;
 
     const result = toLanding(sampleICcQueryResult);
     expect(result.landingDataExpectedAtSubmission).toBe(false);
   });
 
   it('should set isLate=true when firstDateTimeLandingDataRetrieved is after the expected date and before or on the end date', async () => {
-    sampleICcQueryResult.firstDateTimeLandingDataRetrieved='2023-06-01T07:23:52.264Z';
-    sampleICcQueryResult.extended.landingDataExpectedDate="2023-05-30";
-    sampleICcQueryResult.extended.landingDataEndDate="2023-06-07";
+    sampleICcQueryResult.firstDateTimeLandingDataRetrieved = '2023-06-01T07:23:52.264Z';
+    sampleICcQueryResult.extended.landingDataExpectedDate = "2023-05-30";
+    sampleICcQueryResult.extended.landingDataEndDate = "2023-06-07";
     sampleICcQueryResult.extended.vesselOverriddenByAdmin = false;
 
     const result = toLanding(sampleICcQueryResult);
@@ -307,17 +317,17 @@ describe('toLanding', () => {
   });
 
   it('should set isLate=false when isLandingExists is true and firstDateTimeLandingDataRetrieved is after the expected date and before or on the end date', async () => {
-    sampleICcQueryResult.firstDateTimeLandingDataRetrieved='2023-06-01T07:23:52.264Z';
-    sampleICcQueryResult.extended.landingDataExpectedDate="2023-06-01";
+    sampleICcQueryResult.firstDateTimeLandingDataRetrieved = '2023-06-01T07:23:52.264Z';
+    sampleICcQueryResult.extended.landingDataExpectedDate = "2023-06-01";
 
     const result = toLanding(sampleICcQueryResult);
     expect(result.isLate).toEqual(false);
   });
 
   it('should not set isLate when firstDateTimeLandingDataRetrieved is undefined and submission date is on end date', async () => {
-    sampleICcQueryResult.firstDateTimeLandingDataRetrieved=undefined;
-    sampleICcQueryResult.extended.landingDataEndDate="2023-06-01";
-    sampleICcQueryResult.extended.dataEverExpected=true;
+    sampleICcQueryResult.firstDateTimeLandingDataRetrieved = undefined;
+    sampleICcQueryResult.extended.landingDataEndDate = "2023-06-01";
+    sampleICcQueryResult.extended.dataEverExpected = true;
     sampleICcQueryResult.extended.vesselOverriddenByAdmin = false;
 
     const result = toLanding(sampleICcQueryResult);
@@ -473,6 +483,7 @@ describe('toDynamicsCcCase', () => {
     parentDocumentVoid: exampleCc.parentDocumentVoid,
     caseType1: CaseOneType.CatchCertificate,
     caseType2: CaseTwoType.VoidByExporter,
+    caseRiskAtSubmission: undefined,
     numberOfFailedSubmissions: 5,
     isDirectLanding: false,
     documentUrl: `${ApplicationConfig.prototype.externalAppUrl}/qr/export-certificates/${exampleCc.documentUri}`,

@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { ApplicationConfig } from '../../../src/config';
 import { IEodAdminAudit, IEodAudit, IEodRule, IEodSetting, EodSettingModel } from '../../../src/landings/types/appConfig/eodSettings';
-import { IVessel } from '../../../src/landings/types/appConfig/vessels';
+import { ILicence, IVessel } from '../../../src/landings/types/appConfig/vessels';
 import * as SUT from '../../../src/landings/persistence/eodSettings';
 import * as Cache from '../../../src/data/cache';
 
@@ -17,7 +17,7 @@ ApplicationConfig.prototype.cloudRoleName = 'mmo-cc-reference-data-reader-svc';
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
-  await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+  await mongoose.connect(mongoUri, opts).catch(err => { console.log(err) });
 });
 
 afterEach(async () => {
@@ -737,7 +737,7 @@ describe('Eod Rules: getEodSetting', () => {
         numberOfDays: 0,
         ruleType: 'expectedDate',
         vesselSize: '12m+'
-      },{
+      }, {
         numberOfDays: 14,
         ruleType: 'endDate',
         vesselSize: '12m+'
@@ -773,7 +773,7 @@ describe('Eod Rules: getEodSetting', () => {
         numberOfDays: 0,
         ruleType: 'expectedDate',
         vesselSize: '12m+'
-      },{
+      }, {
         numberOfDays: 14,
         ruleType: 'endDate',
         vesselSize: '12m+'
@@ -795,7 +795,17 @@ describe('Eod Rules: getEodSetting', () => {
 
 describe('Eod Rules: isLandingDataAvailable', () => {
   const landingDate = '2020-05-12';
-  const rssNumber = 'C20514';
+  const licence: ILicence = {
+    da: 'England',
+    flag: 'GBR',
+    vesselLength: 50.63,
+    rssNumber: 'C20514',
+    homePort: '',
+    imoNumber: null,
+    licenceNumber: '',
+    licenceValidTo: '',
+    licenceHolder: ''
+  };
 
   const vesselData: IVessel[] = [{
     fishingVesselName: "WIRON 5",
@@ -835,7 +845,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(false);
   });
@@ -848,7 +858,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(false);
   });
@@ -861,7 +871,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(false);
   });
@@ -879,7 +889,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(false);
   });
@@ -898,7 +908,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate, isLegallyDue);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate, isLegallyDue);
 
     expect(result).toBe(true);
   });
@@ -916,13 +926,13 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, '2020-05-13');
+    const result = await SUT.isLandingDataAvailable(licence, '2020-05-13');
 
     expect(result).toBe(true);
   });
 
   it('will return true when an eod setting is not found', async () => {
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(true);
   });
@@ -935,7 +945,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(true);
   });
@@ -953,7 +963,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(true);
   });
@@ -971,7 +981,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(true);
   });
@@ -989,7 +999,7 @@ describe('Eod Rules: isLandingDataAvailable', () => {
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(rssNumber, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landingDate);
 
     expect(result).toBe(true);
   });
@@ -1053,11 +1063,11 @@ describe('Eod Rules: seedingEodRules', () => {
     ApplicationConfig.prototype.eodRulesMigration = false;
 
     const audit: IEodAudit = {
-      user:         'Bob',
-      timestamp:    Date.now().toLocaleString(),
-      vesselSizes:  '12m+',
-      changedFrom:  '',
-      changedTo:    '12m+'
+      user: 'Bob',
+      timestamp: Date.now().toLocaleString(),
+      vesselSizes: '12m+',
+      changedFrom: '',
+      changedTo: '12m+'
     }
 
     await EodSettingModel.findOneAndUpdate({ da: 'England' }, { "$push": { "audit": audit }, vesselSizes: ['12m+'] }, { upsert: true })
@@ -1080,17 +1090,17 @@ describe('Eod Rules: cleanUpEodRules', () => {
 
   it('will remove entries with old eod rules', async () => {
     const setting_1 = new EodSettingModel({
-      "rule" : "Wales",
-      "vessels" : [
+      "rule": "Wales",
+      "vessels": [
         "Under 10m",
         "10-12m",
         "12m+"
       ],
-      "audit" : [
+      "audit": [
         {
-          "audit" : "Under 10m,10-12m,12m+",
-          "timestamp" : "2023-06-08T18:44:36.430Z",
-          "user" : "Horsfall, Dom"
+          "audit": "Under 10m,10-12m,12m+",
+          "timestamp": "2023-06-08T18:44:36.430Z",
+          "user": "Horsfall, Dom"
         }
       ]
     });

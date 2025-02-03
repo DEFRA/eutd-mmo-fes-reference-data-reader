@@ -362,7 +362,9 @@
     },
     "exportedTo": {
       "type": "object",
-      "required": ["officialCountryName", "isoCodeAlpha2", "isoCodeAlpha3"],
+      "required": [
+        "officialCountryName"
+      ],
       "additionalProperties": false,
       "properties": {
         "officialCountryName": {

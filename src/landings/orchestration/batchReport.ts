@@ -312,7 +312,7 @@ export async function catchCertReport(
   fromDate: moment.Moment,
   toDate: moment.Moment,
   asOfDate: moment.Moment=moment.utc(),
-  areas: string[]
+  areas: string[]=[]
 ): Promise<IterableIterator<ICcBatchValidationReport>> {
 
   logger.info(`[BATCH-REPORT][CATCH-CERT-REPORT][FROM-DATE]${fromDate.toISOString()}[TO-DATE]${toDate.toISOString()}[AS-OF-DATE]${asOfDate.toISOString()}[AREA]${areas}`)
@@ -340,7 +340,7 @@ export async function catchCertVoidReport(
   fromDate: moment.Moment,
   toDate: moment.Moment,
   asOfDate: moment.Moment=moment.utc(),
-  areas: string[]
+  areas: string[]=[]
 ): Promise<IterableIterator<ICcBatchValidationReport>> {
 
   logger.info(`[BATCH-REPORT][CATCH-CERT-VOID-REPORT][FROM-DATE]${fromDate.toISOString()}[TO-DATE]${toDate.toISOString()}[AS-OF-DATE]${asOfDate.toISOString()}[AREA]${areas}`)

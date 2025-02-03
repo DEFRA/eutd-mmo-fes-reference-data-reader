@@ -8,15 +8,15 @@ export class ApplicationConfig {
   public cloudRoleName: string;
   public scheduleFishCountriesAndSpeciesJob: string;
   public scheduleVesselsDataJob: string;
-  public basicAuthUser: string | any;
-  public basicAuthPassword: string | any;
-  public boomiUrl: string | any;
-  public boomiAuthUser: string | any;
-  public boomiAuthCertificate: string | any;
-  public boomiAuthPassphrase: string | any;
-  public dbConnectionUri: string | any;
-  public dbName: string | any;
-  public dbConnectionPool: string | any;
+  public basicAuthUser: string;
+  public basicAuthPassword: string;
+  public boomiUrl: string;
+  public boomiAuthUser: string;
+  public boomiAuthCertificate: string;
+  public boomiAuthPassphrase: string;
+  public dbConnectionUri: string;
+  public dbName: string;
+  public dbConnectionPool: string;
   public enableCountryData: boolean;
   public externalAppUrl: string;
   public internalAppUrl: string;
@@ -69,7 +69,6 @@ export class ApplicationConfig {
 
   public constructor() { }
 
-  // TODO: may be use ProcessEnv as type
   public static loadEnv(env: any): void {
     ApplicationConfig.prototype.basicAuthUser = env.REF_SERVICE_BASIC_AUTH_USER;
     ApplicationConfig.prototype.basicAuthPassword = env.REF_SERVICE_BASIC_AUTH_PASSWORD;

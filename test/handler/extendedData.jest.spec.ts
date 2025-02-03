@@ -5,9 +5,8 @@ import { extendedDataRoutes } from '../../src/handler/extendedData';
 const moment = require('moment')
 moment.suppressDeprecationWarnings = true
 
-const sinon = require('sinon');
 
-const dataMock = sinon.stub(extendedDataService, 'getExtendedValidationData')
+const dataMock = jest.spyOn(extendedDataService, 'getExtendedValidationData');
 
 let server;
 
@@ -86,8 +85,10 @@ describe("When retrieving raw landings", () => {
 
   describe('we will throw an internal server error when', () => {
       it('something goes wrong retrieving the raw landings', async () => {
-        dataMock.reset();
-        dataMock.throws();
+        dataMock.mockReset();
+        dataMock.mockImplementation(() => {
+          throw new Error();
+        })
 
         const req = {
             method: 'GET',
@@ -103,8 +104,8 @@ describe("When retrieving raw landings", () => {
   });
 
   it('will return 200 if all goes OK', async () => {
-    dataMock.reset();
-    dataMock.returns([{}]);
+    dataMock.mockReset();
+    dataMock.mockResolvedValue([{}]);
 
     const req = {
         method: 'GET',
@@ -120,8 +121,8 @@ describe("When retrieving raw landings", () => {
 
   it('will attempt to retrieve RawLandings', async () => {
 
-    dataMock.reset();
-    dataMock.returns([{}]);
+    dataMock.mockReset();
+    dataMock.mockResolvedValue([{}]);
 
     const req = {
         method: 'GET',
@@ -130,14 +131,14 @@ describe("When retrieving raw landings", () => {
 
     await server.inject(req);
 
-    expect(dataMock.getCall(0).args[2]).toBe("rawLandings");
+    expect(dataMock).toHaveBeenCalledWith("2019-01-01", "test", "rawLandings");
 
 
   });
 
   it('will return retrieved data', async () => {
-    dataMock.reset();
-    dataMock.returns({landing: "Landing"});
+    dataMock.mockReset();
+    dataMock.mockResolvedValue({landing: "Landing"});
 
     const req = {
         method: 'GET',
@@ -210,8 +211,10 @@ describe("When retrieving sales notes", () => {
 
     describe('we will throw an internal server error when', () => {
         it('something goes wrong retrieving the sales note', async () => {
-          dataMock.reset();
-          dataMock.throws();
+          dataMock.mockReset();
+          dataMock.mockImplementation(() => {
+            throw new Error();
+          })
 
           const req = {
               method: 'GET',
@@ -227,8 +230,8 @@ describe("When retrieving sales notes", () => {
     });
 
     it('will return 200 if all goes OK', async () => {
-        dataMock.reset();
-        dataMock.returns([{}]);
+        dataMock.mockReset();
+        dataMock.mockResolvedValue([{}]);
 
         const req = {
             method: 'GET',
@@ -244,8 +247,8 @@ describe("When retrieving sales notes", () => {
 
     it('will attempt to retrieve SalesNotes', async () => {
 
-      dataMock.reset();
-      dataMock.returns([{}]);
+      dataMock.mockReset();
+      dataMock.mockResolvedValue([{}]);
 
       const req = {
           method: 'GET',
@@ -254,14 +257,13 @@ describe("When retrieving sales notes", () => {
 
         await server.inject(req);
 
-       expect(dataMock.getCall(0).args[2]).toBe("salesNotes");
-
+       expect(dataMock).toHaveBeenCalledWith("2019-01-01", "test", "salesNotes")
 
     });
 
     it('will return retrieved data', async () => {
-        dataMock.reset();
-        dataMock.returns({salesNote: "Note"});
+        dataMock.mockReset();
+        dataMock.mockResolvedValue({salesNote: "Note"});
 
         const req = {
             method: 'GET',

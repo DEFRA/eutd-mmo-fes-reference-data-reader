@@ -1,5 +1,4 @@
-import { AxiosResponse } from 'axios';
-import axios from "axios";
+import axios, { AxiosResponse } from 'axios';
 import logger from '../logger';
 import appConfig from '../config';
 import { getAvServiceConf, IAvConfig } from './trade.service';

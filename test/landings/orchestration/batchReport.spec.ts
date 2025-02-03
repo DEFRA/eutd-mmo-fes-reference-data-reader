@@ -1,6 +1,6 @@
 const _ = require('lodash')
 import moment from 'moment'
-const sinon = require('sinon')
+
 const mongoose = require('mongoose');
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -17,27 +17,37 @@ import * as Documents from '../../../src/landings/persistence/storeDocProcStat'
 
 const vessels = [
   {
+    fishingVesselName: "",
     registrationNumber:"WA1",
     fishingLicenceValidFrom:"2010-12-29T00:00:00",
     fishingLicenceValidTo:"2020-12-20T00:00:00",
     rssNumber: "rssWA1",
     adminPort: 'GUERNSEY',
-    vesselLength: 100
+    vesselLength: 100,
+    flag: "",
+    homePort: "",
+    fishingLicenceNumber: "",
+    imo: null
   },
   {
+    fishingVesselName: "",
     registrationNumber:"WA2",
     fishingLicenceValidFrom:"2010-12-29T00:00:00",
     fishingLicenceValidTo:"2020-12-20T00:00:00",
     rssNumber: "rssWA2",
     adminPort: 'GUERNSEY',
-    vesselLength: 5
+    vesselLength: 5,
+    flag: "",
+    homePort: "",
+    fishingLicenceNumber: "",
+    imo: null
   }
 ]
 const vesselsIdx = generateIndex(vessels)
-const getVesselIdxMock = sinon.stub(cache, 'getVesselsIdx')
-getVesselIdxMock.returns(vesselsIdx)
-const getVesselsDataMock = sinon.stub(cache, 'getVesselsData')
-getVesselsDataMock.returns(vessels)
+const getVesselIdxMock = jest.spyOn(cache, 'getVesselsIdx');
+getVesselIdxMock.mockReturnValue(vesselsIdx)
+const getVesselsDataMock = jest.spyOn(cache, 'getVesselsData')
+getVesselsDataMock.mockReturnValue(vessels)
 
 interface ICatchTestItem {
   species: string,

@@ -11,7 +11,7 @@ export const fetchLandings = async (rssNumber: string, dateLanded: string): Prom
   logger.info(`[LANDINGS][FETCH-LANDING][${rssNumber}-${dateLanded}][GET-VESSEL-DETAILS]`);
   const vesselDetails = getVesselDetails(rssNumber);
 
-  if (vesselDetails && vesselDetails.vesselLength !== undefined) {
+  if (vesselDetails?.vesselLength) {
     logger.info(`[LANDINGS][FETCH-LANDING][${rssNumber}-${dateLanded}][VESSELLENGTH:${vesselDetails.vesselLength}]`)
 
     let landings: ILanding[] = [];
@@ -48,7 +48,7 @@ export const fetchSalesNote = (rssNumber: string, dateLanded: string) => {
   logger.info(`[LANDINGS][FETCH-SALES-NOTE][${rssNumber}-${dateLanded}][GET-VESSEL-DETAILS]`);
   const vesselDetails = getVesselDetails(rssNumber);
 
-  if (vesselDetails && vesselDetails.vesselLength !== undefined) {
+  if (vesselDetails?.vesselLength) {
     logger.info(`[LANDINGS][FETCH-SALES-NOTE][${rssNumber}-${dateLanded}][VESSELLENGTH:${vesselDetails.vesselLength}]`)
 
     const isVesselOver10Meters = vesselDetails.vesselLength >= 10;

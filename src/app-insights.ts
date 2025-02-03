@@ -13,12 +13,10 @@ export default () => {
     .setAutoCollectDependencies(true)
     .setAutoCollectConsole(true)
     .setUseDiskRetryCaching(true);
-    appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = config.cloudRoleName;  
+    appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = config.cloudRoleName;
     appInsights.start();
     console.info(`Application Insights for reference data service enabled for key: ${instrumentationKey}`);
   } else {
-    if (process.env.NODE_ENV !== "test") {
-      console.info('Application Insights for reference data service disabled');
-    }
+    console.info('Application Insights for reference data service disabled');
   }
 };

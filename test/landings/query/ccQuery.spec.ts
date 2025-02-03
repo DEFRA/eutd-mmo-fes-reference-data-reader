@@ -624,4 +624,12 @@ describe('runUpdateForLandings', () => {
       }
     });
   });
+
+  it('will not error is document does not exists', async () => {
+    mockGetCertificateByDocumentNumber.mockResolvedValue(null);
+
+    await Query.runUpdateForLandings(ccQueryResult, 'CC1');
+    expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith('CC1');
+    expect(mockUpsertCertificate).not.toHaveBeenCalled();
+  });
 });

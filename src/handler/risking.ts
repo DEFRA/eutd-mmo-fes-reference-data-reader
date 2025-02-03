@@ -79,7 +79,7 @@ export const riskingRoutes = (server: Server) => {
       handler: async (request: Request, h: ResponseToolkit) => {
         try {
           const query = request.query;
-          const searchTerm = query && query.searchTerm;
+          const searchTerm = query.searchTerm;
 
           if (searchTerm) {
             const isAlphaNumaric = /^[a-zA-Z0-9]*$/g.test(searchTerm)

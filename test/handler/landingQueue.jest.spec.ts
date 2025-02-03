@@ -7,18 +7,15 @@ import { landingQueueRoutes } from '../../src/handler/landingQueue';
 
 import logger from '../../src/logger';
 
-const sinon = require('sinon');
-
-const dataMock = sinon.stub(cache, 'getVesselsData')
-const idxMock = sinon.stub(cache, 'getVesselsIdx')
-const getDataEverExpected = sinon.stub(cache, 'getDataEverExpected')
-const isLandingDataAvailable = sinon.stub(eodSettings, 'isLandingDataAvailable')
-const fetchLandingsMock = sinon.stub(landingsRefresh, 'fetchLandings')
-const fetchSalesNoteMock = sinon.stub(landingsRefresh, 'fetchSalesNote');
-const loggerMock = sinon.stub(logger, 'info');
-const loggerErrorMock = sinon.stub(logger, 'error');
-
 let server;
+let dataMock: jest.SpyInstance;
+let idxMock: jest.SpyInstance;
+let getDataEverExpected: jest.SpyInstance;
+let isLandingDataAvailable: jest.SpyInstance;
+let fetchLandingsMock: jest.SpyInstance;
+let fetchSalesNoteMock: jest.SpyInstance;
+let loggerMock: jest.SpyInstance;
+let loggerErrorMock: jest.SpyInstance;
 
 beforeAll(async () => {
   server = Hapi.server({
@@ -37,11 +34,20 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
-  fetchLandingsMock.resolves([]);
-  fetchSalesNoteMock.resolves(undefined);
-  getDataEverExpected.returns(true);
-  isLandingDataAvailable.resolves(true);
-  dataMock.returns(
+  dataMock = jest.spyOn(cache, 'getVesselsData')
+  idxMock = jest.spyOn(cache, 'getVesselsIdx')
+  getDataEverExpected = jest.spyOn(cache, 'getDataEverExpected')
+  isLandingDataAvailable = jest.spyOn(eodSettings, 'isLandingDataAvailable')
+  fetchLandingsMock = jest.spyOn(landingsRefresh, 'fetchLandings')
+  fetchSalesNoteMock = jest.spyOn(landingsRefresh, 'fetchSalesNote');
+  loggerMock = jest.spyOn(logger, 'info');
+  loggerErrorMock = jest.spyOn(logger, 'error');
+
+  fetchLandingsMock.mockResolvedValue([]);
+  fetchSalesNoteMock.mockResolvedValue(undefined);
+  getDataEverExpected.mockReturnValue(true);
+  isLandingDataAvailable.mockResolvedValue(true);
+  dataMock.mockReturnValue(
     [{
       registrationNumber: "B13508",
       fishingLicenceValidTo: "2020-12-20T00:00:00",
@@ -59,16 +65,16 @@ beforeEach(() => {
       vesselLength: 10.75
     }]);
 
-  idxMock.returns(vesselsIdx)
+  idxMock.mockReturnValue(vesselsIdx)
 })
 
 afterEach(() => {
-  loggerMock.reset();
-  fetchLandingsMock.reset();
-  fetchSalesNoteMock.reset();
-  getDataEverExpected.reset();
-  isLandingDataAvailable.reset();
-  loggerErrorMock.reset();
+  loggerMock.mockReset();
+  fetchLandingsMock.mockReset();
+  fetchSalesNoteMock.mockReset();
+  getDataEverExpected.mockReset();
+  isLandingDataAvailable.mockReset();
+  loggerErrorMock.mockReset();
 })
 
 describe("Refreshing landings", () => {
@@ -81,8 +87,8 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
@@ -95,8 +101,8 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
@@ -109,8 +115,8 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
@@ -123,8 +129,8 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
@@ -137,8 +143,8 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
@@ -151,8 +157,8 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
@@ -165,9 +171,9 @@ describe("Refreshing landings", () => {
 
     await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(loggerMock.getCall(0).args[0]).toEqual("[POST /landings/queue]");
-    expect(loggerMock.getCall(1).args[0]).toEqual("[POST /landings/queue][PLN: B13509][DATE-LANDED: 2019-02-31][LEGALLY-DUE: true]");
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(loggerMock).toHaveBeenNthCalledWith(1, "[POST /landings/queue]");
+    expect(loggerMock).toHaveBeenNthCalledWith(2, "[POST /landings/queue][PLN: B13509][DATE-LANDED: 2019-02-31][LEGALLY-DUE: true]");
   });
 
   it('will fail if we cant find rssNumber', async () => {
@@ -179,9 +185,9 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(false);
-    expect(loggerMock.getCall(3).args[0]).toEqual("[POST /landings/queue]licence not found for [B13509][2019-09-05]");
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
+    expect(loggerMock).toHaveBeenNthCalledWith(4, "[POST /landings/queue]licence not found for [B13509][2019-09-05]");
     expect(response.statusCode).toBe(400);
   });
 
@@ -194,14 +200,14 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(isLandingDataAvailable.getCall(0).args[2]).toBeUndefined();
-    expect(fetchLandingsMock.called).toBe(true);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(isLandingDataAvailable).toHaveBeenNthCalledWith(1, expect.anything(), expect.anything(), undefined);
+    expect(fetchLandingsMock).toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(202);
   });
 
   it('will not call fetch landings if landing data is not available but will fetch sales note', async () => {
-    isLandingDataAvailable.resolves(false);
+    isLandingDataAvailable.mockResolvedValueOnce(false);
 
     const req = {
       method: 'POST',
@@ -211,15 +217,17 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(loggerMock.getCall(3).args[0]).toEqual("[POST /landings/queue][FETCHING-SALES-NOTE][PLN: B13508][DATE-LANDED: 2019-09-05]");
-    expect(loggerMock.getCall(4).args[0]).toEqual("[POST /landings/queue][LANDING-DATA-NOT-AVAILABLE][PLN: B13508][DATE-LANDED: 2019-09-05][LEGALLY-DUE: true]");
-    expect(fetchLandingsMock.called).toBe(false);
-    expect(fetchSalesNoteMock.called).toBe(true);
+    expect(loggerMock).toHaveBeenNthCalledWith(4, "[POST /landings/queue][FETCHING-SALES-NOTE][PLN: B13508][DATE-LANDED: 2019-09-05]");
+    expect(loggerMock).toHaveBeenNthCalledWith(5, "[POST /landings/queue][LANDING-DATA-NOT-AVAILABLE][PLN: B13508][DATE-LANDED: 2019-09-05][LEGALLY-DUE: true]");
+    expect(fetchLandingsMock).not.toHaveBeenCalled();
+    expect(fetchSalesNoteMock).toHaveBeenCalled();
     expect(response.statusCode).toBe(400);
   });
 
   it('will fail with 500 when calling POST', async () => {
-    idxMock.throws();
+    idxMock.mockImplementationOnce(() => {
+      throw new Error();
+    });
 
     const req = {
       method: 'POST',
@@ -242,9 +250,9 @@ describe("Refreshing landings", () => {
 
     const response = await server.inject(req);
 
-    expect(isLandingDataAvailable.getCall(0).args[2]).toBe(true);
-    expect(fetchLandingsMock.called).toBe(true);
-    expect(fetchSalesNoteMock.called).toBe(false);
+    expect(isLandingDataAvailable).toHaveBeenCalledWith(expect.anything(), expect.anything(), true);
+    expect(fetchLandingsMock).toHaveBeenCalled();
+    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(202);
   });
 

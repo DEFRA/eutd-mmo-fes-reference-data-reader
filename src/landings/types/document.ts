@@ -11,13 +11,6 @@ export const DocumentStatuses = Object.freeze(
   }
 )
 
-export enum LandingStatus {
-  Pending = 'PENDING_LANDING_DATA',
-  Complete = 'HAS_LANDING_DATA',
-  Exceeded14Days = 'EXCEEDED_14_DAY_LIMIT',
-  DataNeverExpected = 'LANDING_DATA_NEVER_EXPECTED'
-}
-
 export interface Investigation {
   investigator: string,
   status: string

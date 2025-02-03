@@ -3,11 +3,9 @@ import { generateIndex } from 'mmo-shared-reference-data';
 import * as vesselService from '../../src/handler/vesselService';
 import logger from '../../src/logger';
 
-const sinon = require('sinon');
-
-const dataMock = sinon.stub(cache, 'getVesselsData')
-const idxMock = sinon.stub(cache, 'getVesselsIdx')
-const loggerMock = sinon.stub(logger, 'error');
+let dataMock: jest.SpyInstance;
+let idxMock: jest.SpyInstance;
+let loggerMock: jest.SpyInstance;
 
 describe("When retrieving rssNumber", () => {
 
@@ -28,14 +26,19 @@ describe("When retrieving rssNumber", () => {
   const vesselsIdx = generateIndex(vessels)
 
   beforeEach(() => {
-    dataMock.returns(vessels)
-    idxMock.returns(vesselsIdx)
+    dataMock = jest.spyOn(cache, 'getVesselsData');
+    dataMock.mockReturnValue(vessels);
+
+    idxMock = jest.spyOn(cache, 'getVesselsIdx');
+    idxMock.mockReturnValue(vesselsIdx);
+
+    loggerMock = jest.spyOn(logger, 'error');
   });
 
   afterEach(() => {
-    dataMock.reset();
-    idxMock.reset();
-    loggerMock.reset();
+    dataMock.mockReset();
+    idxMock.mockReset();
+    loggerMock.mockReset();
   });
 
   it('will return undefined if date is wrong', () => {
@@ -77,7 +80,7 @@ describe("When retrieving rssNumber", () => {
     const output = vesselService.getRssNumber("OB956", "2020-12-02");
 
     expect(output).toEqual(undefined);
-    expect(loggerMock.getCall(0).args[0]).toBe('[VESSEL-SERVICE][RSS-NUMBER][NOT-FOUND]OB956:2020-12-02')
+    expect(loggerMock).toHaveBeenNthCalledWith(1, '[VESSEL-SERVICE][RSS-NUMBER][NOT-FOUND]OB956:2020-12-02')
   });
 
   it('should do an exact search on pln and not pick up another pln that happens to start with the pln we are searching for', () => {
@@ -98,8 +101,8 @@ describe("When retrieving rssNumber", () => {
 
     const vesselsIdx = generateIndex(vessels)
 
-    dataMock.returns(vessels)
-    idxMock.returns(vesselsIdx)
+    dataMock.mockReturnValue(vessels)
+    idxMock.mockReturnValue(vesselsIdx)
 
     const output = vesselService.getRssNumber("BM1", "2015-12-02");
 
@@ -112,7 +115,7 @@ describe("When retrieving rssNumber", () => {
 describe("When retrieving vessel details for landings refresh", () => {
 
   it('search by rssNumber', () => {
-    dataMock.returns(
+    dataMock.mockReturnValue(
       [{
         vesselLength: 10.73,
         rssNumber: "rssNumber",
@@ -126,7 +129,7 @@ describe("When retrieving vessel details for landings refresh", () => {
   });
 
   it('should only return the first occurrence', () => {
-    dataMock.returns(
+    dataMock.mockReturnValue(
       [{
         vesselLength: 30.01,
         rssNumber: "rssNumber",
@@ -145,7 +148,7 @@ describe("When retrieving vessel details for landings refresh", () => {
   });
 
   it('should return undefined if vessel does not exist', () => {
-    dataMock.returns(
+    dataMock.mockReturnValue(
       [{
         rssNumber: "rssNumber",
         cfr: "GBRrssNumber"
@@ -157,7 +160,7 @@ describe("When retrieving vessel details for landings refresh", () => {
   });
 
   it('should do an exact search on rssNumber and not pick up another rssNumber that happens to start with the rssNumber we are searching for', () => {
-    dataMock.returns([
+    dataMock.mockReturnValue([
       {
         vesselLength: 7.03,
         rssNumber: "BM132",

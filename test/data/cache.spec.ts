@@ -16,7 +16,6 @@ import { ILicence, IVessel } from '../../src/landings/types/appConfig/vessels';
 import { IEodSetting } from '../../src/landings/types/appConfig/eodSettings';
 import moment from 'moment';
 
-const sinon = require('sinon');
 const allSpeciesData: any[] = [
   {
     faoCode: 'AAB',
@@ -309,15 +308,15 @@ describe('when in production mode', () => {
     appConfig.vesselNotFoundEnabled = true;
     appConfig.blobStorageConnection = 'blob-connection';
 
-    mockLoadAllSpecies = sinon.stub(SUT, 'loadAllSpecies');
-    mockLoadSpecies = sinon.stub(SUT, 'loadSpeciesData');
-    mockVesselsData = sinon.stub(SUT, 'loadVesselsData');
-    mockaddVesselNotFound = sinon.stub(SUT, 'addVesselNotFound')
-    mockLoadSeasonalFishData = sinon.stub(SUT, 'loadSeasonalFishData');
-    mockLoadCountries = sinon.stub(SUT, 'loadCountriesData');
-    mockLoadSpeciesAliases = sinon.stub(SUT, 'loadSpeciesAliases');
-    mockLoadConversionFactors = sinon.stub(SUT, 'loadConversionFactorsData');
-    mockGetCommodityCodes = sinon.stub(SUT, 'loadCommodityCodeData');
+    mockLoadAllSpecies = jest.spyOn(SUT, 'loadAllSpecies');
+    mockLoadSpecies = jest.spyOn(SUT, 'loadSpeciesData');
+    mockVesselsData = jest.spyOn(SUT, 'loadVesselsData');
+    mockaddVesselNotFound = jest.spyOn(SUT, 'addVesselNotFound')
+    mockLoadSeasonalFishData = jest.spyOn(SUT, 'loadSeasonalFishData');
+    mockLoadCountries = jest.spyOn(SUT, 'loadCountriesData');
+    mockLoadSpeciesAliases = jest.spyOn(SUT, 'loadSpeciesAliases');
+    mockLoadConversionFactors = jest.spyOn(SUT, 'loadConversionFactorsData');
+    mockGetCommodityCodes = jest.spyOn(SUT, 'loadCommodityCodeData');
     mockSeedVesselsOfInterest = jest.spyOn(RiskingService, 'seedVesselsOfInterest');
     mockSeedWeightingRisk = jest.spyOn(RiskingService, 'seedWeightingRisk');
     mockGetAllVesselsOfInterest = jest.spyOn(RiskingService, 'getVesselsOfInterest');
@@ -326,18 +325,18 @@ describe('when in production mode', () => {
     mockGetAddresses = jest.spyOn(BoomiService, 'getAddresses');
     mockGetEodSettings = jest.spyOn(EoDService, 'getEodSettings');
 
-    mockLoggerInfo = sinon.spy(logger, 'info');
+    mockLoggerInfo = jest.spyOn(logger, 'info');
     mockLoggerError = jest.spyOn(logger, 'error');
     mockLoggerDebug = jest.spyOn(logger, 'debug');
 
-    mockLoadAllSpecies.resolves(allSpeciesData);
-    mockVesselsData.resolves(vesselData);
-    mockLoadSpecies.resolves(speciesData);
-    mockLoadSeasonalFishData.resolves(seasonalFishData);
-    mockLoadCountries.resolves(countriesData);
-    mockLoadSpeciesAliases.resolves(speciesAliasesData);
-    mockLoadConversionFactors.resolves([]);
-    mockGetCommodityCodes.resolves(commodityCodes);
+    mockLoadAllSpecies.mockResolvedValue(allSpeciesData);
+    mockVesselsData.mockResolvedValue(vesselData);
+    mockLoadSpecies.mockResolvedValue(speciesData);
+    mockLoadSeasonalFishData.mockResolvedValue(seasonalFishData);
+    mockLoadCountries.mockResolvedValue(countriesData);
+    mockLoadSpeciesAliases.mockResolvedValue(speciesAliasesData);
+    mockLoadConversionFactors.mockResolvedValue([]);
+    mockGetCommodityCodes.mockResolvedValue(commodityCodes);
     mockSeedVesselsOfInterest.mockResolvedValue(vesselsOfInterestData);
     mockGetEodSettings.mockResolvedValue(eodSettingsData);
     mockSeedWeightingRisk.mockResolvedValue(weightingRiskData);
@@ -348,20 +347,20 @@ describe('when in production mode', () => {
   });
 
   afterEach(() => {
-    mockLoadAllSpecies.restore();
-    mockVesselsData.restore();
-    mockLoadSpecies.restore();
-    mockLoadSeasonalFishData.restore();
-    mockLoadCountries.restore();
-    mockLoadSpeciesAliases.restore();
-    mockGetCommodityCodes.restore();
+    mockLoadAllSpecies.mockRestore();
+    mockVesselsData.mockRestore();
+    mockLoadSpecies.mockRestore();
+    mockLoadSeasonalFishData.mockRestore();
+    mockLoadCountries.mockRestore();
+    mockLoadSpeciesAliases.mockRestore();
+    mockGetCommodityCodes.mockRestore();
     mockSeedVesselsOfInterest.mockRestore();
     mockSeedWeightingRisk.mockRestore();
     mockGetAllVesselsOfInterest.mockRestore();
     mockGetWeightingRisk.mockRestore();
     mockGetSpeciesToggle.mockRestore();
     mockGetEodSettings.mockRestore();
-    mockLoggerInfo.restore();
+    mockLoggerInfo.mockRestore();
     mockLoggerError.mockRestore();
     mockLoggerDebug.mockRestore();
 
@@ -378,7 +377,6 @@ describe('when in production mode', () => {
       enabled: false
     });
     SUT.updateEodSettingsCache([]);
-    sinon.restore();
   });
 
   describe('loadProdFishCountriesAndSpecies ', () => {
@@ -394,7 +392,7 @@ describe('when in production mode', () => {
 
       await SUT.loadProdFishCountriesAndSpecies();
 
-      expect(mockLoadCountries.called).toBeTruthy();
+      expect(mockLoadCountries).toHaveBeenCalled();
     });
 
     it('should not call loadCountriesData when enableCountryData is set to false', async () => {
@@ -402,48 +400,48 @@ describe('when in production mode', () => {
 
       await SUT.loadProdFishCountriesAndSpecies();
 
-      expect(mockLoadCountries.called).toBeFalsy();
+      expect(mockLoadCountries).not.toHaveBeenCalled();
     });
 
     it('should not call loadAllSpecies, loadSeasonalFishData  ', async () => {
       await SUT.loadProdFishCountriesAndSpecies();
 
-      expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[LOAD-PROD-CONFIG] Loading data from blob storage in production mode');
+      expect(mockLoggerInfo).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] Loading data from blob storage in production mode');
 
-      expect(mockLoadSpecies.getCall(0).args[0]).toEqual('blob-connection');
-      expect(mockLoadSeasonalFishData.getCall(0).args[0]).toEqual('blob-connection');
+      expect(mockLoadSpecies).toHaveBeenCalledWith('blob-connection');
+      expect(mockLoadSeasonalFishData).toHaveBeenCalledWith('blob-connection');
 
-      expect(mockLoggerInfo.getCall(1).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished reading data, previously species: 0, countries: 0, speciesAliases: 0, commodityCodes: 0');
-      expect(mockLoggerInfo.getCall(2).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: 1, seasonalFish: 1, countries: 0, speciesAliases: 7, commodityCodes: 1');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, '[LOAD-PROD-CONFIG] Finished reading data, previously species: 0, countries: 0, speciesAliases: 0, commodityCodes: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, '[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: 1, seasonalFish: 1, countries: 0, speciesAliases: 7, commodityCodes: 1');
     });
 
     it('should call loadConversionFactors ', async () => {
       await SUT.loadProdFishCountriesAndSpecies();
 
-      expect(mockLoadConversionFactors.called).toBeTruthy();
+      expect(mockLoadConversionFactors).toHaveBeenCalled();
     });
 
     it('should call getAllVesselsOfInterest', async () => {
       await SUT.loadProdFishCountriesAndSpecies();
 
       expect(mockGetAllVesselsOfInterest).toHaveBeenCalled();
-      expect(mockLoggerInfo.getCall(3).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished reading vessels of interest, previously: 0');
-      expect(mockLoggerInfo.getCall(4).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished loading vessels of interest, currently: 4');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(4, '[LOAD-PROD-CONFIG] Finished reading vessels of interest, previously: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(5, '[LOAD-PROD-CONFIG] Finished loading vessels of interest, currently: 4');
     });
 
     it('should call get weighting risk data', async () => {
       await SUT.loadProdFishCountriesAndSpecies();
 
       expect(mockGetWeightingRisk).toHaveBeenCalled();
-      expect(mockLoggerInfo.getCall(5).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished reading weighting risk, previously exporterWeight: 0, vesselWeight: 0, speciesWeight: 0, threshold: 0');
-      expect(mockLoggerInfo.getCall(6).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished loading weighting, currently exporterWeight: 1, vesselWeight: 1, speciesWeight: 1, threshold: 1');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(6, '[LOAD-PROD-CONFIG] Finished reading weighting risk, previously exporterWeight: 0, vesselWeight: 0, speciesWeight: 0, threshold: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(7, '[LOAD-PROD-CONFIG] Finished loading weighting, currently exporterWeight: 1, vesselWeight: 1, speciesWeight: 1, threshold: 1');
     });
 
     it('will initialise the cache for Species Toggle', async () => {
       await SUT.loadProdFishCountriesAndSpecies();
 
       expect(mockGetSpeciesToggle).toHaveBeenCalled();
-      expect(mockLoggerInfo.getCall(7).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished reading the species toggle, previously: false');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(8,'[LOAD-PROD-CONFIG] Finished reading the species toggle, previously: false');
     });
 
     it('will get the updated cache cache for Species Toggle', async () => {
@@ -451,7 +449,7 @@ describe('when in production mode', () => {
 
       await SUT.loadProdFishCountriesAndSpecies();
 
-      expect(mockLoggerInfo.getCall(8).args[0]).toEqual('[LOAD-PROD-CONFIG] Finished loading the species toggle, currently: true');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(9, '[LOAD-PROD-CONFIG] Finished loading the species toggle, currently: true');
     });
 
     it('should log when it is calling each function for data', async () => {
@@ -488,11 +486,13 @@ describe('when in production mode', () => {
 
     it('should log an error if thrown', async () => {
 
-      mockLoadSpecies.throws('error');
+      mockLoadSpecies.mockImplementationOnce(() => {
+        throw new Error('error')
+      });
 
       await expect(() => SUT.loadProdFishCountriesAndSpecies()).rejects.toThrow();
 
-      expect(mockLoggerError).toHaveBeenCalledWith('[ERROR][LOADING PROD MODE], error');
+      expect(mockLoggerError).toHaveBeenCalledWith('[ERROR][LOADING PROD MODE], Error: error');
     });
 
   });
@@ -501,12 +501,14 @@ describe('when in production mode', () => {
 
     it('should call loadProdFishCountriesAndSpecies', async () => {
       let mockloadProdFishCountriesAndSpecies;
-      mockloadProdFishCountriesAndSpecies = sinon.stub(SUT, 'loadProdFishCountriesAndSpecies');
-      mockloadProdFishCountriesAndSpecies.resolves({ some: 'data' });
+      mockloadProdFishCountriesAndSpecies = jest.spyOn(SUT, 'loadProdFishCountriesAndSpecies');
+      mockloadProdFishCountriesAndSpecies.mockResolvedValue({ some: 'data' });
 
       await SUT.loadFishCountriesAndSpecies();
 
-      expect(mockloadProdFishCountriesAndSpecies.called).toBeTruthy();
+      expect(mockloadProdFishCountriesAndSpecies).toHaveBeenCalled();
+
+      mockloadProdFishCountriesAndSpecies.mockRestore();
     });
 
   });
@@ -515,8 +517,8 @@ describe('when in production mode', () => {
 
     it('should call load vesssel data with addVesselNotFound', async () => {
       await SUT.loadVessels();
-      expect(mockVesselsData.called).toBeTruthy();
-      expect(mockaddVesselNotFound.called).toBeTruthy();
+      expect(mockVesselsData).toHaveBeenCalled();
+      expect(mockaddVesselNotFound).toHaveBeenCalled();
     });
 
   });
@@ -554,47 +556,47 @@ describe('when in development mode', () => {
   beforeEach(() => {
     appConfig.inDev = true;
 
-    mockLoadAllSpecies = sinon.stub(SUT, 'loadAllSpeciesFromLocalFile');
-    mockLoadSpeciesDataFromLocalFile = sinon.stub(SUT, 'loadSpeciesDataFromLocalFile');
-    mockLoadVesselsDataFromLocalFile = sinon.stub(SUT, 'loadVesselsDataFromLocalFile');
-    mockaddVesselNotFound = sinon.stub(SUT, 'addVesselNotFound')
-    mockLoadSeasonalFishData = sinon.stub(SUT, 'loadSeasonalFishDataFromLocalFile');
-    mockLoadCountries = sinon.stub(SUT, 'loadCountriesDataFromLocalFile');
-    mockLoadSpeciesAliases = sinon.stub(SUT, 'loadSpeciesAliasesFromLocalFile');
-    mockLoadConversionFactors = sinon.stub(ConversionFactorService, 'loadConversionFactorsFromLocalFile');
-    mockSeedWeightingRisk = sinon.stub(RiskingService, 'seedWeightingRisk')
-    mockSeedVesselsOfInterest = sinon.stub(RiskingService, 'seedVesselsOfInterest');
-    mockGetEodSettings = sinon.stub(EoDService, 'getEodSettings');
-    mockGetSpeciesToggle = sinon.stub(RiskingService, 'getSpeciesToggle');
-    mockLoggerInfo = sinon.spy(logger, 'info');
-    mockSeedBlockingRules = sinon.stub(systemBlocks, 'seedBlockingRules');
+    mockLoadAllSpecies = jest.spyOn(SUT, 'loadAllSpeciesFromLocalFile');
+    mockLoadSpeciesDataFromLocalFile = jest.spyOn(SUT, 'loadSpeciesDataFromLocalFile');
+    mockLoadVesselsDataFromLocalFile = jest.spyOn(SUT, 'loadVesselsDataFromLocalFile');
+    mockaddVesselNotFound = jest.spyOn(SUT, 'addVesselNotFound')
+    mockLoadSeasonalFishData = jest.spyOn(SUT, 'loadSeasonalFishDataFromLocalFile');
+    mockLoadCountries = jest.spyOn(SUT, 'loadCountriesDataFromLocalFile');
+    mockLoadSpeciesAliases = jest.spyOn(SUT, 'loadSpeciesAliasesFromLocalFile');
+    mockLoadConversionFactors = jest.spyOn(ConversionFactorService, 'loadConversionFactorsFromLocalFile');
+    mockSeedWeightingRisk = jest.spyOn(RiskingService, 'seedWeightingRisk')
+    mockSeedVesselsOfInterest = jest.spyOn(RiskingService, 'seedVesselsOfInterest');
+    mockGetEodSettings = jest.spyOn(EoDService, 'getEodSettings');
+    mockGetSpeciesToggle = jest.spyOn(RiskingService, 'getSpeciesToggle');
+    mockLoggerInfo = jest.spyOn(logger, 'info');
+    mockSeedBlockingRules = jest.spyOn(systemBlocks, 'seedBlockingRules');
 
-    mockLoadAllSpecies.resolves(allSpeciesData);
-    mockLoadVesselsDataFromLocalFile.resolves(vesselData);
-    mockLoadSpeciesDataFromLocalFile.resolves(speciesData);
-    mockLoadSeasonalFishData.resolves(seasonalFishData);
-    mockLoadCountries.returns(countriesData);
-    mockLoadSpeciesAliases.returns(speciesAliasesData);
-    mockLoadConversionFactors.resolves([]);
-    mockSeedVesselsOfInterest.resolves(vesselsOfInterestData);
-    mockGetEodSettings.resolves(eodSettingsData);
-    mockSeedWeightingRisk.resolves(weightingRiskData);
-    mockGetSpeciesToggle.resolves(speciesToggleData);
-    mockSeedBlockingRules.resolves(undefined);
+    mockLoadAllSpecies.mockResolvedValue(allSpeciesData);
+    mockLoadVesselsDataFromLocalFile.mockResolvedValue(vesselData);
+    mockLoadSpeciesDataFromLocalFile.mockResolvedValue(speciesData);
+    mockLoadSeasonalFishData.mockResolvedValue(seasonalFishData);
+    mockLoadCountries.mockReturnValue(countriesData);
+    mockLoadSpeciesAliases.mockReturnValue(speciesAliasesData);
+    mockLoadConversionFactors.mockResolvedValue([]);
+    mockSeedVesselsOfInterest.mockResolvedValue(vesselsOfInterestData);
+    mockGetEodSettings.mockResolvedValue(eodSettingsData);
+    mockSeedWeightingRisk.mockResolvedValue(weightingRiskData);
+    mockGetSpeciesToggle.mockResolvedValue(speciesToggleData);
+    mockSeedBlockingRules.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    mockLoadAllSpecies.restore();
-    mockLoadVesselsDataFromLocalFile.restore();
-    mockLoadSpeciesDataFromLocalFile.restore();
-    mockLoadSeasonalFishData.restore();
-    mockLoadCountries.restore();
-    mockLoadSpeciesAliases.restore();
-    mockLoadConversionFactors.restore();
-    mockGetSpeciesToggle.restore();
-    mockSeedBlockingRules.restore();
-    mockLoggerInfo.restore();
-    mockGetEodSettings.restore();
+    mockLoadAllSpecies.mockRestore();
+    mockLoadVesselsDataFromLocalFile.mockRestore();
+    mockLoadSpeciesDataFromLocalFile.mockRestore();
+    mockLoadSeasonalFishData.mockRestore();
+    mockLoadCountries.mockRestore();
+    mockLoadSpeciesAliases.mockRestore();
+    mockLoadConversionFactors.mockRestore();
+    mockGetSpeciesToggle.mockRestore();
+    mockSeedBlockingRules.mockRestore();
+    mockLoggerInfo.mockRestore();
+    mockGetEodSettings.mockRestore();
 
     appConfig.enableCountryData = enableCountryData;
     appConfig.vesselNotFoundEnabled = enableVesselNotFound;
@@ -605,7 +607,6 @@ describe('when in development mode', () => {
       enabled: false
     });
     SUT.updateEodSettingsCache([])
-    sinon.restore();
   });
 
   describe('loadFishCountriesAndSpecies', () => {
@@ -616,26 +617,26 @@ describe('when in development mode', () => {
 
       await SUT.loadFishCountriesAndSpecies();
 
-      expect(mockLoadAllSpecies.called).toBeTruthy();
-      expect(mockLoadSpeciesDataFromLocalFile.called).toBeTruthy();
-      expect(mockLoadSeasonalFishData.called).toBeTruthy();
-      expect(mockLoadCountries.called).toBeTruthy();
-      expect(mockLoadSpeciesAliases.called).toBeTruthy();
-      expect(mockLoadConversionFactors.called).toBeTruthy();
-      expect(mockSeedWeightingRisk.called).toBeTruthy();
-      expect(mockSeedVesselsOfInterest.called).toBeTruthy();
-      expect(mockGetSpeciesToggle.called).toBeTruthy();
+      expect(mockLoadAllSpecies).toHaveBeenCalled();
+      expect(mockLoadSpeciesDataFromLocalFile).toHaveBeenCalled();
+      expect(mockLoadSeasonalFishData).toHaveBeenCalled();
+      expect(mockLoadCountries).toHaveBeenCalled();
+      expect(mockLoadSpeciesAliases).toHaveBeenCalled();
+      expect(mockLoadConversionFactors).toHaveBeenCalled();
+      expect(mockSeedWeightingRisk).toHaveBeenCalled();
+      expect(mockSeedVesselsOfInterest).toHaveBeenCalled();
+      expect(mockGetSpeciesToggle).toHaveBeenCalled();
 
-      expect(mockLoggerInfo.getCall(1).args[0]).toEqual('Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
-      expect(mockLoggerInfo.getCall(2).args[0]).toEqual('Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
-      expect(mockLoggerInfo.getCall(3).args[0]).toEqual('Start setting the blocking rules');
-      expect(mockLoggerInfo.getCall(4).args[0]).toEqual('Finished saving the blocking rules');
-      expect(mockLoggerInfo.getCall(5).args[0]).toEqual('Start setting the vessels of interest, previously vessels of interest: 0');
-      expect(mockLoggerInfo.getCall(6).args[0]).toEqual('Finished saving vessels of interest, currently vessels of interest: 4');
-      expect(mockLoggerInfo.getCall(7).args[0]).toEqual('Start setting the weighting risk, previously exporterWeight: 0, vesselWeight: 0, speciesWeight: 0, threshold: 0');
-      expect(mockLoggerInfo.getCall(8).args[0]).toEqual('Finish setting the weighting risk, currently exporterWeight: 1, vesselWeight: 1, speciesWeight: 1, threshold: 1');
-      expect(mockLoggerInfo.getCall(9).args[0]).toEqual('Start setting the species toggle, previously: false');
-      expect(mockLoggerInfo.getCall(10).args[0]).toEqual('Finish setting the species toggle, currently: true');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(4, 'Start setting the blocking rules');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(5, 'Finished saving the blocking rules');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(6, 'Start setting the vessels of interest, previously vessels of interest: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(7, 'Finished saving vessels of interest, currently vessels of interest: 4');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(8, 'Start setting the weighting risk, previously exporterWeight: 0, vesselWeight: 0, speciesWeight: 0, threshold: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(9, 'Finish setting the weighting risk, currently exporterWeight: 1, vesselWeight: 1, speciesWeight: 1, threshold: 1');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(10, 'Start setting the species toggle, previously: false');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(11, 'Finish setting the species toggle, currently: true');
 
     });
 
@@ -654,8 +655,8 @@ describe('when in development mode', () => {
     it('should call loadVesselsDataFromLocalFile', async () => {
       await SUT.loadVessels();
 
-      expect(mockLoadVesselsDataFromLocalFile.called).toBeTruthy();
-      expect(mockaddVesselNotFound.called).toBeTruthy();
+      expect(mockLoadVesselsDataFromLocalFile).toHaveBeenCalled();
+      expect(mockaddVesselNotFound).toHaveBeenCalled();
     });
 
   });
@@ -697,15 +698,15 @@ describe('when in development mode', () => {
     appConfig.enableCountryData = true;
 
     await SUT.loadLocalFishCountriesAndSpecies();
-    expect(mockLoadAllSpecies.called).toBeTruthy();
+    expect(mockLoadAllSpecies).toHaveBeenCalled();
 
-    expect(mockLoggerInfo.getCall(0).args[0]).toEqual('Loading data from local files in dev mode');
-    expect(mockLoadSpeciesDataFromLocalFile.called).toBeTruthy();
-    expect(mockLoadSeasonalFishData.called).toBeTruthy();
-    expect(mockLoadCountries.called).toBeTruthy();
+    expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, 'Loading data from local files in dev mode');
+    expect(mockLoadSpeciesDataFromLocalFile).toHaveBeenCalled();
+    expect(mockLoadSeasonalFishData).toHaveBeenCalled();
+    expect(mockLoadCountries).toHaveBeenCalled();
 
-    expect(mockLoggerInfo.getCall(1).args[0]).toEqual('Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
-    expect(mockLoggerInfo.getCall(2).args[0]).toEqual('Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
+    expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
+    expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
   });
 
 });
@@ -861,7 +862,7 @@ describe('getToLiveWeightFactor', () => {
         species: 'COD',
         state: 'FRE',
         presentation: 'FRO',
-        toLiveWeightFactor: undefined,
+        toLiveWeightFactor: 0,
         quotaStatus: 'quota',
         riskScore: 1
       },
@@ -877,7 +878,7 @@ describe('getToLiveWeightFactor', () => {
         species: 'ALB',
         state: 'FRE',
         presentation: 'FIL',
-        toLiveWeightFactor: undefined,
+        toLiveWeightFactor: 0,
         quotaStatus: 'quota',
         riskScore: 1
       },
@@ -895,7 +896,7 @@ describe('getToLiveWeightFactor', () => {
         presentation: 'WHO',
         quotaStatus: 'quota',
         riskScore: 1,
-        toLiveWeightFactor: null
+        toLiveWeightFactor: 0
       },
       {
         species: 'COD',
@@ -911,7 +912,7 @@ describe('getToLiveWeightFactor', () => {
         presentation: 'FIL',
         toLiveWeightFactor: 1.2,
         quotaStatus: 'quota',
-        riskScore: undefined
+        riskScore: 0
       }
     ];
 
@@ -968,7 +969,7 @@ describe('getAllConversionFactors', () => {
         species: 'COD',
         state: 'FRE',
         presentation: 'FRO',
-        toLiveWeightFactor: undefined,
+        toLiveWeightFactor: 0,
         quotaStatus: 'quota',
         riskScore: 1
       },
@@ -984,7 +985,7 @@ describe('getAllConversionFactors', () => {
         species: 'ALB',
         state: 'FRE',
         presentation: 'FIL',
-        toLiveWeightFactor: undefined,
+        toLiveWeightFactor: 0,
         quotaStatus: 'quota',
         riskScore: 1
       },
@@ -1002,7 +1003,7 @@ describe('getAllConversionFactors', () => {
         presentation: 'WHO',
         quotaStatus: 'quota',
         riskScore: 1,
-        toLiveWeightFactor: null
+        toLiveWeightFactor: 0
       },
       {
         species: 'COD',
@@ -1018,7 +1019,7 @@ describe('getAllConversionFactors', () => {
         presentation: 'FIL',
         toLiveWeightFactor: 1.2,
         quotaStatus: 'quota',
-        riskScore: undefined
+        riskScore: 0
       }
     ];
 

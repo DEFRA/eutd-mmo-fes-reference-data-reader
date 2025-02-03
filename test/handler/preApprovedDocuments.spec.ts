@@ -3,10 +3,6 @@ import * as preApprovedService from '../../src/landings/persistence/preApproved.
 import { preApprovalDocumentRoutes } from '../../src/handler/preApprovedDocuments';
 import * as Hapi from '@hapi/hapi';
 
-const sinon = require('sinon');
-const serviceGetStub = sinon.stub(preApprovedService, 'getPreApprovedDocumentByDocumentNumber');
-const preApproveMongoStub = sinon.stub(preApprovedService, 'preApproveDocumentFromMongo');
-
 let server;
 
 beforeAll(async () => {
@@ -27,25 +23,37 @@ afterAll(async () => {
 
 describe('When pre approving a document in MONGO', () => {
 
+  let serviceGetStub: jest.SpyInstance;
+  let preApproveMongoStub: jest.SpyInstance;
+
+  beforeEach(() => {
+    serviceGetStub = jest.spyOn(preApprovedService, 'getPreApprovedDocumentByDocumentNumber');
+    preApproveMongoStub = jest.spyOn(preApprovedService, 'preApproveDocumentFromMongo');
+  });
+
+  afterEach(() => {
+    serviceGetStub.mockReset();
+    preApproveMongoStub.mockReset();
+  });
+
   it('will pre approve a document if everything goes ok', async () => {
-        serviceGetStub.reset();
-        serviceGetStub.returns({});
+    preApproveMongoStub.mockResolvedValue({});
 
-        const request = {
-            method: 'POST',
-            url: '/v1/certificates/GBR-AZR-TEST/preApprove',
-            headers : {
-              "X-ADMIN-USER" : "Bob"
-            }
-        };
+    const request = {
+      method: 'POST',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove',
+      headers: {
+        "X-ADMIN-USER": "Bob"
+      }
+    };
 
-        const response = await server.inject(request);
+    const response = await server.inject(request);
 
-        expect(response.statusCode).toBe(204);
+    expect(response.statusCode).toBe(204);
 
-    });
+  });
 
-  it('will return FORBIDDEN if there is no user in headers', async ()=>{
+  it('will return FORBIDDEN if there is no user in headers', async () => {
     const request = {
       method: 'POST',
       url: '/v1/certificates/GBR-AZR-TEST/preApprove'
@@ -57,95 +65,106 @@ describe('When pre approving a document in MONGO', () => {
 
   });
 
-  it('will return NOT FOUND if the document does not exist',async () => {
-      preApproveMongoStub.reset();
-      preApproveMongoStub.throws(new Error("Not Found"));
-
-      const request = {
-          method: 'POST',
-          url: '/v1/certificates/GBR-AZR-TEST/preApprove',
-          headers : {
-            "X-ADMIN-USER" : "Bob"
-          }
-      };
-
-      const response = await server.inject(request);
-
-      expect(response.statusCode).toBe(404);
-
+  it('will return NOT FOUND if the document does not exist', async () => {
+    preApproveMongoStub.mockReset();
+    preApproveMongoStub.mockImplementation(() => {
+      throw new Error("Not Found")
     });
 
+    const request = {
+      method: 'POST',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove',
+      headers: {
+        "X-ADMIN-USER": "Bob"
+      }
+    };
 
-  it('will return INTERNAL SERVER ERROR if something goes wrong',async () => {
-      preApproveMongoStub.reset();
-      preApproveMongoStub.throws();
+    const response = await server.inject(request);
 
-      const request = {
-          method: 'POST',
-          url: '/v1/certificates/GBR-AZR-TEST/preApprove',
-          headers : {
-            "X-ADMIN-USER" : "Bob"
-          }
-      };
+    expect(response.statusCode).toBe(404);
 
-      const response = await server.inject(request);
+  });
 
-      expect(response.statusCode).toBe(500);
+  it('will return INTERNAL SERVER ERROR if something goes wrong', async () => {
+    preApproveMongoStub.mockReset();
+    preApproveMongoStub.mockImplementation(() => {
+      throw new Error()
+    });
+
+    const request = {
+      method: 'POST',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove',
+      headers: {
+        "X-ADMIN-USER": "Bob"
+      }
+    };
+
+    const response = await server.inject(request);
+
+    expect(response.statusCode).toBe(500);
 
   });
 });
 
-
 describe('When getting a pre approved document', () => {
 
-    it('will return a valid pre Approved document', async () => {
-       serviceGetStub.reset();
-       serviceGetStub.returns({
-            documentNumber: 'GBR-AZR-TEST',
-            certificateData: "test"});
+  let serviceGetStub: jest.SpyInstance;
 
-        const request = {
-            method: 'GET',
-            url: '/v1/certificates/GBR-AZR-TEST/preApprove'
-          };
+  beforeEach(() => {
+    serviceGetStub = jest.spyOn(preApprovedService, 'getPreApprovedDocumentByDocumentNumber');
+  });
 
-        const response = await server.inject(request);
-        const payload = JSON.parse(response.payload);
-
-        expect(response.statusCode).toBe(200);
-        expect(payload.documentNumber).toEqual('GBR-AZR-TEST');
-
+  it('will return a valid pre Approved document', async () => {
+    serviceGetStub.mockReset();
+    serviceGetStub.mockResolvedValue({
+      documentNumber: 'GBR-AZR-TEST',
+      certificateData: "test"
     });
 
-    it('will return NOT FOUND if the document does not exist', async () => {
-        serviceGetStub.reset();
-        serviceGetStub.returns(null);
+    const request = {
+      method: 'GET',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove'
+    };
 
-        const request = {
-            method: 'GET',
-            url: '/v1/certificates/GBR-AZR-TEST/preApprove'
-          };
+    const response = await server.inject(request);
+    const payload = JSON.parse(response.payload);
 
-        const response = await server.inject(request);
+    expect(response.statusCode).toBe(200);
+    expect(payload.documentNumber).toEqual('GBR-AZR-TEST');
 
-        expect(response.statusCode).toBe(404);
+  });
 
+  it('will return NOT FOUND if the document does not exist', async () => {
+    serviceGetStub.mockReset();
+    serviceGetStub.mockResolvedValue(null);
 
-      });
+    const request = {
+      method: 'GET',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove'
+    };
 
-      it('will return INTERNAL SERVER ERROR something goes wrong retrieving the document', async () => {
-        serviceGetStub.reset();
-        serviceGetStub.throws();
+    const response = await server.inject(request);
 
-        const request = {
-          method: 'GET',
-          url: '/v1/certificates/GBR-AZR-TEST/preApprove'
-        };
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).toBe(500);
+    expect(response.statusCode).toBe(404);
 
 
-      });
+  });
+
+  it('will return INTERNAL SERVER ERROR something goes wrong retrieving the document', async () => {
+    serviceGetStub.mockReset();
+    serviceGetStub.mockImplementation(() => {
+      throw new Error()
+    });
+
+    const request = {
+      method: 'GET',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove'
+    };
+
+    const response = await server.inject(request);
+
+    expect(response.statusCode).toBe(500);
+
+
+  });
 });

@@ -7,7 +7,10 @@ import {
   postCodeDaLookup,
   TRANSPORT_VEHICLE_DIRECT,
   getIsLegallyDue,
-  ICcQueryResult
+  ICcQueryResult,
+  LevelOfRiskType,
+  LandingOutcomeType,
+  toDefraCcLandingStatus
 } from 'mmo-shared-reference-data';
 import {
    IDefraValidationReport,
@@ -35,6 +38,15 @@ import { Catch, Product, Transport } from '../persistence/catchCert';
 import { IDocument } from '../types/document';
 import { vesselLookup } from './transformations';
 import { ILicence } from '../types/appConfig/vessels';
+import { isRejectedLanding } from '../transformations/dynamicsValidation';
+import {
+   getExportedSpeciesRiskScore,
+   getExporterBehaviourRiskScore,
+   getTotalRiskScore,
+   getVesselOfInterestRiskScore,
+   isHighRisk,
+   isRiskEnabled,
+ } from "../query/isHighRisk";
 
 const TRANSPORT_VEHICLE_TRUCK  = 'truck';
 const TRANSPORT_VEHICLE_TRAIN  = 'train';
@@ -294,7 +306,7 @@ export function toCcDefraReport(documentNumber: string, correlationId: string, s
             result.exporterDetails = exporterDetails;
             result.devolvedAuthority = daLookUp(exportData.exporterDetails.postcode);
 
-            if (exportData.conservation && exportData.conservation.conservationReference) {
+            if (exportData.conservation?.conservationReference) {
                result.conservationReference = exportData.conservation.conservationReference;
             }
 
@@ -325,7 +337,7 @@ export function toCcDefraReport(documentNumber: string, correlationId: string, s
 }
 
 export function toDefraCcLanding(product: Product | undefined, transportation: Transport, createdAt: string): CertificateLanding[] {
-   return (product && product.caughtBy) ? product.caughtBy.map((landing: Catch) => {
+   return (product?.caughtBy) ? product.caughtBy.map((landing: Catch) => {
     const licenceLookup = vesselLookup(getVesselsIdx());
     const licence: ILicence = licenceLookup(landing.pln, landing.date);
     return {
@@ -374,7 +386,7 @@ export function toDefraAudit(systemAudit: IAuditEvent) : CertificateAudit {
       auditOperation : systemAudit.eventType,
       user: systemAudit.triggeredBy,
       auditAt: systemAudit.timestamp,
-      investigationStatus: systemAudit.data && systemAudit.data.investigationStatus ? systemAudit.data.investigationStatus : undefined
+      investigationStatus: systemAudit.data?.investigationStatus ? systemAudit.data.investigationStatus : undefined
    }
 
    return result;
@@ -473,6 +485,11 @@ export function toLandings(queryRes: ICcQueryResult[]): CertificateLanding[] {
       const licenceLookup = vesselLookup(getVesselsIdx());
       const licence: ILicence = licenceLookup(rawValidatedLanding.extended.pln, rawValidatedLanding.dateLanded);
       const isDataNeverExpected = rawValidatedLanding.extended.dataEverExpected === false;
+      const riskScore = getTotalRiskScore(
+         rawValidatedLanding.extended.pln,
+         rawValidatedLanding.species,
+         rawValidatedLanding.extended.exporterAccountId,
+         rawValidatedLanding.extended.exporterContactId);
 
       return {
          date: rawValidatedLanding.dateLanded,
@@ -528,7 +545,17 @@ export function toLandings(queryRes: ICcQueryResult[]): CertificateLanding[] {
          adminPresentation: rawValidatedLanding.extended.presentationAdmin,
          adminState: rawValidatedLanding.extended.stateAdmin,
          adminCommodityCode: rawValidatedLanding.extended.commodityCodeAdmin,
-         speciesOverriddenByAdmin: rawValidatedLanding.extended.speciesOverriddenByAdmin
+         speciesOverriddenByAdmin: rawValidatedLanding.extended.speciesOverriddenByAdmin,
+         risking: {
+            vessel: getVesselOfInterestRiskScore(rawValidatedLanding.extended.pln).toString(),
+            speciesRisk: getExportedSpeciesRiskScore(rawValidatedLanding.species).toString(),
+            exporterRiskScore: getExporterBehaviourRiskScore(rawValidatedLanding.extended.exporterAccountId, rawValidatedLanding.extended.exporterContactId).toString(),
+            landingRiskScore: riskScore.toString(),
+            highOrLowRisk: isHighRisk(riskScore) ? LevelOfRiskType.High : LevelOfRiskType.Low,
+            isSpeciesRiskEnabled: isRiskEnabled()
+          },
+          landingValidationstatusAtSubmission: toDefraCcLandingStatus(rawValidatedLanding, isHighRisk(riskScore)),
+          landingOutcomeAtSubmission: isRejectedLanding(rawValidatedLanding) ? LandingOutcomeType.Rejected : LandingOutcomeType.Success,
       }
    });
 }

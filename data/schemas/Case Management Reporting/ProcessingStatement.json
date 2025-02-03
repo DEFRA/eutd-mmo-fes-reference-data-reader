@@ -62,7 +62,7 @@
           "processedWeight": 800,
           "isDocumentIssuedInUK": true,
           "validation": {
-            "status": "Validation Failure - Overuse",
+            "status": "Overuse Failure",
             "totalUsedWeightAgainstCertificate": 700,
             "weightExceededAmount": 300,
             "overuseInfo": ["GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"]
@@ -196,8 +196,8 @@
           "type": "string",
           "enum": [
             "Validation Success",
-            "Validation Failure - Overuse",
-            "Validation Failure - Weight"
+            "Overuse Failure",
+            "Weight Failure"
           ]
         },
         "totalUsedWeightAgainstCertificate": {

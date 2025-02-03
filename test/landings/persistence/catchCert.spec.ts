@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const moment = require('moment');
 import { MongoMemoryServer } from 'mongodb-memory-server';
-
+import { LandingStatus } from 'mmo-shared-reference-data';
 import { minimalSchema } from '../../../src/landings/types/catchCert';
 import { DocumentModel } from '../../../src/landings/types/document';
 import { FailedOnlineCertificates } from '../../../src/landings/types/query';
@@ -20,8 +20,7 @@ import {
   Product
 } from '../../../src/landings/persistence/catchCert';
 import {
-  DocumentStatuses,
-  LandingStatus
+  DocumentStatuses
 } from '../../../src/landings/types/document';
 
 

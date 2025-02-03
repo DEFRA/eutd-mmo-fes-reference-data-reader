@@ -1,16 +1,16 @@
 import moment from "moment";
-import { ICcQueryResult, IDynamicsLanding } from 'mmo-shared-reference-data';
-import { CertificateStatus, IDefraTradeCatchCertificate, IDefraTradeLanding } from "../types/defraTradeCatchCertificate"
-import { IDefraTradeProcessingStatement, IDefraTradeStorageDocument, IDefraTradeStorageDocumentProduct } from "../types/defraTradeSdPsCase";
+import { ICcQueryResult, IDynamicsLanding, toDefraCcLandingStatus, IDefraTradeLanding, IDefraTradeCatchCertificate, CertificateStatus } from 'mmo-shared-reference-data';
+import { IDefraTradeProcessingStatement, IDefraTradeProcessingStatementCatch, IDefraTradeSdPsStatus, IDefraTradeStorageDocument, IDefraTradeStorageDocumentProduct } from "../types/defraTradeSdPsCase";
 import { IDocument } from "../types/document";
 import { IDynamicsCatchCertificateCase } from "../types/dynamicsCcCase";
 import { ISdPsQueryResult } from "../types/query";
 import { toDefraSdStorageFacility, toTransportation } from "./defraValidation";
-import { toLanding, toPsCatch, toSdProduct } from "./dynamicsValidation";
+import { toLanding, } from "./dynamicsValidation";
 import { Catch, Product } from "../persistence/catchCert";
-import { IDynamicsProcessingStatementCase, IDynamicsProcessingStatementCatch, IDynamicsStorageDocumentCase, IDynamicsStorageDocumentProduct } from "../types/dynamicsSdPsCase";
+import { IDynamicsProcessingStatementCase, IDynamicsStorageDocumentCase } from "../types/dynamicsSdPsCase";
 import { CertificateAuthority, CertificateStorageFacility, CertificateTransport } from "../types/defraValidation";
 import { ApplicationConfig } from "../../config";
+import { getTotalRiskScore, isHighRisk } from "../query/isHighRisk";
 
 const createUrl = (rawDataType: string, q: ICcQueryResult) => {
   return `{BASE_URL}/reference/api/v1/extendedData/${rawDataType}?dateLanded=${q.dateLanded}&rssNumber=${q.rssNumber}`
@@ -59,9 +59,18 @@ const getVesselCount = (products: Product[]) => {
 
 export const toDefraTradeLanding = (landing: ICcQueryResult): IDefraTradeLanding => {
   const dynamicsLanding: IDynamicsLanding = toLanding(landing);
+  const riskScore = getTotalRiskScore(
+    landing.extended.pln,
+    landing.species,
+    landing.extended.exporterAccountId,
+    landing.extended.exporterContactId);
+
+  delete dynamicsLanding['landingOutcomeAtSubmission'];
+  delete dynamicsLanding['landingOutcomeAtRetrospectiveCheck'];
 
   return {
     ...dynamicsLanding,
+    status: toDefraCcLandingStatus(landing, isHighRisk(riskScore)),
     species: landing.extended.species,
     flag: landing.extended.flag,
     catchArea: landing.extended.fao,
@@ -81,9 +90,16 @@ export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCa
   const transportation: CertificateTransport = toTransportation(document.exportData?.transportation);
   Object.keys(transportation).forEach(key => transportation[key] === undefined && delete transportation[key]);
 
+  let status: CertificateStatus;
+  if (!Array.isArray(ccQueryResults)) {
+    status = CertificateStatus.VOID
+  } else {
+    status = ccQueryResults.some((_: ICcQueryResult) => _.status === "BLOCKED") ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE;
+  }
+
   return {
     ...certificateCase,
-    certStatus: Array.isArray(ccQueryResults) ? ccQueryResults.some((_: ICcQueryResult) => _.status === "BLOCKED") ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE : CertificateStatus.VOID,
+    certStatus: status,
     landings: Array.isArray(ccQueryResults) ? ccQueryResults.map((_: ICcQueryResult) => toDefraTradeLanding(_)) : null,
     exportedTo: document.exportData?.transportation?.exportedTo,
     transportation,
@@ -91,18 +107,42 @@ export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCa
   }
 };
 
+export function toDefraTradePsCatch(validatedPsCatches: ISdPsQueryResult): IDefraTradeProcessingStatementCatch {
+
+  let status = IDefraTradeSdPsStatus.Success;
+
+  if (validatedPsCatches.isMismatch) {
+    status = IDefraTradeSdPsStatus.Weight
+  }
+
+  if (validatedPsCatches.isOverAllocated) {
+    status = IDefraTradeSdPsStatus.Overuse
+  }
+
+  return {
+    foreignCatchCertificateNumber: validatedPsCatches.catchCertificateNumber,
+    species: validatedPsCatches.species,
+    id: validatedPsCatches.extended.id,
+    cnCode: validatedPsCatches.commodityCode,
+    scientificName: validatedPsCatches.scientificName,
+    importedWeight: validatedPsCatches.weightOnFCC,
+    usedWeightAgainstCertificate: validatedPsCatches.weightOnDoc,
+    processedWeight: validatedPsCatches.weightAfterProcessing,
+    validation: {
+      status: status,
+      totalUsedWeightAgainstCertificate: validatedPsCatches.weightOnAllDocs,
+      weightExceededAmount: validatedPsCatches.overAllocatedByWeight,
+      overuseInfo: validatedPsCatches.overUsedInfo.some(_ => _ !== validatedPsCatches.documentNumber)
+        ? validatedPsCatches.overUsedInfo.filter(_ => _ !== validatedPsCatches.documentNumber) : undefined
+    }
+  }
+}
+
 export const toDefraTradePs = (document: IDocument, processingStatementCase: IDynamicsProcessingStatementCase, psQueryResults: ISdPsQueryResult[] | null): IDefraTradeProcessingStatement => ({
   ...processingStatementCase,
-  catches: Array.isArray(psQueryResults) ? psQueryResults.map((_: ISdPsQueryResult) => {
-    const psCatch: IDynamicsProcessingStatementCatch = toPsCatch(_);
-
-    delete psCatch['isDocumentIssuedInUK'];
-
-    return {
-      ...psCatch,
-      species: _.species
-    }
-  }) : null,
+  catches: Array.isArray(psQueryResults) ? psQueryResults.map((_: ISdPsQueryResult) =>
+    toDefraTradePsCatch(_)
+  ) : null,
   exportedTo: document.exportData?.exportedTo,
   plantAddress: {
     line1: document.exportData.plantAddressOne,
@@ -122,19 +162,41 @@ export const toDefraTradePs = (document: IDocument, processingStatementCase: IDy
   authority: toAuthority()
 });
 
-export const toDefraTradeProduct = (product: ISdPsQueryResult): IDefraTradeStorageDocumentProduct => {
-  const sdProduct: IDynamicsStorageDocumentProduct = toSdProduct(product);
+export function toDefraTradeSdProduct(validatedSdProducts: ISdPsQueryResult): IDefraTradeStorageDocumentProduct {
 
-  delete sdProduct['isDocumentIssuedInUK'];
+  let status = IDefraTradeSdPsStatus.Success;
+
+  if (validatedSdProducts.isMismatch) {
+    status = IDefraTradeSdPsStatus.Weight
+  }
+
+  if (validatedSdProducts.isOverAllocated) {
+    status = IDefraTradeSdPsStatus.Overuse
+  }
 
   return {
-    ...sdProduct,
-    species: product.species,
-    dateOfUnloading: moment(product.dateOfUnloading, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-    placeOfUnloading: product.placeOfUnloading,
-    transportUnloadedFrom: product.transportUnloadedFrom,
+    foreignCatchCertificateNumber: validatedSdProducts.catchCertificateNumber,
+    species: validatedSdProducts.species,
+    id: validatedSdProducts.extended.id,
+    cnCode: validatedSdProducts.commodityCode,
+    scientificName: validatedSdProducts.scientificName,
+    importedWeight: validatedSdProducts.weightOnFCC,
+    exportedWeight: validatedSdProducts.weightOnDoc,
+    validation: {
+      totalWeightExported: validatedSdProducts.weightOnAllDocs,
+      status: status,
+      weightExceededAmount: validatedSdProducts.overAllocatedByWeight,
+      overuseInfo: validatedSdProducts.overUsedInfo.some(_ => _ !== validatedSdProducts.documentNumber)
+        ? validatedSdProducts.overUsedInfo.filter(_ => _ !== validatedSdProducts.documentNumber) : undefined
+    },
+    dateOfUnloading: moment(validatedSdProducts.dateOfUnloading, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+    placeOfUnloading: validatedSdProducts.placeOfUnloading,
+    transportUnloadedFrom: validatedSdProducts.transportUnloadedFrom,
   }
-};
+}
+
+export const toDefraTradeProduct = (product: ISdPsQueryResult): IDefraTradeStorageDocumentProduct =>
+  toDefraTradeSdProduct(product);
 
 export const toDefraTradeSd = (document: IDocument, documentCase: IDynamicsStorageDocumentCase, sdQueryResults: ISdPsQueryResult[] | null): IDefraTradeStorageDocument => {
   const transportation: CertificateTransport = toTransportation(document.exportData?.transportation);

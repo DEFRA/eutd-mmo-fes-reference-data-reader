@@ -11,12 +11,12 @@ export const updateIgnoreFlagName = async () => {
 };
 
 export const hasLandingsToUpdate = (product: any): boolean =>
-  (product && product.caughtBy)
+  (product?.caughtBy)
     ? product.caughtBy.some(landing => landing?._ignore)
     : false;
 
 export const hasProductsToUpdate = (cert: any): boolean =>
-  (cert.exportData && cert.exportData.products)
+  (cert.exportData?.products)
     ? cert.exportData.products.some(hasLandingsToUpdate)
     : false;
 

@@ -3,6 +3,7 @@ import * as CatchCertService from '../../src/landings/persistence/catchCert';
 import * as VesselService from '../../src/handler/vesselService';
 import { isLegallyDueRoute } from '../../src/handler/isLegallyDue';
 import logger from '../../src/logger';
+import * as Cache from "../../src/data/cache";
 
 describe('POST /isLegallyDue', () => {
   let server;
@@ -12,6 +13,7 @@ describe('POST /isLegallyDue', () => {
   let mockGetCertificateByDocumentNumber;
   let mockVesselLookup;
   let mockGetVesselDetails;
+  let mockRefreshRiskingData;
 
   const vesselDetails = { vesselLength :  33.89, cfr : 'GBR000B14974', adminPort : 'KIRKWALL' };
   const mockDocumentNumber = 'mockDoc-123';
@@ -128,6 +130,7 @@ describe('POST /isLegallyDue', () => {
     mockUpsertCertificate = jest.spyOn(CatchCertService, 'upsertCertificate');
     mockUpsertCertificate.mockResolvedValue(null);
     mockGetCertificateByDocumentNumber = jest.spyOn(CatchCertService, 'getCertificateByDocumentNumber');
+    mockRefreshRiskingData = jest.spyOn(Cache, 'refreshRiskingData');
     mockGetCertificateByDocumentNumber.mockResolvedValue({
       documentNumber: mockDocumentNumber,
       exportData
@@ -141,6 +144,7 @@ describe('POST /isLegallyDue', () => {
     mockGetCertificateByDocumentNumber.mockRestore();
     mockVesselLookup.mockRestore();
     mockGetVesselDetails.mockRestore();
+    mockRefreshRiskingData.mockRestore();
   })
 
   afterAll(async () => {
@@ -148,6 +152,7 @@ describe('POST /isLegallyDue', () => {
   });
 
   it('will update isLegallyDue on exportData', async () => {
+    mockRefreshRiskingData.mockResolvedValue(null);
     const response = await server.inject({
       method: 'POST',
       url: '/v1/isLegallyDue',
@@ -223,7 +228,13 @@ describe('POST /isLegallyDue', () => {
         },
         "caughtBy":[{
           ...caughtBy,
-          "isLegallyDue": true
+          "isLegallyDue": true,
+          "riskScore": 0,
+          "threshold": 0,
+          "speciesRiskScore": 0,
+          "vesselRiskScore": 0,
+          "exporterRiskScore": 0,
+          "isSpeciesRiskEnabled": false
         }]
       }],
       "conservation":{
@@ -266,7 +277,7 @@ describe('POST /isLegallyDue', () => {
         products: undefined
       }
     });
-
+    mockRefreshRiskingData.mockResolvedValue(null);
     const response = await server.inject({
       method: 'POST',
       url: '/v1/isLegallyDue',
@@ -279,9 +290,28 @@ describe('POST /isLegallyDue', () => {
     expect(response.statusCode).toBe(404);
   });
 
+  it('will handle refreshRiskingData error', async () => {
+    
+    const error = new Error('riskingMockError');
+    mockRefreshRiskingData.mockRejectedValue(error);
+   
+    const response = await server.inject({
+      method: 'POST',
+      url: '/v1/isLegallyDue',
+      payload: {
+        documentNumber: mockDocumentNumber
+      }
+    });
+
+    expect(mockGetCertificateByDocumentNumber).toHaveBeenCalled();
+    expect(response.statusCode).toBe(200);
+    expect(mockLogError).toHaveBeenCalledWith(`[RUN-UPDATE-FOR-LEGALLY-DUE][ERROR][${error}]`);
+  });
+  
   it('will handle undefined vessel details', async () => {
     mockVesselLookup.mockReturnValue(undefined);
     mockGetVesselDetails.mockReturnValue(undefined);
+    mockRefreshRiskingData.mockResolvedValue(null);
 
     const response = await server.inject({
       method: 'POST',
@@ -358,7 +388,13 @@ describe('POST /isLegallyDue', () => {
         },
         "caughtBy":[{
           ...caughtBy,
-          "isLegallyDue": false
+          "isLegallyDue": false,
+          "riskScore": 0,
+          "threshold": 0,
+          "speciesRiskScore": 0,
+          "vesselRiskScore": 0,
+          "exporterRiskScore": 0,
+          "isSpeciesRiskEnabled": false,
         }]
       }],
       "conservation":{
@@ -436,6 +472,8 @@ describe('POST /isLegallyDue', () => {
         products: [{}]
       }
     })
+    mockRefreshRiskingData.mockResolvedValue(null);
+    
     const response = await server.inject({
       method: 'POST',
       url: '/v1/isLegallyDue',
@@ -451,6 +489,30 @@ describe('POST /isLegallyDue', () => {
     expect(mockGetCertificateByDocumentNumber).toHaveBeenCalled();
     expect(mockLogInfo).toHaveBeenCalledWith(`[RUN-UPDATE-FOR-LEGALLY-DUE][UPSERT][${mockDocumentNumber}]`);
     expect(mockUpsertCertificate).toHaveBeenCalledWith(mockDocumentNumber, { exportData: expectedExportData });
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('will handle exporterDetails missing data', async () => {
+    mockGetCertificateByDocumentNumber.mockResolvedValue({
+      documentNumber: mockDocumentNumber,
+      exportData: {
+        ...exportData,
+        exporterDetails: undefined
+      }
+    })
+
+    mockRefreshRiskingData.mockResolvedValue(null);
+    
+    const response = await server.inject({
+      method: 'POST',
+      url: '/v1/isLegallyDue',
+      payload: {
+        documentNumber: mockDocumentNumber
+      }
+    });
+
+    expect(mockGetCertificateByDocumentNumber).toHaveBeenCalled();
+    expect(mockLogInfo).toHaveBeenCalledWith(`[RUN-UPDATE-FOR-LEGALLY-DUE][UPSERT][${mockDocumentNumber}]`);
     expect(response.statusCode).toBe(200);
   });
 });

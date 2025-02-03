@@ -34,7 +34,7 @@ export async function generateForeignCatchCertOnlineValidationReport(payload: an
 
     const report = getForeignCatchCertificateOnlineValidationReport(payload.dataToValidate.documentNumber, rawValidationResults);
 
-    const isBlocking4bEnabled : Boolean = await getBlockingStatus(ValidationRules.FOUR_B);
+    const isBlocking4bEnabled : boolean = await getBlockingStatus(ValidationRules.FOUR_B);
 
     if(!report.isValid && isBlocking4bEnabled) {
         const certificate = await DocumentModel.findOne({

@@ -87,6 +87,6 @@ export enum SdPsCaseTwoType {
 
 export enum SdPsStatus {
     Success = 'Validation Success',
-    Overuse = 'Validation Failure - Overuse',
-    Weight = 'Validation Failure - Weight'
+    Overuse = 'Overuse Failure',
+    Weight = 'Weight Failure'
 }

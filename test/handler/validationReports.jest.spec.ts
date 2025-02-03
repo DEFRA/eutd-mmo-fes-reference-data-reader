@@ -5,21 +5,6 @@ import * as Hapi from '@hapi/hapi';
 const moment = require('moment');
 moment.suppressDeprecationWarnings = true;
 
-const sinon = require('sinon');
-
-const catchCertMock = sinon.stub(report, 'catchCertReport');
-const catchCertVoidMock = sinon.stub(report, 'catchCertVoidReport');
-const catchCertBlockMock = sinon.stub(report,'catchCertBlockedReport');
-const sdpsMock = sinon.stub(report, 'sdpsReport');
-const sdpsVoidMock = sinon.stub(report, 'sdpsVoidReport');
-const sdpsBlockMock = sinon.stub(report,'sdpsBlockedReport')
-
-const catchCertInvestigationMock = sinon.stub(report, 'catchCertInvestigationReport');
-const catchCertVoidInvestigationMock = sinon.stub(report, 'catchCertVoidInvestigationReport');
-const catchCertBlockInvestigationMock = sinon.stub(report,'catchCertBlockedInvestigationReport');
-const sdpsInvestigationMock = sinon.stub(report, 'sdpsInvestigationReport');
-const sdpsVoidInvestigationMock = sinon.stub(report, 'sdpsVoidInvestigationReport');
-const sdpsBlockInvestigationMock = sinon.stub(report,'sdpsBlockedInvestigationReport')
 
 let server;
 
@@ -41,14 +26,28 @@ afterAll(async () => {
 
 describe("When generating a Catch Certificate Report", () => {
 
+  let catchCertMock: jest.SpyInstance;
+  let catchCertVoidMock: jest.SpyInstance;
+  let catchCertBlockMock: jest.SpyInstance;
+
+
+  beforeEach(() => {
+    catchCertMock = jest.spyOn(report, 'catchCertReport');
+    catchCertVoidMock = jest.spyOn(report, 'catchCertVoidReport');
+    catchCertBlockMock = jest.spyOn(report,'catchCertBlockedReport');
+  });
+
+  afterEach(() => {
+    catchCertMock.mockRestore();
+    catchCertVoidMock.mockRestore();
+    catchCertBlockMock.mockRestore();
+  })
+
   it('will disregard any `nulls` and set them as a white space', async () => {
 
-    catchCertMock.reset();
-    catchCertVoidMock.reset();
-    catchCertVoidMock.returns([]);
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertMock.returns([{column1: null, column2: 'value2'}]);
+    catchCertVoidMock.mockResolvedValue([]);
+    catchCertBlockMock.mockResolvedValue([]);
+    catchCertMock.mockResolvedValue([{column1: null, column2: 'value2'}]);
 
     const req = {
         method: 'GET',
@@ -66,12 +65,9 @@ describe("When generating a Catch Certificate Report", () => {
 
   it('will disregard any `undefineds` and set them as a white space', async () => {
 
-    catchCertMock.reset();
-    catchCertVoidMock.reset();
-    catchCertVoidMock.returns([]);
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertMock.returns([{column1: undefined, column2: 'value2'}]);
+    catchCertVoidMock.mockResolvedValue([]);
+    catchCertBlockMock.mockResolvedValue([]);
+    catchCertMock.mockResolvedValue([{column1: undefined, column2: 'value2'}]);
 
     const req ={
         method: 'GET',
@@ -87,15 +83,13 @@ describe("When generating a Catch Certificate Report", () => {
 
   });
 
-
   it('can get data in CSV format', async () => {
 
-    catchCertMock.reset();
-    catchCertVoidMock.reset();
-    catchCertVoidMock.returns([]);
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertMock.returns([{column1: 'value1', column2: 'value2'}]);
+    catchCertVoidMock.mockResolvedValue([]);
+
+    catchCertBlockMock.mockResolvedValue([]);
+
+    catchCertMock.mockResolvedValue([{column1: 'value1', column2: 'value2'}]);
 
     const req ={
         method: 'GET',
@@ -108,19 +102,15 @@ describe("When generating a Catch Certificate Report", () => {
 
     expect(response.payload).toEqual(`"column1","column2"
 "value1","value2"`);
-
-
-
   });
 
   it('can get data in JSON format', async () => {
 
-    catchCertMock.reset();
-    catchCertVoidMock.reset();
-    catchCertVoidMock.returns([]);
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertMock.returns([{column1: 'value1'}]);
+    catchCertVoidMock.mockResolvedValue([]);
+
+    catchCertBlockMock.mockResolvedValue([]);
+
+    catchCertMock.mockResolvedValue([{column1: 'value1'}]);
 
     const req ={
         method: 'GET',
@@ -141,12 +131,11 @@ describe("When generating a Catch Certificate Report", () => {
 
   it('will normalise case in url path', async () => {
 
-    catchCertMock.reset();
-    catchCertVoidMock.reset();
-    catchCertVoidMock.returns([]);
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertMock.returns([{column1: 'value1'}]);
+    catchCertVoidMock.mockResolvedValue([]);
+
+    catchCertBlockMock.mockResolvedValue([]);
+
+    catchCertMock.mockResolvedValue([{column1: 'value1'}]);
 
     const req ={
         method: 'GET',
@@ -167,12 +156,11 @@ describe("When generating a Catch Certificate Report", () => {
 
   it('can get data for void report', async () => {
 
-    catchCertMock.reset();
-    catchCertMock.returns([]);
-    catchCertVoidMock.reset();
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertVoidMock.returns([{column1: 'value1'}]);
+    catchCertMock.mockResolvedValue([]);
+
+    catchCertBlockMock.mockResolvedValue([]);
+
+    catchCertVoidMock.mockResolvedValue([{column1: 'value1'}]);
 
     const req ={
         method: 'GET',
@@ -193,12 +181,11 @@ describe("When generating a Catch Certificate Report", () => {
 
   it('will set timestamp bounds correctly on date inputs: FI0-381', async () => {
 
-    catchCertMock.reset();
-    catchCertVoidMock.reset();
-    catchCertVoidMock.returns([]);
-    catchCertBlockMock.reset();
-    catchCertBlockMock.returns([]);
-    catchCertMock.returns([{column1: 'value'}]);
+    catchCertVoidMock.mockResolvedValue([]);
+
+    catchCertBlockMock.mockResolvedValue([]);
+
+    catchCertMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -209,8 +196,8 @@ describe("When generating a Catch Certificate Report", () => {
 
     expect(response.statusCode).toBe(200);
 
-    expect(catchCertMock.args[0][0].toISOString()).toEqual('2019-01-01T00:00:00.000Z');
-    expect(catchCertMock.args[0][1].toISOString()).toEqual('2019-01-01T23:59:59.999Z');
+    expect(catchCertMock.mock.calls[0][0].toISOString()).toEqual('2019-01-01T00:00:00.000Z');
+    expect(catchCertMock.mock.calls[0][1].toISOString()).toEqual('2019-01-01T23:59:59.999Z');
 
 
 
@@ -220,12 +207,29 @@ describe("When generating a Catch Certificate Report", () => {
 
 describe("When generating a SDPS Report", () => {
 
+  let sdpsMock: jest.SpyInstance;
+  let sdpsVoidMock: jest.SpyInstance;
+  let sdpsBlockMock: jest.SpyInstance;
+
+  beforeEach(() => {
+    sdpsMock = jest.spyOn(report, 'sdpsReport');
+    sdpsVoidMock = jest.spyOn(report, 'sdpsVoidReport');
+    sdpsBlockMock = jest.spyOn(report,'sdpsBlockedReport');
+  });
+
+  afterEach(() => {
+    sdpsMock.mockRestore();
+    sdpsVoidMock.mockRestore();
+    sdpsBlockMock.mockRestore();
+  })
+
   it('will disregard any `nulls` and set them as a white space', async () => {
-    sdpsMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsMock.returns([{column1: null, column2: 'value2'}]);
+
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: null, column2: 'value2'}]);
 
     const req ={
         method: 'GET',
@@ -243,12 +247,11 @@ describe("When generating a SDPS Report", () => {
 
   it('can get data in JSON format', async () => {
 
-    sdpsMock.reset();
-    sdpsVoidMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsMock.returns([{column1: 'value1'}]);
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value1'}]);
 
     const req ={
         method: 'GET',
@@ -269,12 +272,11 @@ describe("When generating a SDPS Report", () => {
 
   it('will set timestamp bounds correctly on date inputs', async () => {
 
-    sdpsMock.reset();
-    sdpsVoidMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsMock.returns([{column1: 'value'}]);
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -285,8 +287,8 @@ describe("When generating a SDPS Report", () => {
 
     expect(response.statusCode).toBe(200);
 
-    expect(sdpsMock.args[0][0].toISOString()).toEqual('2019-01-01T00:00:00.000Z');
-    expect(sdpsMock.args[0][1].toISOString()).toEqual('2019-01-01T23:59:59.999Z');
+    expect(sdpsMock.mock.calls[0][0].toISOString()).toEqual('2019-01-01T00:00:00.000Z');
+    expect(sdpsMock.mock.calls[0][1].toISOString()).toEqual('2019-01-01T23:59:59.999Z');
 
 
 
@@ -294,12 +296,11 @@ describe("When generating a SDPS Report", () => {
 
   it('will 400 on bad missing parameters', async () => {
 
-    sdpsMock.reset();
-    sdpsVoidMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsMock.returns([{column1: 'value'}]);
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -316,12 +317,10 @@ describe("When generating a SDPS Report", () => {
 
   it('can get data for void report', async () => {
 
-    sdpsMock.reset();
-    sdpsMock.returns([]);
-    sdpsVoidMock.reset();
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsVoidMock.returns([{column1: 'value'}]);
+    sdpsMock.mockResolvedValue([]);
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsVoidMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -334,7 +333,7 @@ describe("When generating a SDPS Report", () => {
 
 
     // did call 'void' report
-    expect(sdpsVoidMock.args.length).toEqual(1);
+    expect(sdpsVoidMock.mock.calls.length).toEqual(1);
 
 
 
@@ -345,14 +344,28 @@ describe("When generating a SDPS Report", () => {
 
 describe("When generating a Catch Certificate Investigation Report", () => {
 
+  let catchCertInvestigationMock: jest.SpyInstance;
+  let catchCertVoidInvestigationMock: jest.SpyInstance;
+  let catchCertBlockInvestigationMock: jest.SpyInstance;
+
+  beforeEach(() => {
+    catchCertInvestigationMock = jest.spyOn(report, 'catchCertInvestigationReport');
+    catchCertVoidInvestigationMock = jest.spyOn(report, 'catchCertVoidInvestigationReport');
+    catchCertBlockInvestigationMock = jest.spyOn(report,'catchCertBlockedInvestigationReport');
+  });
+
+  afterEach(() => {
+    catchCertInvestigationMock.mockRestore();
+    catchCertVoidInvestigationMock.mockRestore();
+    catchCertBlockInvestigationMock.mockRestore();
+  })
+
   it('an investigation report with no data', async () => {
 
-    catchCertInvestigationMock.reset();
-    catchCertInvestigationMock.returns([])
-    catchCertVoidInvestigationMock.reset();
-    catchCertVoidInvestigationMock.returns([])
-    catchCertBlockInvestigationMock.reset();
-    catchCertBlockInvestigationMock.returns([])
+    catchCertInvestigationMock.mockResolvedValue([])
+
+    catchCertVoidInvestigationMock.mockResolvedValue([])
+    catchCertBlockInvestigationMock.mockResolvedValue([])
 
     const req ={
       method: 'GET',
@@ -367,12 +380,11 @@ describe("When generating a Catch Certificate Investigation Report", () => {
 
   it('an investigation report with data', async () => {
 
-    catchCertInvestigationMock.reset();
-    catchCertInvestigationMock.returns([{bob: 1}])
-    catchCertVoidInvestigationMock.reset();
-    catchCertVoidInvestigationMock.returns([{bob: 2}])
-    catchCertBlockInvestigationMock.reset();
-    catchCertBlockInvestigationMock.returns([{bob: 3}])
+    catchCertInvestigationMock.mockResolvedValue([{bob: 1}])
+
+    catchCertVoidInvestigationMock.mockResolvedValue([{bob: 2}])
+
+    catchCertBlockInvestigationMock.mockResolvedValue([{bob: 3}])
 
     const req ={
       method: 'GET',
@@ -391,14 +403,29 @@ describe("When generating a Catch Certificate Investigation Report", () => {
 })
 
 describe("When generating a SDPS Investigation Report", () => {
+  let sdpsInvestigationMock: jest.SpyInstance;
+  let sdpsVoidInvestigationMock: jest.SpyInstance;
+  let sdpsBlockInvestigationMock: jest.SpyInstance;
+
+  beforeEach(() => {
+    sdpsInvestigationMock = jest.spyOn(report, 'sdpsInvestigationReport');
+    sdpsVoidInvestigationMock = jest.spyOn(report, 'sdpsVoidInvestigationReport');
+    sdpsBlockInvestigationMock = jest.spyOn(report,'sdpsBlockedInvestigationReport');
+  })
+
+  afterEach(() => {
+    sdpsInvestigationMock.mockRestore();
+    sdpsVoidInvestigationMock.mockRestore();
+    sdpsBlockInvestigationMock.mockRestore();
+  })
+
   it('an investigation report with no data', async () => {
 
-    sdpsInvestigationMock.reset();
-    sdpsInvestigationMock.returns([])
-    sdpsVoidInvestigationMock.reset();
-    sdpsVoidInvestigationMock.returns([])
-    sdpsBlockInvestigationMock.reset();
-    sdpsBlockInvestigationMock.returns([])
+    sdpsInvestigationMock.mockResolvedValue([])
+
+    sdpsVoidInvestigationMock.mockResolvedValue([])
+
+    sdpsBlockInvestigationMock.mockResolvedValue([])
 
     const req ={
       method: 'GET',
@@ -413,12 +440,11 @@ describe("When generating a SDPS Investigation Report", () => {
 
   it('an investigation report with data', async () => {
 
-    sdpsInvestigationMock.reset();
-    sdpsInvestigationMock.returns([{bob: 1}])
-    sdpsVoidInvestigationMock.reset();
-    sdpsVoidInvestigationMock.returns([{bob: 2}])
-    sdpsBlockInvestigationMock.reset();
-    sdpsBlockInvestigationMock.returns([{bob: 3}])
+    sdpsInvestigationMock.mockResolvedValue([{bob: 1}])
+
+    sdpsVoidInvestigationMock.mockResolvedValue([{bob: 2}])
+
+    sdpsBlockInvestigationMock.mockResolvedValue([{bob: 3}])
 
     const req ={
       method: 'GET',
@@ -438,6 +464,22 @@ describe("When generating a SDPS Investigation Report", () => {
 
 describe("various other edgecase paths", () => {
 
+  let sdpsMock: jest.SpyInstance;
+  let sdpsVoidMock: jest.SpyInstance;
+  let sdpsBlockMock: jest.SpyInstance;
+
+  beforeEach(() => {
+    sdpsMock = jest.spyOn(report, 'sdpsReport');
+    sdpsVoidMock = jest.spyOn(report, 'sdpsVoidReport');
+    sdpsBlockMock = jest.spyOn(report, 'sdpsBlockedReport');
+  })
+
+  afterEach(() => {
+    sdpsMock.mockRestore();
+    sdpsVoidMock.mockRestore();
+    sdpsBlockMock.mockRestore();
+  })
+
   it('invalid report type', async () => {
 
     const req ={
@@ -454,11 +496,11 @@ describe("various other edgecase paths", () => {
 
   it('asofdate parameter happy path', async () => {
 
-    sdpsMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsMock.returns([{column1: 'value'}]);
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -474,8 +516,7 @@ describe("various other edgecase paths", () => {
 
   it('asofdate parameter sad path', async () => {
 
-    sdpsMock.reset();
-    sdpsMock.returns([{column1: 'value'}]);
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -490,12 +531,11 @@ describe("various other edgecase paths", () => {
   });
 
   it('area parameter happy path', async () => {
-    sdpsMock.reset();
-    sdpsVoidMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
-    sdpsMock.returns([{column1: 'value'}]);
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
 
     const req ={
       method: 'GET',
@@ -536,12 +576,11 @@ describe("various other edgecase paths", () => {
 
 
   it('empty report will return no data', async () => {
-    sdpsMock.reset();
-    sdpsVoidMock.reset();
-    sdpsVoidMock.returns([]);
-    sdpsMock.returns([]);
-    sdpsBlockMock.reset();
-    sdpsBlockMock.returns([]);
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
 
     const req ={
       method: 'GET',
@@ -555,8 +594,9 @@ describe("various other edgecase paths", () => {
   });
 
   it('500 on unexpected error', async () => {
-    sdpsMock.reset();
-    sdpsMock.throws();
+    sdpsMock.mockImplementationOnce(() => {
+      throw new Error();
+    })
 
     const req ={
       method: 'GET',
@@ -603,8 +643,6 @@ describe("various other edgecase paths", () => {
     };
     const response = await server.inject(req);
     expect(response.statusCode).toBe(404);
-
-
 
   })
 

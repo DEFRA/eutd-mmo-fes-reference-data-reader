@@ -1,14 +1,17 @@
 import { IDynamicsLanding, LevelOfRiskType } from 'mmo-shared-reference-data';
 import { ICountry } from './appConfig/countries';
 import {
-  CertificateExporterAndCompany,
-  CertificateAudit
-} from "./defraValidation";
+    CertificateExporterAndCompany,
+    CertificateAudit
+} from './defraValidation';
 
 export interface IDynamicsCatchCertificateCase {
     da: string;
     caseType1: CaseOneType;
     caseType2: CaseTwoType;
+    caseRiskAtSubmission?: LevelOfRiskType;
+    caseStatusAtSubmission?: CaseStatusAtSubmission;
+    caseOutcomeAtSubmission?: CaseOutcomeAtSubmission;
     numberOfFailedSubmissions: number;
     isDirectLanding: boolean;
     documentNumber: string;
@@ -67,4 +70,18 @@ export enum CaseTwoType {
     Success = 'Real Time Validation - Successful',
     VoidByExporter = 'Void by an Exporter',
     VoidByAdmin = 'Void by SMO/PMO'
+}
+
+export enum CaseStatusAtSubmission {
+    ValidationFailure_NoLandingData = 'No Landing Data Failure',
+    ValidationFailure = 'Validation Failure',
+    PendingLandingData_DataExpected = 'Pending Landing Data - Data Expected',
+    PendingLandingData_DataNotYetExpected = 'Pending Landing Data - Data Not Yet Expected',
+    DataNeverExpected = 'Data Never Expected',
+    ValidationSuccess = 'Validation Success'
+}
+
+export enum CaseOutcomeAtSubmission {
+    Issued = 'Issued',
+    Rejected = 'Rejected'
 }

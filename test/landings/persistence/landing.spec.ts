@@ -5,7 +5,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { ILanding, LandingModel, LandingSources } from '../../../src/landings/types/landing';
 import { ApplicationConfig } from '../../../src/config';
 import logger from '../../../src/logger';
-const sinon = require('sinon');
+
 const Service = require('../../../src/landings/persistence/landing');
 
 ApplicationConfig.loadEnv({})
@@ -352,14 +352,14 @@ describe('given that timestamps from CEFAS are UTC, and dateLanded within the ca
 
 describe('get multiple landings', () => {
 
-  let mockLoggerInfo;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(async () => {
     await LandingModel.deleteMany({});
   });
 
   it('can get multiple landings', async() => {
-    mockLoggerInfo = sinon.spy(logger, 'info');
+    mockLoggerInfo = jest.spyOn(logger, 'info');
 
     const landings: ILanding[] = [
       {
@@ -380,9 +380,9 @@ describe('get multiple landings', () => {
 
     const res = await Service.getLandingsMultiple( [{ rssNumber: '100', dateLanded: '2019-07-01' }] )
 
-    expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[LANDINGS][GET-MULTIPLE-LANDINGS][LENGTH][1]');
+    expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[LANDINGS][GET-MULTIPLE-LANDINGS][LENGTH][1]');
 
-    expect(mockLoggerInfo.getCall(1).args[0]).toEqual('[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING][RSS-NUMBER][100]');
+    expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, '[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING][RSS-NUMBER][100]');
 
     expect(res.length).toBe(2)
   })

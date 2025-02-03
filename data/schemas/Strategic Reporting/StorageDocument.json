@@ -300,9 +300,7 @@
         "exportedTo": {
             "type": "object",
             "required": [
-                "officialCountryName",
-                "isoCodeAlpha2",
-                "isoCodeAlpha3"
+                "officialCountryName"
             ],
             "additionalProperties": false,
             "properties": {

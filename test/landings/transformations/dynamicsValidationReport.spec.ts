@@ -211,21 +211,11 @@ describe('Dynamics Validation', () => {
       weightOnAllCertsBefore: 0,
       weightOnAllCertsAfter: 100,
       weightFactor: 5,
-      isLandingExists: true,
+      isLandingExists: false,
       isSpeciesExists: false,
       numberOfLandingsOnDay: 1,
       weightOnLanding: 30,
       weightOnLandingAllSpecies: 30,
-      landingTotalBreakdown: [
-        {
-          factor: 1.7,
-          isEstimate: true,
-          weight: 30,
-          liveWeight: 51,
-          source: LandingSources.CatchRecording
-        }
-      ],
-      source: LandingSources.CatchRecording,
       isExceeding14DayLimit: false,
       isOverusedThisCert: false,
       isOverusedAllCerts: false,
@@ -258,7 +248,10 @@ describe('Dynamics Validation', () => {
           investigator: "Investigator Gadget",
           status: InvestigationStatus.Open
         },
-        transportationVehicle: 'directLanding'
+        transportationVehicle: 'directLanding',
+        dataEverExpected: true,
+        landingDataExpectedDate: '2019-07-13',
+        landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD')
       }
     }
 
@@ -270,6 +263,7 @@ describe('Dynamics Validation', () => {
       expect(result.documentNumber).toEqual('GBR-2020-CC-1BC924FCF');
       expect(result.caseType1).toEqual('CC');
       expect(result.caseType2).toEqual(CaseTwoType.RealTimeValidation_Rejected)
+      expect(result.landings[0].is14DayLimitReached).toBe(true);
       expect(result.numberOfFailedSubmissions).toBe(5);
       expect(result.isDirectLanding).toBeTruthy();
       expect(result.da).toEqual('Scotland');
@@ -552,7 +546,7 @@ describe('Dynamics Validation', () => {
         mockIsHighRisk = jest.spyOn(RiskRating, 'isHighRisk');
         mockGetTotalRiskScore = jest.spyOn(RiskRating, 'getTotalRiskScore');
         mockIsRiskEnabled = jest.spyOn(RiskRating, 'isRiskEnabled');
-        mockIsSpeciesFailure = jest.spyOn(RiskRating, 'isSpeciesFailure');
+        mockIsSpeciesFailure = jest.spyOn(Shared, 'isSpeciesFailure');
         mockIsElog = jest.spyOn(Shared, 'isElog');
         mockIsWithinDeminimus = jest.spyOn(Shared, 'isWithinDeminimus');
       });
@@ -5977,6 +5971,489 @@ describe('Dynamics Validation', () => {
       expect(result.landingDataExpectedAtSubmission).toBe(false);
     });
 
+    it('will set 14DayLimitReached to true when species failure for an under 50 kg landing using Elog outside of retrospective period', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().subtract(2, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "ELOG",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: false,
+        weightOnLanding: 0,
+        isOverusedAllCerts: false,
+        isOverusedThisCert: false,
+        overUsedInfo: []
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input);
+      expect(result.is14DayLimitReached).toBe(true);
+    });
+
+    it('will set 14DayLimitReached to false when CT2 is Pending landing Data or species failure for an under 50 kg landing using Elog', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "ELOG",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: false,
+        weightOnLanding: 0,
+        isOverusedAllCerts: false,
+        isOverusedThisCert: false,
+        overUsedInfo: []
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input);
+      expect(result.is14DayLimitReached).toBe(false);
+    });
+
+    it('will set 14DayLimitReached to true when Species Failure - Validation Failure - occurs for a landing using Landing Declaration', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "LANDING_DECLARATION",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: false,
+        weightOnLanding: 0,
+        isOverusedAllCerts: false,
+        isOverusedThisCert: false,
+        overUsedInfo: []
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input);
+      expect(result.is14DayLimitReached).toBe(true);
+    });
+
+    it('will set 14DayLimitReached to true when Overuse - Validation Failure - occurs for a landing using Landing Declaration', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "LANDING_DECLARATION",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: true,
+        weightOnLanding: 0,
+        isOverusedAllCerts: true,
+        isOverusedThisCert: true,
+        overUsedInfo: ['CC1']
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input);
+      expect(result.is14DayLimitReached).toBe(true);
+    });
+
+    it('will set Is 14 day limit reached to True on all landings on a rejected catch certificate', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "ELOG",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: false,
+        weightOnLanding: 0,
+        isOverusedAllCerts: false,
+        isOverusedThisCert: false,
+        overUsedInfo: []
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input, CaseTwoType.RealTimeValidation_Rejected);
+      expect(result.is14DayLimitReached).toBe(true);
+    });
+
+    it('will set Is 14 day limit reached to True on all landings on voiding the catch certificate by admin', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "ELOG",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: false,
+        weightOnLanding: 0,
+        isOverusedAllCerts: false,
+        isOverusedThisCert: false,
+        overUsedInfo: []
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input, CaseTwoType.VoidByAdmin);
+      expect(result.is14DayLimitReached).toBe(true);
+    });
+
+    it('will set Is 14 day limit reached to True on all landings on voiding the catch certificate by exporter', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-5D31C8ADF",
+        documentType: "catchCertificate",
+        createdAt: "2024-06-12T13:05:35.209Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "0eee9e71-61d5-ee11-904d-000d3ab00f0f",
+          exporterName: "Gosia Miksza",
+          exporterCompanyName: "Scenario 12",
+          exporterPostCode: "PE2 8YY",
+          vessel: "CELTIC",
+          landingId: "GBR-2024-CC-5D31C8ADF-7949086400",
+          pln: "M509",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C18051",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Wolffishes(=Catfishes) nei (CAT)",
+          scientificName: "Anarhichas spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03028990",
+          commodityCodeDescription: "Fresh or chilled fish, n.e.s.",
+          transportationVehicle: "directLanding",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "MR A G PHILLIPS",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-06-12",
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD'),
+          isLegallyDue: false,
+          homePort: "MILFORD HAVEN",
+          imoNumber: null,
+          licenceNumber: "11704",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C18051",
+        da: "Wales",
+        dateLanded: "2024-06-11",
+        species: "CAT",
+        weightFactor: 1,
+        weightOnCert: 20,
+        rawWeightOnCert: 20,
+        weightOnAllCerts: 20,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 20,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.046S",
+        source: "ELOG",
+        weightOnLandingAllSpecies: 20,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT0.107S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT0.107S",
+        firstDateTimeLandingDataRetrieved: "2024-06-12T13:05:35.102Z",
+        isSpeciesExists: false,
+        weightOnLanding: 0,
+        isOverusedAllCerts: false,
+        isOverusedThisCert: false,
+        overUsedInfo: []
+      };
+
+      const result: Shared.IDynamicsLanding = SUT.toLanding(input, CaseTwoType.VoidByExporter);
+      expect(result.is14DayLimitReached).toBe(true);
+    });
+
   });
 
   describe('When mapping from an ICcQueryResult to an IDynamicsLandingValidation', () => {
@@ -6707,6 +7184,470 @@ describe('Dynamics Validation', () => {
     });
   });
 
+  describe('toDynamicsLandingCase', () => {
+    let res: Shared.IDynamicsLandingCase;
+
+    const input: Shared.ICcQueryResult = {
+      documentNumber: 'CC1',
+      documentType: 'catchCertificate',
+      createdAt: moment.utc('2019-07-13T08:26:06.939Z').toISOString(),
+      status: 'COMPLETE',
+      rssNumber: 'rssWA1',
+      da: 'Guernsey',
+      dateLanded: '2019-07-10',
+      species: 'LBE',
+      weightOnCert: 121,
+      rawWeightOnCert: 122,
+      weightOnAllCerts: 200,
+      weightOnAllCertsBefore: 0,
+      weightOnAllCertsAfter: 100,
+      weightFactor: 5,
+      isLandingExists: true,
+      isSpeciesExists: true,
+      numberOfLandingsOnDay: 1,
+      weightOnLanding: 30,
+      weightOnLandingAllSpecies: 30,
+      landingTotalBreakdown: [
+        {
+          factor: 1.7,
+          isEstimate: true,
+          weight: 30,
+          liveWeight: 51,
+          source: Shared.LandingSources.CatchRecording
+        }
+      ],
+      isOverusedThisCert: false,
+      isOverusedAllCerts: false,
+      isExceeding14DayLimit: false,
+      overUsedInfo: [],
+      durationSinceCertCreation: moment.duration(
+        queryTime
+          .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+      durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
+        moment.utc('2019-07-11T09:00:00.000Z')
+          .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+      durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
+        moment.utc('2019-07-11T09:00:00.000Z')
+          .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+      extended: {
+        landingId: 'rssWA12019-07-10',
+        exporterName: 'Mr Bob',
+        presentation: 'SLC',
+        documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
+        presentationName: 'sliced',
+        vessel: 'DAYBREAK',
+        fao: 'FAO27',
+        pln: 'WA1',
+        species: 'Lobster',
+        state: 'FRE',
+        stateName: 'fresh',
+        commodityCode: '1234',
+        investigation: {
+          investigator: "Investigator Gadget",
+          status: 'OPEN_UNDER_ENQUIRY'
+        },
+        transportationVehicle: 'directLanding',
+        numberOfSubmissions: 1,
+      }
+    };
+
+    let mockToLanding: jest.SpyInstance;
+
+    beforeEach(() => {
+      mockToLanding = jest.spyOn(SUT, 'toLanding');
+      mockToLanding.mockResolvedValue({});
+
+      res = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
+    });
+
+    afterEach(() => {
+      mockToLanding.mockRestore();
+    });
+
+    it('should include all the properties from the standard landing mapper', () => {
+      expect(res.status).not.toBeUndefined();
+    });
+
+    it('should include all the properties from the standard exporter mapper', () => {
+      expect(res.exporter).not.toBeUndefined();
+    });
+
+    it('should include the documentNumber', () => {
+      expect(res.documentNumber).toBe("GBR-2020-CC-1BC924FCF");
+    });
+
+    it('should include the documentDate', () => {
+      expect(res.documentDate).toBe("2020-06-24T10:39:32.000Z");
+    });
+
+    it('should include the documentUrl', () => {
+      expect(res.documentUrl).toBe(`${ApplicationConfig.prototype.externalAppUrl}/qr/export-certificates/${exampleCc.documentUri}`);
+    });
+
+    it('should include a correlationId', () => expect(res._correlationId).toEqual('some-uuid-correlation-id'));
+
+    it('should include a requestedByAdmin flag', () => expect(res.requestedByAdmin).toEqual(false));
+
+    it('should include a numberOfFailedSubmissions field', () => expect(res.numberOfFailedSubmissions).toEqual(5));
+
+    it('should include a numberOfSubmissions field', () => expect(res.numberOfTotalSubmissions).toEqual(1));
+
+    it('should include an exportedTo', () => {
+      expect(res.exportedTo).toEqual({
+        officialCountryName: "Nigeria",
+        isoCodeAlpha2: "NG",
+        isoCodeAlpha3: "NGA"
+      });
+    })
+
+    it('will set status as Pending Landing Data for retrospective landing where status is Pending Landing Data - Elog species', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: 'CC1',
+        documentType: 'catchCertificate',
+        createdAt: moment.utc('2019-07-13T08:26:06.939Z').toISOString(),
+        status: 'COMPLETE',
+        rssNumber: 'rssWA1',
+        da: 'Guernsey',
+        dateLanded: '2019-07-10',
+        species: 'LBE',
+        weightOnCert: 20,
+        rawWeightOnCert: 122,
+        weightOnAllCerts: 200,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 100,
+        weightFactor: 5,
+        isLandingExists: true,
+        isSpeciesExists: false,
+        numberOfLandingsOnDay: 1,
+        weightOnLanding: 30,
+        weightOnLandingAllSpecies: 30,
+        landingTotalBreakdown: [
+          {
+            factor: 1.7,
+            isEstimate: true,
+            weight: 30,
+            liveWeight: 51,
+            source: Shared.LandingSources.ELog
+          }
+        ],
+        source: Shared.LandingSources.ELog,
+        isOverusedThisCert: false,
+        isOverusedAllCerts: false,
+        isExceeding14DayLimit: false,
+        overUsedInfo: [],
+        durationSinceCertCreation: moment.duration(
+          queryTime
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        extended: {
+          landingId: 'rssWA12019-07-10',
+          exporterName: 'Mr Bob',
+          presentation: 'SLC',
+          documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
+          presentationName: 'sliced',
+          vessel: 'DAYBREAK',
+          fao: 'FAO27',
+          pln: 'WA1',
+          species: 'Lobster',
+          state: 'FRE',
+          stateName: 'fresh',
+          commodityCode: '1234',
+          investigation: {
+            investigator: "Investigator Gadget",
+            status: Shared.InvestigationStatus.Open
+          },
+          transportationVehicle: 'directLanding',
+          licenceHolder: 'Mr Bob'
+        }
+      }
+
+      const result: Shared.IDynamicsLandingCase = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
+      expect(result.status).toBe('Pending Landing Data');
+    });
+
+    it('will set status as Pending Landing Data for retrospective landing where status is Pending Landing Data - Data Not Yet Expected', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: 'CC1',
+        documentType: 'catchCertificate',
+        createdAt: moment.utc('2019-07-13T08:26:06.939Z').toISOString(),
+        status: 'COMPLETE',
+        rssNumber: 'rssWA1',
+        da: 'Guernsey',
+        dateLanded: '2019-07-10',
+        species: 'LBE',
+        weightOnCert: 121,
+        rawWeightOnCert: 122,
+        weightOnAllCerts: 200,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 100,
+        weightFactor: 5,
+        isLandingExists: false,
+        isSpeciesExists: false,
+        numberOfLandingsOnDay: 0,
+        weightOnLanding: 30,
+        weightOnLandingAllSpecies: 30,
+        landingTotalBreakdown: [],
+        isOverusedThisCert: false,
+        isOverusedAllCerts: false,
+        isExceeding14DayLimit: false,
+        overUsedInfo: [],
+        durationSinceCertCreation: moment.duration(
+          queryTime
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        extended: {
+          landingId: 'rssWA12019-07-10',
+          exporterName: 'Mr Bob',
+          presentation: 'SLC',
+          documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
+          presentationName: 'sliced',
+          vessel: 'DAYBREAK',
+          fao: 'FAO27',
+          pln: 'WA1',
+          species: 'Lobster',
+          state: 'FRE',
+          stateName: 'fresh',
+          commodityCode: '1234',
+          investigation: {
+            investigator: "Investigator Gadget",
+            status: Shared.InvestigationStatus.Open
+          },
+          transportationVehicle: 'directLanding',
+          licenceHolder: 'Mr Bob',
+          dataEverExpected: true,
+          landingDataExpectedDate: moment.utc().add(2, 'day').format('YYYY-MM-DD'),
+          landingDataEndDate: moment.utc().add(3, 'day').format('YYYY-MM-DD')
+        }
+      }
+
+      const result: Shared.IDynamicsLandingCase = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
+      expect(result.status).toBe('Pending Landing Data');
+    });
+
+    it('will set status as Pending Landing Data for retrospective landing where status is Pending Landing Data - Data Expected', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: 'CC1',
+        documentType: 'catchCertificate',
+        createdAt: moment.utc().toISOString(),
+        status: 'COMPLETE',
+        rssNumber: 'rssWA1',
+        da: 'Guernsey',
+        dateLanded: '2019-07-10',
+        species: 'LBE',
+        weightOnCert: 121,
+        rawWeightOnCert: 122,
+        weightOnAllCerts: 200,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 100,
+        weightFactor: 5,
+        isLandingExists: false,
+        isSpeciesExists: true,
+        numberOfLandingsOnDay: 0,
+        weightOnLanding: 30,
+        weightOnLandingAllSpecies: 30,
+        landingTotalBreakdown: [],
+        isOverusedThisCert: false,
+        isOverusedAllCerts: false,
+        isExceeding14DayLimit: false,
+        overUsedInfo: [],
+        durationSinceCertCreation: moment.duration(
+          queryTime
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        extended: {
+          landingId: 'rssWA12019-07-10',
+          exporterName: 'Mr Bob',
+          presentation: 'SLC',
+          documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
+          presentationName: 'sliced',
+          vessel: 'DAYBREAK',
+          fao: 'FAO27',
+          pln: 'WA1',
+          species: 'Lobster',
+          state: 'FRE',
+          stateName: 'fresh',
+          commodityCode: '1234',
+          investigation: {
+            investigator: "Investigator Gadget",
+            status: Shared.InvestigationStatus.Open
+          },
+          transportationVehicle: 'directLanding',
+          licenceHolder: 'Mr Bob',
+          dataEverExpected: true,
+          landingDataExpectedDate: moment.utc().format('YYYY-MM-DD'),
+          landingDataEndDate: moment.utc().add(1, 'day').format('YYYY-MM-DD')
+        }
+      }
+
+      const result: Shared.IDynamicsLandingCase = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
+      expect(result.status).toBe('Pending Landing Data');
+    });
+
+    it('will set status as found status for retrospective landing where status is Validation Success', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: 'CC1',
+        documentType: 'catchCertificate',
+        createdAt: moment.utc('2019-07-13T08:26:06.939Z').toISOString(),
+        status: 'COMPLETE',
+        rssNumber: 'rssWA1',
+        da: 'Guernsey',
+        dateLanded: '2019-07-10',
+        species: 'LBE',
+        weightOnCert: 121,
+        rawWeightOnCert: 122,
+        weightOnAllCerts: 200,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 100,
+        weightFactor: 5,
+        isLandingExists: true,
+        isSpeciesExists: true,
+        numberOfLandingsOnDay: 1,
+        weightOnLanding: 30,
+        weightOnLandingAllSpecies: 30,
+        landingTotalBreakdown: [{
+          factor: 1.7,
+          isEstimate: true,
+          weight: 30,
+          liveWeight: 51,
+          source: Shared.LandingSources.LandingDeclaration
+        }],
+        isOverusedThisCert: false,
+        isOverusedAllCerts: false,
+        isExceeding14DayLimit: false,
+        overUsedInfo: [],
+        durationSinceCertCreation: moment.duration(
+          queryTime
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
+          moment.utc('2019-07-11T09:00:00.000Z')
+            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
+        extended: {
+          landingId: 'rssWA12019-07-10',
+          exporterName: 'Mr Bob',
+          presentation: 'SLC',
+          documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
+          presentationName: 'sliced',
+          vessel: 'DAYBREAK',
+          fao: 'FAO27',
+          pln: 'WA1',
+          species: 'Lobster',
+          state: 'FRE',
+          stateName: 'fresh',
+          commodityCode: '1234',
+          investigation: {
+            investigator: "Investigator Gadget",
+            status: Shared.InvestigationStatus.Open
+          },
+          transportationVehicle: 'directLanding',
+          licenceHolder: 'Mr Bob'
+        }
+      }
+
+      const result: Shared.IDynamicsLandingCase = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
+      expect(result.status).toBe('Validation Success');
+    });
+
+    it('will set status as found status for retrospective landing where status is Validation Failure', () => {
+      const input: Shared.ICcQueryResult = {
+        documentNumber: "GBR-2024-CC-26F85FD5A",
+        documentType: "catchCertificate",
+        createdAt: "2024-09-13T10:40:40.023Z",
+        status: "COMPLETE",
+        extended: {
+          exporterContactId: "42baa958-e498-e911-a962-000d3ab6488a",
+          exporterName: "harshal edake",
+          exporterCompanyName: "Capgemini",
+          exporterPostCode: "CH3 7PN",
+          vessel: "CATHARINA OF LADRAM",
+          landingId: "GBR-2024-CC-26F85FD5A-6863951470",
+          pln: "BM111",
+          fao: "FAO27",
+          flag: "GBR",
+          cfr: "GBR000C19045",
+          presentation: "WHL",
+          presentationName: "Whole",
+          species: "Common squids nei (SQC)",
+          scientificName: "Loligo spp",
+          state: "FRE",
+          stateName: "Fresh",
+          commodityCode: "03074220",
+          commodityCodeDescription: "Squid \"Loligo spp.\", live, fresh or chilled",
+          transportationVehicle: "truck",
+          numberOfSubmissions: 1,
+          speciesOverriddenByAdmin: false,
+          licenceHolder: "WATERDANCE LIMITED ",
+          dataEverExpected: true,
+          landingDataExpectedDate: "2024-07-19",
+          landingDataEndDate: "2024-08-02",
+          isLegallyDue: true,
+          homePort: "BRIXHAM",
+          imoNumber: 9019365,
+          licenceNumber: "11930",
+          licenceValidTo: "2030-12-31"
+        },
+        rssNumber: "C19045",
+        da: "England",
+        dateLanded: "2024-07-19",
+        species: "SQC",
+        weightFactor: 1,
+        weightOnCert: 100,
+        rawWeightOnCert: 100,
+        weightOnAllCerts: 400,
+        weightOnAllCertsBefore: 0,
+        weightOnAllCertsAfter: 100,
+        isLandingExists: true,
+        isExceeding14DayLimit: false,
+        speciesAlias: "N",
+        durationSinceCertCreation: "PT0.008S",
+        source: "LANDING_DECLARATION",
+        weightOnLandingAllSpecies: 100,
+        numberOfLandingsOnDay: 1,
+        durationBetweenCertCreationAndFirstLandingRetrieved: "-PT19H49M5.517S",
+        durationBetweenCertCreationAndLastLandingRetrieved: "-PT19H49M5.517S",
+        firstDateTimeLandingDataRetrieved: "2024-09-12T14:51:34.506Z",
+        isSpeciesExists: true,
+        weightOnLanding: 100,
+        landingTotalBreakdown: [
+          {
+            presentation: "WHL",
+            state: "FRE",
+            source: "LANDING_DECLARATION",
+            isEstimate: false,
+            factor: 1,
+            weight: 100,
+            liveWeight: 100
+          }
+        ],
+        isOverusedThisCert: false,
+        isOverusedAllCerts: true,
+        overUsedInfo: [
+          "GBR-2024-CC-26F85FD5A"
+        ]
+      }
+
+      const result: Shared.IDynamicsLandingCase = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
+      expect(result.status).toBe('Overuse Failure');
+    });
+  });
+
   describe("When assigning a case2Type to a IDynamicsProcessingStatementCase and IDynamicsStorageDocumentCase", () => {
     it("will contain correct string for RealTimeValidation_Success", () => {
       const result = SdPsCaseTwoType.RealTimeValidation_Success;
@@ -6736,11 +7677,11 @@ describe('Dynamics Validation', () => {
     });
     it("will contain correct string for Overuse", () => {
       const result = SdPsStatus.Overuse;
-      expect(result).toBe("Validation Failure - Overuse");
+      expect(result).toBe("Overuse Failure");
     });
     it("will contain correct string for Weight", () => {
       const result = SdPsStatus.Weight;
-      expect(result).toBe("Validation Failure - Weight");
+      expect(result).toBe("Weight Failure");
     });
 
   });
@@ -7808,8 +8749,9 @@ describe('Dynamics Validation', () => {
     });
   });
 
-  describe('When mapping from a IDynamicsLanding to failureIrrespectiveOfRisk', () => {
-    const landing: Shared.IDynamicsLanding = {
+  describe('When mapping from IDynamicsLanding to caseRiskAtSubmission', () => {
+
+    const landing_low_risk: Shared.IDynamicsLanding = {
       status: Shared.LandingStatusType.ValidationFailure_Overuse,
       id: "GBR-2020-CC-X",
       landingDate: "2018-12-08",
@@ -7840,11 +8782,445 @@ describe('Dynamics Validation', () => {
         salesNoteUrl: "some-sales-notes-url",
         isLegallyDue: true
       },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
       dataEverExpected: true,
       vesselAdministration: 'England'
     };
 
-    const landing_weight_failure: Shared.IDynamicsLanding = {
+    const landing_high_risk: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Overuse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "2.0",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "2.0",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    it("caseRiskAtSubmission will be set to High when at least one landing has high risk", () => {
+      expect(SUT.toCaseRisk([landing_low_risk, landing_high_risk])).toBe("High");
+    })
+
+    it("caseRiskAtSubmission will be set to Low when no landing has high risk", () => {
+      expect(SUT.toCaseRisk([landing_low_risk])).toBe("Low");
+    })
+  });
+
+  describe('When mapping from a IDynamicsLanding to caseOutcomeAtSubmission', () => {
+    const landing_success: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationSuccess,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+    const landing__rejected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.DataNeverExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: false,
+      vesselAdministration: 'England'
+    };
+    it("caseOutcomeAtSubmission will be set to 'Issued' when there are no landings with landingOutcomeAtSubmission=Rejected", () => {
+      expect(landing_success.landingOutcomeAtSubmission).toBe("Success");
+      expect(landing_success.landingOutcomeAtRetrospectiveCheck).toBe("Success");
+      expect(SUT.toCaseOutcomeAtSubmission([landing_success])).toBe("Issued");
+    });
+    it("caseOutcomeAtSubmission will be set to 'Rejected' when there are one or more landings with landingOutcomeAtSubmission=Rejected", () => {
+      expect(landing__rejected.landingOutcomeAtSubmission).toBe("Rejected");
+      expect(landing__rejected.landingOutcomeAtRetrospectiveCheck).toBe("Failure");
+      expect(SUT.toCaseOutcomeAtSubmission([landing_success, landing__rejected])).toBe("Rejected");
+    });
+  });
+
+  describe('When mapping from IDynamicsLanding to caseStatusAtSubmission', () => {
+
+    const landing_low_risk_success_ValidationSuccess: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationSuccess,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_success_PendingLandingData_DataNotYetExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataNotYetExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_success_PendingLandingData_DataExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_success_PendingLandingData_ElogSpecies: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_ElogSpecies,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      source: LandingSources.ELog,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_success_DataNeverExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.DataNeverExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: false,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_success_validation_failure_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Overuse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_success_validation_failure_weight: Shared.IDynamicsLanding = {
       status: Shared.LandingStatusType.ValidationFailure_Weight,
       id: "GBR-2020-CC-X",
       landingDate: "2018-12-08",
@@ -7867,6 +9243,8 @@ describe('Dynamics Validation', () => {
       adminState: "Fresh",
       adminPresentation: "Whole",
       adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
       validation: {
         liveExportWeight: 26,
         totalRecordedAgainstLanding: 26,
@@ -7875,46 +9253,19 @@ describe('Dynamics Validation', () => {
         salesNoteUrl: "some-sales-notes-url",
         isLegallyDue: true
       },
-      dataEverExpected: true,
-      vesselAdministration: 'England'
-    };
-
-    const landing_species_failure: Shared.IDynamicsLanding = {
-      status: Shared.LandingStatusType.ValidationFailure_Species,
-      id: "GBR-2020-CC-X",
-      landingDate: "2018-12-08",
-      species: "COD",
-      is14DayLimitReached: false,
-      vesselOverriddenByAdmin: false,
-      state: "FRE",
-      cnCode: "1234",
-      commodityCodeDescription: "some description",
-      scientificName: "some scientific name",
-      presentation: "FIL",
-      speciesOverriddenByAdmin: false,
-      vesselName: "BOB WINNIE",
-      vesselPln: "FH691",
-      vesselLength: 10,
-      licenceHolder: "VESSEL MASTER",
-      weight: 10,
-      numberOfTotalSubmissions: 1,
-      adminSpecies: "Sand smelt (ATP)",
-      adminState: "Fresh",
-      adminPresentation: "Whole",
-      adminCommodityCode: "some commodity code",
-      validation: {
-        liveExportWeight: 26,
-        totalRecordedAgainstLanding: 26,
-        landedWeightExceededBy: undefined,
-        rawLandingsUrl: "some-raw-landings-url",
-        salesNoteUrl: "some-sales-notes-url",
-        isLegallyDue: true
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
       },
       dataEverExpected: true,
       vesselAdministration: 'England'
     };
 
-    const landing_no_data_failure: Shared.IDynamicsLanding = {
+    const landing_low_risk_success_ValidationFailure_NoLandingData: Shared.IDynamicsLanding = {
       status: Shared.LandingStatusType.ValidationFailure_NoLandingData,
       id: "GBR-2020-CC-X",
       landingDate: "2018-12-08",
@@ -7937,6 +9288,8 @@ describe('Dynamics Validation', () => {
       adminState: "Fresh",
       adminPresentation: "Whole",
       adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
       validation: {
         liveExportWeight: 26,
         totalRecordedAgainstLanding: 26,
@@ -7945,12 +9298,20 @@ describe('Dynamics Validation', () => {
         salesNoteUrl: "some-sales-notes-url",
         isLegallyDue: true
       },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
       dataEverExpected: true,
       vesselAdministration: 'England'
     };
 
-    const landing_no_licence_holder: Shared.IDynamicsLanding = {
-      status: Shared.LandingStatusType.ValidationFailure_NoLicenceHolder,
+    const landing_low_risk_success_validation_failure_weight_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_WeightAndOveruse,
       id: "GBR-2020-CC-X",
       landingDate: "2018-12-08",
       species: "COD",
@@ -7958,7 +9319,7 @@ describe('Dynamics Validation', () => {
       vesselOverriddenByAdmin: false,
       state: "FRE",
       presentation: "FIL",
-      speciesOverriddenByAdmin: true,
+      speciesOverriddenByAdmin: false,
       cnCode: "1234",
       commodityCodeDescription: "some description",
       scientificName: "some scientific name",
@@ -7972,6 +9333,8 @@ describe('Dynamics Validation', () => {
       adminState: "Fresh",
       adminPresentation: "Whole",
       adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
       validation: {
         liveExportWeight: 26,
         totalRecordedAgainstLanding: 26,
@@ -7980,200 +9343,1713 @@ describe('Dynamics Validation', () => {
         salesNoteUrl: "some-sales-notes-url",
         isLegallyDue: true
       },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
       dataEverExpected: true,
       vesselAdministration: 'England'
     };
 
-    it('will return the correct failureIrrespectiveOfRisk for a given set of landings', () => {
-      expect(SUT.toFailureIrrespectiveOfRisk([landing])).toBeFalsy();
-      expect(SUT.toFailureIrrespectiveOfRisk([landing, landing_species_failure])).toBeTruthy();
-      expect(SUT.toFailureIrrespectiveOfRisk([landing, landing_weight_failure])).toBeTruthy();
-      expect(SUT.toFailureIrrespectiveOfRisk([landing, landing_no_data_failure])).toBeTruthy();
-      expect(SUT.toFailureIrrespectiveOfRisk([landing, landing_no_licence_holder])).toBeTruthy();
-    });
-  });
-
-  describe('When mapping from ICcQueryResult to IDynamicsLandingCase', () => {
-    let res: Shared.IDynamicsLandingCase;
-
-    const input: Shared.ICcQueryResult = {
-      documentNumber: 'CC1',
-      documentType: 'catchCertificate',
-      createdAt: moment.utc('2019-07-13T08:26:06.939Z').toISOString(),
-      status: 'COMPLETE',
-      rssNumber: 'rssWA1',
-      da: 'Guernsey',
-      dateLanded: '2019-07-10',
-      species: 'LBE',
-      weightOnCert: 121,
-      rawWeightOnCert: 122,
-      weightOnAllCerts: 200,
-      weightOnAllCertsBefore: 0,
-      weightOnAllCertsAfter: 100,
-      weightFactor: 5,
-      isLandingExists: true,
-      isSpeciesExists: true,
-      numberOfLandingsOnDay: 1,
-      weightOnLanding: 30,
-      weightOnLandingAllSpecies: 30,
-      landingTotalBreakdown: [
-        {
-          factor: 1.7,
-          isEstimate: true,
-          weight: 30,
-          liveWeight: 51,
-          source: Shared.LandingSources.CatchRecording
-        }
-      ],
-      isOverusedThisCert: false,
-      isOverusedAllCerts: false,
-      isExceeding14DayLimit: false,
-      overUsedInfo: [],
-      durationSinceCertCreation: moment.duration(
-        queryTime
-          .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
-      durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
-        moment.utc('2019-07-11T09:00:00.000Z')
-          .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
-      durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
-        moment.utc('2019-07-11T09:00:00.000Z')
-          .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
-      extended: {
-        landingId: 'rssWA12019-07-10',
-        exporterName: 'Mr Bob',
-        presentation: 'SLC',
-        documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
-        presentationName: 'sliced',
-        vessel: 'DAYBREAK',
-        fao: 'FAO27',
-        pln: 'WA1',
-        species: 'Lobster',
-        state: 'FRE',
-        stateName: 'fresh',
-        commodityCode: '1234',
-        investigation: {
-          investigator: "Investigator Gadget",
-          status: 'OPEN_UNDER_ENQUIRY'
-        },
-        transportationVehicle: 'directLanding',
-        numberOfSubmissions: 1,
-      }
+    const landing_low_risk_success_validation_failure_species: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Species,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
     };
 
-    let mockToLanding: jest.SpyInstance;
+    const landing_high_risk_success_ValidationSuccess: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationSuccess,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    beforeEach(() => {
-      mockToLanding = jest.spyOn(SUT, 'toLanding');
-      mockToLanding.mockResolvedValue({});
+    const landing_high_risk_success_PendingLandingData_DataNotYetExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataNotYetExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-      res = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
-    });
+    const landing_high_risk_success_PendingLandingData_DataExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    afterEach(() => {
-      mockToLanding.mockRestore();
-    });
+    const landing_high_risk_success_PendingLandingData_ElogSpecies: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_ElogSpecies,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      source: LandingSources.ELog,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include all the properties from the standard landing mapper', () => {
-      expect(res.status).not.toBeUndefined();
-    });
+    const landing_high_risk_success_DataNeverExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.DataNeverExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: false,
+      vesselAdministration: 'England'
+    };
 
-    it('should include all the properties from the standard exporter mapper', () => {
-      expect(res.exporter).not.toBeUndefined();
-    });
+    const landing_high_risk_success_validation_failure_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Overuse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include the documentNumber', () => {
-      expect(res.documentNumber).toBe("GBR-2020-CC-1BC924FCF");
-    });
+    const landing_high_risk_success_validation_failure_weight: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Weight,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include the documentDate', () => {
-      expect(res.documentDate).toBe("2020-06-24T10:39:32.000Z");
-    });
+    const landing_high_risk_success_ValidationFailure_NoLandingData: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_NoLandingData,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include the documentUrl', () => {
-      expect(res.documentUrl).toBe(`${ApplicationConfig.prototype.externalAppUrl}/qr/export-certificates/${exampleCc.documentUri}`);
-    });
+    const landing_high_risk_success_validation_failure_weight_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_WeightAndOveruse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include a correlationId', () => expect(res._correlationId).toEqual('some-uuid-correlation-id'));
+    const landing_high_risk_success_validation_failure_species: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Species,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Success,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Success,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include a requestedByAdmin flag', () => expect(res.requestedByAdmin).toEqual(false));
+    const landing_low_risk_rejected_DataNeverExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.DataNeverExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: false,
+      vesselAdministration: 'England'
+    };
 
-    it('should include a numberOfFailedSubmissions field', () => expect(res.numberOfFailedSubmissions).toEqual(5));
+    const landing_low_risk_rejected_PendingLandingData_DataNotYetExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataNotYetExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include a numberOfSubmissions field', () => expect(res.numberOfTotalSubmissions).toEqual(1));
+    const landing_low_risk_rejected_PendingLandingData_ElogSpecies: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_ElogSpecies,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
 
-    it('should include an exportedTo', () => {
-      expect(res.exportedTo).toEqual({
-        officialCountryName: "Nigeria",
-        isoCodeAlpha2: "NG",
-        isoCodeAlpha3: "NGA"
+    const landing_low_risk_rejected_validation_failure_weight: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Weight,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_rejected_validation_failure_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Overuse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_rejected_validation_failure_weight_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_WeightAndOveruse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_rejected_validation_failure_species: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Species,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_low_risk_rejected_ValidationFailure_NoLandingData: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_NoLandingData,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.Low,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_DataNeverExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.DataNeverExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: false,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_PendingLandingData_DataNotYetExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataNotYetExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_PendingLandingData_DataExpected: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_DataExpected,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_PendingLandingData_ElogSpecies: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.PendingLandingData_ElogSpecies,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_validation_failure_weight: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Weight,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_validation_failure_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Overuse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_validation_failure_weight_overuse: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_WeightAndOveruse,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_validation_failure_species: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_Species,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    const landing_high_risk_rejected_ValidationFailure_NoLandingData: Shared.IDynamicsLanding = {
+      status: Shared.LandingStatusType.ValidationFailure_NoLandingData,
+      id: "GBR-2020-CC-X",
+      landingDate: "2018-12-08",
+      species: "COD",
+      is14DayLimitReached: false,
+      vesselOverriddenByAdmin: false,
+      state: "FRE",
+      presentation: "FIL",
+      speciesOverriddenByAdmin: false,
+      cnCode: "1234",
+      commodityCodeDescription: "some description",
+      scientificName: "some scientific name",
+      vesselName: "BOB WINNIE",
+      vesselPln: "FH691",
+      vesselLength: 10,
+      licenceHolder: "VESSEL MASTER",
+      weight: 10,
+      numberOfTotalSubmissions: 1,
+      adminSpecies: "Sand smelt (ATP)",
+      adminState: "Fresh",
+      adminPresentation: "Whole",
+      adminCommodityCode: "some commodity code",
+      landingOutcomeAtSubmission: Shared.LandingOutcomeType.Rejected,
+      landingOutcomeAtRetrospectiveCheck: Shared.LandingRetrospectiveOutcomeType.Failure,
+      validation: {
+        liveExportWeight: 26,
+        totalRecordedAgainstLanding: 26,
+        landedWeightExceededBy: undefined,
+        rawLandingsUrl: "some-raw-landings-url",
+        salesNoteUrl: "some-sales-notes-url",
+        isLegallyDue: true
+      },
+      risking: {
+        vessel: "0.5",
+        speciesRisk: "1",
+        exporterRiskScore: "1",
+        landingRiskScore: "0.5",
+        highOrLowRisk: Shared.LevelOfRiskType.High,
+        isSpeciesRiskEnabled: true
+      },
+      dataEverExpected: true,
+      vesselAdministration: 'England'
+    };
+
+    describe('when we have at least one rejected landing at submission', () => {
+
+      describe('when risk is high', () => {
+
+        it("caseStatusAtSubmission will be set to 'Validation Success' when there are no failures or any pending statues", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess])).toBe("Validation Success");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Data Never Expected' when the case has at least one high risk worst landing has with a status of Data Never Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_DataNeverExpected])).toBe("Data Never Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Not Yet Expected' when the case has at least one high risk worst landing has with a status of Pending Landing Data - Data Not Yet Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected])).toBe("Pending Landing Data - Data Not Yet Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one high risk worst landing has with a status of Pending Landing Data - Data Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_success_PendingLandingData_DataExpected])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one high risk worst landing has with a status of Pending Landing Data - Elog Species", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_success_PendingLandingData_ElogSpecies])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Weight Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_validation_failure_weight])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_validation_failure_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Weight and Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_validation_failure_weight_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Species Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_validation_failure_species])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'No Landing Data Failure' when the case has at least one high risk worst landing has with a status of No Landing Data Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_high_risk_rejected_ValidationFailure_NoLandingData])).toBe("No Landing Data Failure");
+        });
       });
-    })
-  });
 
-  describe('When mapping from ICcQueryResult to IDynamicsLandingDetails', () => {
+      describe('when risk is low', () => {
 
-    it('will process all ICcQueryResults to a collection of IDynamicsLandingCase', () => {
-      const input: Shared.ICcQueryResult[] = [{
-        documentNumber: 'CC1',
-        documentType: 'catchCertificate',
-        createdAt: moment.utc('2019-07-13T08:26:06.939Z').toISOString(),
-        status: 'COMPLETE',
-        rssNumber: 'rssWA1',
-        da: 'Guernsey',
-        dateLanded: '2019-07-10',
-        species: 'LBE',
-        weightOnCert: 121,
-        rawWeightOnCert: 122,
-        weightOnAllCerts: 200,
-        weightOnAllCertsBefore: 0,
-        weightOnAllCertsAfter: 100,
-        weightFactor: 5,
-        isLandingExists: false,
-        isSpeciesExists: true,
-        numberOfLandingsOnDay: 0,
-        weightOnLanding: 30,
-        weightOnLandingAllSpecies: 30,
-        landingTotalBreakdown: [],
-        isOverusedThisCert: false,
-        isOverusedAllCerts: false,
-        isExceeding14DayLimit: false,
-        overUsedInfo: [],
-        durationSinceCertCreation: moment.duration(
-          queryTime
-            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
-        durationBetweenCertCreationAndFirstLandingRetrieved: moment.duration(
-          moment.utc('2019-07-11T09:00:00.000Z')
-            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
-        durationBetweenCertCreationAndLastLandingRetrieved: moment.duration(
-          moment.utc('2019-07-11T09:00:00.000Z')
-            .diff(moment.utc('2019-07-13T08:26:06.939Z'))).toISOString(),
-        extended: {
-          landingId: 'rssWA12019-07-10',
-          exporterName: 'Mr Bob',
-          presentation: 'SLC',
-          documentUrl: '_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf',
-          presentationName: 'sliced',
-          vessel: 'DAYBREAK',
-          fao: 'FAO27',
-          pln: 'WA1',
-          species: 'Lobster',
-          state: 'FRE',
-          stateName: 'fresh',
-          commodityCode: '1234',
-          investigation: {
-            investigator: "Investigator Gadget",
-            status: 'OPEN_UNDER_ENQUIRY'
-          },
-          transportationVehicle: 'directLanding',
-          dataEverExpected: true,
-          landingDataExpectedDate: '2023-09-01',
-          landingDataEndDate: '2023-09-02'
-        }
-      }];
+        it("caseStatusAtSubmission will be set to 'Validation Success' when there are no failures or any pending statues", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess])).toBe("Validation Success");
+        });
 
-      const result = SUT.toDynamicsLandingDetails(input, exampleCc, correlationId);
+        it("caseStatusAtSubmission will be set to 'Data Never Expected' when the case has at least one low risk worst landing has with a status of Data Never Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_DataNeverExpected])).toBe("Data Never Expected");
+        });
 
-      expect(result).toHaveLength(1);
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Not Yet Expected' when the case has at least one low risk worst landing has with a status of Pending Landing Data - Data Not Yet Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_PendingLandingData_DataNotYetExpected])).toBe("Pending Landing Data - Data Not Yet Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one low risk worst landing has with a status of Pending Landing Data - Data Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_PendingLandingData_DataExpected])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one low risk worst landing has with a status of Pending Landing Data - Elog Species", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_PendingLandingData_ElogSpecies])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Weight Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_validation_failure_weight])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_validation_failure_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Weight and Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_validation_failure_weight_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Species Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_validation_failure_species])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'No Landing Data Failure' when the case has at least one low risk worst landing has with a status of No Landing Data Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_rejected_ValidationFailure_NoLandingData])).toBe("No Landing Data Failure");
+        });
+      });
+
+      describe("Test the hierarchy for rejected landings based on priority- 'No Landing Data Failure' has highest priority", () => {
+        //1. No Landing Data Failure
+        //2. Validation Failure
+        //3. Pending Landing Data - Data Expected
+        //4. Pending Landing Data - Data Not Yet Expected
+        //5. Data Never Expected
+        //6. Validation Success
+        it("caseStatusAtSubmission will be set to 'Data Never Expected' when the case has at least one worst landing has with a status of Data Never Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected])).toBe("Data Never Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Not Yet Expected' when the case has at least one worst landing has with a status of Pending Landing Data - Data Not Yet Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected])).toBe("Pending Landing Data - Data Not Yet Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one worst landing has with a status of Pending Landing Data - Elog Species", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected, landing_high_risk_rejected_PendingLandingData_ElogSpecies])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one worst landing has with a status of Pending Landing Data - Data Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_DataNeverExpected, landing_high_risk_success_PendingLandingData_DataNotYetExpected, landing_high_risk_success_PendingLandingData_DataExpected])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one worst landing has with a status of Weight Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected, landing_high_risk_success_PendingLandingData_DataExpected, landing_high_risk_rejected_validation_failure_weight])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one worst landing has with a status of Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected, landing_high_risk_success_PendingLandingData_DataExpected, landing_high_risk_rejected_validation_failure_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one worst landing has with a status of Weight and Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected, landing_high_risk_success_PendingLandingData_DataExpected, landing_high_risk_rejected_validation_failure_weight_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'No Landing Data Failure' when the case has at least one low risk worst landing has with a status of No Landing Data Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_rejected_DataNeverExpected, landing_high_risk_rejected_PendingLandingData_DataNotYetExpected, landing_high_risk_rejected_PendingLandingData_DataExpected, landing_high_risk_rejected_validation_failure_weight_overuse, landing_high_risk_rejected_ValidationFailure_NoLandingData])).toBe("No Landing Data Failure");
+        });
+      })
+    });
+
+    describe('when all landings are successful at submission', () => {
+
+      describe('when risk is high', () => {
+
+        it("caseStatusAtSubmission will be set to 'Validation Success' when there are no failures or any pending statues", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess])).toBe("Validation Success");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Data Never Expected' when the case has at least one high risk worst landing has with a status of Data Never Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_DataNeverExpected])).toBe("Data Never Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Not Yet Expected' when the case has at least one high risk worst landing has with a status of Pending Landing Data - Data Not Yet Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_PendingLandingData_DataNotYetExpected])).toBe("Pending Landing Data - Data Not Yet Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one high risk worst landing has with a status of Pending Landing Data - Data Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_PendingLandingData_DataExpected])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one high risk worst landing has with a status of Pending Landing Data - Elog Species", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_PendingLandingData_ElogSpecies])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Weight Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_validation_failure_weight])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_validation_failure_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Weight and Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_validation_failure_weight_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one high risk worst landing has with a status of Species Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_validation_failure_species])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'No Landing Data Failure' when the case has at least one high risk worst landing has with a status of No Landing Data Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_high_risk_success_ValidationSuccess, landing_high_risk_success_ValidationFailure_NoLandingData])).toBe("No Landing Data Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one high risk rejected landing has with a status of Pending Landing Data - Data Expected", () => {
+          const UAT_326: Shared.IDynamicsLanding[] = [
+            {
+              "status": Shared.LandingStatusType.PendingLandingData_ElogSpecies,
+              "id": "GBR-2024-CC-75EB2CD89-1840578027",
+              "landingDate": "2024-07-02",
+              "species": "CCL",
+              "cnCode": "03028180",
+              "commodityCodeDescription": "Fresh or chilled dogfish and other sharks (excl. picked dogfish \"Squalus acanthias\", catsharks \"Scyliorhinus spp.\", porbeagle shark \"Lamna nasus\" and blue shark \"Prionace glauca\")",
+              "scientificName": "Carcharhinus limbatus",
+              "is14DayLimitReached": true,
+              "state": "FRE",
+              "presentation": "WHL",
+              "vesselName": "BRISAN",
+              "vesselPln": "FD9",
+              "vesselLength": 35.7,
+              "vesselAdministration": "England",
+              "licenceHolder": "BASONAS LIMITED",
+              "source": "ELOG",
+              "speciesAlias": "N",
+              "weight": 35,
+              "numberOfTotalSubmissions": 1,
+              "vesselOverriddenByAdmin": false,
+              "speciesOverriddenByAdmin": false,
+              "dataEverExpected": true,
+              "landingDataExpectedDate": "2024-07-02",
+              "landingDataEndDate": "2024-07-03",
+              "landingDataExpectedAtSubmission": true,
+              "landingOutcomeAtSubmission": Shared.LandingOutcomeType.Success,
+              "isLate": false,
+              "dateDataReceived": "2024-07-02T14:24:35.013Z",
+              "validation": {
+                "liveExportWeight": 35,
+                "totalRecordedAgainstLanding": 35,
+                "landedWeightExceededBy": 35,
+                "rawLandingsUrl": "https://ukecc-int-tst.azure.defra.cloud/reference/api/v1/extendedData/rawLandings?dateLanded=2024-07-02&rssNumber=A10122",
+                "isLegallyDue": false
+              },
+              "risking": {
+                "vessel": "1",
+                "speciesRisk": "1",
+                "exporterRiskScore": "1",
+                "landingRiskScore": "1",
+                "highOrLowRisk": Shared.LevelOfRiskType.High,
+                "isSpeciesRiskEnabled": true
+              }
+            },
+            {
+              "status": Shared.LandingStatusType.PendingLandingData_ElogSpecies,
+              "id": "GBR-2024-CC-75EB2CD89-6360560639",
+              "landingDate": "2024-07-02",
+              "species": "NOP",
+              "cnCode": "03025990",
+              "commodityCodeDescription": "Fresh or chilled fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae (excl. cod, haddock, coalfish, hake, Alaska pollack, blue whitings, Boreogadus saida, whiting, pollack and ling)",
+              "scientificName": "Trisopterus esmarkii",
+              "is14DayLimitReached": true,
+              "state": "FRE",
+              "presentation": "WHL",
+              "vesselName": "BRISAN",
+              "vesselPln": "FD9",
+              "vesselLength": 35.7,
+              "vesselAdministration": "England",
+              "licenceHolder": "BASONAS LIMITED",
+              "source": "ELOG",
+              "speciesAlias": "N",
+              "weight": 35,
+              "numberOfTotalSubmissions": 1,
+              "vesselOverriddenByAdmin": false,
+              "speciesOverriddenByAdmin": false,
+              "dataEverExpected": true,
+              "landingDataExpectedDate": "2024-07-02",
+              "landingDataEndDate": "2024-07-03",
+              "landingDataExpectedAtSubmission": true,
+              "landingOutcomeAtSubmission": Shared.LandingOutcomeType.Success,
+              "isLate": false,
+              "dateDataReceived": "2024-07-02T14:24:35.013Z",
+              "validation": {
+                "liveExportWeight": 35,
+                "totalRecordedAgainstLanding": 35,
+                "landedWeightExceededBy": 35,
+                "rawLandingsUrl": "https://ukecc-int-tst.azure.defra.cloud/reference/api/v1/extendedData/rawLandings?dateLanded=2024-07-02&rssNumber=A10122",
+                "isLegallyDue": false
+              },
+              "risking": {
+                "vessel": "1",
+                "speciesRisk": "0.8",
+                "exporterRiskScore": "1",
+                "landingRiskScore": "0.8",
+                "highOrLowRisk": Shared.LevelOfRiskType.Low,
+                "isSpeciesRiskEnabled": true
+              }
+            },
+            {
+              "status": Shared.LandingStatusType.PendingLandingData_DataExpected,
+              "id": "GBR-2024-CC-75EB2CD89-8276407803",
+              "landingDate": "2024-07-01",
+              "species": "MAC",
+              "cnCode": "03024400",
+              "commodityCodeDescription": "Fresh or chilled mackerel \"Scomber scombrus, Scomber australasicus, Scomber japonicus\"",
+              "scientificName": "Scomber scombrus",
+              "is14DayLimitReached": false,
+              "state": "FRE",
+              "presentation": "WHL",
+              "vesselName": "HARMONI",
+              "vesselPln": "M147",
+              "vesselLength": 14.96,
+              "vesselAdministration": "Wales",
+              "licenceHolder": "G&M ROBERTS FISHING (NEFYN) LTD",
+              "speciesAlias": "N",
+              "weight": 45,
+              "numberOfTotalSubmissions": 1,
+              "vesselOverriddenByAdmin": false,
+              "speciesOverriddenByAdmin": false,
+              "dataEverExpected": true,
+              "landingDataExpectedDate": "2024-07-02",
+              "landingDataEndDate": "2024-07-07",
+              "landingDataExpectedAtSubmission": true,
+              "landingOutcomeAtSubmission": Shared.LandingOutcomeType.Success,
+              "validation": {
+                "liveExportWeight": 45,
+                "totalRecordedAgainstLanding": 45,
+                "landedWeightExceededBy": 0,
+                "isLegallyDue": false
+              },
+              "risking": {
+                "vessel": "1",
+                "speciesRisk": "0.8",
+                "exporterRiskScore": "1",
+                "landingRiskScore": "0.8",
+                "highOrLowRisk": Shared.LevelOfRiskType.Low,
+                "isSpeciesRiskEnabled": true
+              }
+            },
+            {
+              "status": Shared.LandingStatusType.PendingLandingData_DataExpected,
+              "id": "GBR-2024-CC-75EB2CD89-1972367180",
+              "landingDate": "2024-07-01",
+              "species": "BSS",
+              "cnCode": "03028410",
+              "commodityCodeDescription": "Fresh or chilled European sea bass \"Dicentrarchus labrax\"",
+              "scientificName": "Dicentrarchus labrax",
+              "is14DayLimitReached": false,
+              "state": "FRE",
+              "presentation": "WHL",
+              "vesselName": "HARMONI",
+              "vesselPln": "M147",
+              "vesselLength": 14.96,
+              "vesselAdministration": "Wales",
+              "licenceHolder": "G&M ROBERTS FISHING (NEFYN) LTD",
+              "speciesAlias": "N",
+              "weight": 45,
+              "numberOfTotalSubmissions": 1,
+              "vesselOverriddenByAdmin": false,
+              "speciesOverriddenByAdmin": false,
+              "dataEverExpected": true,
+              "landingDataExpectedDate": "2024-07-02",
+              "landingDataEndDate": "2024-07-07",
+              "landingDataExpectedAtSubmission": true,
+              "landingOutcomeAtSubmission": Shared.LandingOutcomeType.Rejected,
+              "validation": {
+                "liveExportWeight": 45,
+                "totalRecordedAgainstLanding": 45,
+                "landedWeightExceededBy": 0,
+                "isLegallyDue": false
+              },
+              "risking": {
+                "vessel": "1",
+                "speciesRisk": "1",
+                "exporterRiskScore": "1",
+                "landingRiskScore": "1",
+                "highOrLowRisk": Shared.LevelOfRiskType.High,
+                "isSpeciesRiskEnabled": true
+              }
+            }];
+
+          expect(SUT.toCaseStatusAtSubmission(UAT_326)).toBe("Pending Landing Data - Data Expected");
+        });
+      });
+
+      describe('when risk is low', () => {
+        it("caseStatusAtSubmission will be set to 'Validation Success' when there are no failures or any pending statues", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess])).toBe("Validation Success");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Data Never Expected' when the case has at least one low risk worst landing has with a status of Data Never Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected])).toBe("Data Never Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Not Yet Expected' when the case has at least one low risk worst landing has with a status of Pending Landing Data - Data Not Yet Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_PendingLandingData_DataNotYetExpected])).toBe("Pending Landing Data - Data Not Yet Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one low risk worst landing has with a status of Pending Landing Data - Data Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_PendingLandingData_DataExpected])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one low risk worst landing has with a status of Pending Landing Data - Elog Species", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_PendingLandingData_ElogSpecies])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Weight Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_validation_failure_weight])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_validation_failure_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Weight and Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_validation_failure_weight_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one low risk worst landing has with a status of Species Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_validation_failure_species])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'No Landing Data Failure' when the case has at least one low risk worst landing has with a status of No Landing Data Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_ValidationFailure_NoLandingData])).toBe("No Landing Data Failure");
+        });
+      });
+
+      describe("Test the hierarchy for successful landings based on priority- 'No Landing Data Failure' has highest priority", () => {
+        //1. No Landing Data Failure
+        //2. Validation Failure
+        //3. Pending Landing Data - Data Expected
+        //4. Pending Landing Data - Data Not Yet Expected
+        //5. Data Never Expected
+        //6. Validation Success
+        it("caseStatusAtSubmission will be set to 'Data Never Expected' when the case has at least one worst landing has with a status of Data Never Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected])).toBe("Data Never Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Not Yet Expected' when the case has at least one worst landing has with a status of Pending Landing Data - Data Not Yet Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected])).toBe("Pending Landing Data - Data Not Yet Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one worst landing has with a status of Pending Landing Data - Elog Species", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected, landing_low_risk_success_PendingLandingData_ElogSpecies])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Pending Landing Data - Data Expected' when the case has at least one worst landing has with a status of Pending Landing Data - Data Expected", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected, landing_low_risk_success_PendingLandingData_DataExpected])).toBe("Pending Landing Data - Data Expected");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one worst landing has with a status of Weight Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected, landing_low_risk_success_PendingLandingData_DataExpected, landing_low_risk_success_validation_failure_weight])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one worst landing has with a status of Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected, landing_low_risk_success_PendingLandingData_DataExpected, landing_low_risk_success_validation_failure_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'Validation Failure' when the case has at least one worst landing has with a status of Weight and Overuse Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected, landing_low_risk_success_PendingLandingData_DataExpected, landing_low_risk_success_validation_failure_weight_overuse])).toBe("Validation Failure");
+        });
+
+        it("caseStatusAtSubmission will be set to 'No Landing Data Failure' when the case has at least one low risk worst landing has with a status of No Landing Data Failure", () => {
+          expect(SUT.toCaseStatusAtSubmission([landing_low_risk_success_ValidationSuccess, landing_low_risk_success_DataNeverExpected, landing_low_risk_success_PendingLandingData_DataNotYetExpected, landing_low_risk_success_PendingLandingData_DataExpected, landing_low_risk_success_validation_failure_weight_overuse, landing_low_risk_success_ValidationFailure_NoLandingData])).toBe("No Landing Data Failure");
+        });
+
+      })
     });
 
   });

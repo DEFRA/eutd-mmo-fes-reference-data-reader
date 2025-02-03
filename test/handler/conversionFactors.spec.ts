@@ -3,9 +3,6 @@ import logger from '../../src/logger';
 import { conversionFactorRoutes } from '../../src/handler/conversionFactors';
 import * as Hapi from '@hapi/hapi';
 
-const sinon = require('sinon');
-const getConversionFactorsStub = sinon.stub(conversionFactorService, 'getConversionFactors');
-
 let server;
 
 beforeAll(async () => {
@@ -25,17 +22,20 @@ afterAll(async () => {
 });
 
 describe('When retrieving conversion factors from mongo', () => {
-    let mockLoggerInfo;
-    let mockLoggerError;
+    let getConversionFactorsStub: jest.SpyInstance;
+    let mockLoggerInfo: jest.SpyInstance;
+    let mockLoggerError: jest.SpyInstance;
 
     beforeEach(() => {
-        mockLoggerInfo = sinon.spy(logger, 'info');
-        mockLoggerError = sinon.spy(logger, 'error');
+        getConversionFactorsStub = jest.spyOn(conversionFactorService, 'getConversionFactors');
+        mockLoggerInfo = jest.spyOn(logger, 'info');
+        mockLoggerError = jest.spyOn(logger, 'error');
     });
 
     afterEach(() => {
-        mockLoggerInfo.restore();
-        mockLoggerError.restore();
+        getConversionFactorsStub.mockRestore();
+        mockLoggerInfo.mockRestore();
+        mockLoggerError.mockRestore();
     });
 
     it('will a 200 OK all factors are found', async () => {
@@ -53,8 +53,7 @@ describe('When retrieving conversion factors from mongo', () => {
             }
         ];
 
-        getConversionFactorsStub.reset();
-        getConversionFactorsStub.returns(conversionFactorData);
+        getConversionFactorsStub.mockReturnValueOnce(conversionFactorData);
 
         const request = {
             method: 'GET',
@@ -64,8 +63,8 @@ describe('When retrieving conversion factors from mongo', () => {
         const response = await server.inject(request);
         const payload = JSON.parse(response.payload);
 
-        expect(getConversionFactorsStub.getCall(0).args[0]).toStrictEqual(testQueryData);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTORS][2 CONVERSION FACTORS FOUND][SUCCESS]');
+        expect(getConversionFactorsStub).toHaveBeenNthCalledWith(1, testQueryData);
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTORS][2 CONVERSION FACTORS FOUND][SUCCESS]');
         expect(response.statusCode).toBe(200);
         expect(payload.length).toEqual(2);
     });
@@ -85,8 +84,7 @@ describe('When retrieving conversion factors from mongo', () => {
             }
         ];
 
-        getConversionFactorsStub.reset();
-        getConversionFactorsStub.returns(conversionFactorData);
+        getConversionFactorsStub.mockReturnValueOnce(conversionFactorData);
 
         const request = {
             method: 'GET',
@@ -96,15 +94,14 @@ describe('When retrieving conversion factors from mongo', () => {
         const response = await server.inject(request);
         const payload = JSON.parse(response.payload);
 
-        expect(getConversionFactorsStub.getCall(0).args[0]).toStrictEqual(testQueryData);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTORS][1 CONVERSION FACTORS FOUND][SUCCESS]');
+        expect(getConversionFactorsStub).toHaveBeenNthCalledWith(1, testQueryData);
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTORS][1 CONVERSION FACTORS FOUND][SUCCESS]');
         expect(response.statusCode).toBe(200);
         expect(payload.length).toEqual(1);
     });
 
     it('will return a 200 OK if no factors are found', async () => {
-        getConversionFactorsStub.reset();
-        getConversionFactorsStub.returns([]);
+        getConversionFactorsStub.mockReturnValueOnce([]);
 
         const queryData: any[] = [{
             presentation: "WHL",
@@ -120,15 +117,16 @@ describe('When retrieving conversion factors from mongo', () => {
         const response = await server.inject(request);
         const payload = JSON.parse(response.payload);
 
-        expect(getConversionFactorsStub.getCall(0).args[0]).toStrictEqual(queryData);
-        expect(mockLoggerInfo.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTORS][0 CONVERSION FACTORS FOUND][SUCCESS]');
+        expect(getConversionFactorsStub).toHaveBeenNthCalledWith(1, queryData);
+        expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTORS][0 CONVERSION FACTORS FOUND][SUCCESS]');
         expect(response.statusCode).toBe(200);
         expect(payload).toEqual([]);
     });
 
     it('will return a 500 error if any errors are thrown', async () => {
-        getConversionFactorsStub.reset();
-        getConversionFactorsStub.throws('Error');
+        getConversionFactorsStub.mockImplementationOnce(() => {
+          throw 'Error';
+        })
 
         const testQueryData: any[] = [{
             presentation: "WHL",
@@ -144,8 +142,8 @@ describe('When retrieving conversion factors from mongo', () => {
         const response = await server.inject(request);
         const payload = response.payload;
 
-        expect(getConversionFactorsStub.getCall(0).args[0]).toStrictEqual(testQueryData);
-        expect(mockLoggerError.getCall(0).args[0]).toEqual('[GET-CONVERSION-FACTORS][ERROR] Error');
+        expect(getConversionFactorsStub).toHaveBeenNthCalledWith(1, testQueryData);
+        expect(mockLoggerError).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTORS][ERROR] Error');
         expect(response.statusCode).toBe(500);
         expect(payload).toEqual("");
     });

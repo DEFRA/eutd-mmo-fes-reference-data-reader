@@ -1,8 +1,7 @@
 import moment from 'moment';
 import config from '../../config';
-import { getVesselDetails } from '../../handler/vesselService';
 import { vesselLengthToSize } from '../../data/cache';
-import { getDevolvedAuthority } from 'mmo-shared-reference-data';
+import { ILicence } from 'mmo-shared-reference-data';
 import {
   EodSettingModel,
   IEodSetting,
@@ -126,11 +125,9 @@ export const cleanUpEodRules = async (): Promise<void> => {
   }
 }
 
-export const isLandingDataAvailable = async (rssNumber: string, landedDate: string, isLegallyDue?: boolean) => {
-  const vesselDetails = getVesselDetails(rssNumber);
-  const group: vesselSizeGroup = vesselLengthToSize(vesselDetails?.vesselLength);
-  const da = getDevolvedAuthority(vesselDetails.flag, vesselDetails.adminPort);
-  const eodSetting: IEodSetting = await getEodSetting(da);
+export const isLandingDataAvailable = async (licence: ILicence, landedDate: string, isLegallyDue?: boolean): Promise<boolean> => {
+  const group: vesselSizeGroup = vesselLengthToSize(licence.vesselLength);
+  const eodSetting: IEodSetting = await getEodSetting(licence.da);
 
   if (!eodSetting) {
     return true;

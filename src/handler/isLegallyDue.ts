@@ -4,12 +4,13 @@ import errorExtractor from '../utils/errorExtractor';
 import { Request, Server } from '@hapi/hapi';
 import { getDevolvedAuthority } from 'mmo-shared-reference-data';
 import { ResponseToolkit } from 'hapi';
-import { isQuotaSpecies } from '../data/cache';
+import { getRiskThreshold, isQuotaSpecies, refreshRiskingData } from '../data/cache';
 import { isLegallyDue } from '../landings/query/isLegallyDue';
 import { Catch, Product, getCertificateByDocumentNumber, upsertCertificate } from '../landings/persistence/catchCert';
 import { getRssNumber, getVesselDetails } from './vesselService';
 import { IsLegallyDuePayload } from './types/isLegallyDue';
 import logger from '../logger';
+import { getExportedSpeciesRiskScore, getExporterBehaviourRiskScore, getTotalRiskScore, getVesselOfInterestRiskScore, isRiskEnabled } from '../landings/query/isHighRisk';
 
 export const isLegallyDueRoute = (server: Server) => {
     server.route([
@@ -37,8 +38,9 @@ export const isLegallyDueRoute = (server: Server) => {
 
             logger.info(`[RUN-UPDATE-FOR-LEGALLY-DUE][${documentNumber}]`);
 
-            if (exportData.products && exportData.products.length) {
-
+            if (exportData.products?.length) {
+              await refreshRiskingData()
+              .catch(e => logger.error(`[RUN-UPDATE-FOR-LEGALLY-DUE][ERROR][${e}]`));
               exportData.products = exportData.products.map((product: Product) => (
                   {
                     ...product,
@@ -55,7 +57,13 @@ export const isLegallyDueRoute = (server: Server) => {
                           moment.utc(landing.date),
                           isQuotaSpecies(product.speciesCode),
                           landing.weight
-                        ) : false
+                        ) : false,
+                        vesselRiskScore: getVesselOfInterestRiskScore(landing.pln),
+                        speciesRiskScore:  getExportedSpeciesRiskScore(product.speciesCode),
+                        exporterRiskScore: getExporterBehaviourRiskScore(exportData.exporterDetails?.accountId, exportData.exporterDetails?.contactId),
+                        threshold: getRiskThreshold(),
+                        riskScore: getTotalRiskScore(landing.pln, product.speciesCode, exportData.exporterDetails?.accountId, exportData.exporterDetails?.contactId),
+                        isSpeciesRiskEnabled: isRiskEnabled()
                       });
                     })
                   }

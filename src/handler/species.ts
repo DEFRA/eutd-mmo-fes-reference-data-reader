@@ -32,7 +32,6 @@ export const speciesRoutes = (server: Hapi.Server) => {
         const query = request.query;
 
         if (query.uk && (query.uk.toUpperCase() === 'Y')) {
-          // TODO: handle faocode based calls - not sure where it's used as the whole journey works without this endpoint...
           const speciesCollection = getSpeciesData('uk');
           useOperators(OperatorType.PIPELINE, { $group });
 
@@ -146,7 +145,6 @@ export const speciesRoutes = (server: Hapi.Server) => {
       handler: async (request, h) => {
         try {
           const query = request.query;
-          const code = query && query.faoCode;
           useOperators(OperatorType.PIPELINE, { $match, $group });
           useOperators(OperatorType.EXPRESSION, { $concat, $first, $toUpper, $toLower, $substr  });
           useOperators(OperatorType.ACCUMULATOR, { $push  });
@@ -154,7 +152,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
           const agg = new mingo.Aggregator([
             {
               "$match": {
-                faoCode: code
+                faoCode: query.faoCode
               }
             },
             {
@@ -287,12 +285,9 @@ export const speciesRoutes = (server: Hapi.Server) => {
         try {
           ///v1/species/search-exact?faoCode=COD&faoName=Atlantic+cod&scientificName=Gadus+morhua
           const query = request.query;
-          const faoCode = query && query.faoCode;
-          const faoName = query && query.faoName;
-          const scientificName = query && query.scientificName;
           const species = getSpeciesData('all');
           const s = mingo.find(species,
-            { "faoCode": faoCode, "faoName": faoName, "scientificName": scientificName }
+            { "faoCode": query.faoCode, "faoName": query.faoName, "scientificName": query.scientificName }
           );
 
           if (s.hasNext()) {
