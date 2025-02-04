@@ -108,14 +108,14 @@ export const certificateRoutes = (server: Hapi.Server) => server.route([
 export const payloadValidForVoid = (payload: any) => {
   return payload &&
     Object.keys(payload).length == 1 &&
-    Object.prototype.hasOwnProperty.call(payload, "status") &&
+    Object.hasOwn(payload, "status") &&
     payload.status === DocumentStatuses.Void;
 }
 
 export const payloadValidForInvestigate = (payload: any) => {
   return payload &&
     Object.keys(payload).length == 1 &&
-    Object.prototype.hasOwnProperty.call(payload, "investigationStatus") &&
+    Object.hasOwn(payload, "investigationStatus") &&
     payload.investigationStatus.length > 0
 }
 

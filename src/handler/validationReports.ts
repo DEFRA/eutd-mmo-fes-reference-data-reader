@@ -19,65 +19,37 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
       handler: async (req, h) => {
 
         try {
-
           const qparams = req.query;
           const params = req.params;
-          let reportData: any[] = [];
-          let reportType: string;
+          let reportData: any = [];
+          const reportType: string = params.reportType?.toLowerCase();
           const fromDate: moment.Moment = moment.utc(qparams.fromdate).startOf('day');
           const toDate: moment.Moment = moment.utc(qparams.todate).endOf('day');
-          let asOfDate: moment.Moment;
-          let areas: string[];
-          let ext: string;
-          let documentNumber: string;
-          let exporter: string;
-          let pln: string;
+          const asOfDate: moment.Moment = getAsOfDate(qparams.asofdate);
+          const areas: string[] = getAreaData(qparams);
+          const ext: string = params.ext;
+          const documentNumber: string = qparams.documentNumber;
+          const exporter: string = qparams.exporter;
+          const pln: string = qparams.pln;
 
-          if (['catchcert', 'sdps', 'catchcertinvestigation', 'sdpsinvestigation']
-            .includes(params.reportType.toLowerCase()))
-              reportType = params.reportType.toLowerCase()
-          else
+          if (!isValidReportType(reportType))
             return h.response('invalid report').code(404)
-
-          if (params.ext === 'csv' || params.ext === 'json') {
-            ext = params.ext
-          } else {
+            
+          if (!isValidExtension(params))
             return h.response('missing or invalid extension suffix').code(404)
-          }
+          
+          if (!(moment.utc(qparams.asofdate).isValid()))
+            return h.response('asofdate must be valid date').code(400)
+          
+          const allDas = ['Northern Ireland', 'Isle of Man', 'Channel Islands', 'Guernsey', 'Jersey', 'England', 'Wales', 'Scotland', 'Isle of Man']
+          const invalids = areas.filter(_ => (!allDas.includes(_)));
+          if (invalids.length > 0)
+            return h.response(`invalid areas ${invalids}`).code(400)
 
-          if (qparams.asofdate) {
-            asOfDate = moment.utc(qparams.asofdate)
-            if (!asOfDate.isValid())
-              return h.response('asofdate must be valid date').code(400)
-          } else {
-            asOfDate = moment.utc()
-          }
-
-          if (qparams.area) {
-
-            const allDas = ['Northern Ireland', 'Isle of Man', 'Channel Islands', 'Guernsey', 'Jersey', 'England', 'Wales', 'Scotland', 'Isle of Man']
-
-            if (qparams.area === 'all') {
-              areas = []
-            } else {
-
-              areas = qparams.area.split(',').map(s => s.trim());
-
-              const invalids = areas.filter(_ => (!allDas.includes(_)));
-
-              if (invalids.length > 0)
-                return h.response(`invalid areas ${invalids}`).code(400)
-
-            }
-
-          } else {
-            areas = []
-          }
-
-          if (!(qparams.fromdate && qparams.todate))
+          if (!isValidParamDate(qparams))
             return h.response('fromdate and todate are manditory').code(400);
 
-          if (!(fromDate.isValid() && toDate.isValid()))
+          if (!isValidFromAndTodateDate(fromDate, toDate))
             return h.response('fromdate and todate must be valid date').code(400);
 
 
@@ -92,12 +64,7 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
           } else if (reportType === 'catchcertinvestigation') {
 
             /* how to handle case? */
-
-            documentNumber = qparams.documentNumber
-            exporter = qparams.exporter
-            pln = qparams.pln
-
-            if (!documentNumber && !exporter && !pln)
+            if (verifyCatchcertInvestigationParams(documentNumber, exporter, pln))
               return h.response('missing investigation parameters').code(400)
 
             const basicData = Array.from(await Report.catchCertInvestigationReport({ fromDate, toDate , documentNumber, exporter, pln, asOfDate }));
@@ -105,7 +72,6 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
             const blockedData = Array.from(await Report.catchCertBlockedInvestigationReport({fromDate,toDate,documentNumber,exporter,pln}));
 
             reportData = basicData.concat(voidData).concat(blockedData)
-
           } else if (reportType === 'sdps') {
             const basicData = Array.from(await Report.sdpsReport(fromDate, toDate, areas));
             const voidData = Array.from(await Report.sdpsVoidReport(fromDate, toDate, areas));
@@ -113,10 +79,7 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
 
             reportData = basicData.concat(voidData).concat(blockedData)
           } else if (reportType == 'sdpsinvestigation') {
-            documentNumber = qparams.documentNumber;
-            exporter = qparams.exporter;
-
-            if (!documentNumber && !exporter)
+            if (verifySdpsInvestigationParams(documentNumber, exporter))
               return h.response('missing investigation parameters').code(400);
 
             const basicData = Array.from(await Report.sdpsInvestigationReport({ fromDate, toDate , documentNumber, exporter }));
@@ -126,19 +89,7 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
             reportData = basicData.concat(voidData).concat(blockedData)
           }
 
-          if (reportData.length === 0)
-            return h.response().code(204);
-
-          if (ext === 'csv') {
-            const csvConverter = new CsvConverter();
-            const csvReport = csvConverter.generateCatchCertificateReport(reportData);
-            return h.response(csvReport).type('text/csv');
-          }
-          if (ext === 'json') {
-            withNoUndefineds(reportData);
-            return h.response(reportData).type('application/json')
-          }
-
+          return getReponseData(reportData, ext, h);
         } catch (e) {
           logger.error(`[CATCHCERTIFICATEVALIDATION][GENERATINGREPORT][ERROR][${e}]`);
           return h.response(e.message).code(500);
@@ -148,6 +99,37 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
     }
   ])
 }
+
+const getReponseData = (reportData, ext, h) => {
+  if (reportData.length === 0)
+    return h.response().code(204);
+
+  if (ext === 'csv') {
+    const csvConverter = new CsvConverter();
+    const csvReport = csvConverter.generateCatchCertificateReport(reportData);
+    return h.response(csvReport).type('text/csv');
+  }
+  if (ext === 'json') {
+    withNoUndefineds(reportData);
+    return h.response(reportData).type('application/json')
+  }
+}
+
+const getAreaData = (qparams) => qparams.area && qparams.area !== 'all' ? qparams.area.split(',').map(s => s.trim()) : [];
+
+const getAsOfDate = (asofdate) => !asofdate ? moment.utc() : moment.utc(asofdate)
+
+const verifyCatchcertInvestigationParams = (documentNumber, exporter, pln) => !documentNumber && !exporter && !pln;
+
+const verifySdpsInvestigationParams = (documentNumber, exporter) => !documentNumber && !exporter;
+
+const isValidReportType = (reportType) => ['catchcert', 'sdps', 'catchcertinvestigation', 'sdpsinvestigation'].includes(reportType?.toLowerCase());
+
+const isValidExtension = (params) => params?.ext === 'csv' || params?.ext === 'json';
+
+const isValidParamDate = (qparams) => qparams?.fromdate && qparams?.todate;
+
+const isValidFromAndTodateDate = (fromDate, toDate) => fromDate?.isValid() && toDate?.isValid();
 
 function withNoUndefineds(reportData){
   reportData.forEach(reportLine=>{

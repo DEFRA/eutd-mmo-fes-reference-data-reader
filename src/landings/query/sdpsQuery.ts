@@ -58,7 +58,7 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
 
   for (const item of unwoundCatches) {
 
-    const r = <ISdPsQueryResult>{}
+    let r = <ISdPsQueryResult>{}
 
     const fcc = fccIdx[`${item.certificateNumber}${item.species}`]
 
@@ -86,18 +86,21 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
       r.overUsedInfo = r.isOverAllocated  ? [...new Set(linkedSdPs)] : [];
       r.isMismatch = item.weightOnCC !== fcc.declaredWeight  // Declared weight different to first declared weight
 
-      if (item.weightAfterProcessing !== undefined) {
-        r.weightAfterProcessing = item.weightAfterProcessing
-      }
-
-      if (item.dateOfUnloading !== undefined) r.dateOfUnloading = item.dateOfUnloading
-      if (item.placeOfUnloading !== undefined) r.placeOfUnloading = item.placeOfUnloading
-      if (item.transportUnloadedFrom !== undefined) r.transportUnloadedFrom = item.transportUnloadedFrom
+      r = {...r, ...getExtentedObject(item)}
       linkedSdPs.push(item.documentNumber);
       yield r
 
     }
   }
+}
+
+const getExtentedObject = (item) => {
+  const newObj = <ISdPsQueryResult>{};
+  if (item.weightAfterProcessing !== undefined) newObj.weightAfterProcessing = item.weightAfterProcessing;
+  if (item.dateOfUnloading !== undefined) newObj.dateOfUnloading = item.dateOfUnloading;
+  if (item.placeOfUnloading !== undefined) newObj.placeOfUnloading = item.placeOfUnloading;
+  if (item.transportUnloadedFrom !== undefined) newObj.transportUnloadedFrom = item.transportUnloadedFrom;
+  return newObj;
 }
 
 export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
@@ -114,9 +117,9 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
 
     const basic = {
       documentNumber: doc.documentNumber,
-      status: doc.status ? doc.status : 'COMPLETE',
+      status: getDocStatus(doc.status),
       createdAt: moment.utc(doc.createdAt).toISOString(),
-      da: doc.exportData.exporterDetails ? daLookup(doc.exportData.exporterDetails.postcode) : 'England'
+      da: getDALookupDetails(doc.exportData.exporterDetails, daLookup),
     }
 
     let specific
@@ -129,7 +132,7 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         species: cat.product,
         commodityCode: cat.commodityCode,
         weight: parseFloat(cat.productWeight),
-        weightOnCC: cat.weightOnCC ? parseFloat(cat.weightOnCC) : 0,
+        weightOnCC: getWeightOnCC(cat.weightOnCC),
         dateOfUnloading: cat.dateOfUnloading,
         placeOfUnloading: cat.placeOfUnloading,
         transportUnloadedFrom: cat.transportUnloadedFrom,
@@ -146,16 +149,16 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         commodityCode: 'N/A',
         weight: parseFloat(cat.exportWeightBeforeProcessing),
         weightOnCC: parseFloat(cat.totalWeightLanded),
-        weightAfterProcessing: (cat.exportWeightAfterProcessing !== undefined) ? parseFloat(cat.exportWeightAfterProcessing) : undefined
+        weightAfterProcessing: getWeightAfterProcess(cat.exportWeightAfterProcessing),
       }
     }
 
     const extended = {
       url: doc.documentUri,
-      exporterCompanyName: doc.exportData.exporterDetails ? doc.exportData.exporterDetails.exporterCompanyName : undefined,
+      exporterCompanyName: getExporterCompanyName(doc.exportData.exporterDetails) ? doc.exportData.exporterDetails.exporterCompanyName : undefined,
       investigation: doc.investigation,
-      voidedBy : (voidedEvent?.triggeredBy) ? voidedEvent.triggeredBy : undefined,
-      preApprovedBy: (preApprovedEvent?.triggeredBy) ? preApprovedEvent.triggeredBy : undefined,
+      voidedBy : getValidData(voidedEvent?.triggeredBy),
+      preApprovedBy: getValidData(preApprovedEvent?.triggeredBy),
       id: cat.id,
     }
 
@@ -163,6 +166,18 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
 
   })
 }
+
+const getDocStatus = (status) => !status ? 'COMPLETE' : status;
+
+const getDALookupDetails = (exporterDetails, daLookup) => exporterDetails ? daLookup(exporterDetails.postcode) : 'England';
+
+const getWeightOnCC = (weightOnCC) => weightOnCC ? parseFloat(weightOnCC) : 0;
+
+const getWeightAfterProcess = (exportWeightAfterProcessing) => exportWeightAfterProcessing !== undefined ? parseFloat(exportWeightAfterProcessing) : undefined;
+
+const getValidData = (value) => !value ? undefined : value;
+
+const getExporterCompanyName = (exporterDetails) => exporterDetails ? exporterDetails.exporterCompanyName : undefined;
 
 export function* unwindDocumentsToCatches(documents: any[], daLookup) {
   for (const unwounds of documents.map(doc => unwindAndMapCatches(doc, daLookup)))
@@ -203,7 +218,7 @@ export function* unwoundCatchesToForeignCatchCerts(unwoundCatches: IFlattenedCat
 
       const species = cat.species
 
-      if (!(Object.prototype.hasOwnProperty.call(items, species))) {
+      if (!(Object.hasOwn(items, species))) {
 
         /*
          * first (we've sorted above by createdAt) document to refernce this fkk / species

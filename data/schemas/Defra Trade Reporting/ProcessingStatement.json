@@ -561,10 +561,10 @@
           "type": "string"
         },
         "isoCodeAlpha3": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "isoNumericCode": {
-          "type": "string"
+          "type": ["string", "null"]
         }
       }
     },

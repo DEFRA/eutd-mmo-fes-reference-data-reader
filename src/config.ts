@@ -10,10 +10,6 @@ export class ApplicationConfig {
   public scheduleVesselsDataJob: string;
   public basicAuthUser: string;
   public basicAuthPassword: string;
-  public boomiUrl: string;
-  public boomiAuthUser: string;
-  public boomiAuthCertificate: string;
-  public boomiAuthPassphrase: string;
   public dbConnectionUri: string;
   public dbName: string;
   public dbConnectionPool: string;
@@ -34,9 +30,6 @@ export class ApplicationConfig {
   public refServiceBasicAuthUser: string;
   public refServiceBasicAuthPassword: string;
   public cosmosDBRawConnectionUri: string
-  public refBoomiUser: string
-  public refBoomiCertificate: string
-  public refBoomiPassPhrase: string
   public blobStorageConnection: string
 
   // service bus queue
@@ -67,15 +60,10 @@ export class ApplicationConfig {
   // sets eod default rules when going live for the first time
   public eodRulesMigration: boolean;
 
-  public constructor() { }
-
   public static loadEnv(env: any): void {
     ApplicationConfig.prototype.basicAuthUser = env.REF_SERVICE_BASIC_AUTH_USER;
     ApplicationConfig.prototype.basicAuthPassword = env.REF_SERVICE_BASIC_AUTH_PASSWORD;
     ApplicationConfig.prototype.dbConnectionUri = env.DB_CONNECTION_URI || env.COSMOS_DB_RW_CONNECTION_URI;
-    ApplicationConfig.prototype.boomiAuthUser = env.REF_BOOMI_USER;
-    ApplicationConfig.prototype.boomiAuthCertificate = env.REF_BOOMI_CERTIFICATE == 'none' ? undefined : env.REF_BOOMI_CERTIFICATE;
-    ApplicationConfig.prototype.boomiAuthPassphrase = env.REF_BOOMI_PASSPHRASE == 'none' ? undefined : env.REF_BOOMI_PASSPHRASE;
     ApplicationConfig.prototype.blobStorageConnection = env.REFERENCE_DATA_AZURE_STORAGE;
 
     ApplicationConfig.prototype.port = env.PORT || '9000';
@@ -84,7 +72,6 @@ export class ApplicationConfig {
     ApplicationConfig.prototype.scheduleVesselsDataJob = env.REFRESH_VESSEL_JOB;
     ApplicationConfig.prototype.instrumentationKey = env.INSTRUMENTATION_KEY;
     ApplicationConfig.prototype.cloudRoleName = env.INSTRUMENTATION_CLOUD_ROLE;
-    ApplicationConfig.prototype.boomiUrl = env.BOOMI_URL;
     ApplicationConfig.prototype.dbName = env.DB_NAME;
     ApplicationConfig.prototype.dbConnectionPool = env.DB_CONNECTION_POOL;
     ApplicationConfig.prototype.enableCountryData = true;

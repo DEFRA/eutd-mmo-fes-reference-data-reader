@@ -63,7 +63,8 @@ code	description
 03028115	Fresh or chilled picked dogfish "Squalus acanthias" and catsharks "Scyliorhinus spp."
 03028130	Fresh or chilled porbeagle shark "Lamna nasus"
 03028140	Fresh or chilled blue shark "Prionace glauca"
-03028180	Fresh or chilled dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus" and blue shark "Prionace glauca")
+03028150	Fresh or chilled shortfin mako shark "Isurus oxyrinchus"
+03028170	Fresh or chilled dogfish and other sharks (excl. picked dogfish "Squalus acanthias", catsharks "Scyliorhinus spp.", porbeagle shark "Lamna nasus", blue shark "Prionace glauca" and Shortfin mako shark "Isurus oxyrinchus")
 03028200	Fresh or chilled, rays and skates "Rajidae"
 03028300	Fresh or chilled toothfish "Dissostichus spp."
 03028410	Fresh or chilled European sea bass "Dicentrarchus labrax"
