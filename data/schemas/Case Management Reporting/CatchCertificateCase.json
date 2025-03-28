@@ -59,6 +59,7 @@
         {
           "status": "Pending landing data - Elog Species",
           "id": "2342340-24513aga-adfrewbf",
+          "startDate": "2023-06-10 01:34:05",
           "landingDate": "2023-06-10 01:34:05",
           "is14DayLimitReached": false,
           "species": "Atlantic Herring (HER)",
@@ -297,6 +298,9 @@
           ]
         },
         "id": {
+          "type": "string"
+        },
+        "startDate": {
           "type": "string"
         },
         "landingDate": {

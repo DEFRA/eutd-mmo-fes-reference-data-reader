@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 import config from "../config";
 import logger from '../logger';
-import { ICountry } from '../landings/types/appConfig/countries';
+import { ICountry } from 'mmo-shared-reference-data';
 import { SSL_OP_LEGACY_SERVER_CONNECT } from "constants";
 
 const https = require('https');

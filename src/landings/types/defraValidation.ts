@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { ICountry } from './appConfig/countries';
+import { ICountry } from 'mmo-shared-reference-data';
 
 export interface IDefraValidationReport  {
     certificateId:      string;

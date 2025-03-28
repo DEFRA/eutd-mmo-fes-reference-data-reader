@@ -1002,6 +1002,7 @@ describe('map from the structure in orchestrator to cc', () => {
                   "domId": "CORNELISVROLIJKFZN-H171",
                   "vesselOverriddenByAdmin": true
                 },
+                "startDate": "2019-10-05",
                 "dateLanded": "2019-10-06T00:00:00.000Z",
                 "exportWeight": 78,
                 "faoArea": "FAO27",
@@ -1033,6 +1034,7 @@ describe('map from the structure in orchestrator to cc', () => {
                   "label": "DAYBREAK (WA1)",
                   "domId": "CORNELISVROLIJKFZN-H171"
                 },
+                "startDate": "2019-10-05",
                 "dateLanded": "2019-07-01T00:00:00.000Z",
                 "exportWeight": 78,
                 "faoArea": "FAO27",
@@ -1073,8 +1075,8 @@ describe('map from the structure in orchestrator to cc', () => {
           "presentation": { "code": "FIS", "name": "Filleted and skinned", "admin": undefined },
           "factor": 5,
           "caughtBy": [
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "date": "2019-10-06", "weight": 78, "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5},
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "date": "2019-07-01", "weight": 78, "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.04, "speciesRiskScore": 0.2, "threshold": 1, "vesselRiskScore": 0.2 }
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-10-06", "weight": 78, "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5},
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-07-01", "weight": 78, "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.04, "speciesRiskScore": 0.2, "threshold": 1, "vesselRiskScore": 0.2 }
           ]
         }],
       "exporterDetails": {

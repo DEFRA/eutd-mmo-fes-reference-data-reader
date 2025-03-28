@@ -11,6 +11,7 @@
         "is14DayLimitReached": false,
         "documentNumber": "document12345",
         "documentDate": "2020-06-20",
+        "startDate": "2020-06-01",
         "landingDate": "2020-06-01",
         "numberOfFailedSubmissions": 5,
         "species": "Cod",
@@ -257,6 +258,10 @@
         },
         "id": {
           "description": "Unique ID for this landing",
+          "type": "string"
+        },
+        "startDate": {
+          "description": "Fishing Trip Start Date ",
           "type": "string"
         },
         "landingDate": {

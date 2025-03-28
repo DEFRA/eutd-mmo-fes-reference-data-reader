@@ -5688,6 +5688,7 @@ describe('Dynamics Validation', () => {
       status: 'COMPLETE',
       rssNumber: 'rssWA1',
       da: 'Guernsey',
+      startDate: '2019-07-10',
       dateLanded: '2019-07-10',
       species: 'LBE',
       weightOnCert: 121,
@@ -5752,6 +5753,7 @@ describe('Dynamics Validation', () => {
 
       expect(result.status).toEqual(Shared.LandingStatusType.ValidationFailure_NoLandingData);
       expect(result.id).toEqual('rssWA12019-07-10');
+      expect(result.startDate).toEqual('2019-07-10');
       expect(result.landingDate).toEqual('2019-07-10');
       expect(result.species).toEqual('LBE');
       expect(result.state).toEqual('FRE');

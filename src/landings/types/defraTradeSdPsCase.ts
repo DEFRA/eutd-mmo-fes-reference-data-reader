@@ -1,4 +1,4 @@
-import { ICountry } from "./appConfig/countries";
+import { ICountry } from "mmo-shared-reference-data";
 import { SdPsCaseTwoType } from "./dynamicsSdPsCase";
 import { CertificateAddress, CertificateAuthority, CertificateCompany, CertificateStorageFacility, CertificateTransport } from "./defraValidation";
 

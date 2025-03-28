@@ -1,5 +1,4 @@
-import { IDynamicsLanding } from "mmo-shared-reference-data";
-import { ICountry } from "./appConfig/countries";
+import { IDynamicsLanding, ICountry } from "mmo-shared-reference-data";
 import { CertificateAudit, CertificateExporterAndCompany, CertificateTransport } from "./defraValidation";
 import { CaseOneType, CaseTwoType } from "./dynamicsCcCase";
 

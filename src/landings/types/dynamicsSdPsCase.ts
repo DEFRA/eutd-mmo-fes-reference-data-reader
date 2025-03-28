@@ -1,5 +1,5 @@
 import { CertificateCompany } from "./defraValidation";
-import { ICountry } from './appConfig/countries';
+import { ICountry } from 'mmo-shared-reference-data';
 export interface IDynamicsProcessingStatementCase {
     exporter: CertificateCompany;
     documentUrl: string;

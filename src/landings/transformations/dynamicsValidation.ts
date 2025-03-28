@@ -21,7 +21,8 @@ import {
   LandingOutcomeType,
   isSpeciesFailure,
   has14DayLimitReached,
-  toFailureIrrespectiveOfRisk
+  toFailureIrrespectiveOfRisk,
+  ICountry
 } from "mmo-shared-reference-data";
 import {
   CaseOneType,
@@ -53,7 +54,6 @@ import {
   isRiskEnabled
 } from "../query/isHighRisk";
 import { IAuditEvent } from "../types/auditEvent";
-import { ICountry } from "../types/appConfig/countries";
 import { isValidationOveruse } from "../query/ccQuery";
 
 const isFailedWeightCheck = (ccQueryLanding: ICcQueryResult) =>
@@ -104,6 +104,7 @@ export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoT
   return {
     status: toLandingStatus(validatedLanding, isHighRisk(riskScore)),
     id: validatedLanding.extended.landingId,
+    startDate: validatedLanding.startDate,
     landingDate: validatedLanding.dateLanded,
     species: validatedLanding.species,
     cnCode: validatedLanding.extended.commodityCode,

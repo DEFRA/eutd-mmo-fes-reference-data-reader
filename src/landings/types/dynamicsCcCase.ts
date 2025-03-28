@@ -1,9 +1,5 @@
-import { IDynamicsLanding, LevelOfRiskType } from 'mmo-shared-reference-data';
-import { ICountry } from './appConfig/countries';
-import {
-    CertificateExporterAndCompany,
-    CertificateAudit
-} from './defraValidation';
+import { IDynamicsLanding, LevelOfRiskType, ICountry } from 'mmo-shared-reference-data';
+import { CertificateExporterAndCompany, CertificateAudit } from './defraValidation';
 
 export interface IDynamicsCatchCertificateCase {
     da: string;

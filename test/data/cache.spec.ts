@@ -2,7 +2,7 @@ import * as SUT from '../../src/data/cache';
 import * as ConversionFactorService from '../../src/landings/persistence/conversionFactors';
 import * as RiskingService from '../../src/landings/persistence/risking';
 import * as EoDService from '../../src/landings/persistence/eodSettings';
-import { type IConversionFactor } from 'mmo-shared-reference-data';
+import { type IConversionFactor, BoomiService, type ICountry  } from 'mmo-shared-reference-data';
 import { IExporterBehaviour } from '../../src/landings/types/appConfig/exporterBehaviour';
 import { ISpeciesRiskToggle, IVesselOfInterest, IWeighting, WEIGHT } from '../../src/landings/types/appConfig/risking';
 import * as blob from '../../src/data/blob-storage';
@@ -10,8 +10,6 @@ import * as file from '../../src/data/local-file';
 import * as systemBlocks from '../../src/services/systemBlock.service';
 import appConfig from '../../src/config'
 import logger from '../../src/logger';
-import { ICountry } from '../../src/landings/types/appConfig/countries';
-import { BoomiService } from 'mmo-shared-reference-data';
 import { ILicence, IVessel } from '../../src/landings/types/appConfig/vessels';
 import { IEodSetting } from '../../src/landings/types/appConfig/eodSettings';
 import moment from 'moment';

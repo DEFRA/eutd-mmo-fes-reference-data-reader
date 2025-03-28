@@ -1,8 +1,7 @@
 import moment from 'moment'
-import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus } from 'mmo-shared-reference-data';
+import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry } from 'mmo-shared-reference-data';
 import { DocumentModel, DocumentStatuses, IDocument } from '../types/document';
-import { ICountry } from '../types/appConfig/countries';
-import logger from '../../logger'
+import logger from '../../logger';
 
 export const getCertificateByPdfReference = async (documentNumber: string) => {
   return await DocumentModel.findOne({ documentUri: `${documentNumber}.pdf` }).lean()

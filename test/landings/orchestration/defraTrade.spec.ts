@@ -113,6 +113,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         {
           "status": Shared.LandingStatusType.DataNeverExpected,
           "id": "GBR-2023-CC-C58DF9A73-4248789552",
+          "startDate": "2023-08-31",
           "landingDate": "2023-08-31",
           "species": "BSF",
           "cnCode": "03028990",
@@ -362,6 +363,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         {
           "status": Shared.LandingStatusType.DataNeverExpected,
           "id": "GBR-2023-CC-C58DF9A73-4248789552",
+          "startDate": "2023-08-31",
           "landingDate": "2023-08-31",
           "species": "BSF",
           "cnCode": "03028990",
@@ -822,6 +824,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         {
           "status": Shared.LandingStatusType.DataNeverExpected,
           "id": "GBR-2023-CC-C58DF9A73-4248789552",
+          "startDate": "2023-08-31",
           "landingDate": "2023-08-31",
           "species": "BSF",
           "cnCode": "03028990",
@@ -3867,6 +3870,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         {
           "status": Shared.LandingStatusType.DataNeverExpected,
           "id": "GBR-2023-CC-C58DF9A73-4248789552",
+          "startDate": "2023-08-31",
           "landingDate": "2023-08-31",
           "species": "BSF",
           "cnCode": "03028990",
@@ -4221,6 +4225,7 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
         {
           "status": Shared.LandingStatusType.DataNeverExpected,
           "id": "GBR-2023-CC-C58DF9A73-4248789552",
+          "startDate": "2023-08-31",
           "landingDate": "2023-08-31",
           "species": "BSF",
           "cnCode": "03028990",

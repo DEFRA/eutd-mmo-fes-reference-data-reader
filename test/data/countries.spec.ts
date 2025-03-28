@@ -1,7 +1,7 @@
 import * as CountriesApi from '../../src/data/countries-api';
 import { getCountriesDataFromFile } from '../../src/data/local-file';
 import * as Cache from '../../src/data/cache';
-import { ICountry } from '../../src/landings/types/appConfig/countries';
+import { ICountry } from 'mmo-shared-reference-data';
 import logger from '../../src/logger';
 
 const path = `${__dirname}/../../data/countries.json`;

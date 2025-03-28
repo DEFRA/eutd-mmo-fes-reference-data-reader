@@ -5,7 +5,7 @@ import * as CountriesApi from './countries-api';
 
 import logger from '../logger';
 import appConfig from '../config';
-import { generateIndex, type IConversionFactor } from 'mmo-shared-reference-data';
+import { generateIndex, type IConversionFactor, type ICountry } from 'mmo-shared-reference-data';
 import { QuotaStatuses } from '../landings/types/appConfig/conversionFactors';
 import { loadConversionFactorsFromLocalFile } from '../landings/persistence/conversionFactors';
 import { ISpeciesRiskToggle, IVesselOfInterest, IWeighting, WEIGHT } from '../landings/types/appConfig/risking';
@@ -15,7 +15,6 @@ import { getSpeciesToggle } from '../controllers/risking';
 import { IExporterBehaviour } from '../landings/types/appConfig/exporterBehaviour';
 import { IAllSpecies } from '../landings/types/appConfig/allSpecies';
 import { ILicence, IVessel } from '../landings/types/appConfig/vessels';
-import { ICountry } from '../landings/types/appConfig/countries';
 import { IEodRule, IEodSetting, vesselSizeGroup } from '../landings/types/appConfig/eodSettings';
 import { getEodSettings } from '../landings/persistence/eodSettings';
 
