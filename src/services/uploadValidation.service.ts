@@ -36,6 +36,11 @@ export const initialiseErrorsForLanding = (landing: IUploadedLanding): IUploaded
 
 export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDaysInFuture: number): IUploadedLanding => {
 
+  if (landing.startDate && !moment(landing.startDate, 'DD/MM/YYYY', true).isValid()) {
+    landing.errors.push('error.startDate.date.base');
+    return landing;
+  }
+
   if(landing.landingDate === undefined || landing.landingDate === '') {
     landing.errors.push('error.dateLanded.date.missing');
     return landing;
@@ -45,6 +50,11 @@ export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDa
 
   if (!landingDate.isValid()) {
     landing.errors.push('error.dateLanded.date.base');
+    return landing;
+  }
+
+  if (landing.startDate && landingDate.isBefore(moment(landing.startDate, 'DD/MM/YYYY', true), 'day')) {
+    landing.errors.push('error.startDate.date.max');
     return landing;
   }
 
@@ -132,7 +142,7 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
   }
 
   landing.product = favouriteProduct;
-  
+
   const specificCommodity = commodityCodes.find(code => code.code === landing.product.commodity_code);
 
   //Update Description
