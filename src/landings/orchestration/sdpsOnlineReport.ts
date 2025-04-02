@@ -37,6 +37,8 @@ export async function generateForeignCatchCertOnlineValidationReport(payload: an
     const isBlocking4bEnabled : boolean = await getBlockingStatus(ValidationRules.FOUR_B);
 
     if(!report.isValid && isBlocking4bEnabled) {
+        logger.info(`[SDPS-ONLINE-VALIDATION-REPORT[IS-BLOCKED][${mappedSDPS.documentNumber}]`);
+
         const certificate = await DocumentModel.findOne({
             documentNumber : mappedSDPS.documentNumber
         });
@@ -56,6 +58,8 @@ export async function generateForeignCatchCertOnlineValidationReport(payload: an
             await FailedOnlineCertificates.create(rawValidationResults.filter(_=>_.documentNumber === payload.dataToValidate.documentNumber));
         }
     } else {
+        logger.info(`[SDPS-ONLINE-VALIDATION-REPORT][NO-FAILURE][COMPLETE][${mappedSDPS.documentNumber}]`);
+
         report.rawData.forEach(_ => _.status = DocumentStatuses.Complete);
     }
     return report;
