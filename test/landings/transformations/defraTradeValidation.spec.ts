@@ -414,6 +414,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         {
           status: DefraCcLandingStatusType.ValidationFailure_Species,
           id: "GBR-2023-CC-C58DF9A73-1777642314",
+          startDate: "2023-08-31",
           landingDate: "2023-08-31",
           species: "Lobster",
           cnCode: "03028990",
@@ -562,6 +563,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         {
           status: DefraCcLandingStatusType.ValidationFailure_Species,
           id: "GBR-2023-CC-C58DF9A73-1777642314",
+          startDate: "2023-08-31",
           landingDate: "2023-08-31",
           species: "Lobster",
           cnCode: "03028990",

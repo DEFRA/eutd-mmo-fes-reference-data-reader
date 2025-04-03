@@ -67,7 +67,6 @@ export const toDefraTradeLanding = (landing: ICcQueryResult): IDefraTradeLanding
 
   delete dynamicsLanding['landingOutcomeAtSubmission'];
   delete dynamicsLanding['landingOutcomeAtRetrospectiveCheck'];
-  delete dynamicsLanding['startDate'];
 
   return {
     ...dynamicsLanding,
