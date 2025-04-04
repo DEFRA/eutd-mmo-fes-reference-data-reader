@@ -28,6 +28,8 @@ import logger from "../../src/logger";
 
 moment.suppressDeprecationWarnings = true;
 
+const mockVesselIdxWithPln: jest.Mock = jest.fn();
+
 jest.mock('uuid');
 
 const { v4: uuid } = require('uuid');
@@ -256,7 +258,7 @@ describe("Report Draft", () => {
       mockGetCertificateByDocumentNumber.mockResolvedValue(catchCertificate);
 
       uuid.mockImplementation(() => 'some-uuid-correlation-id');
-      mockToCcDefraReport = jest.spyOn(DefraMapper, 'toCcDefraReport');
+      mockToCcDefraReport = jest.spyOn(Shared, 'toCcDefraReport');
       mockLogInfo = jest.spyOn(logger, 'info');
     });
 
@@ -602,7 +604,7 @@ describe("Report Delete", () => {
     let mockToCcDefraReport;
 
     beforeEach(() => {
-      mockToCcDefraReport = jest.spyOn(DefraMapper, 'toCcDefraReport');
+      mockToCcDefraReport = jest.spyOn(Shared, 'toCcDefraReport');
     });
 
     afterEach(() => {
@@ -1150,6 +1152,7 @@ describe("Report Void", () => {
     let mockToCcDefraReport;
     let mockToDynamicsCcCase;
     let mockToCCDefraTrade;
+    let mockVesselIdx;
 
     const documentNumber = "GBR-CC-2342342-32423";
     const backEndCc: IDocument = {
@@ -1247,10 +1250,12 @@ describe("Report Void", () => {
         .spyOn(CertificatePersistance, 'getCertificateByDocumentNumberWithNumberOfFailedAttempts')
         .mockImplementation(() => new Promise(res => res(backEndCc)));
 
-      mockToCcDefraReport = jest.spyOn(DefraMapper, 'toCcDefraReport');
+      mockToCcDefraReport = jest.spyOn(Shared, 'toCcDefraReport');
       mockToDynamicsCcCase = jest.spyOn(DynamicsMapper, 'toDynamicsCcCase');
       mockToCCDefraTrade = jest.spyOn(DefraTrade, 'reportCcToTrade');
       mockToCCDefraTrade.mockResolvedValue(undefined);
+      mockVesselIdx = jest.spyOn(Cache, 'getVesselsIdx');
+      mockVesselIdx.mockReturnValue(mockVesselIdxWithPln);
     });
 
     afterEach(() => {
@@ -1258,6 +1263,7 @@ describe("Report Void", () => {
       mockToCcDefraReport.mockRestore();
       mockToDynamicsCcCase.mockRestore();
       mockToCCDefraTrade.mockRestore();
+      mockVesselIdx.mockRestore();
     });
 
     it("will correctly save the right type of data", async () => {
@@ -1272,7 +1278,7 @@ describe("Report Void", () => {
     it("will include an internal _correlationId for end to end traceability", async () => {
       await Controllers.reportVoid("GBR-CC-2342342-32423");
 
-      expect(mockToCcDefraReport).toHaveBeenCalledWith('GBR-CC-2342342-32423', 'some-uuid-correlation-id', 'VOID', false, backEndCc);
+      expect(mockToCcDefraReport).toHaveBeenCalledWith('GBR-CC-2342342-32423', 'some-uuid-correlation-id', 'VOID', false, mockVesselIdxWithPln, backEndCc);
 
       const result = await DefraPersistance.getAllDefraValidationReports();
       expect(result[0]._correlationId).toEqual('some-uuid-correlation-id');
@@ -1392,7 +1398,7 @@ describe("Report Submitted", () => {
 
   beforeEach(() => {
     mockGetCertificate = jest.spyOn(CertificatePersistance, 'getCertificateByDocumentNumberWithNumberOfFailedAttempts');
-    mockToCcDefraReport = jest.spyOn(DefraMapper, 'toCcDefraReport');
+    mockToCcDefraReport = jest.spyOn(Shared, 'toCcDefraReport');
     mockToLandings = jest.spyOn(DefraMapper, 'toLandings');
     mockToCCDefraTrade = jest.spyOn(DefraTrade, 'reportCcToTrade');
     mockReportCc = jest.spyOn(CaseManagement, 'reportCc');
@@ -1652,12 +1658,15 @@ describe("Report Submitted", () => {
     let mockLogInfo;
     let mockRefreshRiskingData;
     let mockGetExtendedValidationData;
+    let mockVesselIdx;
 
     beforeEach(() => {
       mockLogInfo = jest.spyOn(logger, 'info');
       mockRefreshRiskingData = jest.spyOn(Cache, 'refreshRiskingData');
       mockGetExtendedValidationData = jest.spyOn(extendedValidationDataService, 'getExtendedValidationData');
       mockGetExtendedValidationData.mockResolvedValue(null);
+      mockVesselIdx = jest.spyOn(Cache, 'getVesselsIdx');
+      mockVesselIdx.mockReturnValue(mockVesselIdxWithPln);
       uuid.mockImplementation(() => 'some-uuid-correlation-id');
     });
 
@@ -1665,6 +1674,7 @@ describe("Report Submitted", () => {
       mockLogInfo.mockRestore();
       mockRefreshRiskingData.mockRestore();
       mockGetExtendedValidationData.mockRestore();
+      mockVesselIdx.mockRestore();
       uuid.mockRestore();
     });
 
@@ -1699,7 +1709,7 @@ describe("Report Submitted", () => {
         expect(mockInsertCcReport).toHaveBeenCalledWith({ ...toReportResponse, landings: toLandingsResponse });
 
         expect(mockGetCertificate).toHaveBeenCalledWith('X-CC-1');
-        expect(mockToCcDefraReport).toHaveBeenCalledWith('X-CC-1', 'some-uuid-correlation-id', 'COMPLETE', false, getCatchCertificate);
+        expect(mockToCcDefraReport).toHaveBeenCalledWith('X-CC-1', 'some-uuid-correlation-id', 'COMPLETE', false, mockVesselIdxWithPln, getCatchCertificate);
         expect(mockToLandings).toHaveBeenCalledWith(data);
         expect(mockInsertCcDefraValidationReport).toHaveBeenCalledWith(toReportResponse);
 
@@ -2481,6 +2491,7 @@ describe('Report Cc Landing Update', () => {
   let mockLogInfo;
   let mockLogWarn;
   let mockLogError;
+  let mockVesselIdx;
 
   beforeEach(() => {
     mockLogInfo = jest.spyOn(logger, 'info');
@@ -2490,9 +2501,11 @@ describe('Report Cc Landing Update', () => {
 
     mockInsertCcReport = jest.spyOn(DefraPersistance, 'insertCcDefraValidationReport');
     mockGetCertificate = jest.spyOn(CertificatePersistance, 'getCertificateByDocumentNumberWithNumberOfFailedAttempts');
-    mockToCcDefraReport = jest.spyOn(DefraMapper, 'toCcDefraReport');
+    mockToCcDefraReport = jest.spyOn(Shared, 'toCcDefraReport');
     mockToLandings = jest.spyOn(DefraMapper, 'toLandings');
     mockReportCc = jest.spyOn(CaseManagement, 'reportCcLandingUpdate');
+    mockVesselIdx = jest.spyOn(Cache, 'getVesselsIdx');
+    mockVesselIdx.mockReturnValue(mockVesselIdxWithPln);
     mockLogInfo = jest.spyOn(logger, 'info');
     mockLogWarn = jest.spyOn(logger, 'warn');
     mockLogError = jest.spyOn(logger, 'error');
@@ -2507,6 +2520,7 @@ describe('Report Cc Landing Update', () => {
     mockToCcDefraReport.mockRestore();
     mockToLandings.mockRestore();
     mockReportCc.mockRestore();
+    mockVesselIdx.mockRestore();
     mockLogInfo.mockRestore();
     mockLogWarn.mockRestore();
     mockLogError.mockRestore();
@@ -2538,7 +2552,7 @@ describe('Report Cc Landing Update', () => {
 
       expect(mockInsertCcReport).toHaveBeenCalledWith({ ...toReportResponse, landings: toLandingsResponse });
       expect(mockGetCertificate).toHaveBeenCalledWith('X-CC-1');
-      expect(mockToCcDefraReport).toHaveBeenCalledWith('X-CC-1', 'some-uuid-correlation-id', 'COMPLETE', false, getCatchCertificate);
+      expect(mockToCcDefraReport).toHaveBeenCalledWith('X-CC-1', 'some-uuid-correlation-id', 'COMPLETE', false, mockVesselIdxWithPln, getCatchCertificate);
       expect(mockToLandings).toHaveBeenCalledWith(data);
       expect(mockInsertCcReport).toHaveBeenCalledWith(toReportResponse);
       expect(mockReportCc).toHaveBeenCalledTimes(1);

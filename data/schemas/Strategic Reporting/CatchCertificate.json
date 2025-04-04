@@ -89,6 +89,7 @@
         },
         "landings": [
           {
+            "startDate": "2019-01-01 00:00:00",
             "date": "2019-01-01 05:05:05",
             "species": {
               "name": "commodo aute",
@@ -159,6 +160,7 @@
             "landingValidationstatusAtRetrospective": "Validation Success"
           },
           {
+            "startDate": "2019-01-01 00:00:00",
             "date": "2019-01-01 05:05:05",
             "species": {
               "name": "SAL",

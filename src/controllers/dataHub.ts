@@ -13,8 +13,8 @@ import { DocumentStatuses } from "../landings/types/document";
 import { getCertificateByDocumentNumberWithNumberOfFailedAttempts } from "../landings/persistence/catchCert";
 import { getExtendedValidationData } from "../landings/extendedValidationDataService";
 import { ISdPsQueryResult } from "../landings/types/query";
-import { MessageLabel, ICcQueryResult } from "mmo-shared-reference-data";
-import { refreshRiskingData } from "../data/cache";
+import { MessageLabel, ICcQueryResult, toCcDefraReport } from "mmo-shared-reference-data";
+import { getVesselsIdx, refreshRiskingData } from "../data/cache";
 import { v4 as uuidv4 } from 'uuid';
 import { isEmpty } from 'lodash';
 
@@ -49,7 +49,7 @@ export const reportDraft = async (certificateId: string) => {
     else {
       logger.info(`[REPORTING-CC-DRAFT][${certificateId}][Getting report]`);
       const requestByAdmin = certificate.requestByAdmin;
-      const catchCertificateReport = DefraMapper.toCcDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
+      const catchCertificateReport = toCcDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
 
       logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport._correlationId}]`);
       await insertCcDefraValidationReport(catchCertificateReport);
@@ -93,7 +93,7 @@ export const reportDelete = async (certificateId: string) => {
     }
     else {
       const requestByAdmin = certificate.requestByAdmin;
-      const catchCertificateReport = DefraMapper.toCcDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
+      const catchCertificateReport = toCcDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
 
       if (certificate.exportData?.exporterDetails)
         catchCertificateReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);
@@ -157,12 +157,13 @@ export const reportVoid = async (certificateId: string, isFromExporter = false) 
     }
     else {
       const requestByAdmin = certificate.requestByAdmin;
-      const ccReport = DefraMapper.toCcDefraReport(
+      const ccReport = toCcDefraReport(
         certificateId,
         correlationId,
         DocumentStatuses.Void,
         requestByAdmin,
-        certificate
+        getVesselsIdx(),
+        certificate,
       );
 
       logger.info(`[REPORTING-CC-VOID][${certificateId}][REPORT-ID][${ccReport._correlationId}]`);
@@ -230,7 +231,7 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
       const requestByAdmin = catchCertificate.requestByAdmin;
 
       try {
-        ccReport = DefraMapper.toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, catchCertificate);
+        ccReport = toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin,  getVesselsIdx(), catchCertificate);
         logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][toCcDefraReport][${certificateId}]`);
       }
       catch (e) {
@@ -308,7 +309,7 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
 
       const requestByAdmin = catchCertificate.requestByAdmin;
       try {
-        ccReport = DefraMapper.toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, catchCertificate);
+        ccReport = toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, getVesselsIdx(), catchCertificate);
         logger.info(`[ONLINE-VALIDATION-REPORT][toCcDefraReport][${certificateId}][SUCCESS]`);
       }
       catch (e) {

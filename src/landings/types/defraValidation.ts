@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { ICountry } from 'mmo-shared-reference-data';
+import { CertificateLanding, ICountry } from 'mmo-shared-reference-data';
 
 export interface IDefraValidationReport  {
     certificateId:      string;
@@ -153,46 +153,6 @@ export interface CertificateLandingVessel {
     fao?: string,
     flag: string, // the jurisdiction under whose laws the vessel is registered or licensed
     cfr: string // cost and freight (CFR)
-}
-
-export interface CertificateLanding {
-    date: string;
-    species: CertificateFish;
-    state: CertificateFish;
-    presentation: CertificateFish;
-    cnCode: string;
-    cnCodeDesc?: string;
-    vessel: CertificateLandingVessel;
-    exportWeight: number;
-    isDirectLanding: boolean;
-    isValidationFailed?: boolean;
-    isSpeciesMisMatch?: boolean;
-    isExporterLandingOveruse?: boolean;
-    isOveruse?: boolean;
-    isLandingDataAvailable?: boolean;
-    rss?: string;
-    exportWeightFactor?: number;
-    landingBreakdown?: object;
-    totalWeightRecordedAgainstLanding?: number;
-    isNoLandingDataTimeExceeded?: boolean;
-    daysWithNoLandingData?: string;
-    landedWeightExceededAmount?: number;
-    totalWeightExported?: number;
-    rawLandingsDataUrl?: string;
-    rawSalesNotesDataUrl?: string;
-    isLegallyDue?: boolean;
-    vesselAdministration?: string;
-    dataEverExpected?: boolean;
-    landingDataExpectedDate?: string;
-    landingDataEndDate?: string;
-    isLate?: boolean;
-    dateDataReceived?: string;
-    landingDataExpectedAtSubmission?: boolean;
-    adminSpecies?: string;
-    adminState?: string;
-    adminPresentation?: string;
-    adminCommodityCode?: string;
-    speciesOverriddenByAdmin?: boolean;
 }
 
 interface Created {

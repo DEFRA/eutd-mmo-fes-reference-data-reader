@@ -5,12 +5,12 @@ import {
   isLandingDataLate,
   postCodeToDa,
   postCodeDaLookup,
-  TRANSPORT_VEHICLE_DIRECT,
   getIsLegallyDue,
   ICcQueryResult,
   LevelOfRiskType,
   LandingOutcomeType,
-  toDefraCcLandingStatus
+  toDefraCcLandingStatus,
+  CertificateLanding
 } from 'mmo-shared-reference-data';
 import {
    IDefraValidationReport,
@@ -23,9 +23,6 @@ import {
    CertificateCompany,
    CertificateStorageFacility,
    CertificateTransport,
-   IDefraValidationCatchCertificate,
-   CertificateExporterAndCompany,
-   CertificateLanding
 } from '../types/defraValidation';
 import {
   ISdPsQueryResult,
@@ -34,7 +31,6 @@ import {
 import { IAuditEvent } from '../types/auditEvent';
 import { ApplicationConfig } from '../../config';
 import { getVesselsIdx } from '../../data/cache';
-import { Catch, Product, Transport } from '../persistence/catchCert';
 import { IDocument } from '../types/document';
 import { vesselLookup } from './transformations';
 import { ILicence } from '../types/appConfig/vessels';
@@ -255,132 +251,6 @@ export function toSdDefraReport(documentNumber: string, correlationId: string, s
     return result;
 }
 
-export function toCcDefraReport(documentNumber: string, correlationId: string, status: string, requestByAdmin:boolean, catchCert?: IDocument) : IDefraValidationCatchCertificate {
-   const result : IDefraValidationCatchCertificate = {
-      documentType : "CatchCertificate",
-      documentNumber: documentNumber,
-      status: status,
-      _correlationId: correlationId,
-      requestedByAdmin: requestByAdmin
-   };
-
-   if (!isEmpty(catchCert)) {
-      result.userReference = catchCert.userReference;
-      result.dateCreated = catchCert.createdAt;
-      result.failedSubmissions = catchCert.numberOfFailedAttempts;
-      result.clonedFrom = catchCert.clonedFrom;
-      result.landingsCloned = catchCert.landingsCloned;
-      result.parentDocumentVoid = catchCert.parentDocumentVoid;
-
-      if (catchCert.audit.length > 0) {
-         result.audits = catchCert.audit.map(_ => toDefraAudit(_));
-      }
-
-      if (catchCert.documentUri) {
-         result.documentUri = `${ApplicationConfig.prototype.externalAppUrl}/qr/export-certificates/${catchCert.documentUri}`;
-      }
-
-      const exportData = catchCert.exportData;
-      if (exportData) {
-
-         if (exportData.exporterDetails) {
-            const exporterDetails: CertificateExporterAndCompany = {
-               fullName: exportData.exporterDetails.exporterFullName,
-               companyName: exportData.exporterDetails.exporterCompanyName,
-               contactId : exportData.exporterDetails.contactId,
-               accountId : exportData.exporterDetails.accountId,
-               address: {
-                  building_number: exportData.exporterDetails.buildingNumber,
-                  sub_building_name: exportData.exporterDetails.subBuildingName,
-                  building_name: exportData.exporterDetails.buildingName,
-                  street_name: exportData.exporterDetails.streetName,
-                  county: exportData.exporterDetails.county,
-                  country: exportData.exporterDetails.country,
-                  line1: exportData.exporterDetails.addressOne,
-                  city: exportData.exporterDetails.townCity,
-                  postCode: exportData.exporterDetails.postcode
-               },
-               dynamicsAddress : exportData.exporterDetails._dynamicsAddress
-            };
-
-            result.exporterDetails = exporterDetails;
-            result.devolvedAuthority = daLookUp(exportData.exporterDetails.postcode);
-
-            if (exportData.conservation?.conservationReference) {
-               result.conservationReference = exportData.conservation.conservationReference;
-            }
-
-            const userDetails = exportData.exporterDetails._dynamicsUser || {};
-            const { firstName, lastName } = userDetails;
-            result.created = {
-               id: catchCert.createdBy,
-               email: catchCert.createdByEmail,
-               firstName,
-               lastName
-            }
-         }
-
-         if(exportData.transportation) {
-            result.transportation = toTransportation(exportData.transportation);
-            result.exportedFrom = exportData.transportation.exportedFrom;
-            result.exportedTo = exportData.transportation.exportedTo;
-         }
-
-         if (exportData.products && exportData.products.length > 0) {
-          result.landings = exportData.products.flatMap((product: Product) =>
-              toDefraCcLanding(product, exportData.transportation, catchCert.createdAt.toISOString()));
-         }
-      }
-   }
-
-   return result;
-}
-
-export function toDefraCcLanding(product: Product | undefined, transportation: Transport, createdAt: string): CertificateLanding[] {
-   return (product?.caughtBy) ? product.caughtBy.map((landing: Catch) => {
-    const licenceLookup = vesselLookup(getVesselsIdx());
-    const licence: ILicence = licenceLookup(landing.pln, landing.date);
-    return {
-      date: landing.date,
-      species: {
-         name: product.species,
-         code: product.speciesCode,
-         scientificName: product.scientificName
-      },
-      state: {
-         name: product.state.name,
-         code: product.state.code,
-      },
-      presentation: {
-         name: product.presentation.name,
-         code: product.presentation.code,
-      },
-      cnCode: product.commodityCode,
-      cnCodeDesc: product.commodityCodeDescription,
-      vessel: {
-         name: landing.vessel,
-         pln: landing.pln,
-         length: licence ? licence.vesselLength : undefined,
-         fao: landing.faoArea,
-         flag: landing.flag,
-         cfr: landing.cfr
-      },
-      exportWeight: landing.weight,
-      isDirectLanding: (transportation?.vehicle === TRANSPORT_VEHICLE_DIRECT),
-      vesselAdministration: licence ? licence.da : undefined,
-      dataEverExpected: landing.dataEverExpected,
-      landingDataExpectedDate: landing.landingDataExpectedDate,
-      landingDataEndDate: landing.landingDataEndDate,
-      landingDataExpectedAtSubmission: (createdAt !== undefined && landing.landingDataExpectedDate !== undefined) ? moment.utc(createdAt).isSameOrAfter(moment.utc(landing.landingDataExpectedDate), 'day') : undefined,
-      speciesAdmin: product.speciesAdmin,
-      adminState: product.state ? product.state.admin : undefined,
-      adminPresentation: product.presentation ? product.presentation.admin : undefined,
-      adminCommodityCode: product.commodityCodeAdmin,
-      speciesOverriddenByAdmin: product.speciesOverriddenByAdmin,
-   }
-   }) : [];
-}
-
 export function toDefraAudit(systemAudit: IAuditEvent) : CertificateAudit {
    const result : CertificateAudit = {
       auditOperation : systemAudit.eventType,
@@ -478,7 +348,6 @@ export function toTransportation(transportation) : CertificateTransport {
 }
 
 export function toLandings(queryRes: ICcQueryResult[]): CertificateLanding[] {
-
    return queryRes.map((rawValidatedLanding: ICcQueryResult) => {
 
       const ccBatchReportForLanding : ICcBatchValidationReport = Array.from(ccBatchReport([rawValidatedLanding][Symbol.iterator]()))[0]
@@ -492,6 +361,7 @@ export function toLandings(queryRes: ICcQueryResult[]): CertificateLanding[] {
          rawValidatedLanding.extended.exporterContactId);
 
       return {
+         startDate: rawValidatedLanding.startDate,
          date: rawValidatedLanding.dateLanded,
          species: {
             name: rawValidatedLanding.extended.species,

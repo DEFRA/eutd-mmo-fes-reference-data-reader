@@ -77,6 +77,7 @@ export interface Catch {
   licenceValidTo?: string;
   licenceHolder?: string;
   date?: string;
+  startDate?: string;
   faoArea?: string;
   weight?: number;
   _status?: LandingStatus;
