@@ -122,7 +122,7 @@ export function toPsDefraReport(documentNumber, correlationId: string, status: s
          personResponsible: processingStatement.exportData.personResponsibleForConsignment
       }
 
-      result.failedSubmissions = processingStatement.numberOfFailedAttempts;
+      result.failedSubmissions = processingStatement.numberOfFailedAttempts ? processingStatement.numberOfFailedAttempts : 0;
 
       if (processingStatement.exportData.exporterDetails) {
          result.exporterDetails = {
@@ -183,7 +183,7 @@ export function toSdDefraReport(documentNumber: string, correlationId: string, s
     if (!isEmpty(storageDocument)) {
       result.userReference = storageDocument.userReference;
       result.dateCreated = storageDocument.createdAt;
-      result.failedSubmissions = storageDocument.numberOfFailedAttempts;
+      result.failedSubmissions = storageDocument.numberOfFailedAttempts ? storageDocument.numberOfFailedAttempts : 0;
       result.clonedFrom = storageDocument.clonedFrom;
       result.parentDocumentVoid = storageDocument.parentDocumentVoid;
 

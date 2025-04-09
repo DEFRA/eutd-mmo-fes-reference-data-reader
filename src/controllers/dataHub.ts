@@ -21,10 +21,20 @@ import { isEmpty } from 'lodash';
 import logger from "../logger";
 import moment from "moment";
 
+export const getDocumentType = (documentNumber: string) => {
+  if (documentNumber.toUpperCase().includes('-PS-')) {
+    return "processingStatement";
+  } else if (documentNumber.toUpperCase().includes('-SD-')) {
+    return "storageDocument";
+  } else {
+    return "catchCert";
+  }
+}
+
 export const reportDraft = async (certificateId: string) => {
   const correlationId = uuidv4();
   logger.info(`[REPORTING-DRAFT][Getting certificate with number of failed attempts]`);
-  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
   logger.info(`[REPORTING-DRAFT][Getting certificate with number of failed attempts][COMPLETE]`);
 
   if (certificate) {
@@ -68,7 +78,7 @@ export const reportDraft = async (certificateId: string) => {
  */
 export const reportDelete = async (certificateId: string) => {
   const correlationId = uuidv4();
-  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId,  getDocumentType(certificateId));
 
   if (certificate) {
     if (certificateId.toUpperCase().includes('-PS-')) {
@@ -106,7 +116,7 @@ export const reportDelete = async (certificateId: string) => {
 
 export const reportVoid = async (certificateId: string, isFromExporter = false) => {
   const correlationId = uuidv4();
-  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId,  getDocumentType(certificateId));
 
   if (certificate) {
     if (certificateId.toUpperCase().includes('-PS-')) {
@@ -184,7 +194,7 @@ export const reportSdPsSubmitted = async (sdpsValidationData: ISdPsQueryResult[]
 
     logger.info(`[DATA-HUB][REPORT-SDPS-SUBMITTED][${certificateId}]`);
 
-    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
 
     if (certificate?.documentNumber) {
       logger.info(`[DATA-HUB][REPORT-SDPS-SUBMITTED][${certificateId}][FOUND]`);
@@ -217,7 +227,7 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
       logger.info(`[LANDINGS][REPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
 
       try {
-        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
         logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}]`);
       }
       catch (e) {
@@ -299,7 +309,7 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
       logger.info(`[ONLINE-VALIDATION-REPORT][REPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
 
       try {
-        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId);
+        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
         logger.info(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}][SUCCESS]`);
       }
       catch (e) {

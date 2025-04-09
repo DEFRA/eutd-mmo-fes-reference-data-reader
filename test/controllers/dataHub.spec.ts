@@ -126,7 +126,7 @@ describe("Report Draft", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "processingStatement");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -203,7 +203,7 @@ describe("Report Draft", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "storageDocument");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -297,7 +297,7 @@ describe("Report Draft", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "catchCert");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -363,7 +363,7 @@ describe("Report Delete", () => {
       const documentNumber = "GBR-2020-PS-5A1FEE8A2";
       const processingStatement = {
         "createdAt": moment.utc("2020-07-20T15:04:40.523Z").toISOString(),
-        "__t": "storageDocument",
+        "__t": "processingStatement",
         "createdBy": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
         "createdByEmail": "foo@foo.com",
         "status": "DRAFT",
@@ -389,7 +389,7 @@ describe("Report Delete", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "processingStatement");
       expect(mockPostCodeDaLookup).toHaveBeenCalled();
       expect(result[0].devolvedAuthority).toEqual("Isle of Man");
     });
@@ -453,7 +453,7 @@ describe("Report Delete", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "processingStatement");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -522,7 +522,7 @@ describe("Report Delete", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "storageDocument");
       expect(mockPostCodeDaLookup).toHaveBeenCalled();
       expect(result[0].devolvedAuthority).toEqual("Isle of Man");
     });
@@ -586,7 +586,7 @@ describe("Report Delete", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "storageDocument");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -662,7 +662,7 @@ describe("Report Delete", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "catchCert");
       expect(mockPostCodeDaLookup).toHaveBeenCalled();
       expect(result[0].devolvedAuthority).toEqual("Isle of Man");
     });
@@ -726,7 +726,7 @@ describe("Report Delete", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateByDocumentNumber).toHaveBeenCalledWith(documentNumber, "catchCert");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -907,7 +907,7 @@ describe("Report Void", () => {
       await Controllers.reportVoid(documentNumber);
 
       const result = await DefraPersistance.getAllDefraValidationReports();
-      expect(mockGetCertificateById).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateById).toHaveBeenCalledWith(documentNumber, "processingStatement");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -1109,7 +1109,7 @@ describe("Report Void", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(mockGetCertificateById).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateById).toHaveBeenCalledWith(documentNumber, "storageDocument");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -1290,7 +1290,7 @@ describe("Report Void", () => {
       await Controllers.reportVoid(documentNumber);
 
       const result = await DefraPersistance.getAllDefraValidationReports();
-      expect(mockGetCertificateById).toHaveBeenCalledWith(documentNumber);
+      expect(mockGetCertificateById).toHaveBeenCalledWith(documentNumber, "catchCert");
       expect(result[0].requestedByAdmin).toBe(false);
     });
 
@@ -1708,7 +1708,7 @@ describe("Report Submitted", () => {
         expect(mockRefreshRiskingData).toHaveBeenCalled();
         expect(mockInsertCcReport).toHaveBeenCalledWith({ ...toReportResponse, landings: toLandingsResponse });
 
-        expect(mockGetCertificate).toHaveBeenCalledWith('X-CC-1');
+        expect(mockGetCertificate).toHaveBeenCalledWith('X-CC-1', "catchCert");
         expect(mockToCcDefraReport).toHaveBeenCalledWith('X-CC-1', 'some-uuid-correlation-id', 'COMPLETE', false, mockVesselIdxWithPln, getCatchCertificate);
         expect(mockToLandings).toHaveBeenCalledWith(data);
         expect(mockInsertCcDefraValidationReport).toHaveBeenCalledWith(toReportResponse);
@@ -2551,7 +2551,7 @@ describe('Report Cc Landing Update', () => {
       await Controllers.reportCcLandingUpdate(data);
 
       expect(mockInsertCcReport).toHaveBeenCalledWith({ ...toReportResponse, landings: toLandingsResponse });
-      expect(mockGetCertificate).toHaveBeenCalledWith('X-CC-1');
+      expect(mockGetCertificate).toHaveBeenCalledWith('X-CC-1', 'catchCert');
       expect(mockToCcDefraReport).toHaveBeenCalledWith('X-CC-1', 'some-uuid-correlation-id', 'COMPLETE', false, mockVesselIdxWithPln, getCatchCertificate);
       expect(mockToLandings).toHaveBeenCalledWith(data);
       expect(mockInsertCcReport).toHaveBeenCalledWith(toReportResponse);

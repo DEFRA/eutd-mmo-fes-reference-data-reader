@@ -10,10 +10,9 @@ import {
   StorageDocumentReportCatch,
   IDefraValidationStorageDocument,
   CertificateStorageFacility,
-  CertificateTransport,
-  IDefraValidationCatchCertificate
+  CertificateTransport
 } from '../../../src/landings/types/defraValidation';
-import { CertificateLanding, ICcQueryResult, toCcDefraReport } from 'mmo-shared-reference-data';
+import { CertificateLanding, ICcQueryResult } from 'mmo-shared-reference-data';
 import { ISdPsQueryResult } from '../../../src/landings/types/query';
 import {
   ccQueryResultToDefraValidationReport,
@@ -367,6 +366,95 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
       const result: IDefraValidationProcessingStatement = toPsDefraReport("GBR-PS-32432-234234", "", DocumentStatuses.Draft, requestByAdmin, systemPs)
 
       expect(result.failedSubmissions).toEqual(5);
+    });
+
+    it('will bring the number of unsuccessful submissions when undefined', () => {
+      const examplePsWithNoNumberOfSubmissions: IDocument = {
+        createdAt: new Date("2020-06-09T11:27:49.000Z"),
+        __t: "processingStatement",
+        createdBy: "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
+        status: "COMPLETE",
+        documentNumber: "GBR-2020-PS-BA8A6BE06",
+        requestByAdmin: false,
+        investigation: [],
+        audit: [{
+          eventType: AuditEventTypes.PreApproved,
+          triggeredBy: "Bob",
+          timestamp: new Date(),
+          data: null
+        }, {
+          eventType: AuditEventTypes.Investigated,
+          triggeredBy: "Bob",
+          timestamp: new Date(),
+          data: null
+        }],
+        userReference: "test",
+        exportData: {
+          catches: [
+            {
+              species: "Atlantic herring (HER)",
+              scientificName: "Clupea harengus",
+              catchCertificateNumber: "23462436",
+              totalWeightLanded: 3,
+              exportWeightBeforeProcessing: 3,
+              exportWeightAfterProcessing: 3
+            },
+            {
+              species: "Balbonic Salmon (SAL)",
+              scientificName: "Balbonic",
+              catchCertificateNumber: "RAZ-24323-4234-234",
+              totalWeightLanded: 32,
+              exportWeightBeforeProcessing: 32,
+              exportWeightAfterProcessing: 3524
+            }],
+          exporterDetails: {
+            contactId: 'a contact id',
+            accountId: 'an account id',
+            exporterCompanyName: "Bobby The Second",
+            buildingName: "Building Name",
+            buildingNumber: "Building Number",
+            subBuildingName: "Sub Building Name",
+            addressOne: "11, Righteous Way",
+            townCity: "Blaydon-on-Thames",
+            county: "County",
+            country: "Country",
+            postcode: "BT1 1AA",
+            _dynamicsAddress: { dynamicsData: 'original address' },
+            _dynamicsUser: {
+              firstName: "Bob",
+              lastName: "Exporter"
+            }
+          },
+          consignmentDescription: "test",
+          healthCertificateNumber: "3",
+          healthCertificateDate: "01/06/2020",
+          personResponsibleForConsignment: "Bob Bobby",
+          plantApprovalNumber: "111-222",
+          plantName: "Bob's plant",
+          plantAddressOne: "test1",
+          plantBuildingName: "plantBuildingName",
+          plantBuildingNumber: "plantBuildingNumber",
+          plantSubBuildingName: "plantSubBuildingName",
+          plantStreetName: "plantStreetName",
+          plantCountry: "plantCountry",
+          plantCounty: "plantCounty",
+          plantTownCity: "city Test",
+          plantPostcode: "RRR",
+          dateOfAcceptance: "09/06/2020",
+          exportedTo: {
+            officialCountryName: "Nigeria",
+            isoCodeAlpha2: "NG",
+            isoCodeAlpha3: "NGA",
+            isoNumericCode: "566"
+          }
+        },
+        createdByEmail: "foo@foo.com",
+        documentUri: "_fd91895a-85e5-4e1b-90ef-53cffe3ac758.pdf"
+      }
+
+      const result: IDefraValidationProcessingStatement = toPsDefraReport("GBR-PS-32432-234234", "", DocumentStatuses.Draft, requestByAdmin, examplePsWithNoNumberOfSubmissions)
+
+      expect(result.failedSubmissions).toEqual(0);
     });
 
     it('will surface the report uri with correct path', () => {
@@ -1126,6 +1214,81 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-SD-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndSd);
           expect(result.storageFacilities).toEqual(expectedResult);
         });
+      });
+    });
+
+    describe('when document status is COMPLETE', () => {
+      const backEndSd: IDocument = {
+        "createdAt": new Date("2020-06-12T20:12:28.201Z"),
+        "__t": "storageDocument",
+        "createdBy": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
+        "createdByEmail": "foo@foo.com",
+        "status": "DRAFT",
+        "documentNumber": "GBR-2020-SD-C90A88218",
+        "clonedFrom": "GBR-2023-SD-C3A82642B",
+        "parentDocumentVoid": false,
+        "requestByAdmin": false,
+        "investigation": [],
+        "audit": [{
+          "eventType": AuditEventTypes.PreApproved,
+          "triggeredBy": "Bob",
+          "timestamp": new Date(),
+          "data": null
+        }, {
+          "eventType": AuditEventTypes.Investigated,
+          "triggeredBy": "Bob",
+          "timestamp": new Date(),
+          "data": null
+        }],
+        "userReference": "My Reference",
+        "exportData": {
+          "exporterDetails": {
+            "exporterCompanyName": "Exporter Ltd",
+            "addressOne": "Building Name",
+            "addressTwo": "Building Street",
+            "townCity": "Town",
+            "postcode": "IM1 3AA",
+            "_dynamicsAddress": { "dynamicsData": 'original address' },
+            "_dynamicsUser": {
+              "firstName": "Bob",
+              "lastName": "Exporter"
+            }
+          },
+          "catches": [{
+            "product": "Atlantic herring (HER)",
+            "scientificName": "Clupea harengus",
+            "commodityCode": "0345603",
+            "productWeight": "1000",
+            "dateOfUnloading": "12/06/2020",
+            "placeOfUnloading": "Dover",
+            "transportUnloadedFrom": "BA078",
+            "certificateNumber": "GBR-3453-3453-3443",
+            "weightOnCC": "1000"
+          }],
+          "storageFacilities": [{
+            "facilityName": "Exporter Person",
+            "facilityAddressOne": "Building Name",
+            "facilityAddressTwo": "Building Street",
+            "facilityTownCity": "Town",
+            "facilityPostcode": "XX12 X34"
+          }],
+          "transportation": {
+            "vehicle": "truck",
+            "cmr": true
+          },
+          "exportedTo": {
+            "officialCountryName": "Nigeria",
+            "isoCodeAlpha2": "NG",
+            "isoCodeAlpha3": "NGA",
+            "isoNumericCode": "566"
+          }
+        },
+        "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf"
+      };
+
+      it('will map all required fields correctly', () => {
+        const result: IDefraValidationStorageDocument = toSdDefraReport('GBR-2020-SD-C90A88218', correlationId, 'COMPLETE', requestByAdmin, backEndSd);
+        expect(result.failedSubmissions).toBe(0);
       });
     });
   });
@@ -1899,157 +2062,6 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
   });
 
 });
-
-const exampleCc: IDocument = {
-  "createdAt": new Date("2020-06-24T10:39:32.000Z"),
-  "__t": "catchCert",
-  "createdBy": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
-  "status": "COMPLETE",
-  "documentNumber": "GBR-2020-CC-1BC924FCF",
-  "clonedFrom": "GBR-2023-CC-C3A82642B",
-  "landingsCloned": false,
-  "parentDocumentVoid": false,
-  "audit": [
-    {
-      "eventType": "INVESTIGATED",
-      "triggeredBy": "Chris Waugh",
-      "timestamp": {
-        "$date": "2020-06-24T10:40:18.780Z"
-      },
-      "data": {
-        "investigationStatus": "UNDER_INVESTIGATION"
-      }
-    },
-    {
-      "eventType": "INVESTIGATED",
-      "triggeredBy": "Chris Waugh",
-      "timestamp": {
-        "$date": "2020-06-24T10:40:23.439Z"
-      },
-      "data": {
-        "investigationStatus": "CLOSED_NFA"
-      }
-    }
-  ],
-  "userReference": "MY REF",
-  "exportData": {
-    "exporterDetails": {
-      "contactId": "an id",
-      "accountId": "an id acc",
-      "exporterFullName": "Bob Exporter",
-      "exporterCompanyName": "Exporter Co",
-      "addressOne": "123 Unit 1 CJC Fish Ltd 17 Old Edinburgh Road",
-      "townCity": "T",
-      "postcode": "P",
-      "buildingNumber": "123",
-      "subBuildingName": "Unit 1",
-      "buildingName": "CJC Fish Ltd",
-      "streetName": "17  Old Edinburgh Road",
-      "county": "West Midlands",
-      "country": "England",
-      "_dynamicsAddress": { "dynamicsData": 'original address' },
-      "_dynamicsUser": {
-        "firstName": 'Bob',
-        "lastName": 'Exporter'
-      }
-    },
-    "products": [
-      {
-        "species": "European lobster (LBE)",
-        "speciesId": "4e5fff23-184c-4a46-beef-e93ccd040392",
-        "speciesCode": "LBE",
-        "scientificName": "some scientific name",
-        "commodityCode": "1234",
-        "commodityCodeDescription": "some commodity code description",
-        "state": {
-          "code": "ALI",
-          "name": "Alive"
-        },
-        "presentation": {
-          "code": "WHL",
-          "name": "Whole"
-        },
-        "factor": 1,
-        "caughtBy": [
-          {
-            "vessel": "WIRON 5",
-            "pln": "H1100",
-            "id": "5a259dc5-b05c-44fe-8d3f-7ee8cc99bfca",
-            "date": "2020-06-24",
-            "faoArea": "FAO27",
-            "flag": "GBR",
-            "cfr": "GBRC17737",
-            "weight": 100,
-            "dataEverExpected": true,
-            "landingDataExpectedDate": "2023-10-26",
-            "landingDataEndDate": "2023-10-27",
-          }
-        ]
-      },
-      {
-        "species": "Atlantic cod (COD)",
-        "speciesId": "6763576e-c5b8-41cf-a708-f4b9a470623e",
-        "speciesCode": "COD",
-        "scientificName": "Gadus morhua",
-        "commodityCode": "1234",
-        "commodityCodeDescription": `Fresh or chilled fillets of cod "Gadus morhua, Gadus ogac, Gadus macro...`,
-        "state": {
-          "code": "FRE",
-          "name": "Fresh"
-        },
-        "presentation": {
-          "code": "GUT",
-          "name": "Gutted"
-        },
-        "factor": 1.17,
-        "caughtBy": [
-          {
-            "vessel": "WIRON 5",
-            "pln": "H1100",
-            "id": "2e9da3e5-5e31-4555-abb4-9e5e53b8d0ef",
-            "date": "2020-06-02",
-            "faoArea": "FAO27",
-            "weight": 200,
-            "flag": "GBR",
-            "cfr": "GBRC17737",
-            "dataEverExpected": false
-          },
-          {
-            "vessel": "WIRON 6",
-            "pln": "H2200",
-            "id": "4cf6cb44-28ad-4731-bea4-05051ae2edd9",
-            "date": "2020-05-31",
-            "faoArea": "FAO27",
-            "weight": 200,
-            "flag": "GBR",
-            "cfr": "GBRC17737"
-          }
-        ]
-      }
-    ],
-    "conservation": {
-      "conservationReference": "UK Fisheries Policy"
-    },
-    "transportation": {
-      "vehicle": "truck",
-      "exportedFrom": "United Kingdom",
-      "exportedTo": {
-        "officialCountryName": "Nigeria",
-        "isoCodeAlpha2": "NG",
-        "isoCodeAlpha3": "NGA",
-        "isoNumericCode": "566"
-      },
-      "cmr": true
-    }
-  },
-  "createdByEmail": "foo@foo.com",
-  "documentUri": "_44fd226f-598f-4615-930f-716b2762fea4.pdf",
-  "investigation": {
-    "investigator": "Chris Waugh",
-    "status": "CLOSED_NFA"
-  },
-  "numberOfFailedAttempts": 5
-}
 
 const correlationId = 'some-uuid-correlation-id';
 const requestByAdmin = false;

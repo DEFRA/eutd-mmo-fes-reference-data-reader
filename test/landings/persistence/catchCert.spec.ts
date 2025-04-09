@@ -1166,7 +1166,7 @@ describe('reading individual certificates', () => {
 
     await model.save()
 
-    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-1")
+    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-1", "processingStatement")
 
     expect(certificate.documentNumber).toBe("GBR-XX-1");
     expect(certificate.status).toBe(DocumentStatuses.Draft);
@@ -1188,7 +1188,7 @@ describe('reading individual certificates', () => {
 
     await model.save()
 
-    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-1")
+    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-1", "processingStatement")
 
     expect(certificate.documentNumber).toBe("GBR-XX-1");
     expect(certificate.status).toBe(DocumentStatuses.Draft);
@@ -1228,7 +1228,7 @@ describe('reading individual certificates', () => {
 
     await model.save()
 
-    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-1")
+    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-1", "processingStatement")
 
     expect(certificate.documentNumber).toBe("GBR-XX-1");
     expect(certificate.status).toBe(DocumentStatuses.Draft);
@@ -1250,7 +1250,7 @@ describe('reading individual certificates', () => {
 
     await model.save()
 
-    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-2")
+    const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts("GBR-XX-2", "processingStatement")
 
     expect(certificate).toBeUndefined();
   })

@@ -8254,6 +8254,28 @@ describe('Dynamics Validation', () => {
       expect(result.numberOfFailedSubmissions).toEqual(5);
     });
 
+    it('will map the number 0 for failed submissions when 0', () => {
+      const exampleSdWithNoFailedSubmissions = {
+        ...examplePS,
+        numberOfFailedAttempts: 0
+      };
+
+      const result = toDynamicsPs([input], exampleSdWithNoFailedSubmissions, correlationId);
+
+      expect(result.numberOfFailedSubmissions).toEqual(0);
+    });
+
+    it('will map the number 0 for failed submissions when undefined', () => {
+      const exampleSdWithNoFailedSubmissions = {
+        ...examplePS,
+        numberOfFailedAttempts: undefined
+      };
+
+      const result = toDynamicsPs([input], exampleSdWithNoFailedSubmissions, correlationId);
+
+      expect(result.numberOfFailedSubmissions).toEqual(0);
+    });
+
     it('will map the case two type', () => {
       const result = toDynamicsPs([input], examplePS, correlationId);
 
@@ -8656,6 +8678,28 @@ describe('Dynamics Validation', () => {
       const result = toDynamicsSd([input], exampleSd, correlationId);
 
       expect(result.numberOfFailedSubmissions).toEqual(5);
+    });
+
+    it('will map the number 0 for failed submissions when 0', () => {
+      const exampleSdWithNoFailedSubmissions = {
+        ...exampleSd,
+        numberOfFailedAttempts: 0
+      };
+
+      const result = toDynamicsSd([input], exampleSdWithNoFailedSubmissions, correlationId);
+
+      expect(result.numberOfFailedSubmissions).toEqual(0);
+    });
+
+    it('will map the number 0 for failed submissions when undefined', () => {
+      const exampleSdWithNoFailedSubmissions = {
+        ...exampleSd,
+        numberOfFailedAttempts: undefined
+      };
+
+      const result = toDynamicsSd([input], exampleSdWithNoFailedSubmissions, correlationId);
+
+      expect(result.numberOfFailedSubmissions).toEqual(0);
     });
 
     it('will map the case two type', () => {
