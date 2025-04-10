@@ -681,6 +681,45 @@ describe('uploadValidation.service', () => {
 
     });
 
+    it('should return an error if the start date is in a restricted period', () => {
+
+      const result = SUT.validateProductForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '01/02/2020',
+          landingDate: '01/04/2020',
+          errors : []
+        },
+        favouriteProducts,
+        seasonalRestrictions
+      );
+
+      const error = {
+        key: 'validation.product.start-date.seasonal.invalid-date',
+        params: ['faoName1 (speciesCode1)']
+      };
+
+      expect(result.errors).toStrictEqual([error]);
+
+    });
+
+    it('should skip the seasonal restriction check if the start date is in the wrong format', () => {
+
+      const result = SUT.validateProductForLanding(
+        {
+          ...uploadedLanding,
+          startDate: undefined,
+          landingDate: '01/ 04/2020',
+          errors : []
+        },
+        favouriteProducts,
+        seasonalRestrictions
+      );
+
+      expect(result.errors).toStrictEqual([]);
+
+    });
+
     it('should skip the seasonal restriction check if the landing date is in the wrong format', () => {
 
       const result = SUT.validateProductForLanding(

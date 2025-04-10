@@ -15,7 +15,7 @@ export const uploadValidatorRoutes = (server : Hapi.Server) => {
         logger.info('[UPLOAD-LANDINGS][VALIDATE]');
 
         try {
-          const {landings, products, landingLimitDaysInFuture} = req.payload as UploadValidatorPayload
+          const { landings, products, landingLimitDaysInFuture } = req.payload as UploadValidatorPayload
 
           const result = validateLandings(landings, products, landingLimitDaysInFuture);
 

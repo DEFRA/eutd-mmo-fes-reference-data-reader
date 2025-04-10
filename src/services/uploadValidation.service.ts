@@ -145,11 +145,23 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
 
   const specificCommodity = commodityCodes.find(code => code.code === landing.product.commodity_code);
 
-  //Update Description
   if (specificCommodity) {
     landing.product.commodity_code_description = specificCommodity.description;
     landing.product.presentationLabel = specificCommodity.presentationLabel;
     landing.product.stateLabel = specificCommodity.stateLabel
+  }
+
+  const startDate = moment(landing.startDate, 'DD/MM/YYYY', true);
+
+  if (startDate.isValid()) {
+    const dateIsRestricted = hasSeasonalFishingRestriction(startDate.format('YYYY-MM-DD'), favouriteProduct.speciesCode, seasonalRestrictions);
+
+    if (dateIsRestricted) {
+      landing.errors.push({
+        key: "validation.product.start-date.seasonal.invalid-date",
+        params: [favouriteProduct.species]
+      });
+    }
   }
 
   const landingDate = moment(landing.landingDate, 'DD/MM/YYYY', true);

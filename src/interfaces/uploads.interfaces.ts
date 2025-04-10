@@ -17,5 +17,5 @@ export interface IUploadedLanding {
 
 export interface IErrorObject {
   key : string,
-  params : number[]
+  params : (number | string)[]
 }
