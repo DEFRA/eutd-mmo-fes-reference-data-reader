@@ -47,17 +47,23 @@ export const scanFile = async (fileData: ScanData) : Promise<ScanResponse>  => {
       }
     );
 
-    logger.info(`[AV][SCAN][${fileData.documentNumber}][RESPONSE][${fileData.key}] ${response.data.toString()}`);
+    logger.info(`[AV][SCAN][${fileData.documentNumber}][RESPONSE][${fileData.key}][${response.data.toString()}]`);
 
-    let virusDetected = undefined;
-    if(response.data.toString().includes('Clean')) virusDetected = false;
-    if(response.data.toString().includes('Quarantined')) virusDetected = true;
+    let virusDetected: boolean;
 
-    return { virusDetected : virusDetected }
+    if (response.data.toString().includes('Clean'))
+      virusDetected = false;
+
+    if (response.data.toString().includes('Quarantined'))
+      virusDetected = true;
+
+    logger.info(`[AV][SCAN][${fileData.documentNumber}][VIRUS-DETECTED][${fileData.key}][${virusDetected}]`);
+
+    return { virusDetected }
 
   } catch (err) {
-    logger.error(`[AV][SCAN][${fileData.documentNumber}][ERROR][${fileData.key}] [${err}]`);
-    return {virusDetected:undefined}
+    logger.error(`[AV][SCAN][${fileData.documentNumber}][ERROR][${fileData.key}][${err}]`);
+    return { virusDetected: undefined }
   }
 
 };

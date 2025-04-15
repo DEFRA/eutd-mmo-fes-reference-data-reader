@@ -103,7 +103,7 @@ describe('AV service', () => {
       const result = await scanFile(mockScanData);
 
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(1,`[AV][SCAN][${mockScanData.documentNumber}][START][${mockScanData.key}]`);
-      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2,`[AV][SCAN][${mockScanData.documentNumber}][RESPONSE][${mockScanData.key}] Content-Scan: Clean`);
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2,`[AV][SCAN][${mockScanData.documentNumber}][RESPONSE][${mockScanData.key}][Content-Scan: Clean]`);
       expect(result).toEqual({virusDetected: false});
 
     });
@@ -117,7 +117,7 @@ describe('AV service', () => {
       const result = await scanFile(mockScanData);
 
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(1,`[AV][SCAN][${mockScanData.documentNumber}][START][${mockScanData.key}]`);
-      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2,`[AV][SCAN][${mockScanData.documentNumber}][RESPONSE][${mockScanData.key}] Content-Scan: Quarantined`);
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2,`[AV][SCAN][${mockScanData.documentNumber}][RESPONSE][${mockScanData.key}][Content-Scan: Quarantined]`);
       expect(result).toEqual({virusDetected: true});
 
     });
@@ -131,7 +131,7 @@ describe('AV service', () => {
       const result = await scanFile(mockScanData);
 
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(1,`[AV][SCAN][${mockScanData.documentNumber}][START][${mockScanData.key}]`);
-      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2,`[AV][SCAN][${mockScanData.documentNumber}][RESPONSE][${mockScanData.key}] Content-Scan: FileInaccessible`);
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(2,`[AV][SCAN][${mockScanData.documentNumber}][RESPONSE][${mockScanData.key}][Content-Scan: FileInaccessible]`);
       expect(result).toEqual({virusDetected: undefined});
 
     });
@@ -142,7 +142,7 @@ describe('AV service', () => {
       const result = await scanFile(mockScanData);
 
       expect(mockLoggerInfo).toHaveBeenCalledWith(`[AV][SCAN][${mockScanData.documentNumber}][START][${mockScanData.key}]`);
-      expect(mockLoggerError).toHaveBeenCalledWith(`[AV][SCAN][${mockScanData.documentNumber}][ERROR][${mockScanData.key}] [Error: an error]`);
+      expect(mockLoggerError).toHaveBeenCalledWith(`[AV][SCAN][${mockScanData.documentNumber}][ERROR][${mockScanData.key}][Error: an error]`);
       expect(result).toEqual({virusDetected: undefined});
 
     });
@@ -153,7 +153,7 @@ describe('AV service', () => {
       const result = await scanFile(mockScanData);
 
       expect(mockLoggerInfo).toHaveBeenCalledWith(`[AV][SCAN][${mockScanData.documentNumber}][START][${mockScanData.key}]`);
-      expect(mockLoggerError).toHaveBeenCalledWith(`[AV][SCAN][${mockScanData.documentNumber}][ERROR][${mockScanData.key}] [Error: an error]`);
+      expect(mockLoggerError).toHaveBeenCalledWith(`[AV][SCAN][${mockScanData.documentNumber}][ERROR][${mockScanData.key}][Error: an error]`);
       expect(result).toEqual({virusDetected: undefined});
 
     });
