@@ -44,11 +44,11 @@ const seedEodRule = async (setting: IEodSetting) => {
 const createUpdateRule = (audit: IEodAudit, vesselSizes?: vesselSizeGroup[], rule?: IEodRule) =>
   Array.isArray(vesselSizes) ?
     { "$push": { "audit": audit }, vesselSizes } :
-    { "$push": { "audit": audit, "rules": { ruleType: rule.ruleType, vesselSize: rule.vesselSize, numberOfDays: rule.numberOfDays }}}
+    { "$push": { "audit": audit, "rules": { ruleType: rule.ruleType, vesselSize: rule.vesselSize, numberOfDays: rule.numberOfDays } } }
 
 export const createEodRules = async (user: string, da: string, vesselSizes?: vesselSizeGroup[], rule?: IEodRule): Promise<void> => {
   if (rule)
-    await EodSettingModel.findOneAndUpdate({ da }, { "$pull": { "rules": { ruleType: rule.ruleType, vesselSize: rule.vesselSize }}});
+    await EodSettingModel.findOneAndUpdate({ da }, { "$pull": { "rules": { ruleType: rule.ruleType, vesselSize: rule.vesselSize } } });
 
   const audit: IEodAudit = {
     user,
@@ -75,33 +75,35 @@ export const getEodSetting = async (da: string): Promise<IEodSetting> =>
     .lean();
 
 export const getEodAudits = async (): Promise<IEodAdminAudit[]> => {
-  const getEODRules: IEodSetting[] = await getEodSettings(false)
+  const getEODRules: IEodSetting[] = await getEodSettings(false);
 
   if (!Array.isArray(getEODRules)) {
     return [];
   }
 
-  const getEODAudits: IEodAdminAudit[] = [];
-  getEODRules.forEach((eodSetting: IEodSetting) => {
-    const audits: IEodAudit[] = eodSetting.audit;
-    if (Array.isArray(audits)) {
-      audits.forEach((eodAudit: IEodAudit) => {
-        getEODAudits.push({
-          date: moment(eodAudit.timestamp).utc().format('DD-MM-YYYY'),
-          time: moment(eodAudit.timestamp).utc().format("hh:mm:ss a"),
-          user: eodAudit.user,
-          rule: eodAudit.rule ? eodAudit.rule.ruleType : 'dataEverExpected',
-          da: eodSetting.da,
-          vesselSizes: eodAudit.rule ? eodAudit.rule.vesselSize : eodAudit.vesselSizes,
-          changedFrom: eodAudit.rule ? eodAudit.rule.changedFrom : undefined,
-          changedTo: eodAudit.rule ? eodAudit.rule.changedTo : undefined,
-        })
-      })
-    }
-  });
+  return getEODRules.flatMap((eodSetting: IEodSetting) => processEodSettingAudits(eodSetting));
+};
 
-  return getEODAudits;
-}
+const processEodSettingAudits = (eodSetting: IEodSetting): IEodAdminAudit[] => {
+  const audits: IEodAudit[] = eodSetting.audit;
+
+  if (!Array.isArray(audits)) {
+    return [];
+  }
+
+  return audits.map((eodAudit: IEodAudit) => mapEodAuditToAdminAudit(eodAudit, eodSetting.da));
+};
+
+const mapEodAuditToAdminAudit = (eodAudit: IEodAudit, da: string): IEodAdminAudit => ({
+  date: moment(eodAudit.timestamp).utc().format('DD-MM-YYYY'),
+  time: moment(eodAudit.timestamp).utc().format("hh:mm:ss a"),
+  user: eodAudit.user,
+  rule: eodAudit.rule ? eodAudit.rule.ruleType : 'dataEverExpected',
+  da,
+  vesselSizes: eodAudit.rule ? eodAudit.rule.vesselSize : eodAudit.vesselSizes,
+  changedFrom: eodAudit.rule ? eodAudit.rule.changedFrom : undefined,
+  changedTo: eodAudit.rule ? eodAudit.rule.changedTo : undefined,
+});
 
 export const seedEodRules = async (): Promise<void> => {
   if (config.eodRulesMigration) {

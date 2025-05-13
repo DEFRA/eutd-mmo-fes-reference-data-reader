@@ -16,82 +16,90 @@ import logger from '../../logger';
 import { ILicence } from '../types/appConfig/vessels';
 
 export function* unwindCatchCerts(catchCerts) {
-  /*
-   * Unwind the referenced landings part of Catch Certificates
-   * Include all data requried for reporting
-   */
-
   for (const catchCert of catchCerts) {
     const exportData = catchCert.exportData;
 
-    const voidedEvent = (catchCert.audit?.length)
-      ? getLastAuditEvent(catchCert.audit, AuditEventTypes.Voided)
-      : undefined;
-
-    const preApprovedEvent = (catchCert.audit?.length)
-      ? getLastAuditEvent(catchCert.audit, AuditEventTypes.PreApproved)
-      : undefined;
+    const voidedEvent = getLastAuditEventIfExists(catchCert.audit, AuditEventTypes.Voided);
+    const preApprovedEvent = getLastAuditEventIfExists(catchCert.audit, AuditEventTypes.PreApproved);
 
     for (const product of exportData.products) {
-      for (const caughtBy of product.caughtBy) {
-        yield {
-          documentNumber: catchCert.documentNumber,
-          createdAt: catchCert.createdAt,
-          status: catchCert.status,
-          speciesCode: product.speciesCode,
-          factor: getToLiveWeightFactor(product.speciesCode, product?.state?.code, product?.presentation?.code),
-          pln: caughtBy.pln,
-          date: moment(caughtBy.date).format('YYYY-MM-DD'),
-          weight: caughtBy.weight,
-          extended: {
-            exporterContactId: exportData.exporterDetails ? exportData.exporterDetails.contactId : undefined,
-            exporterAccountId: exportData.exporterDetails ? exportData.exporterDetails.accountId : undefined,
-            exporterName: exportData.exporterDetails ? exportData.exporterDetails.exporterFullName : undefined,
-            exporterCompanyName: exportData.exporterDetails ? exportData.exporterDetails.exporterCompanyName : undefined,
-            exporterPostCode: exportData.exporterDetails ? exportData.exporterDetails.exporterPostCode : undefined,
-            vessel: caughtBy.vessel,
-            landingId: caughtBy.id,
-            landingStatus: caughtBy._status,
-            pln: caughtBy.pln,
-            fao: caughtBy.faoArea,
-            flag: caughtBy.flag,
-            cfr: caughtBy.cfr,
-            presentation: product.presentation ? product.presentation.code : undefined,
-            presentationName: product.presentation ? product.presentation.name : undefined,
-            presentationAdmin: product.presentation ? product.presentation.admin : undefined,
-            species: product.species,
-            speciesAdmin: product.speciesAdmin,
-            scientificName: product.scientificName,
-            state: product.state ? product.state.code : undefined,
-            stateName: product.state ? product.state.name : undefined,
-            stateAdmin: product.state ? product.state.admin : undefined,
-            commodityCode: product.commodityCode,
-            commodityCodeAdmin: product.commodityCodeAdmin,
-            commodityCodeDescription: product.commodityCodeDescription,
-            url: catchCert.documentUri,
-            investigation: catchCert.investigation,
-            voidedBy: (voidedEvent?.triggeredBy) ? voidedEvent.triggeredBy : undefined,
-            preApprovedBy: (preApprovedEvent?.triggeredBy) ? preApprovedEvent.triggeredBy : undefined,
-            transportationVehicle: exportData.transportation?.vehicle ? exportData.transportation.vehicle : undefined,
-            numberOfSubmissions: caughtBy.numberOfSubmissions,
-            vesselOverriddenByAdmin: caughtBy.vesselOverriddenByAdmin,
-            speciesOverriddenByAdmin: !!product.speciesAdmin || !!product.state?.admin || !!product.presentation?.admin || !!product.commodityCodeAdmin,
-            licenceHolder: caughtBy.licenceHolder,
-            dataEverExpected: caughtBy.dataEverExpected,
-            landingDataExpectedDate: caughtBy.landingDataExpectedDate,
-            landingDataEndDate: caughtBy.landingDataEndDate,
-            isLegallyDue: caughtBy.isLegallyDue,
-            vesselRiskScore: caughtBy.vesselRiskScore,
-            exporterRiskScore: caughtBy.exporterRiskScore,
-            speciesRiskScore: caughtBy.speciesRiskScore,
-            threshold: caughtBy.threshold,
-            riskScore: caughtBy.riskScore,
-            isSpeciesRiskEnabled: caughtBy.isSpeciesRiskEnabled
-          }
-        }
-      }
+      yield* processProduct(product, catchCert, voidedEvent, preApprovedEvent);
     }
   }
+}
+
+function* processProduct(product, catchCert, voidedEvent, preApprovedEvent) {
+  for (const caughtBy of product.caughtBy) {
+    yield mapCaughtByToResult(caughtBy, product, catchCert, voidedEvent, preApprovedEvent);
+  }
+}
+
+function mapCaughtByToResult(caughtBy, product, catchCert, voidedEvent, preApprovedEvent) {
+  return {
+    documentNumber: catchCert.documentNumber,
+    createdAt: catchCert.createdAt,
+    status: catchCert.status,
+    speciesCode: product.speciesCode,
+    factor: getToLiveWeightFactor(product.speciesCode, product?.state?.code, product?.presentation?.code),
+    pln: caughtBy.pln,
+    date: moment(caughtBy.date).format('YYYY-MM-DD'),
+    weight: caughtBy.weight,
+    extended: mapExtendedData(caughtBy, product, catchCert, voidedEvent, preApprovedEvent),
+  };
+}
+
+function mapExtendedData(caughtBy, product, catchCert, voidedEvent, preApprovedEvent) {
+  const exportData = catchCert.exportData;
+
+  return {
+    exporterContactId: exportData.exporterDetails?.contactId,
+    exporterAccountId: exportData.exporterDetails?.accountId,
+    exporterName: exportData.exporterDetails?.exporterFullName,
+    exporterCompanyName: exportData.exporterDetails?.exporterCompanyName,
+    exporterPostCode: exportData.exporterDetails?.exporterPostCode,
+    vessel: caughtBy.vessel,
+    landingId: caughtBy.id,
+    landingStatus: caughtBy._status,
+    pln: caughtBy.pln,
+    fao: caughtBy.faoArea,
+    flag: caughtBy.flag,
+    cfr: caughtBy.cfr,
+    presentation: product.presentation?.code,
+    presentationName: product.presentation?.name,
+    presentationAdmin: product.presentation?.admin,
+    species: product.species,
+    speciesAdmin: product.speciesAdmin,
+    scientificName: product.scientificName,
+    state: product.state?.code,
+    stateName: product.state?.name,
+    stateAdmin: product.state?.admin,
+    commodityCode: product.commodityCode,
+    commodityCodeAdmin: product.commodityCodeAdmin,
+    commodityCodeDescription: product.commodityCodeDescription,
+    url: catchCert.documentUri,
+    investigation: catchCert.investigation,
+    voidedBy: voidedEvent?.triggeredBy,
+    preApprovedBy: preApprovedEvent?.triggeredBy,
+    transportationVehicle: exportData.transportation?.vehicle,
+    numberOfSubmissions: caughtBy.numberOfSubmissions,
+    vesselOverriddenByAdmin: caughtBy.vesselOverriddenByAdmin,
+    speciesOverriddenByAdmin: !!product.speciesAdmin || !!product.state?.admin || !!product.presentation?.admin || !!product.commodityCodeAdmin,
+    licenceHolder: caughtBy.licenceHolder,
+    dataEverExpected: caughtBy.dataEverExpected,
+    landingDataExpectedDate: caughtBy.landingDataExpectedDate,
+    landingDataEndDate: caughtBy.landingDataEndDate,
+    isLegallyDue: caughtBy.isLegallyDue,
+    vesselRiskScore: caughtBy.vesselRiskScore,
+    exporterRiskScore: caughtBy.exporterRiskScore,
+    speciesRiskScore: caughtBy.speciesRiskScore,
+    threshold: caughtBy.threshold,
+    riskScore: caughtBy.riskScore,
+    isSpeciesRiskEnabled: caughtBy.isSpeciesRiskEnabled,
+  };
+}
+
+function getLastAuditEventIfExists(audit, eventType) {
+  return audit?.length ? getLastAuditEvent(audit, eventType) : undefined;
 }
 
 export function getLastAuditEvent(events: IAuditEvent[], eventType: string) {
@@ -186,12 +194,12 @@ export function rawCatchCertToOnlineValidationReport(rawCatchCerts: ICcQueryResu
       cert.isOverusedAllCerts
     )
   ) || (
-    !cert.isLandingExists &&
-    isHighRisk(getTotalRiskScore(cert.extended.pln, cert.species, cert.extended.exporterAccountId, cert.extended.exporterContactId)) &&
-    ((cert.extended.dataEverExpected !== false && moment.utc(cert.createdAt).isSameOrAfter(moment.utc(cert.extended.landingDataExpectedDate), 'day')) || cert.extended.vesselOverriddenByAdmin)
-  ) || (
-    _.isEmpty(cert.extended.licenceHolder)
-  );
+      !cert.isLandingExists &&
+      isHighRisk(getTotalRiskScore(cert.extended.pln, cert.species, cert.extended.exporterAccountId, cert.extended.exporterContactId)) &&
+      ((cert.extended.dataEverExpected !== false && moment.utc(cert.createdAt).isSameOrAfter(moment.utc(cert.extended.landingDataExpectedDate), 'day')) || cert.extended.vesselOverriddenByAdmin)
+    ) || (
+      _.isEmpty(cert.extended.licenceHolder)
+    );
 
   const failedCatchCerts: ICcQueryResult[] = rawCatchCerts.filter(cert => isFailedCert(cert));
   const uniqueSpeciesAndPresentations: IOnlineValidationReportItemKey[] = [];
@@ -200,10 +208,10 @@ export function rawCatchCertToOnlineValidationReport(rawCatchCerts: ICcQueryResu
 
   return uniqueSpeciesAndPresentations.map(key => {
 
-    const failures : string[] = [];
+    const failures: string[] = [];
 
     const certificatesForKey = failedCatchCerts.filter((cert: ICcQueryResult) =>
-         cert.species === key.species
+      cert.species === key.species
       && cert.extended.presentation === key.presentation
       && cert.extended.state === key.state
       && moment.utc(cert.dateLanded).isSame(key.date, 'day')
@@ -233,9 +241,9 @@ export function rawCatchCertToOnlineValidationReport(rawCatchCerts: ICcQueryResu
     }
 
     if (certificatesForKey.some((cert: ICcQueryResult) =>
-    !cert.isLandingExists &&
-    certIsHighRisk(cert) &&
-    ((cert.extended.dataEverExpected !== false && moment.utc(cert.createdAt).isSameOrAfter(moment.utc(cert.extended.landingDataExpectedDate), 'day')) || cert.extended.vesselOverriddenByAdmin))) {
+      !cert.isLandingExists &&
+      certIsHighRisk(cert) &&
+      ((cert.extended.dataEverExpected !== false && moment.utc(cert.createdAt).isSameOrAfter(moment.utc(cert.extended.landingDataExpectedDate), 'day')) || cert.extended.vesselOverriddenByAdmin))) {
       failures.push(ValidationRules.NO_DATA);
     }
 
@@ -299,7 +307,7 @@ function _getUniqueCertificatesBySpeciesPresentationAndState(failedCatchCerts, u
  * how to reuse this from VesselService? when this one supports injection?
  */
 
-export function vesselLookup(vesselsIdx): (pln: string, date: string) => ILicence  {
+export function vesselLookup(vesselsIdx): (pln: string, date: string) => ILicence {
 
   return (pln: string, date: string) => {
 
@@ -332,7 +340,7 @@ export function vesselLookup(vesselsIdx): (pln: string, date: string) => ILicenc
  * exportPayload is the payload that comes from redis
 */
 export function mapExportPayloadToCC(redisData) {
-   const products = redisData.exportPayload.items.map(item => ({
+  const products = redisData.exportPayload.items.map(item => ({
     speciesCode: item.product.species.code,
     species: item.product.species.label,
     speciesAdmin: item.product.species.admin,

@@ -270,18 +270,7 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
       if (catchCertificate.exportData?.exporterDetails !== undefined) {
 
         for (const landing of ccValidationData) {
-          const requestedDate = moment.utc(landing.dateLanded);
-          const requestedDateISO = requestedDate.format('YYYY-MM-DD')
-
-          if (!requestedDate.isValid() || isEmpty(landing.rssNumber)) {
-            logger.info(`[REPORT-CC-SUBMITTED][${landing.extended.landingId}][NO-SALES-NOTE]`);
-            continue;
-          }
-
-          const salesNote = await getExtendedValidationData(requestedDateISO, landing.rssNumber, 'salesNotes');
-          const _hasSaveNote = !isEmpty(salesNote);
-          logger.info(`[REPORT-CC-SUBMITTED][${landing.extended.landingId}][HAS-SALES-NOTE][${_hasSaveNote}]`);
-          landing.hasSalesNote = _hasSaveNote;
+          landing.hasSalesNote= await updateLandings(landing);
         }
 
         const result: IDynamicsCatchCertificateCase = await CaseManagement.reportCc(ccValidationData, catchCertificate, correlationId, MessageLabel.CATCH_CERTIFICATE_SUBMITTED);
@@ -297,25 +286,32 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
     throw e;
   }
 };
+const updateLandings = async (landing: ICcQueryResult) => {
+  const requestedDate = moment.utc(landing.dateLanded);
+  const requestedDateISO = requestedDate.format('YYYY-MM-DD')
+
+  if (!requestedDate.isValid() || isEmpty(landing.rssNumber)) {
+    logger.info(`[ONLINE-VALIDATION-REPORT][${landing.extended.landingId}][NO-SALES-NOTE]`);
+    return;
+  }
+
+  const salesNote = await getExtendedValidationData(requestedDateISO, landing.rssNumber, 'salesNotes');
+  const _hasSaveNote = !isEmpty(salesNote);
+  logger.info(`[ONLINE-VALIDATION-REPORT][${landing.extended.landingId}][HAS-SALES-NOTE][${_hasSaveNote}]`);
+  return _hasSaveNote;
+}
 
 export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]): Promise<void> => {
   try {
     logger.info(`[ONLINE-VALIDATION-REPORT][VALIDATIONS][${ccValidationData.length}]`);
     if (ccValidationData.length > 0) {
-      let ccReport, catchCertificate;
+      let ccReport;
       const certificateId = ccValidationData[0].documentNumber;
       const correlationId = uuidv4();
 
       logger.info(`[ONLINE-VALIDATION-REPORT][REPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
-
-      try {
-        catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
-        logger.info(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}][SUCCESS]`);
-      }
-      catch (e) {
-        logger.warn(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${e}][ERROR]`);
-        throw e;
-      }
+     const catchCertificate = await getCatchCertificate(certificateId)
+     
 
       const requestByAdmin = catchCertificate.requestByAdmin;
       try {
@@ -326,15 +322,8 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
         logger.warn(`[ONLINE-VALIDATION-REPORT][toCcDefraReport][${e}][ERROR]`);
         throw e;
       }
-
-      try {
-        ccReport.landings = DefraMapper.toLandings(ccValidationData);
-        logger.info(`[ONLINE-VALIDATION-REPORT][toLandings][${certificateId}][SUCCESS]`);
-      }
-      catch (e) {
-        logger.warn(`[ONLINE-VALIDATION-REPORT][toLandings][${e}][ERROR]`);
-        throw e;
-      }
+      ccReport.landings = await getLandings(ccValidationData, certificateId);
+     
 
       try {
         await insertCcDefraValidationReport(ccReport);
@@ -372,3 +361,25 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
     logger.error(`[ONLINE-VALIDATION-REPORT][ERROR][${e.stack || e}]`);
   }
 };
+const getCatchCertificate = async (certificateId: string) => {
+  try {
+    const catchCertificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
+    logger.info(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${certificateId}][SUCCESS]`);
+    return catchCertificate;
+  }
+  catch (e) {
+    logger.warn(`[ONLINE-VALIDATION-REPORT][getCertificateByDocumentNumberWithNumberOfFailedAttempts][${e}][ERROR]`);
+    throw e;
+  }
+}
+const getLandings = async (ccValidationData: ICcQueryResult[], certificateId: string) => {
+  try {
+    const landings=DefraMapper.toLandings(ccValidationData);
+    logger.info(`[ONLINE-VALIDATION-REPORT][toLandings][${certificateId}][SUCCESS]`);
+    return landings
+  }
+  catch (e) {
+    logger.warn(`[ONLINE-VALIDATION-REPORT][toLandings][${e}][ERROR]`);
+    throw e;
+  }
+}
