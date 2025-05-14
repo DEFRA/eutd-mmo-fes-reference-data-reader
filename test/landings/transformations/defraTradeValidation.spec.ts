@@ -491,6 +491,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "truck",
+        hasRoadTransportDocument: false,
         exportLocation: "Hull"
       }
     };
@@ -1157,6 +1158,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "truck",
+        hasRoadTransportDocument: false,
         exportLocation: "Hull",
       }
     };
@@ -1229,6 +1231,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "truck",
+        hasRoadTransportDocument: false,
         exportLocation: "Hull"
       }
     };
