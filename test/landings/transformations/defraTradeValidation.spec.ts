@@ -88,17 +88,11 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
           ]
         }
       ],
-      "transportation": {
-        "exportedFrom": "United Kingdom",
-        "exportedTo": {
-          "officialCountryName": "Åland Islands",
-          "isoCodeAlpha2": "AX",
-          "isoCodeAlpha3": "ALA",
-          "isoNumericCode": "248"
-        },
+      "transportations": [{
+        "id": 0,
         "vehicle": "truck",
-        "cmr": true
-      },
+        "departurePlace": "Hull"
+      }],
       "conservation": {
         "conservationReference": "UK Fisheries Policy"
       },
@@ -141,7 +135,14 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
           "lastName": "Tester"
         }
       },
-      "landingsEntryOption": "manualEntry"
+      "landingsEntryOption": "manualEntry",
+      "exportedFrom": "United Kingdom",
+      "exportedTo": {
+        "officialCountryName": "Åland Islands",
+        "isoCodeAlpha2": "AX",
+        "isoCodeAlpha3": "ALA",
+        "isoNumericCode": "248"
+      },
     },
     "createdByEmail": "foo@foo.com",
     "documentUri": "_44fd226f-598f-4615-930f-716b2762fea4.pdf",
@@ -490,7 +491,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "truck",
-        hasRoadTransportDocument: true,
+        exportLocation: "Hull"
       }
     };
 
@@ -1156,7 +1157,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "truck",
-        hasRoadTransportDocument: true,
+        exportLocation: "Hull",
       }
     };
 
@@ -1228,7 +1229,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "truck",
-        hasRoadTransportDocument: true,
+        exportLocation: "Hull"
       }
     };
 
