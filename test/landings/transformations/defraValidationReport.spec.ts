@@ -12,7 +12,7 @@ import {
   CertificateStorageFacility,
   CertificateTransport
 } from '../../../src/landings/types/defraValidation';
-import { CertificateLanding, ICcQueryResult } from 'mmo-shared-reference-data';
+import { CertificateLanding, ICcQueryResult, CatchCertificateTransport, toTransportations } from 'mmo-shared-reference-data';
 import { ISdPsQueryResult } from '../../../src/landings/types/query';
 import {
   ccQueryResultToDefraValidationReport,
@@ -2055,6 +2055,189 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         };
 
         const result = toTransportation(directLanding);
+
+        expect(result).toEqual(expectedResult);
+      });
+    });
+  });
+
+  describe('For transportations', () => {
+
+    it('will include all the required transportations properties when provided', () => {
+      const result = toTransportations(undefined);
+
+      expect(result).toEqual(undefined);
+    });
+
+    describe('For Truck', () => {
+      it('will include the correct set of properties when exporter has transport document', () => {
+        const truckTransport = {
+          "id": "0",
+          "freightBillNumber": "0",
+          "vehicle": "truck",
+          "departurePlace": "Hull",
+          "nationalityOfVehicle": "",
+          "registrationNumber": "",
+          "exportedTo": {
+            "officialCountryName": "Nigeria",
+            "isoCodeAlpha2": "NG",
+            "isoCodeAlpha3": "NGA",
+            "isoNumericCode": "566"
+          },
+          "documents": [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const expectedResult: CatchCertificateTransport = {
+          modeofTransport: 'truck',
+          nationality: '',
+          registration: '',
+          id: '0',
+          exportLocation: 'Hull',
+          freightBillNumber: '0',
+          transportDocuments: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }],
+        };
+
+        const result = toTransportations(truckTransport);
+
+        expect(result).toEqual(expectedResult);
+      });
+
+      it('will include the correct set of properties when exporter has not got transports document', () => {
+        const truckTransport = {
+          vehicle: "truck",
+          nationalityOfVehicle: "UK",
+          registrationNumber: "WE893EF",
+          departurePlace: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          documents: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        }
+
+        const expectedResult: CatchCertificateTransport = {
+          modeofTransport: 'truck',
+          nationality: "UK",
+          registration: "WE893EF",
+          exportLocation: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          transportDocuments: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const result = toTransportations(truckTransport);
+
+        expect(result).toEqual(expectedResult);
+      });
+    });
+
+    describe('For Train', () => {
+      it('will include the correct set of properties', () => {
+        const trainTransport = {
+          vehicle: "train",
+          railwayBillNumber: "1234",
+          departurePlace: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          documents: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const expectedResult: CatchCertificateTransport = {
+          modeofTransport: 'train',
+          billNumber: "1234",
+          exportLocation: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          transportDocuments: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const result = toTransportations(trainTransport);
+
+        expect(result).toEqual(expectedResult);
+      });
+    });
+
+    describe('For Plane', () => {
+      it('will include the correct set of properties', () => {
+        const planeTransport = {
+          vehicle: "plane",
+          flightNumber: "BA078",
+          containerNumber: "1234",
+          departurePlace: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          documents: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const expectedResult: CatchCertificateTransport = {
+          modeofTransport: 'plane',
+          flightNumber: "BA078",
+          containerId: "1234",
+          exportLocation: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          transportDocuments: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const result = toTransportations(planeTransport);
+
+        expect(result).toEqual(expectedResult);
+      });
+    });
+
+    describe('For Container Vessel', () => {
+      it('will include the correct set of properties', () => {
+        const vesselTransport = {
+          vehicle: "containerVessel",
+          vesselName: "WIRON 5",
+          flagState: "UK",
+          containerNumber: "1234",
+          departurePlace: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          documents: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        };
+
+        const expectedResult: CatchCertificateTransport = {
+          modeofTransport: 'vessel',
+          name: "WIRON 5",
+          flag: "UK",
+          containerId: "1234",
+          exportLocation: "Telford",
+          freightBillNumber: "0",
+          id: "0",
+          transportDocuments: [{
+            "name": "Invoice",
+            "reference": "INV001"
+          }]
+        }
+
+        const result = toTransportations(vesselTransport);
 
         expect(result).toEqual(expectedResult);
       });

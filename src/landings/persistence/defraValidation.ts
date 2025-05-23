@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { ApplicationConfig } from '../../config';
+import { IDefraValidationCatchCertificate } from 'mmo-shared-reference-data';
 import {
     IDefraValidationReport,
     IDefraValidationProcessingStatement,
@@ -8,7 +9,6 @@ import {
     DefraValidationReportData,
     IDefraValidationStorageDocument,
     DefraValidationStorageDocumentModel,
-    IDefraValidationCatchCertificate,
     DefraValidationCatchCertificateModel
 } from '../types/defraValidation';
 

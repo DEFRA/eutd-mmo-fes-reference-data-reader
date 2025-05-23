@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { CertificateLanding, ICountry } from 'mmo-shared-reference-data';
+import { ICountry, IDefraValidationCatchCertificate } from 'mmo-shared-reference-data';
 
 export interface IDefraValidationReport  {
     certificateId:      string;
@@ -209,31 +209,6 @@ export interface IDefraValidationStorageDocument {
     parentDocumentVoid?:    boolean;
 }
 
-export interface IDefraValidationCatchCertificate {
-    documentType:           string;
-    documentNumber:         string;
-    status:                 string;
-    devolvedAuthority?:     string;
-    dateCreated?:           Date;
-    lastUpdated?:           Date;
-    created?:               Created;
-    userReference?:         string;
-    audits?:                CertificateAudit[];
-    exporterDetails?:       CertificateExporterAndCompany;
-    landings?:              CertificateLanding[];
-    conservationReference?: string;
-    documentUri?:           string;
-    exportedFrom?:          string;
-    exportedTo?:            ICountry;
-    transportation?:        CertificateTransport;
-    failedSubmissions?:     number;
-    _correlationId:         string;
-    requestedByAdmin:       boolean;
-    clonedFrom?:            string;
-    landingsCloned?:        boolean;
-    parentDocumentVoid?:    boolean;
-}
-
 export const countrySchema = new Schema({
   officialCountryName:  { type: String, required: true },
   isoCodeAlpha2:        { type: String, required: false },
@@ -313,6 +288,7 @@ export const DefraValidationCatchCertificateSchema = new Schema ({
     exportedFrom:          { type: String,  required: false },
     exportedTo:            { type: countrySchema, required: false },
     transportation:        { type: Object,  required: false },
+    transportations:       { type: [Schema.Types.Mixed],  required: false },
     failedSubmissions:     { type: Number,  required: false },
     _processed:            { type: Boolean, required: false, default: false },
     clonedFrom:            { type: String,  required: false },

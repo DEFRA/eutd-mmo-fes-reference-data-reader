@@ -2,6 +2,7 @@ import moment from 'moment';
 import { ApplicationConfig } from '../../../src/config';
 import { FailedOnlineCertificates } from '../../../src/landings/types/query';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { IDefraValidationCatchCertificate } from 'mmo-shared-reference-data';
 import {
   insertPsDefraValidationReport,
   insertSdDefraValidationReport,
@@ -16,7 +17,6 @@ import {
   DefraValidationProcessingStatementModel,
   DefraValidationStorageDocumentModel,
   IDefraValidationStorageDocument,
-  IDefraValidationCatchCertificate
 } from '../../../src/landings/types/defraValidation';
 
 import * as SUT from '../../../src/landings/persistence/defraValidation';

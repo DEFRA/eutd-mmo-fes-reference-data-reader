@@ -9,7 +9,6 @@ import {
   getExporterBehaviourFromCSV,
   getSpeciesAliasesFromFile
 } from "../../src/data/local-file";
-import { IDefraValidationCatchCertificate, IDefraValidationProcessingStatement, IDefraValidationStorageDocument } from "../../src/landings/types/defraValidation";
 
 describe('get conversion factors ', () => {
 
