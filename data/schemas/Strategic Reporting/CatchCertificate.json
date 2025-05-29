@@ -226,62 +226,46 @@
             "exportLocation":"DOVER"
         },
         "transportations": [{
-          "id": 0,
+          "id": "0",
           "freightBillNumber": "0",
-          "vehicle": "truck",
-          "departurePlace": "Hull",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "documents": [{
+          "modeofTransport": "truck",
+          "exportLocation": "Hull",
+          "nationality": "",
+          "registration": "",
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
         }, {
-          "id": 0,
+          "id": "0",
           "freightBillNumber": "0",
-          "vehicle": "plane",
-          "departurePlace": "Hull",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "documents": [{
+          "modeofTransport": "plane",
+          "exportLocation": "Hull",
+          "flightNumber": "",
+          "containerId": "",
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
         }, {
-          "id": 0,
+          "id": "0",
           "freightBillNumber": "0",
-          "vehicle": "train",
-          "departurePlace": "Hull",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "documents": [{
+          "modeofTransport": "train",
+          "exportLocation": "Hull",
+          "billNumber": "",
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
         }, {
-          "id": 0,
+          "id": "0",
           "freightBillNumber": "0",
-          "vehicle": "containerVessel",
-          "departurePlace": "Hull",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "documents": [{
+          "modeofTransport": "vessel",
+          "exportLocation": "Hull",
+          "name": "",
+          "flag": "",
+          "containerId": "",
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
