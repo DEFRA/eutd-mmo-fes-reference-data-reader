@@ -20,10 +20,10 @@ export const validateLandings = (landings: IUploadedLanding[], products: IProduc
   return landings.map(l =>
     pipe(
       initialiseErrorsForLanding,
+      validateProduct,
       validateLandingDate,
       validateExportWeightForLanding,
       validateFaoAreaForLanding,
-      validateProduct,
       validateVesselForLanding
     )(l)
   );
@@ -35,36 +35,30 @@ export const initialiseErrorsForLanding = (landing: IUploadedLanding): IUploaded
 }
 
 export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDaysInFuture: number): IUploadedLanding => {
+  const { errors } = landing;
+  const startDate = landing.startDate ? moment(landing.startDate, 'DD/MM/YYYY', true) : null;
+  const landingDate = landing.landingDate ? moment(landing.landingDate, 'DD/MM/YYYY', true) : null;
 
-  if (landing.startDate && !moment(landing.startDate, 'DD/MM/YYYY', true).isValid()) {
-    landing.errors.push('error.startDate.date.base');
-    return landing;
+  if (!startDate) {
+    errors.push('error.startDate.date.missing');
+  } else if (!startDate.isValid()) {
+    errors.push('error.startDate.date.base');
   }
 
-  if(landing.landingDate === undefined || landing.landingDate === '') {
-    landing.errors.push('error.dateLanded.date.missing');
-    return landing;
-  }
-
-  const landingDate = moment(landing.landingDate, 'DD/MM/YYYY', true);
-
-  if (!landingDate.isValid()) {
-    landing.errors.push('error.dateLanded.date.base');
-    return landing;
-  }
-
-  if (landing.startDate && landingDate.isBefore(moment(landing.startDate, 'DD/MM/YYYY', true), 'day')) {
-    landing.errors.push('error.startDate.date.max');
-    return landing;
-  }
-
-  const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
-
-  if(landingDate.utc() > maxValidDate) {
-    landing.errors.push({
-      key: 'error.dateLanded.date.max',
-      params: [landingLimitDaysInFuture],
-    });
+  if (!landingDate) {
+    errors.push('error.dateLanded.date.missing');
+  } else if (!landingDate.isValid()) {
+    errors.push('error.dateLanded.date.base');
+  } else if (startDate?.isValid() && landingDate.isBefore(startDate, 'day')) {
+    errors.push('error.startDate.date.max');
+  } else {
+    const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
+    if (landingDate.utc() > maxValidDate) {
+      errors.push({
+        key: 'error.dateLanded.date.max',
+        params: [landingLimitDaysInFuture],
+      })
+    }
   }
 
   return landing;

@@ -57,14 +57,24 @@ describe('uploadValidation.service', () => {
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledWith(landings[1]);
     });
 
-    it('should pipe the result of initialiseErrorsForLanding into validateDateForLanding', () => {
+    it('should pipe the result of initialiseErrorsForLanding into validateProduct', () => {
       mockInitialiseErrorsForLanding.mockImplementation((landing) => `${landing.id} - errors initialised`);
 
       SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
+      expect(mockValidateProductForLanding).toHaveBeenCalledTimes(2);
+      expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 1 - errors initialised', favourites, seasonalFish);
+      expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 2 - errors initialised', favourites, seasonalFish);
+    });
+
+    it('should pipe the result of validateProduct into validateDateForLanding', () => {
+      mockValidateProductForLanding.mockImplementation((landing) => `${landing.id} - product validated`);
+
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+
       expect(mockValidateDateForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 1 - errors initialised', landingLimitDaysInFuture);
-      expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 2 - errors initialised', landingLimitDaysInFuture);
+      expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 1 - product validated', landingLimitDaysInFuture);
+      expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 2 - product validated', landingLimitDaysInFuture);
     });
 
     it('should pipe the result of validateDateForLanding into validateExportWeightForLanding', () => {
@@ -77,7 +87,7 @@ describe('uploadValidation.service', () => {
       expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 2 - date validated');
     });
 
-    it('should pipe the result of mockValidateExportWeightForLanding into validateFaoAreaForLanding', () => {
+    it('should pipe the result of validateExportWeightForLanding into validateFaoAreaForLanding', () => {
       mockValidateExportWeightForLanding.mockImplementation((landing) => `${landing.id} - weight validated`);
 
       SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
@@ -87,24 +97,14 @@ describe('uploadValidation.service', () => {
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 2 - weight validated');
     });
 
-    it('should pipe the result of validateFaoAreaForLanding into validateProductForLanding', () => {
+    it('should pipe the result of validateFaoAreaForLanding into validateVesselForLanding', () => {
       mockValidateFaoAreaForLanding.mockImplementation((landing) => `${landing.id} - fao area validated`);
 
       SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
-      expect(mockValidateProductForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 1 - fao area validated', favourites, seasonalFish);
-      expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 2 - fao area validated', favourites, seasonalFish);
-    });
-
-    it('should pipe the result of validateProductForLanding into validateVesselForLanding', () => {
-      mockValidateProductForLanding.mockImplementation((landing) => `${landing.id} - product validated`);
-
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
-
       expect(mockValidateVesselForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 1 - product validated');
-      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 2 - product validated');
+      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
+      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
     });
 
     it('should return the result of validateVesselForLanding', () => {
@@ -155,6 +155,7 @@ describe('uploadValidation.service', () => {
       originalRow : undefined,
       productId : undefined,
       product : undefined,
+      startDate: '24/12/2020',
       landingDate: '25/12/2020',
       faoArea: undefined,
       vessel : undefined,
@@ -163,15 +164,18 @@ describe('uploadValidation.service', () => {
       errors : []
     }
 
+    beforeEach(() => {
+      uploadedLanding.errors = [];
+    })
+
     const landingLimitDaysInFuture = 7;
 
     it('should return an error if the landingDate is missing', () => {
-
+      
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
           landingDate: undefined,
-          errors: []
         },
         landingLimitDaysInFuture
       );
@@ -181,18 +185,17 @@ describe('uploadValidation.service', () => {
     });
 
     it('should return an error if the landingDate is empty', () => {
-
+      
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
           landingDate: '',
-          errors: []
         },
         landingLimitDaysInFuture
       );
 
       expect(result.errors).toStrictEqual(['error.dateLanded.date.missing']);
-
+    
     });
 
     it('should return an error if the landingDate is invalid', () => {
@@ -201,7 +204,6 @@ describe('uploadValidation.service', () => {
         {
           ...uploadedLanding,
           landingDate: 'x',
-          errors: []
         },
         landingLimitDaysInFuture
       );
@@ -216,8 +218,6 @@ describe('uploadValidation.service', () => {
         {
           ...uploadedLanding,
           startDate: 'x',
-          landingDate: '25/12/2020',
-          errors: []
         },
         landingLimitDaysInFuture
       );
@@ -226,14 +226,13 @@ describe('uploadValidation.service', () => {
 
     });
 
-    it('should return an error if the startDate is before the endDate', () => {
+    it('should return an error if the startDate is after the landingDate', () => {
 
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
           startDate: '26/12/2020',
           landingDate: '25/12/2020',
-          errors: []
         },
         landingLimitDaysInFuture
       );
@@ -250,7 +249,6 @@ describe('uploadValidation.service', () => {
           landingDate: moment()
             .add(landingLimitDaysInFuture + 1, 'days')
             .format('DD/MM/YYYY'),
-          errors: []
         },
         landingLimitDaysInFuture
       );
@@ -266,13 +264,10 @@ describe('uploadValidation.service', () => {
 
     });
 
-    it('should return no errors if the landingDate is valid', () => {
+    it('should return no errors if the landingDate and startDate is valid', () => {
 
       const result = SUT.validateDateForLanding(
-        {
-          ...uploadedLanding,
-          errors: []
-        },
+        uploadedLanding,
         landingLimitDaysInFuture
       );
 
@@ -280,6 +275,61 @@ describe('uploadValidation.service', () => {
 
     });
 
+    it('should return aggregated errors when dates are missing', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '',
+          landingDate: '',
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([
+        'error.startDate.date.missing',
+        'error.dateLanded.date.missing'
+      ]);
+    })
+
+    it('should return aggregated errors when dates are invalid', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: 'x',
+          landingDate: 'x',
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([
+        'error.startDate.date.base',
+        'error.dateLanded.date.base'
+      ]);
+    })
+
+    it('should validate landing date separate to start date', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: undefined,
+          landingDate: moment()
+            .add(landingLimitDaysInFuture + 1, 'days')
+            .format('DD/MM/YYYY'),
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([
+        'error.startDate.date.missing',
+        {
+          key: 'error.dateLanded.date.max',
+          params: [
+            landingLimitDaysInFuture
+          ]
+        }
+      ]);
+
+    });
   });
 
   describe('validateExportWeightForLanding', () => {
