@@ -101,7 +101,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
           },
-          "documents": [{
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -118,7 +118,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
           },
-          "documents": [{
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -134,7 +134,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
           },
-          "documents": [{
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -152,7 +152,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
           },
-          "documents": [{
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -169,7 +169,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
           },
-          "documents": []
+          "transportDocuments": []
         }
       ],
       "conservation": {

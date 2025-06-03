@@ -2084,7 +2084,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
           },
-          "documents": [{
+          "transportDocuments": [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -2116,7 +2116,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           departurePlace: "Telford",
           freightBillNumber: "0",
           id: "0",
-          documents: [{
+          transportDocuments: [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -2149,7 +2149,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           departurePlace: "Telford",
           freightBillNumber: "0",
           id: "0",
-          documents: [{
+          transportDocuments: [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -2182,7 +2182,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           departurePlace: "Telford",
           freightBillNumber: "0",
           id: "0",
-          documents: [{
+          transportDocuments: [{
             "name": "Invoice",
             "reference": "INV001"
           }]
@@ -2217,7 +2217,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           departurePlace: "Telford",
           freightBillNumber: "0",
           id: "0",
-          documents: [{
+          transportDocuments: [{
             "name": "Invoice",
             "reference": "INV001"
           }]
