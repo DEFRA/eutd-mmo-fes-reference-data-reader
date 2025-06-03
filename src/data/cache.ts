@@ -178,7 +178,7 @@ export const getVesselRiskScore = (pln: string) =>
 
 export const getSpeciesRiskScore = (speciesCode: string) => {
   const speciesData = CONVERSION_FACTORS.find(f => f.species === speciesCode);
-  return speciesData && speciesData.riskScore !== undefined ? speciesData.riskScore : 0.5;
+  return speciesData?.riskScore ?? 0.5;
 };
 
 export const getToLiveWeightFactor = (species: string, state: string, presentation: string): number => {
@@ -192,43 +192,50 @@ export const getConversionFactor = (species: string, state: string, presentation
 export const getAllConversionFactors = (): IConversionFactor[] =>
   CONVERSION_FACTORS;
 
-export const getExporterRiskScore = (accountId: string | null, contactId: string | null) => {
+const getExactMatchScore = (
+  accountId: string,
+  contactId: string | null,
+): number | undefined => {
+  return EXPORTER_BEHAVIOUR.find(
+    (e) => e.accountId === accountId && e.contactId === contactId,
+  )?.score;
+};
 
+const getScoreByContactOnly = (
+  contactId: string | null,
+): number | undefined => {
+  return EXPORTER_BEHAVIOUR.find(
+    (e) => e.contactId === contactId && !e.accountId,
+  )?.score;
+};
+
+const getScoreByAccountOnly = (accountId: string): number | undefined => {
+  return EXPORTER_BEHAVIOUR.find(
+    (e) => e.accountId === accountId && !e.contactId,
+  )?.score;
+};
+  
+  
+export const getExporterRiskScore = (
+  accountId: string | null,
+  contactId: string | null,
+) => {
   const defaultScore = 1.0;
 
-  if (!accountId && !contactId) {
+  if ((!accountId && !contactId) || !EXPORTER_BEHAVIOUR.length) {
     return defaultScore;
   }
-
-  if (EXPORTER_BEHAVIOUR.length) {
-
-    if (!accountId) {
-      const individual = EXPORTER_BEHAVIOUR.find(e => e.contactId === contactId && !e.accountId);
-
-      if (individual)
-        return individual.score;
-    } else {
-
-      const exactMatch = EXPORTER_BEHAVIOUR.find(e => e.accountId === accountId && e.contactId === contactId);
-
-      if (exactMatch)
-        return exactMatch.score;
-
-      const contactMatch = EXPORTER_BEHAVIOUR.find(e => e.contactId === contactId && !e.accountId);
-
-      if (contactMatch)
-        return contactMatch.score;
-
-      const accountMatch = EXPORTER_BEHAVIOUR.find(e => e.accountId === accountId && !e.contactId);
-
-      if (accountMatch)
-        return accountMatch.score;
-    }
+  if (!accountId) {
+    return getScoreByContactOnly(contactId) ?? defaultScore;
   }
 
-  return defaultScore;
-
-}
+  return (
+    getExactMatchScore(accountId, contactId) ??
+    getScoreByContactOnly(contactId) ??
+    getScoreByAccountOnly(accountId) ??
+    defaultScore
+  );
+};
 
 export const getWeighting = (type: WEIGHT): number => WEIGHTING[type];
 
@@ -444,7 +451,7 @@ export const loadCountriesData = async (): Promise<ICountry[] | undefined> => {
   try {
     return await CountriesApi.loadCountryData();
   } catch (e) {
-    logger.error(`[LOAD-COUNTRIES-DATA][COUNTRIES-API][ERROR][${e.stack || e}]`);
+    logger.error(`[LOAD-COUNTRIES-DATA][COUNTRIES-API][ERROR][${e.stack ?? e}]`);
   }
 }
 
@@ -453,6 +460,7 @@ export const loadAllSpeciesFromLocalFile = async (): Promise<IAllSpecies[] | und
   try {
     return await file.getSpeciesDataFromCSV(path);
   } catch (e) {
+    logger.error(e);
     logger.error(`[LOCAL-LOAD-SPECIES-ERROR][PATH][${path}]`);
   }
 }

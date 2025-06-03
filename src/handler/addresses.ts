@@ -14,7 +14,7 @@ export const addressesRoutes = (server: Hapi.Server) => {
         security: true,
         validate: {
           query: Joi.object({
-            postcode: Joi.string().pattern(new RegExp('^[A-Za-z0-9 ,-]{5,8}$')).required()
+            postcode: Joi.string().pattern(/^[A-Za-z0-9 ,-]{5,8}$/).required()
           }),
           failAction: (_req, h, error) => {
             logger.error(`[GET-ADDRESS][FAIL-ACTION][ERROR][${JSON.stringify(error)}]`);
@@ -32,7 +32,7 @@ export const addressesRoutes = (server: Hapi.Server) => {
             return h.response(data)
           })
           .catch(e => {
-            logger.error(`[GET-ADDRESS][${request.query.postcode}][ERROR][${e.stack || e}]`);
+            logger.error(`[GET-ADDRESS][${request.query.postcode}][ERROR][${e.stack ?? e}]`);
             return h.response([]);
           })
     },
