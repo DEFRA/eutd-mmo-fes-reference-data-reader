@@ -90,17 +90,100 @@ export const isRejectedLanding = (ccQuery: ICcQueryResult): boolean => (isFailed
 
 export const daLookUp = postCodeDaLookup(postCodeToDa);
 
+const getLegalTimeLimitStatus = (validatedLanding: ICcQueryResult) => {
+  return validatedLanding.extended.vesselOverriddenByAdmin &&
+    !validatedLanding.rssNumber
+    ? false
+    : validatedLanding.extended.isLegallyDue;
+};
+
+const isLandingRejectedOrVoided = (case2Type?: CaseTwoType): boolean => {
+  return (
+    case2Type === CaseTwoType.RealTimeValidation_Rejected ||
+    case2Type === CaseTwoType.VoidByAdmin ||
+    case2Type === CaseTwoType.VoidByExporter
+  );
+};
+
+const buildValidationSection = (
+  validatedLanding: ICcQueryResult,
+  report: ICcBatchValidationReport,
+  isLegallyDue: boolean,
+  isDataNeverExpected: boolean,
+): IDynamicsLanding['validation'] => {
+  return {
+    liveExportWeight: validatedLanding.weightOnCert,
+    totalWeightForSpecies: report.aggregatedLandedDecWeight,
+    totalLiveForExportSpecies:
+      validatedLanding.isSpeciesExists &&
+      validatedLanding.source === LandingSources.LandingDeclaration
+        ? validatedLanding.weightOnLanding
+        : undefined,
+    totalEstimatedForExportSpecies: report.aggregatedEstimateWeight,
+    totalEstimatedWithTolerance: report.aggregatedEstimateWeightPlusTolerance,
+    totalRecordedAgainstLanding: validatedLanding.weightOnAllCerts,
+    landedWeightExceededBy: report.exportedWeightExceedingEstimateLandedWeight
+      ? Number(report.exportedWeightExceedingEstimateLandedWeight ?? 0)
+      : Number(report.FI0_290_exportedWeightExceedingLandedWeight ?? 0),
+    rawLandingsUrl:
+      validatedLanding.isLandingExists && !isDataNeverExpected
+        ? report.rawLandingsUrl.replace(
+            '{BASE_URL}',
+            ApplicationConfig.prototype.internalAppUrl,
+          )
+        : undefined,
+    salesNoteUrl: validatedLanding.hasSalesNote
+      ? report.salesNotesUrl.replace(
+          '{BASE_URL}',
+          ApplicationConfig.prototype.internalAppUrl,
+        )
+      : undefined,
+    isLegallyDue: isLegallyDue,
+  };
+};
+
+const buildRiskingSection = (
+  validatedLanding: ICcQueryResult,
+  riskScore: number,
+): IDynamicsLanding['risking'] => {
+  return {
+    overuseInfo: validatedLanding.overUsedInfo.some(
+      (_) => _ !== validatedLanding.documentNumber,
+    )
+      ? validatedLanding.overUsedInfo.filter(
+          (_) => _ !== validatedLanding.documentNumber,
+        )
+      : undefined,
+    vessel: getVesselOfInterestRiskScore(
+      validatedLanding.extended.pln,
+    ).toString(),
+    speciesRisk: getExportedSpeciesRiskScore(
+      validatedLanding.species,
+    ).toString(),
+    exporterRiskScore: getExporterBehaviourRiskScore(
+      validatedLanding.extended.exporterAccountId,
+      validatedLanding.extended.exporterContactId,
+    ).toString(),
+    landingRiskScore: riskScore.toString(),
+    highOrLowRisk: isHighRisk(riskScore)
+      ? LevelOfRiskType.High
+      : LevelOfRiskType.Low,
+    isSpeciesRiskEnabled: isRiskEnabled(),
+  };
+};
+
 export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoType): IDynamicsLanding {
   const ccBatchReportForLanding: ICcBatchValidationReport = Array.from(ccBatchReport([validatedLanding][Symbol.iterator]()))[0];
-  const hasLegalTimeLimitPassed = (validatedLanding.extended.vesselOverriddenByAdmin && !validatedLanding.rssNumber) ? false : validatedLanding.extended.isLegallyDue;
+  const hasLegalTimeLimitPassed = getLegalTimeLimitStatus(validatedLanding);
   const riskScore = getTotalRiskScore(
     validatedLanding.extended.pln,
     validatedLanding.species,
     validatedLanding.extended.exporterAccountId,
-    validatedLanding.extended.exporterContactId);
+    validatedLanding.extended.exporterContactId
+  );
 
   const isDataNeverExpected = validatedLanding.extended.dataEverExpected === false;
-  const isRejectedOrVoided = case2Type === CaseTwoType.RealTimeValidation_Rejected || case2Type === CaseTwoType.VoidByAdmin || case2Type === CaseTwoType.VoidByExporter;
+  const isRejectedOrVoided = isLandingRejectedOrVoided(case2Type);
   return {
     status: toLandingStatus(validatedLanding, isHighRisk(riskScore)),
     id: validatedLanding.extended.landingId,
@@ -132,29 +215,13 @@ export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoT
     landingOutcomeAtSubmission: isRejectedLanding(validatedLanding) ? LandingOutcomeType.Rejected : LandingOutcomeType.Success,
     isLate: !isDataNeverExpected ? isLandingDataLate(validatedLanding.firstDateTimeLandingDataRetrieved, validatedLanding.extended.landingDataExpectedDate) : undefined,
     dateDataReceived: validatedLanding.firstDateTimeLandingDataRetrieved,
-    validation: {
-      liveExportWeight: validatedLanding.weightOnCert,
-      totalWeightForSpecies: ccBatchReportForLanding.aggregatedLandedDecWeight,
-      totalLiveForExportSpecies: validatedLanding.isSpeciesExists && validatedLanding.source === LandingSources.LandingDeclaration
-        ? validatedLanding.weightOnLanding : undefined,
-      totalEstimatedForExportSpecies: ccBatchReportForLanding.aggregatedEstimateWeight,
-      totalEstimatedWithTolerance: ccBatchReportForLanding.aggregatedEstimateWeightPlusTolerance,
-      totalRecordedAgainstLanding: validatedLanding.weightOnAllCerts,
-      landedWeightExceededBy: ccBatchReportForLanding.exportedWeightExceedingEstimateLandedWeight ? Number(ccBatchReportForLanding.exportedWeightExceedingEstimateLandedWeight ?? 0) : Number(ccBatchReportForLanding.FI0_290_exportedWeightExceedingLandedWeight ?? 0),
-      rawLandingsUrl: validatedLanding.isLandingExists && !isDataNeverExpected ? ccBatchReportForLanding.rawLandingsUrl.replace('{BASE_URL}', ApplicationConfig.prototype.internalAppUrl) : undefined,
-      salesNoteUrl: validatedLanding.hasSalesNote ? ccBatchReportForLanding.salesNotesUrl.replace('{BASE_URL}', ApplicationConfig.prototype.internalAppUrl) : undefined,
-      isLegallyDue: hasLegalTimeLimitPassed
-    },
-    risking: {
-      overuseInfo: validatedLanding.overUsedInfo.some(_ => _ !== validatedLanding.documentNumber)
-        ? validatedLanding.overUsedInfo.filter(_ => _ !== validatedLanding.documentNumber) : undefined,
-      vessel: getVesselOfInterestRiskScore(validatedLanding.extended.pln).toString(),
-      speciesRisk: getExportedSpeciesRiskScore(validatedLanding.species).toString(),
-      exporterRiskScore: getExporterBehaviourRiskScore(validatedLanding.extended.exporterAccountId, validatedLanding.extended.exporterContactId).toString(),
-      landingRiskScore: riskScore.toString(),
-      highOrLowRisk: isHighRisk(riskScore) ? LevelOfRiskType.High : LevelOfRiskType.Low,
-      isSpeciesRiskEnabled: isRiskEnabled()
-    },
+    validation: buildValidationSection(
+      validatedLanding,
+      ccBatchReportForLanding,
+      hasLegalTimeLimitPassed,
+      isDataNeverExpected,
+    ),
+    risking: buildRiskingSection(validatedLanding, riskScore),
     adminSpecies: validatedLanding.extended.speciesAdmin,
     adminState: validatedLanding.extended.stateAdmin,
     adminPresentation: validatedLanding.extended.presentationAdmin,
