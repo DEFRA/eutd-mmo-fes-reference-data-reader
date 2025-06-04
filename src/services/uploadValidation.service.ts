@@ -164,7 +164,10 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
     const dateIsRestricted = hasSeasonalFishingRestriction(landingDate.format('YYYY-MM-DD'), favouriteProduct.speciesCode, seasonalRestrictions);
 
     if (dateIsRestricted) {
-      landing.errors.push("validation.product.seasonal.invalid-date");
+      landing.errors.push({
+        key: 'validation.product.seasonal.invalid-date',
+        params: [favouriteProduct.species]
+      });
     }
   }
 

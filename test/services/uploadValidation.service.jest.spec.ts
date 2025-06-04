@@ -727,7 +727,12 @@ describe('uploadValidation.service', () => {
         seasonalRestrictions
       );
 
-      expect(result.errors).toStrictEqual(['validation.product.seasonal.invalid-date']);
+      const error = {
+        key: 'validation.product.seasonal.invalid-date',
+        params: ['faoName1 (speciesCode1)']
+      };
+
+      expect(result.errors).toStrictEqual([error]);
 
     });
 
