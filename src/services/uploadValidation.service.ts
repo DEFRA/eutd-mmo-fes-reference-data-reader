@@ -39,11 +39,10 @@ export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDa
   const startDate = landing.startDate ? moment(landing.startDate, 'DD/MM/YYYY', true) : null;
   const landingDate = landing.landingDate ? moment(landing.landingDate, 'DD/MM/YYYY', true) : null;
 
-  if (!startDate) {
-    errors.push('error.startDate.date.missing');
-  } else if (!startDate.isValid()) {
+   // only validate the start date if set
+   if (startDate && !startDate.isValid()) {
     errors.push('error.startDate.date.base');
-  }
+  } 
 
   if (!landingDate) {
     errors.push('error.dateLanded.date.missing');

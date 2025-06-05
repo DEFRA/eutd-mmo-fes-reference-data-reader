@@ -275,7 +275,7 @@ describe('uploadValidation.service', () => {
 
     });
 
-    it('should return aggregated errors when dates are missing', () => {
+    it('should return  errors when landing dates are missing', () => {
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -286,7 +286,6 @@ describe('uploadValidation.service', () => {
       );
 
       expect(result.errors).toStrictEqual([
-        'error.startDate.date.missing',
         'error.dateLanded.date.missing'
       ]);
     })
@@ -307,7 +306,7 @@ describe('uploadValidation.service', () => {
       ]);
     })
 
-    it('should validate landing date separate to start date', () => {
+    it('should only validate landing date separate to start date optional', () => {
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -320,7 +319,6 @@ describe('uploadValidation.service', () => {
       );
 
       expect(result.errors).toStrictEqual([
-        'error.startDate.date.missing',
         {
           key: 'error.dateLanded.date.max',
           params: [
