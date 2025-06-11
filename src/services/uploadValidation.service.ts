@@ -22,9 +22,9 @@ export const validateLandings = (landings: IUploadedLanding[], products: IProduc
       initialiseErrorsForLanding,
       validateProduct,
       validateLandingDate,
-      validateExportWeightForLanding,
       validateFaoAreaForLanding,
-      validateVesselForLanding
+      validateVesselForLanding,
+      validateExportWeightForLanding,
     )(l)
   );
 }

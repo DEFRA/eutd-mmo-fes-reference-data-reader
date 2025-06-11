@@ -77,24 +77,14 @@ describe('uploadValidation.service', () => {
       expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 2 - product validated', landingLimitDaysInFuture);
     });
 
-    it('should pipe the result of validateDateForLanding into validateExportWeightForLanding', () => {
+    it('should pipe the result of validateDateForLanding into validateFaoAreaForLanding', () => {
       mockValidateDateForLanding.mockImplementation((landing) => `${landing.id} - date validated`);
 
       SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
-      expect(mockValidateExportWeightForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 1 - date validated');
-      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 2 - date validated');
-    });
-
-    it('should pipe the result of validateExportWeightForLanding into validateFaoAreaForLanding', () => {
-      mockValidateExportWeightForLanding.mockImplementation((landing) => `${landing.id} - weight validated`);
-
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
-
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 1 - weight validated');
-      expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 2 - weight validated');
+      expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 1 - date validated');
+      expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 2 - date validated');
     });
 
     it('should pipe the result of validateFaoAreaForLanding into validateVesselForLanding', () => {
@@ -107,14 +97,24 @@ describe('uploadValidation.service', () => {
       expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
     });
 
-    it('should return the result of validateVesselForLanding', () => {
-      mockValidateVesselForLanding.mockImplementation((landing) => `${landing.id} - final validation finished`);
+    it('should pipe the result of validateVesselForLanding into validateExportWeightForLanding', () => {
+      mockValidateVesselForLanding.mockImplementation((landing) => `${landing.id} - vessel validated`);
+
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+
+      expect(mockValidateExportWeightForLanding).toHaveBeenCalledTimes(2);
+      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 1 - vessel validated');
+      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 2 - vessel validated');
+    });
+
+    it('should return the result of validateExportWeightForLanding', () => {
+      mockValidateExportWeightForLanding.mockImplementation((landing) => `${landing.id} - export weight validated`);
 
       const result = SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
       expect(result).toStrictEqual([
-        'landing 1 - final validation finished',
-        'landing 2 - final validation finished'
+        'landing 1 - export weight validated',
+        'landing 2 - export weight validated'
       ]);
     });
 
