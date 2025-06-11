@@ -263,7 +263,9 @@ describe('Dynamics Validation', () => {
       expect(result.documentNumber).toEqual('GBR-2020-CC-1BC924FCF');
       expect(result.caseType1).toEqual('CC');
       expect(result.caseType2).toEqual(CaseTwoType.RealTimeValidation_Rejected)
-      expect(result.landings[0].is14DayLimitReached).toBe(true);
+      expect(result.landings?.[0].is14DayLimitReached).toBe(true);
+      expect(result.landings?.[0].landingOutcomeAtSubmission).toBe(Shared.LandingOutcomeType.Rejected);
+      expect(result.landings?.[0].landingOutcomeAtRetrospectiveCheck).toBeUndefined();
       expect(result.numberOfFailedSubmissions).toBe(5);
       expect(result.isDirectLanding).toBeTruthy();
       expect(result.da).toEqual('Scotland');
@@ -7648,6 +7650,11 @@ describe('Dynamics Validation', () => {
       const result: Shared.IDynamicsLandingCase = SUT.toDynamicsLandingCase(input, exampleCc, correlationId);
       expect(result.status).toBe('Overuse Failure');
     });
+
+    it('will add retrospective at submission field for landing updates', () => {
+      expect(res.landingOutcomeAtSubmission).toBeUndefined();
+      expect(res.landingOutcomeAtRetrospectiveCheck).toBe(Shared.LandingRetrospectiveOutcomeType.Failure);
+    })
   });
 
   describe("When assigning a case2Type to a IDynamicsProcessingStatementCase and IDynamicsStorageDocumentCase", () => {

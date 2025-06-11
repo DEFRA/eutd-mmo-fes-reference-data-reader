@@ -22,7 +22,8 @@ import {
   isSpeciesFailure,
   has14DayLimitReached,
   toFailureIrrespectiveOfRisk,
-  ICountry
+  ICountry,
+  LandingRetrospectiveOutcomeType
 } from "mmo-shared-reference-data";
 import {
   CaseOneType,
@@ -405,7 +406,8 @@ export function toDynamicsLandingCase(
   catchCertificate: IDocument,
   correlationId: string
 ): IDynamicsLandingCase {
-  const landing = toLanding(validatedLanding);
+  const landing: IDynamicsLanding = toLanding(validatedLanding);
+  delete landing['landingOutcomeAtSubmission'];
 
   return {
     ...landing,
@@ -417,7 +419,8 @@ export function toDynamicsLandingCase(
     _correlationId: correlationId,
     requestedByAdmin: catchCertificate.requestByAdmin,
     numberOfFailedSubmissions: catchCertificate.numberOfFailedAttempts,
-    exportedTo: toExportedTo(catchCertificate)
+    exportedTo: toExportedTo(catchCertificate),
+    landingOutcomeAtRetrospectiveCheck: isRejectedLanding(validatedLanding) ? LandingRetrospectiveOutcomeType.Failure : LandingRetrospectiveOutcomeType.Success
   };
 }
 
