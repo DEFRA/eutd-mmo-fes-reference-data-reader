@@ -574,60 +574,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         nationality: '',
         registration: '',
         exportLocation: "Hull"
-      },
-      transportations: [{
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'truck',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'plane',
-        exportLocation: "Hull",
-        flightNumber: '',
-        containerId: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'train',
-        exportLocation: "Hull",
-        billNumber: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'vessel',
-        exportLocation: "Hull",
-        name: '',
-        flag: '',
-        containerId: "",
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'unknown',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: []
-      }],
+      }
     };
 
     expect(result).toStrictEqual(expected);
@@ -775,60 +722,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       multiVesselSchedule: false,
       transportation: {
         modeofTransport: "directLanding",
-      },
-      transportations: [{
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'truck',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'plane',
-        exportLocation: "Hull",
-        flightNumber: '',
-        containerId: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'train',
-        exportLocation: "Hull",
-        billNumber: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'vessel',
-        exportLocation: "Hull",
-        name: '',
-        flag: '',
-        containerId: "",
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'unknown',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: []
-      }],
+      }
     };
 
     expect(result).toStrictEqual(expected);
@@ -1349,60 +1243,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         exportLocation: "Hull",
         nationality: '',
         registration: '',
-      },
-      transportations: [{
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'truck',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'plane',
-        exportLocation: "Hull",
-        flightNumber: '',
-        containerId: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'train',
-        exportLocation: "Hull",
-        billNumber: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'vessel',
-        exportLocation: "Hull",
-        name: '',
-        flag: '',
-        containerId: "",
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'unknown',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: []
-      }],
+      }
     };
 
     expect(result).toStrictEqual(expected);
@@ -1477,60 +1318,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         exportLocation: "Hull",
         nationality: '',
         registration: '',
-      },
-      transportations: [{
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'truck',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'plane',
-        exportLocation: "Hull",
-        flightNumber: '',
-        containerId: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'train',
-        exportLocation: "Hull",
-        billNumber: '',
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'vessel',
-        exportLocation: "Hull",
-        name: '',
-        flag: '',
-        containerId: "",
-        transportDocuments: [{
-          name: "Invoice",
-          reference: "INV001"
-        }]
-      }, {
-        id: '0',
-        freightBillNumber: '0',
-        modeofTransport: 'unknown',
-        exportLocation: "Hull",
-        nationality: '',
-        registration: '',
-        transportDocuments: []
-      }],
+      }
     };
 
     expect(result).toStrictEqual(expected);

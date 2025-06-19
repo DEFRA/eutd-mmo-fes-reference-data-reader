@@ -57,7 +57,6 @@
         {
           "status": "Pending landing data - Data Not Yet Expected",
           "id": "2342340-24513aga-adfrewbf",
-          "startDate": "2023-06-10 01:34:05",
           "landingDate": "2023-06-10 01:34:05",
           "is14DayLimitReached": false,
           "species": "Atlantic Herring (HER)",
@@ -208,52 +207,7 @@
         "flag": "consequat cupidatat labore esse anim",
         "containerId": "velit quis commodo aliqua sint",
         "exportLocation": "DOVER"
-      },
-      "transportations": [{
-          "id": "0",
-          "freightBillNumber": "0",
-          "modeofTransport": "truck",
-          "exportLocation": "Hull",
-          "nationality": "",
-          "registration": "",
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": "0",
-          "freightBillNumber": "0",
-          "modeofTransport": "plane",
-          "exportLocation": "Hull",
-          "flightNumber": "",
-          "containerId": "",
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": "0",
-          "freightBillNumber": "0",
-          "modeofTransport": "train",
-          "exportLocation": "Hull",
-          "billNumber": "",
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": "0",
-          "freightBillNumber": "0",
-          "modeofTransport": "vessel",
-          "exportLocation": "Hull",
-          "name": "",
-          "flag": "",
-          "containerId": "",
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }]
+      }
     }
   ],
   "additionalProperties": false,
@@ -544,10 +498,6 @@
           ]
         },
         "id": {
-          "type": "string"
-        },
-        "startDate": {
-          "description": "fishing trip start date",
           "type": "string"
         },
         "landingDate": {
@@ -858,90 +808,6 @@
           "required": []
         }
       ]
-    },
-    "transportDocument": {
-      "type": "object",
-      "required": [
-        "name",
-        "reference"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "name": { "type": "string" },
-        "reference": { "type": "string" }
-      }
-    },
-    "catch_transportation": {
-      "type": "object",
-      "required": [
-        "id",
-        "modeofTransport",
-        "freightBillNumber",
-        "exportLocation",
-        "transportDocuments"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "modeofTransport": {
-          "enum": [
-            "truck",
-            "train",
-            "plane",
-            "vessel"
-          ]
-        },
-        "id": { "type": "number" },
-        "freightBillNumber": { "type": "string" },
-        "nationality": { "type": "string" },
-        "registration": { "type": "string" },
-        "exportLocation": { "type": "string" },
-        "billNumber": { "type": "string" },
-        "flightNumber": { "type": "string" },
-        "containerId": { "type": "string" },
-        "name": { "type": "string" },
-        "flag": { "type": "string" },
-        "transportDocuments": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/transportDocument" }
-        }
-      },
-      "anyOf": [{
-          "properties": {
-            "modeofTransport": { "const": "truck" }
-          },
-          "required": [
-            "nationality",
-            "registration"
-          ]
-        },
-        {
-          "properties": {
-            "modeOfTransport": { "const": "train" }
-          },
-          "required": [
-            "billNumber"
-          ]
-        },
-        {
-          "properties": {
-            "modeOfTransport": { "const": "plane" }
-          },
-          "required": [
-            "flightNumber",
-            "containerId"
-          ]
-        },
-        {
-          "properties": {
-            "modeOfTransport": { "const": "vessel" }
-          },
-          "required": [
-            "name",
-            "flag",
-            "containerId"
-          ]
-        }
-      ]
     }
   },
   "properties": {
@@ -1064,10 +930,6 @@
     },
     "transportation": {
       "$ref": "#/definitions/transportation"
-    },
-    "transportations": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/catch_transportation" }
     },
     "_correlationId": {
       "description": "Unique ID to improve the end to end traceability of an event",

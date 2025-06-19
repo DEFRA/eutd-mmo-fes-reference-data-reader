@@ -87,14 +87,10 @@ export const toDefraTradeLanding = (landing: ICcQueryResult): IDefraTradeLanding
 };
 
 export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCatchCertificateCase, ccQueryResults: ICcQueryResult[] | null): IDefraTradeCatchCertificate => {
-  const transportation: CertificateTransport = document.exportData?.transportation 
-    ? toTransportation(document.exportData?.transportation) 
+  const transportation: CertificateTransport = document.exportData?.transportation
+    ? toTransportation(document.exportData?.transportation)
     : toTransportation(document.exportData?.transportations.find((t) => t.departurePlace));
   Object.keys(transportation).forEach(key => transportation[key] === undefined && delete transportation[key]);
-
-  const transportations: CatchCertificateTransport[] = Array.isArray(document.exportData?.transportations) && document.exportData.transportations.length > 0
-    ? document.exportData.transportations.map((transportation) => toTransportations(transportation))
-    : undefined;
 
   let status: CertificateStatus;
   if (!Array.isArray(ccQueryResults)) {
@@ -109,7 +105,6 @@ export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCa
     landings: Array.isArray(ccQueryResults) ? ccQueryResults.map((_: ICcQueryResult) => toDefraTradeLanding(_)) : null,
     exportedTo: document.exportData?.transportation?.exportedTo ?? document.exportData?.exportedTo,
     transportation,
-    transportations,
     multiVesselSchedule: isMultiVessel(document.exportData?.products)
   }
 };
