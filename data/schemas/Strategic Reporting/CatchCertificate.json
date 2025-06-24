@@ -115,6 +115,7 @@
               "cfr": "GBRC1121091"
             },
             "exportWeight": 5,
+            "gearType": "Category 1",
             "isDirectLanding": true,
             "isValidationFailed": false,
             "isSpeciesMisMatch": true,
@@ -186,6 +187,7 @@
               "cfr": "GBRC1121091"
             },
             "exportWeight": 2,
+            "gearType": "Category 1",
             "isDirectLanding": false,
             "isValidationFailed": false,
             "isSpeciesMisMatch": false,
@@ -407,6 +409,7 @@
                 "cnCodeDesc": { "type": "string" },
                 "vessel" : { "$ref": "#/definitions/landingVessel" },
                 "exportWeight" : {"type" : "number"},
+                "gearType" : {"type" : "string"},
                 "isDirectLanding" : {"type" : "boolean"},
                 "isValidationFailed" : {"type": "boolean"},
                 "isSpeciesMisMatch" : {

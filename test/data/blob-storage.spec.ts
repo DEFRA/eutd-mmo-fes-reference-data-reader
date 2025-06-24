@@ -329,3 +329,47 @@ describe('getSpeciesAliases', () => {
         expect.objectContaining({ "SQC": ["SQR", "SQZ", "SQI"] })
     });
 });
+
+
+
+describe('getGearTypesData', () => {
+
+    let mockLogError;
+    let mockReadToText;
+    let mockBlobClient;
+    const container = 'geartype';
+    const file = 'geartypes.csv'
+
+    beforeEach(() => {
+        mockLogError = jest.spyOn(logger, 'error');
+        mockReadToText = jest.spyOn(blob, 'readToText');
+
+        mockBlobClient = jest.spyOn(BlobServiceClient, 'fromConnectionString');
+        const containerObj = new ContainerClient(container);
+        containerObj.getBlobClient = () => new BlobClient(file);
+        mockBlobClient.mockImplementation(() => ({
+            getContainerClient: () => containerObj,
+        }));
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it('will log and rethrow any errors', async () => {
+        const error = new Error('gearTypesMockError');
+        mockReadToText.mockRejectedValue(error);
+        await expect(blob.getGearTypesData('connString')).rejects.toThrow('Error: gearTypesMockError');
+
+        expect(mockLogError).toHaveBeenNthCalledWith(1, error);
+        expect(mockLogError).toHaveBeenNthCalledWith(2, `Cannot read remote file ${file} from container ${container}`);
+    });
+
+    it('will return gear types data', async () => {
+        mockReadToText.mockResolvedValue(fs.readFileSync(__dirname + '/../../data/geartypes.csv', 'utf-8'));
+        const res = await blob.getGearTypesData('connString');
+
+        expect(res.length).toBeGreaterThan(0);
+    });
+
+});

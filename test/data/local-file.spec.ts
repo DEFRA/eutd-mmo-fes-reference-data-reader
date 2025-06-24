@@ -7,7 +7,8 @@ import {
   getVesselsOfInterestFromFile,
   getWeightingRiskFromFile,
   getExporterBehaviourFromCSV,
-  getSpeciesAliasesFromFile
+  getSpeciesAliasesFromFile,
+  getGearTypesDataFromCSV
 } from "../../src/data/local-file";
 
 describe('get conversion factors ', () => {
@@ -315,4 +316,40 @@ describe('get species aliases from file', () => {
     const result = getSpeciesAliasesFromFile(filePath);
     expect(result).toBeInstanceOf(Array);
   });
+});
+
+
+
+
+describe('get gear types data from CSV', () => {
+
+  let mockLoggerError;
+
+  beforeEach(() => {
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should throw and log an error if file does not exist', async () => {
+    const filePath = 'pathToNonExistingFile';
+
+    try {
+      await getGearTypesDataFromCSV(filePath)
+    }
+    catch (e) {
+      expect(e.message).toContain('File does not exist');
+      expect(mockLoggerError).toHaveBeenCalledWith('Could not load gear types data from file', filePath);
+    }
+  });
+
+  it('should return an array of gear types', async () => {
+    const filePath = `${__dirname}/../../data/geartypes.csv`;
+
+    const result = await getGearTypesDataFromCSV(filePath);
+    expect(result).toBeInstanceOf(Array);
+  });
+
 });

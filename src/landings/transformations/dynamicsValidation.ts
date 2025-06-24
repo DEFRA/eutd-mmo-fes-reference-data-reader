@@ -206,6 +206,7 @@ export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoT
     speciesAlias: validatedLanding.speciesAlias,
     speciesAnomaly: validatedLanding.speciesAnomaly,
     weight: validatedLanding.rawWeightOnCert,
+    gearType: validatedLanding.gearType,
     numberOfTotalSubmissions: validatedLanding.extended.numberOfSubmissions,
     vesselOverriddenByAdmin: validatedLanding.extended.vesselOverriddenByAdmin === true,
     speciesOverriddenByAdmin: validatedLanding.extended.speciesOverriddenByAdmin === true,

@@ -75,6 +75,7 @@
           "vesselLength": 10,
           "vesselAdministration": "Northern Ireland",
           "weight": 500,
+          "gearType": "Type 1",
           "speciesAlias": "Y",
           "speciesAnomaly": "SQR",
           "numberOfTotalSubmissions": 1,
@@ -413,6 +414,9 @@
         "weight": {
           "type": "number",
           "description": "The raw export weight"
+        },
+        "gearType": {
+          "type": "string"
         },
         "speciesAlias": {
           "description": "status (Y/N) of certain species mismatching during real-time validation and retrospective validation",

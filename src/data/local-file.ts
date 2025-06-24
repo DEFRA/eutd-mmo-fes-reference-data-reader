@@ -117,3 +117,13 @@ export const getExporterBehaviourFromCSV = async (exporterBehaviourFilePath: str
     throw new Error(e);
   }
 };
+
+export const getGearTypesDataFromCSV = async (gearTypesFilePath: string): Promise<any[]> => {
+  try {
+    return await csv({ delimiter: ',' }).fromFile(gearTypesFilePath);
+
+  } catch(e) {
+    logger.error('Could not load gear types data from file', gearTypesFilePath);
+    throw new Error(e);
+  }
+};

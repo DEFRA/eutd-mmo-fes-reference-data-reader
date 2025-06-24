@@ -377,6 +377,7 @@ export function mapExportPayloadToCC(redisData) {
         startDate: landing.model.startDate,
         date: dateLanded,
         weight: landing.model.exportWeight,
+        gearType: landing.model.gearType,
         faoArea: landing.model.faoArea,
         numberOfSubmissions,
         vesselOverriddenByAdmin: landing.model.vessel.vesselOverriddenByAdmin,

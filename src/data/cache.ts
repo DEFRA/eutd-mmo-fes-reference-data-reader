@@ -17,6 +17,7 @@ import { IAllSpecies } from '../landings/types/appConfig/allSpecies';
 import { ILicence, IVessel } from '../landings/types/appConfig/vessels';
 import { IEodRule, IEodSetting, vesselSizeGroup } from '../landings/types/appConfig/eodSettings';
 import { getEodSettings } from '../landings/persistence/eodSettings';
+import { CacheType } from '../handler/types';
 
 let VESSELS: IVessel[] = [];
 let VESSELS_IDX = (pln: string) => undefined;
@@ -37,6 +38,7 @@ let WEIGHTING: IWeighting = {
 };
 let SPECIES_ALIASES: any = {};
 let EOD_SETTINGS: IEodSetting[] = [];
+let GEAR_TYPES: any[] = [];
 
 export const loadLocalFishCountriesAndSpecies = async () => {
   logger.info('Loading data from local files in dev mode');
@@ -50,9 +52,10 @@ export const loadLocalFishCountriesAndSpecies = async () => {
   const vesselsOfInterest = await seedVesselsOfInterest();
   const weightingRisk = await seedWeightingRisk();
   const speciesToggle = await getSpeciesToggle();
+  const gearTypes =await loadGearTypesDataFromLocalFile();
 
   logger.info(`Finished reading data from local file system, previously species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-  updateCache(species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes);
+  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes});
   logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
   logger.info("Start setting the blocking rules");
@@ -109,8 +112,11 @@ export const loadProdFishCountriesAndSpecies = async () => {
     logger.debug('[LOAD-PROD-CONFIG] loadSpeciesAliases');
     const speciesAliases = await loadSpeciesAliases(blobStorageConnStr);
 
+    logger.debug('[LOAD-PROD-CONFIG] loadGearTypesData');
+    const gearTypes = await loadGearTypesData(blobStorageConnStr);
+
     logger.info(`[LOAD-PROD-CONFIG] Finished reading data, previously species: ${SPECIES.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-    updateCache(species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes);
+    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes});
     logger.info(`[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
     logger.info(`[LOAD-PROD-CONFIG] Finished reading vessels of interest, previously: ${VESSELS_OF_INTEREST.length}`);
@@ -243,21 +249,24 @@ export const getRiskThreshold = (): number => WEIGHTING['threshold'];
 
 export const getSpeciesRiskToggle = (): boolean => SPECIES_TOGGLE;
 
-export const updateCache = (
-  species: any[] | undefined,
-  allspecies: any[] | undefined,
-  seasonalFish: any[] | undefined,
-  countries: ICountry[] | undefined,
-  factors: IConversionFactor[] | undefined,
-  speciesAliases?: any,
-  commodityCodes?: any[] | undefined
-) => {
+export const getGearTypes = () => { return GEAR_TYPES };
+
+export const updateCache = ({
+  species,
+  allSpecies,
+  seasonalFish,
+  countries,
+  factors,
+  speciesAliases,
+  commodityCodes,
+  gearTypes,
+}: CacheType) => {
   if (species) {
     SPECIES = species;
   }
 
-  if (allspecies) {
-    ALLSPECIES = allspecies;
+  if (allSpecies) {
+    ALLSPECIES = allSpecies;
   }
 
   if (seasonalFish) {
@@ -287,6 +296,10 @@ export const updateCache = (
 
   if (commodityCodes) {
     COMMODITY_CODES = commodityCodes;
+  }
+
+  if(gearTypes) {
+    GEAR_TYPES = gearTypes;
   }
 }
 
@@ -455,6 +468,15 @@ export const loadCountriesData = async (): Promise<ICountry[] | undefined> => {
   }
 }
 
+export const loadGearTypesData = async (blobConnStr: string): Promise<any[] | undefined> => {
+  try {
+    logger.info('[BLOB-STORAGE-DATA-LOAD][GEAR-TYPES]');
+    return await blob.getGearTypesData(blobConnStr);
+  } catch (e) {
+    throw new Error(`[BLOB-STORAGE-LOAD-ERROR][GEAR-TYPES] ${e}`)
+  }
+}
+
 export const loadAllSpeciesFromLocalFile = async (): Promise<IAllSpecies[] | undefined> => {
   const path = `${__dirname}/../../data/allSpecies.csv`;
   try {
@@ -560,3 +582,13 @@ export const loadExporterBehaviourFromAzureBlob = async (blobConnStr: string): P
     throw new Error(`[BLOB-STORAGE-LOAD-ERROR][EXPORTER-BEHAVIOUR] ${e}`);
   }
 };
+
+export const loadGearTypesDataFromLocalFile = async (gearTypesFilePath?: string): Promise<any[] | undefined> => {
+  const path = gearTypesFilePath || `${__dirname}/../../data/geartypes.csv`;
+  try {
+    return await file.getGearTypesDataFromCSV(path);
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot load gear types file from local file system, path: ${path}`);
+  }
+}

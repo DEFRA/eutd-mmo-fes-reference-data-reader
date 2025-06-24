@@ -22,6 +22,7 @@
         "adminCommodityCode": "03062190",
         "scientificName": "scientific name",
         "weight": 1000,
+        "gearType": "Type 1",
         "speciesAlias": "Y",
         "speciesAnomaly": "CAA",
         "numberOfTotalSubmissions": 1,

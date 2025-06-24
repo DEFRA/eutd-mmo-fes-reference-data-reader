@@ -32,6 +32,7 @@ import { uploadValidatorRoutes } from './handler/uploadValidator';
 import { eodRoutes } from './handler/eod';
 import { isLegallyDueRoute } from './handler/isLegallyDue';
 import { purgeRoutes } from './handler/purge';
+import { gearTypeRoutes } from './handler/gearTypes';
 
 const Joi = require('joi');
 
@@ -224,4 +225,5 @@ const setupRoutes = server => {
   virusCheckerRoutes(server);
   uploadValidatorRoutes(server);
   purgeRoutes(server);
+  gearTypeRoutes(server);
 }

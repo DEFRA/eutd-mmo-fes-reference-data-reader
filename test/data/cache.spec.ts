@@ -13,6 +13,7 @@ import logger from '../../src/logger';
 import { ILicence, IVessel } from '../../src/landings/types/appConfig/vessels';
 import { IEodSetting } from '../../src/landings/types/appConfig/eodSettings';
 import moment from 'moment';
+import { mockGearTypesData } from '../mockData';
 
 const allSpeciesData: any[] = [
   {
@@ -279,6 +280,8 @@ const commodityCodes: any[] = [{
   description: 'some description'
 }]
 
+const gearTypesData: any[] = mockGearTypesData
+
 describe('when in production mode', () => {
   let mockLoadAllSpecies;
   let mockLoadSpecies;
@@ -296,6 +299,7 @@ describe('when in production mode', () => {
   let mockGetAddresses;
   let mockGetCommodityCodes;
   let mockGetEodSettings;
+  let mockLoadGearTypesData;
 
   let mockLoggerInfo;
   let mockLoggerError;
@@ -322,6 +326,7 @@ describe('when in production mode', () => {
     mockGetSpeciesToggle = jest.spyOn(RiskingService, 'getSpeciesToggle');
     mockGetAddresses = jest.spyOn(BoomiService, 'getAddresses');
     mockGetEodSettings = jest.spyOn(EoDService, 'getEodSettings');
+    mockLoadGearTypesData = jest.spyOn(SUT, 'loadGearTypesData');
 
     mockLoggerInfo = jest.spyOn(logger, 'info');
     mockLoggerError = jest.spyOn(logger, 'error');
@@ -342,6 +347,7 @@ describe('when in production mode', () => {
     mockGetWeightingRisk.mockResolvedValue(weightingRiskData);
     mockGetSpeciesToggle.mockResolvedValue(speciesToggleData);
     mockGetAddresses.mockResolvedValue(null);
+    mockLoadGearTypesData.mockResolvedValue(gearTypesData);
   });
 
   afterEach(() => {
@@ -358,11 +364,21 @@ describe('when in production mode', () => {
     mockGetWeightingRisk.mockRestore();
     mockGetSpeciesToggle.mockRestore();
     mockGetEodSettings.mockRestore();
+    mockLoadGearTypesData.mockRestore();
+    
     mockLoggerInfo.mockRestore();
     mockLoggerError.mockRestore();
     mockLoggerDebug.mockRestore();
-
-    SUT.updateCache([], [], [], [], [], {}, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: [],
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
     SUT.updateVesselsCache([]);
     SUT.updateVesselsOfInterestCache([]);
     SUT.updateWeightingCache({
@@ -466,6 +482,7 @@ describe('when in production mode', () => {
       expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] getWeightingRisk');
       expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] getSpeciesToggle');
       expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] loadSpeciesAliases');
+      expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] loadGearTypesData');
     });
 
     describe('getCountries', () => {
@@ -529,6 +546,13 @@ describe('when in production mode', () => {
     })
   });
 
+  describe('getGearTypes', () => {
+    it('should have a list of gear types data', async () => {
+      await SUT.loadProdFishCountriesAndSpecies();
+      expect(SUT.getGearTypes()).toHaveLength(54);
+    });
+  })
+
 });
 
 describe('when in development mode', () => {
@@ -550,6 +574,7 @@ describe('when in development mode', () => {
   let mockGetSpeciesToggle;
   let mockSeedBlockingRules;
   let mockGetEodSettings;
+  let mockLoadGearTypesData;
 
   beforeEach(() => {
     appConfig.inDev = true;
@@ -568,6 +593,7 @@ describe('when in development mode', () => {
     mockGetSpeciesToggle = jest.spyOn(RiskingService, 'getSpeciesToggle');
     mockLoggerInfo = jest.spyOn(logger, 'info');
     mockSeedBlockingRules = jest.spyOn(systemBlocks, 'seedBlockingRules');
+    mockLoadGearTypesData = jest.spyOn(SUT, 'loadGearTypesDataFromLocalFile');
 
     mockLoadAllSpecies.mockResolvedValue(allSpeciesData);
     mockLoadVesselsDataFromLocalFile.mockResolvedValue(vesselData);
@@ -581,6 +607,7 @@ describe('when in development mode', () => {
     mockSeedWeightingRisk.mockResolvedValue(weightingRiskData);
     mockGetSpeciesToggle.mockResolvedValue(speciesToggleData);
     mockSeedBlockingRules.mockResolvedValue(undefined);
+    mockLoadGearTypesData.mockResolvedValue(gearTypesData);
   });
 
   afterEach(() => {
@@ -595,11 +622,21 @@ describe('when in development mode', () => {
     mockSeedBlockingRules.mockRestore();
     mockLoggerInfo.mockRestore();
     mockGetEodSettings.mockRestore();
+    mockLoadGearTypesData.mockRestore();
 
     appConfig.enableCountryData = enableCountryData;
     appConfig.vesselNotFoundEnabled = enableVesselNotFound;
 
-    SUT.updateCache([], [], [], [], [], {}, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: [],
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
     SUT.updateVesselsOfInterestCache([]);
     SUT.updateSpeciesToggleCache({
       enabled: false
@@ -624,6 +661,7 @@ describe('when in development mode', () => {
       expect(mockSeedWeightingRisk).toHaveBeenCalled();
       expect(mockSeedVesselsOfInterest).toHaveBeenCalled();
       expect(mockGetSpeciesToggle).toHaveBeenCalled();
+      expect(mockLoadGearTypesData).toHaveBeenCalled();
 
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
@@ -672,7 +710,16 @@ describe('when in development mode', () => {
     };
 
     beforeEach(() => {
-      SUT.updateCache([], [], [], [], [], mockSpeciesAliases, []);
+      SUT.updateCache({
+        species: [],
+        allSpecies: [],
+        seasonalFish: [],
+        countries: [],
+        factors: [],
+        speciesAliases: mockSpeciesAliases,
+        commodityCodes: [],
+        gearTypes: [],
+      });
     });
 
     it('should return species aliases', () => {
@@ -701,6 +748,7 @@ describe('when in development mode', () => {
     expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, 'Loading data from local files in dev mode');
     expect(mockLoadSpeciesDataFromLocalFile).toHaveBeenCalled();
     expect(mockLoadSeasonalFishData).toHaveBeenCalled();
+    expect(mockLoadGearTypesData).toHaveBeenCalled();
     expect(mockLoadCountries).toHaveBeenCalled();
 
     expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
@@ -747,7 +795,16 @@ describe('isQuotaSpecies', () => {
       }
     ];
 
-    SUT.updateCache([], [], [], [], conversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: conversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   })
 
   it('returns true if quotaStatus equals quota', async () => {
@@ -821,7 +878,16 @@ describe('getSpeciesRiskScore', () => {
       }
     ];
 
-    SUT.updateCache([], [], [], [], conversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: conversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   })
 
   it('should return defaultvalue when undefined riskScore ', () => {
@@ -913,14 +979,30 @@ describe('getToLiveWeightFactor', () => {
         riskScore: 0
       }
     ];
-
-    SUT.updateCache([], [], [], [], mockConversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: mockConversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   });
 
   afterEach(() => {
     mockConversionFactors = [];
-
-    SUT.updateCache([], [], [], [], mockConversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: mockConversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   });
 
   it('should return defaultvalue when toLiveWeightFactor is undefined', () => {
@@ -1020,14 +1102,31 @@ describe('getAllConversionFactors', () => {
         riskScore: 0
       }
     ];
-
-    SUT.updateCache([], [], [], [], mockConversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: mockConversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   });
 
   afterEach(() => {
     mockConversionFactors = [];
 
-    SUT.updateCache([], [], [], [], mockConversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: mockConversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   });
 
   it('should return all conversion factors', () => {
@@ -1312,7 +1411,16 @@ describe('getSpeciesRiskScore', () => {
   }];
 
   beforeEach(() => {
-    SUT.updateCache([], [], [], [], mockConversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: mockConversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
   });
 
   it('should return its riskScore when the riskScore is available', () => {
@@ -1402,7 +1510,16 @@ describe('Refresh Risking Data', () => {
   beforeEach(() => {
     SUT.updateVesselsCache(vesselData);
 
-    SUT.updateCache([], [], [], [], conversionFactors, []);
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: conversionFactors,
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
     SUT.updateEodSettingsCache([]);
 
     mockGetVesselsOfInterest = jest.spyOn(RiskingService, 'getVesselsOfInterest');
@@ -1434,7 +1551,17 @@ describe('Refresh Risking Data', () => {
     SUT.updateEodSettingsCache([]);
     SUT.updateVesselsCache([]);
 
-    SUT.updateCache([], [], [], [], [], []);
+
+    SUT.updateCache({
+      species: [],
+      allSpecies: [],
+      seasonalFish: [],
+      countries: [],
+      factors: [],
+      speciesAliases: {},
+      commodityCodes: [],
+      gearTypes: [],
+    });
     SUT.updateEodSettingsCache([]);
 
     mockGetVesselsOfInterest.mockRestore();
@@ -1609,12 +1736,23 @@ describe('getLandingDataRuleDate', () => {
 
 describe('updateCache', () => {
   it('should not add species, allSpecies, seasonalFish and countries to cache when undefined', () => {
-    SUT.updateCache(undefined, undefined, undefined, undefined, undefined, undefined);
+
+    SUT.updateCache({
+      species: undefined,
+      allSpecies: undefined,
+      seasonalFish: undefined,
+      countries: undefined,
+      factors: undefined,
+      speciesAliases: undefined,
+      commodityCodes: undefined,
+      gearTypes: undefined,
+    });
 
     expect(SUT.getSpeciesData('uk')).toHaveLength(0);
     expect(SUT.getSpeciesData('global')).toHaveLength(0)
     expect(SUT.getSeasonalFish()).toHaveLength(0)
     expect(SUT.getCountries()).toHaveLength(0)
+    expect(SUT.getGearTypes()).toHaveLength(0)
   });
 });
 
@@ -1892,7 +2030,7 @@ describe('loadConversionFactorsData', () => {
     expect(mockLoggerInfo).toHaveBeenCalledWith('[BLOB-STORAGE-DATA-LOAD][CONVERSION-FACTORS]');
   });
 
-  it('will call getSeasonalFishData in blob storage', async () => {
+  it('will call getConversionFactorsData in blob storage', async () => {
     mockGetConversionFactorsData.mockResolvedValue('test');
 
     await SUT.loadConversionFactorsData(connString);
@@ -1916,6 +2054,58 @@ describe('loadConversionFactorsData', () => {
     const expected = `[BLOB-STORAGE-LOAD-ERROR][CONVERSION-FACTORS] ${error}`;
 
     await expect(async () => SUT.loadConversionFactorsData(connString)).rejects.toThrow(expected);
+  });
+
+});
+
+describe('loadGearTypesData', () => {
+
+  const connString = 'connection string';
+
+  let mockGetGearTypesData;
+  let mockLoggerInfo;
+
+  beforeEach(() => {
+    mockGetGearTypesData = jest.spyOn(blob, 'getGearTypesData');
+    mockLoggerInfo = jest.spyOn(logger, 'info');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('will log being called', async () => {
+    mockGetGearTypesData.mockResolvedValue('test');
+
+    await SUT.loadGearTypesData(connString);
+
+    expect(mockLoggerInfo).toHaveBeenCalledWith('[BLOB-STORAGE-DATA-LOAD][GEAR-TYPES]');
+  });
+
+  it('will call getGearTypesData in blob storage', async () => {
+    mockGetGearTypesData.mockResolvedValue('test');
+
+    await SUT.loadGearTypesData(connString);
+
+    expect(mockGetGearTypesData).toHaveBeenCalledWith(connString);
+  });
+
+  it('will return data from blob storage', async () => {
+    mockGetGearTypesData.mockResolvedValue('test');
+
+    const result = await SUT.loadGearTypesData(connString);
+
+    expect(result).toBe('test');
+  });
+
+  it('will throw an error if blob storage throws an error', async () => {
+    const error = new Error('something went wrong');
+
+    mockGetGearTypesData.mockRejectedValue(error);
+
+    const expected = `[BLOB-STORAGE-LOAD-ERROR][GEAR-TYPES] ${error}`;
+
+    await expect(async () => SUT.loadGearTypesData(connString)).rejects.toThrow(expected);
   });
 
 });
@@ -2227,6 +2417,50 @@ describe('loadSpeciesAliasesFromLocalFile', () => {
 
     expect(mockLoggerError).toHaveBeenCalledWith(error);
     expect(result).toStrictEqual({});
+  });
+
+});
+
+describe('loadGearTypesDataFromLocalFile', () => {
+
+  let mockGetGearTypesData;
+  let mockLoggerError;
+
+  beforeEach(() => {
+    mockGetGearTypesData = jest.spyOn(file, 'getGearTypesDataFromCSV');
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('will call getGearTypesDataFromFile in file storage', async () => {
+    mockGetGearTypesData.mockResolvedValue('test');
+
+    await SUT.loadGearTypesDataFromLocalFile();
+
+    expect(mockGetGearTypesData).toHaveBeenCalled();
+  });
+
+  it('will return data from file storage', async () => {
+    mockGetGearTypesData.mockResolvedValue('test');
+
+    const result = await SUT.loadGearTypesDataFromLocalFile();
+
+    expect(result).toBe('test');
+  });
+
+  it('will log an error and return void if file storage throws an error', async () => {
+
+    mockGetGearTypesData.mockImplementation(() => {
+      throw 'something went wrong'
+    });
+
+    const result = await SUT.loadGearTypesDataFromLocalFile();
+
+    expect(mockLoggerError).toHaveBeenCalled();
+    expect(result).toBeUndefined();
   });
 
 });

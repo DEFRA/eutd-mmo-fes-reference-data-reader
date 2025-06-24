@@ -1381,6 +1381,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
       weightOnAllCertsBefore: 0,
       weightOnAllCertsAfter: 100,
       weightFactor: 5,
+      gearType: "Type 1",
       isLandingExists: true,
       isSpeciesExists: true,
       numberOfLandingsOnDay: 1,
@@ -1488,6 +1489,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
       expect(result[0].isOveruse).toEqual(true);
       expect(result[0].isExporterLandingOveruse).toEqual(true);
       expect(result[0].isValidationFailed).toEqual(true);
+      expect(result[0].gearType).toEqual('Type 1');
       expect(result[0].startDate).toEqual('2019-07-10');
       expect(result[0].date).toEqual('2019-07-10');
       expect(result[0].cnCode).toEqual('1234');

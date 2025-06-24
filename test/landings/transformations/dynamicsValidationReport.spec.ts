@@ -5699,6 +5699,7 @@ describe('Dynamics Validation', () => {
       weightOnAllCertsBefore: 0,
       weightOnAllCertsAfter: 100,
       weightFactor: 5,
+      gearType: 'Type 1',
       isLandingExists: false,
       isSpeciesExists: true,
       numberOfLandingsOnDay: 1,
@@ -5764,6 +5765,7 @@ describe('Dynamics Validation', () => {
       expect(result.licenceHolder).toBe('MASTER OF VESSEL')
       expect(result.source).toBeUndefined();
       expect(result.weight).toEqual(122);
+      expect(result.gearType).toEqual('Type 1');
       expect(result.numberOfTotalSubmissions).toEqual(1);
       expect(result.risking?.overuseInfo).toEqual(["CC2", "CC3"]);
       expect(result.vesselOverriddenByAdmin).toBe(false);

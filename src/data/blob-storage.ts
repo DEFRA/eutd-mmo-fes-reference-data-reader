@@ -22,6 +22,8 @@ const SPECIES_MISMATCH_DATA_FILE_NAME       = 'speciesmismatch.json';
 const SPECIES_MISMATCH_DATA_CONTAINER_NAME  = 'speciesmismatch';
 const CONVERSION_FACTORS_CONTAINER_NAME     = 'conversionfactors';
 const CONVERSION_FACTORS_DATA_FILE_NAME     = 'conversionfactors.csv';
+const GEAR_TYPES_DATA_CONTAINER_NAME        = 'geartype';
+const GEAR_TYPES_DATA_FILE_NAME             = 'geartypes.csv';
 
 export const readToText = async (blobClient) => {
   const downloadBlockBlobResponse = await blobClient.download();
@@ -202,6 +204,23 @@ export const getSpeciesAliases = async (connectionString: string): Promise<any> 
   } catch (e) {
     logger.error(e);
     logger.error(`Cannot read remote file ${SPECIES_MISMATCH_DATA_FILE_NAME} from container ${SPECIES_MISMATCH_DATA_CONTAINER_NAME}`);
+    throw new Error(e);
+  }
+}
+
+export const getGearTypesData = async (connectionString: string): Promise<any[]> => {
+  try {
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(GEAR_TYPES_DATA_CONTAINER_NAME);
+    const blobClient = containerClient.getBlobClient(GEAR_TYPES_DATA_FILE_NAME);
+
+    const gearTypesData = await readToText(blobClient) as string;
+    const gearTypesDataInJson = await csv({ delimiter: ',' }).fromString(gearTypesData);
+    return gearTypesDataInJson;
+
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot read remote file ${GEAR_TYPES_DATA_FILE_NAME} from container ${GEAR_TYPES_DATA_CONTAINER_NAME}`);
     throw new Error(e);
   }
 }

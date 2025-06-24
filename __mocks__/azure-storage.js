@@ -82,6 +82,9 @@ function __setMockServiceWithError() {
       else if (blobName === 'commodity_code_ps_sd.txt') {
         return cb(new Error('CommodityCodeMockError'));
       }
+      else if (blobName === 'geartypes.csv') {
+        return cb(new Error('GearTypesMockError'));
+      }
       else {
 	      return cb(new Error('SpeciesMockError'));
       }
