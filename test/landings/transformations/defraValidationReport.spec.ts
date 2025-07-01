@@ -2080,6 +2080,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           "departurePlace": "Hull",
           "nationalityOfVehicle": "",
           "registrationNumber": "",
+          "cmr": false,
           "exportedTo": {
             "officialCountryName": "Nigeria",
             "isoCodeAlpha2": "NG",
@@ -2094,6 +2095,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
 
         const expectedResult: CatchCertificateTransport = {
           modeofTransport: 'truck',
+          hasRoadTransportDocument: false,
           nationality: '',
           registration: '',
           id: '0',
@@ -2117,6 +2119,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           registrationNumber: "WE893EF",
           departurePlace: "Telford",
           freightBillNumber: "0",
+          cmr: false,
           id: "0",
           transportDocuments: [{
             "name": "Invoice",
@@ -2126,6 +2129,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
 
         const expectedResult: CatchCertificateTransport = {
           modeofTransport: 'truck',
+          hasRoadTransportDocument: false,
           nationality: "UK",
           registration: "WE893EF",
           exportLocation: "Telford",
