@@ -1,12 +1,18 @@
 import moment from "moment";
 import { commoditySearch } from "../controllers/species";
 import { vesselSearch } from "../controllers/vessel";
-import { getSeasonalFish } from "../data/cache";
+import {
+  getSeasonalFish,
+  getGearTypes
+} from "../data/cache";
 import { faoAreas } from "../data/faoAreas";
 import { IProduct, ISeasonalFishPeriod, ICommodityCode } from "../interfaces/products.interfaces";
 import { IUploadedLanding } from "../interfaces/uploads.interfaces";
 import { IVessel } from "../interfaces/vessels.interfaces";
 import { pipe } from "../utils/functions";
+import { GearRecord } from "../interfaces/gearTypes.interface";
+
+const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
 
 export const validateLandings = (landings: IUploadedLanding[], products: IProduct[], landingLimitDaysInFuture: number): IUploadedLanding[] => {
   const seasonalRestrictions = getSeasonalFish();
@@ -17,6 +23,10 @@ export const validateLandings = (landings: IUploadedLanding[], products: IProduc
   const validateLandingDate = (landing: IUploadedLanding) =>
     validateDateForLanding(landing, landingLimitDaysInFuture);
 
+  const gearRecords = getGearTypes();
+  const validateGearCode = (landing: IUploadedLanding) => 
+    validateGearCodeForLanding(landing, gearRecords);
+
   return landings.map(l =>
     pipe(
       initialiseErrorsForLanding,
@@ -24,6 +34,7 @@ export const validateLandings = (landings: IUploadedLanding[], products: IProduc
       validateLandingDate,
       validateFaoAreaForLanding,
       validateVesselForLanding,
+      validateGearCode,
       validateExportWeightForLanding,
     )(l)
   );
@@ -172,6 +183,24 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
 
   return landing;
 
+}
+
+export const validateGearCodeForLanding = (landing: IUploadedLanding, gearRecords: GearRecord[]): IUploadedLanding => {
+  if (!landing.gearCode) return landing;
+
+  if (!gearCodeRegex.test(landing.gearCode)) {
+    landing.errors.push('validation.gearCode.string.invalid');
+  } else {
+    const gearRecord = gearRecords.find(r => r["Gear code"].toLowerCase() === landing.gearCode?.toLowerCase());
+    if (!gearRecord) {
+      landing.errors.push('validation.gearCode.string.unknown');
+    } else {
+      landing.gearCategory = gearRecord["Gear category"];
+      landing.gearName = gearRecord["Gear name"];
+    }
+  }
+
+  return landing;
 }
 
 export const isPositiveNumberWithTwoDecimals = (num: number) => {

@@ -40,6 +40,7 @@ describe('uploadValidator', () => {
     const landings = [{id: 'landing 1'}];
     const products = [{id: 'product 1'}];
     const landingLimitDaysInFuture = 7;
+    const gearRecords = [{"Gear category":"Surrounding nets","Gear name":"Purse seines","Gear code":"PS"}];
 
     const request = {
       method: "POST",

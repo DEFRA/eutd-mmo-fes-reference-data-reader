@@ -7,15 +7,25 @@ import moment from 'moment';
 
 describe('uploadValidation.service', () => {
 
+  const gearRecords = [
+    {"Gear category":"Surrounding nets","Gear name":"Purse seines","Gear code":"PS"},
+    {"Gear category":"Surrounding nets","Gear name":"Surrounding nets without purse lines","Gear code":"LA"},
+    {"Gear category":"Surrounding nets","Gear name":"Surrounding nets (nei)","Gear code":"SUX"},
+    {"Gear category":"Seine nets","Gear name":"Beach seines","Gear code":"SB"},
+    {"Gear category":"Seine nets","Gear name":"Boat seines","Gear code":"SV"},
+  ];
+
   describe('validateLandings', () => {
 
     let mockGetSeasonalFish;
+    let mockGetGearTypes;
     let mockInitialiseErrorsForLanding;
     let mockValidateDateForLanding;
     let mockValidateExportWeightForLanding;
     let mockValidateFaoAreaForLanding;
     let mockValidateProductForLanding;
     let mockValidateVesselForLanding;
+    let mockValidateGearCodeForLanding;
 
     const seasonalFish = ['seasonal fish 1'];
     const landings = [{id: 'landing 1'}, {id: 'landing 2'}] as any[];
@@ -25,6 +35,9 @@ describe('uploadValidation.service', () => {
     beforeEach(() => {
       mockGetSeasonalFish = jest.spyOn(DataCache, 'getSeasonalFish');
       mockGetSeasonalFish.mockReturnValue(seasonalFish);
+
+      mockGetGearTypes = jest.spyOn(DataCache, 'getGearTypes');
+      mockGetGearTypes.mockReturnValue(gearRecords);
 
       mockInitialiseErrorsForLanding = jest.spyOn(SUT, 'initialiseErrorsForLanding');
       mockInitialiseErrorsForLanding.mockImplementation((landing) => landing);
@@ -43,6 +56,9 @@ describe('uploadValidation.service', () => {
 
       mockValidateVesselForLanding = jest.spyOn(SUT, 'validateVesselForLanding');
       mockValidateVesselForLanding.mockImplementation((landing) => landing);
+
+      mockValidateGearCodeForLanding = jest.spyOn(SUT, 'validateGearCodeForLanding');
+      mockValidateGearCodeForLanding.mockImplementation((landing) => landing);
     });
 
     afterEach(() => {
@@ -50,7 +66,7 @@ describe('uploadValidation.service', () => {
     });
 
     it('should run initialiseErrorsForLanding for each landing', () => {
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
 
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledTimes(2);
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledWith(landings[0]);
@@ -60,7 +76,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of initialiseErrorsForLanding into validateProduct', () => {
       mockInitialiseErrorsForLanding.mockImplementation((landing) => `${landing.id} - errors initialised`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
 
       expect(mockValidateProductForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 1 - errors initialised', favourites, seasonalFish);
@@ -70,7 +86,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateProduct into validateDateForLanding', () => {
       mockValidateProductForLanding.mockImplementation((landing) => `${landing.id} - product validated`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
 
       expect(mockValidateDateForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 1 - product validated', landingLimitDaysInFuture);
@@ -80,7 +96,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateDateForLanding into validateFaoAreaForLanding', () => {
       mockValidateDateForLanding.mockImplementation((landing) => `${landing.id} - date validated`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
 
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 1 - date validated');
@@ -90,27 +106,37 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateFaoAreaForLanding into validateVesselForLanding', () => {
       mockValidateFaoAreaForLanding.mockImplementation((landing) => `${landing.id} - fao area validated`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
 
       expect(mockValidateVesselForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
       expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
     });
 
-    it('should pipe the result of validateVesselForLanding into validateExportWeightForLanding', () => {
+    it('should pipe the result of validateVesselForLanding into validateGearCodeForLanding', () => {
       mockValidateVesselForLanding.mockImplementation((landing) => `${landing.id} - vessel validated`);
 
       SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
+      expect(mockValidateGearCodeForLanding).toHaveBeenCalledTimes(2);
+      expect(mockValidateGearCodeForLanding).toHaveBeenCalledWith('landing 1 - vessel validated', gearRecords);
+      expect(mockValidateGearCodeForLanding).toHaveBeenCalledWith('landing 2 - vessel validated', gearRecords);
+    });
+
+    it('should pipe the result of validateGearCodeForLanding into validateExportWeightForLanding', () => {
+      mockValidateGearCodeForLanding.mockImplementation((landing) => `${landing.id} - gear code validated`);
+
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+
       expect(mockValidateExportWeightForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 1 - vessel validated');
-      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 2 - vessel validated');
+      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 1 - gear code validated');
+      expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 2 - gear code validated');
     });
 
     it('should return the result of validateExportWeightForLanding', () => {
       mockValidateExportWeightForLanding.mockImplementation((landing) => `${landing.id} - export weight validated`);
 
-      const result = SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+      const result = SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
 
       expect(result).toStrictEqual([
         'landing 1 - export weight validated',
@@ -804,6 +830,41 @@ describe('uploadValidation.service', () => {
 
     });
 
+  });
+
+  describe('validateGearCodeForLanding', () => {
+
+    it('should enrich the landing with gear details when gear code exists', () => {
+      const result = SUT.validateGearCodeForLanding({ errors: [], gearCode: 'PS' }, gearRecords);
+
+      expect(result.gearCategory).toEqual('Surrounding nets');
+      expect(result.gearName).toEqual('Purse seines');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should not enrich or return an error when gear code is not passed', () => {
+      const result = SUT.validateGearCodeForLanding({ errors: [] }, gearRecords);
+
+      expect(result.gearCategory).toBeUndefined()
+      expect(result.gearName).toBeUndefined();
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should return an error when gear code is not valid', () => {
+      const result = SUT.validateGearCodeForLanding({ errors: [], gearCode: '123' }, gearRecords);
+
+      expect(result.gearCategory).toBeUndefined()
+      expect(result.gearName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['validation.gearCode.string.invalid']);
+    });
+    
+    it('should return an error when gear code does not exist', () => {
+      const result = SUT.validateGearCodeForLanding({ errors: [], gearCode: 'XYZ' }, gearRecords);
+
+      expect(result.gearCategory).toBeUndefined()
+      expect(result.gearName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['validation.gearCode.string.unknown']);
+    });
   });
 
   describe('isPositiveNumberWithTwoDecimals', () => {

@@ -81,7 +81,12 @@
     "testEnvironment": "node",
     "transform": {
       "^.+\\.js$": "babel-jest",
-      "^.+\\.ts?$": "ts-jest"
+      "^.+\\.ts?$": [
+        "ts-jest",
+        {
+          "diagnostics": false
+        }
+      ]
     },
     "moduleFileExtensions": [
       "tsx",
