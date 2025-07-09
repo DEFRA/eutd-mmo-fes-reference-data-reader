@@ -35,16 +35,16 @@ describe('When retrieving gear categories', () => {
   it('will return 200 if all goes OK', async () => {
     const mockData = mockGearTypesData;
     const mockResponse = [
-      'Surrounding nets',
-      'Seine nets',
+      'Traps',
       'Trawls',
       'Dredges',
+      'Hooks and lines',
+      'Gillnets and entangling nets',
+      'Miscellaneous gear',
+      'Surrounding nets',
+      'Seine nets',
       'Lift nets',
       'Falling gear',
-      'Gillnets and entangling nets',
-      'Traps',
-      'Hooks and lines',
-      'Miscellaneous gear',
     ];
     gearTypesMock.mockReturnValue(mockData);
 

@@ -1,10 +1,10 @@
 ﻿Gear category,Gear name (code),Gear name,Gear code
-Surrounding nets,Purse seines (PS),Purse seines,PS
-Surrounding nets,Surrounding nets without purse lines (LA),Surrounding nets without purse lines,LA
-Surrounding nets,Surrounding nets (nei) (SUX),Surrounding nets (nei),SUX
-Seine nets,Beach seines (SB),Beach seines,SB
-Seine nets,Boat seines (SV),Boat seines ,SV
-Seine nets,Seine nets (nei) (SX),Seine nets (nei) ,SX
+Traps,Stationary uncovered pound nets (FPN),Stationary uncovered pound nets,FPN
+Traps,Pots (FPO),Pots,FPO
+Traps,Fyke nets (FYK),Fyke nets,FYK
+Traps,Stow nets (FSN),Stow nets,FSN
+Traps,Aerial traps (FAR),Aerial traps,FAR
+Traps,Traps (nei) (FIX),Traps (nei) ,FIX
 Trawls,Beam trawls (TBB),Beam trawls,TBB
 Trawls,Single boat bottom otter trawls (OTB),Single boat bottom otter trawls ,OTB
 Trawls,Twin bottom otter trawls (OTT),Twin bottom otter trawls ,OTT
@@ -19,24 +19,6 @@ Trawls,Trawls (nei) (TX),Trawls (nei) ,TX
 Dredges,Towed dredges (DRB),Towed dredges,DRB
 Dredges,Mechanized dredges (DRM),Mechanized dredges,DRM
 Dredges,Dredges (nei) (DRX),Dredges (nei) ,DRX
-Lift nets,Portable lift nets (LNP),Portable lift nets,LNP
-Lift nets,Boat-operated lift nets (LNB),Boat-operated lift nets ,LNB
-Lift nets,Lift nets (nei) (LN),Lift nets (nei) ,LN
-Falling gear,Cast nets (FCN),Cast nets,FCN
-Falling gear,Cover pots/lantern nets (FCO),Cover pots/lantern nets,FCO
-Falling gear,Falling gear (nei) (FG),Falling gear (nei) ,FG
-Gillnets and entangling nets,Set gillnets (anchored) (GNS),Set gillnets (anchored) ,GNS
-Gillnets and entangling nets,Drift gillnets (GND),Drift gillnets,GND
-Gillnets and entangling nets,Encircling nets (GNC),Encircling nets,GNC
-Gillnets and entangling nets,Trammel nets (GTR),Trammel nets,GTR
-Gillnets and entangling nets,Combined gillnets-trammel nets (GTN),Combined gillnets-trammel nets,GTN
-Gillnets and entangling nets,Gillents and entangling nets (nei) (GEN),Gillents and entangling nets (nei) ,GEN
-Traps,Stationary uncovered pound nets (FPN),Stationary uncovered pound nets,FPN
-Traps,Pots (FPO),Pots,FPO
-Traps,Fyke nets (FYK),Fyke nets,FYK
-Traps,Stow nets (FSN),Stow nets,FSN
-Traps,Aerial traps (FAR),Aerial traps,FAR
-Traps,Traps (nei) (FIX),Traps (nei) ,FIX
 Hooks and lines,Handlines and hand operated pole and lines (LHP),Handlines and hand operated pole and lines ,LHP
 Hooks and lines,Mechanized lines and pole-and-lines (LHM),Mechanized lines and pole-and-lines,LHM
 Hooks and lines,Set longlines (LLS),Set longlines,LLS
@@ -45,6 +27,12 @@ Hooks and lines,Longlines (nei) (LL),Longlines (nei) ,LL
 Hooks and lines,Vertical lines (LVT),Vertical lines,LVT
 Hooks and lines,Trolling lines (LTL),Trolling lines,LTL
 Hooks and lines,Hooks and lines (nei) (LX),Hooks and lines (nei) ,LX
+Gillnets and entangling nets,Set gillnets (anchored) (GNS),Set gillnets (anchored) ,GNS
+Gillnets and entangling nets,Drift gillnets (GND),Drift gillnets,GND
+Gillnets and entangling nets,Encircling nets (GNC),Encircling nets,GNC
+Gillnets and entangling nets,Trammel nets (GTR),Trammel nets,GTR
+Gillnets and entangling nets,Combined gillnets-trammel nets (GTN),Combined gillnets-trammel nets,GTN
+Gillnets and entangling nets,Gillents and entangling nets (nei) (GEN),Gillents and entangling nets (nei) ,GEN
 Miscellaneous gear,Harpoons (HAR),Harpoons,HAR
 Miscellaneous gear,"Hand implements (Wrenching gear, Clamps, Tongs, Rakes, Spears) (MHI)","Hand implements (Wrenching gear, Clamps, Tongs, Rakes, Spears)",MHI
 Miscellaneous gear,Pumps (MPM),Pumps,MPM
@@ -53,3 +41,15 @@ Miscellaneous gear,Pushnets (MPN),Pushnets,MPN
 Miscellaneous gear,Scoopnets (MSO),Scoopnets,MSO
 Miscellaneous gear,Drive-in-nets (MDR),Drive-in-nets,MDR
 Miscellaneous gear,Diving (MDV),Diving ,MDV
+Surrounding nets,Purse seines (PS),Purse seines,PS
+Surrounding nets,Surrounding nets without purse lines (LA),Surrounding nets without purse lines,LA
+Surrounding nets,Surrounding nets (nei) (SUX),Surrounding nets (nei),SUX
+Seine nets,Beach seines (SB),Beach seines,SB
+Seine nets,Boat seines (SV),Boat seines ,SV
+Seine nets,Seine nets (nei) (SX),Seine nets (nei) ,SX
+Lift nets,Portable lift nets (LNP),Portable lift nets,LNP
+Lift nets,Boat-operated lift nets (LNB),Boat-operated lift nets ,LNB
+Lift nets,Lift nets (nei) (LN),Lift nets (nei) ,LN
+Falling gear,Cast nets (FCN),Cast nets,FCN
+Falling gear,Cover pots/lantern nets (FCO),Cover pots/lantern nets,FCO
+Falling gear,Falling gear (nei) (FG),Falling gear (nei) ,FG
