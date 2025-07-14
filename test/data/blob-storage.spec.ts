@@ -373,3 +373,45 @@ describe('getGearTypesData', () => {
     });
 
 });
+
+describe('getRfmosData', () => {
+
+    let mockLogError;
+    let mockReadToText;
+    let mockBlobClient;
+
+    const container = 'catcharea';
+    const file = 'rfmoList.csv';
+
+    beforeEach(() => {
+        mockLogError = jest.spyOn(logger, 'error');
+        mockReadToText = jest.spyOn(blob, 'readToText');
+
+        mockBlobClient = jest.spyOn(BlobServiceClient, 'fromConnectionString');
+        const containerObj = new ContainerClient(container);
+        containerObj.getBlobClient = () => new BlobClient(file);
+        mockBlobClient.mockImplementation(() => ({
+            getContainerClient: () => containerObj,
+        }));
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it('will return rfmos data', async () => {
+        mockReadToText.mockResolvedValue(fs.readFileSync(__dirname + '/../../data/rfmoList.csv', 'utf-8'));
+        const res = await blob.getRfmosData('connString');
+
+        expect(res.length).toBeGreaterThan(0);
+    });
+
+    it('will log and throw any errors', async () => {
+        const error = new Error('rfmosMockError');
+        mockReadToText.mockRejectedValue(error);
+        await expect(blob.getRfmosData('connString')).rejects.toThrow('Error: rfmosMockError');
+
+        expect(mockLogError).toHaveBeenNthCalledWith(1, error);
+        expect(mockLogError).toHaveBeenNthCalledWith(2, `Cannot read remote file ${file} from container ${container}`);
+    });
+});

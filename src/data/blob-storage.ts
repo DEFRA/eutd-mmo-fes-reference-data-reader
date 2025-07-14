@@ -24,6 +24,8 @@ const CONVERSION_FACTORS_CONTAINER_NAME     = 'conversionfactors';
 const CONVERSION_FACTORS_DATA_FILE_NAME     = 'conversionfactors.csv';
 const GEAR_TYPES_DATA_CONTAINER_NAME        = 'geartype';
 const GEAR_TYPES_DATA_FILE_NAME             = 'geartypes.csv';
+const RFMO_DATA_CONTAINER_NAME              = 'catcharea';
+const RFMO_DATA_FILE_NAME                   = 'rfmoList.csv';
 
 export const readToText = async (blobClient) => {
   const downloadBlockBlobResponse = await blobClient.download();
@@ -221,6 +223,23 @@ export const getGearTypesData = async (connectionString: string): Promise<any[]>
   } catch (e) {
     logger.error(e);
     logger.error(`Cannot read remote file ${GEAR_TYPES_DATA_FILE_NAME} from container ${GEAR_TYPES_DATA_CONTAINER_NAME}`);
+    throw new Error(e);
+  }
+}
+
+export const getRfmosData = async (connectionString: string): Promise<any[]> => {
+  try {
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(RFMO_DATA_CONTAINER_NAME);
+    const blobClient = containerClient.getBlobClient(RFMO_DATA_FILE_NAME);
+
+    const rfmoData = await readToText(blobClient) as string;
+    const rfmoDataInJson = await csv({ delimiter: ',' }).fromString(rfmoData);
+    return rfmoDataInJson;
+
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot read remote file ${RFMO_DATA_FILE_NAME} from container ${RFMO_DATA_CONTAINER_NAME}`);
     throw new Error(e);
   }
 }
