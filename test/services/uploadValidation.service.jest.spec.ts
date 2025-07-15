@@ -15,6 +15,41 @@ describe('uploadValidation.service', () => {
     {"Gear category":"Seine nets","Gear name":"Boat seines","Gear code":"SV"},
   ];
 
+  const vessels = [
+    {
+      "fishingVesselName": "KINGFISHER",
+      "ircs": "MXWZ7",
+      "cfr": "GBR000C16272",
+      "flag": "GBR",
+      "homePort": "BALLANTRAE",
+      "registrationNumber": "BA810",
+      "imo": 9183714,
+      "fishingLicenceNumber": "40836",
+      "fishingLicenceValidFrom": "2017-06-27T00:00:00",
+      "fishingLicenceValidTo": "2027-12-31T00:00:00",
+      "adminPort": "AYR",
+      "rssNumber": "C16272",
+      "vesselLength": 22.94,
+      "licenceHolderName": "J KING"
+    },
+    {
+      "fishingVesselName": "KINGFISHER II",
+      "ircs": "",
+      "cfr": "GBR000C16608",
+      "flag": "GBR",
+      "homePort": "TORRIDON",
+      "registrationNumber": "PD110",
+      "imo": null,
+      "fishingLicenceNumber": "31921",
+      "fishingLicenceValidFrom": "2016-07-01T00:01:00",
+      "fishingLicenceValidTo": "2027-12-31T00:01:00",
+      "adminPort": "PORTREE",
+      "rssNumber": "C16608",
+      "vesselLength": 7.32,
+      "licenceHolderName": "MR MA EDWARDS"
+    },
+  ]
+
   describe('validateLandings', () => {
 
     let mockGetSeasonalFish;
@@ -517,6 +552,7 @@ describe('uploadValidation.service', () => {
   describe('validateVesselForLanding', () => {
 
     let mockVesselSearch;
+    let mockGetVesselData;
 
     const uploadedLanding = {
       rowNumber : undefined,
@@ -526,17 +562,20 @@ describe('uploadValidation.service', () => {
       landingDate: '01/01/2020',
       faoArea: undefined,
       vessel : undefined,
-      vesselPln: 'vesselPln',
+      vesselPln: 'PD110',
       exportWeight: undefined,
       errors : []
     }
 
     const vessel = {
-      pln: 'vesselPln',
+      pln: 'PD110',
       vesselLength: 10
     }
 
     beforeEach(() => {
+      mockGetVesselData = jest.spyOn(DataCache, 'getVesselsData');
+      mockGetVesselData.mockReturnValue(vessels);
+
       mockVesselSearch = jest.spyOn(VesselController, 'vesselSearch');
       mockVesselSearch.mockReturnValue([ vessel ]);
     });
@@ -565,17 +604,17 @@ describe('uploadValidation.service', () => {
         }
       );
 
-      expect(result.errors).toStrictEqual(['error.vesselPln.any.invalid']);
+      expect(result.errors).toStrictEqual(['error.vesselPln.any.exists']);
 
     });
 
-    it('should not validate the pln if the landing date is invalid', () => {
+    it('should not check vessel license if the landing date is invalid', () => {
 
       const result = SUT.validateVesselForLanding(
         {
           ...uploadedLanding,
           landingDate: undefined,
-          vesselPln: 'x',
+          vesselPln: 'PD110',
           errors: []
         }
       );

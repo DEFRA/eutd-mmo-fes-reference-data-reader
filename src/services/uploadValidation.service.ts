@@ -3,7 +3,8 @@ import { commoditySearch } from "../controllers/species";
 import { vesselSearch } from "../controllers/vessel";
 import {
   getSeasonalFish,
-  getGearTypes
+  getGearTypes,
+  getVesselsData,
 } from "../data/cache";
 import { faoAreas } from "../data/faoAreas";
 import { IProduct, ISeasonalFishPeriod, ICommodityCode } from "../interfaces/products.interfaces";
@@ -11,6 +12,7 @@ import { IUploadedLanding } from "../interfaces/uploads.interfaces";
 import { IVessel } from "../interfaces/vessels.interfaces";
 import { pipe } from "../utils/functions";
 import { GearRecord } from "../interfaces/gearTypes.interface";
+import { equalsIgnoreCase } from "../utils/string";
 
 const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
 
@@ -102,6 +104,12 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
 
   if (!landing.vesselPln) {
     landing.errors.push('error.vesselPln.any.missing');
+    return landing;
+  }
+  
+  const knownVessels = getVesselsData();
+  if (!knownVessels.find(v => equalsIgnoreCase(landing.vesselPln, v.registrationNumber) || equalsIgnoreCase(landing.vesselPln, v.fishingVesselName))) {
+    landing.errors.push('error.vesselPln.any.exists');
     return landing;
   }
 
