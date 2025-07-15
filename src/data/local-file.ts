@@ -127,13 +127,3 @@ export const getGearTypesDataFromCSV = async (gearTypesFilePath: string): Promis
     throw new Error(e);
   }
 };
-
-export const getRfmosDataFromCSV = async (rfmosFilePath: string): Promise<any[]> => {
-  try {
-    return await csv({ delimiter: ',' }).fromFile(rfmosFilePath);
-
-  } catch(e) {
-    logger.error('Could not load RFMOs data from file', rfmosFilePath);
-    throw new Error(e);
-  }
-};

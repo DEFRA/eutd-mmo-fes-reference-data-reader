@@ -39,7 +39,6 @@ let WEIGHTING: IWeighting = {
 let SPECIES_ALIASES: any = {};
 let EOD_SETTINGS: IEodSetting[] = [];
 let GEAR_TYPES: any[] = [];
-let RFMO_AREAS: any[] = [];
 
 export const loadLocalFishCountriesAndSpecies = async () => {
   logger.info('Loading data from local files in dev mode');
@@ -54,10 +53,9 @@ export const loadLocalFishCountriesAndSpecies = async () => {
   const weightingRisk = await seedWeightingRisk();
   const speciesToggle = await getSpeciesToggle();
   const gearTypes =await loadGearTypesDataFromLocalFile();
-  const rfmos = await loadRfmosDataFromLocalFile();
 
   logger.info(`Finished reading data from local file system, previously species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos});
+  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes});
   logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
   logger.info("Start setting the blocking rules");
@@ -117,11 +115,8 @@ export const loadProdFishCountriesAndSpecies = async () => {
     logger.debug('[LOAD-PROD-CONFIG] loadGearTypesData');
     const gearTypes = await loadGearTypesData(blobStorageConnStr);
 
-    logger.debug('[LOAD-PROD-CONFIG] loadRfmosData');
-    const rfmos = await loadRfmosDataFromAzureBlob(blobStorageConnStr);
-
     logger.info(`[LOAD-PROD-CONFIG] Finished reading data, previously species: ${SPECIES.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos});
+    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes});
     logger.info(`[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
     logger.info(`[LOAD-PROD-CONFIG] Finished reading vessels of interest, previously: ${VESSELS_OF_INTEREST.length}`);
@@ -256,8 +251,6 @@ export const getSpeciesRiskToggle = (): boolean => SPECIES_TOGGLE;
 
 export const getGearTypes = () => { return GEAR_TYPES };
 
-export const getRfmos = (): any[] => { return RFMO_AREAS };
-
 export const updateCache = ({
   species,
   allSpecies,
@@ -267,7 +260,6 @@ export const updateCache = ({
   speciesAliases,
   commodityCodes,
   gearTypes,
-  rfmos
 }: CacheType) => {
   if (species) {
     SPECIES = species;
@@ -308,10 +300,6 @@ export const updateCache = ({
 
   if(gearTypes) {
     GEAR_TYPES = gearTypes;
-  }
-
-  if (rfmos) {
-    RFMO_AREAS = rfmos;
   }
 }
 
@@ -489,15 +477,6 @@ export const loadGearTypesData = async (blobConnStr: string): Promise<any[] | un
   }
 }
 
-export const loadRfmosDataFromAzureBlob = async (blobConnStr: string): Promise<string[] | undefined> => {
-  try {
-    logger.info('[BLOB-STORAGE-DATA-LOAD][RFMO-AREAS]');
-    return await blob.getRfmosData(blobConnStr);
-  } catch (e) {
-    throw new Error(`[BLOB-STORAGE-LOAD-ERROR][RFMO-AREAS] ${e}`)
-  }
-}
-
 export const loadAllSpeciesFromLocalFile = async (): Promise<IAllSpecies[] | undefined> => {
   const path = `${__dirname}/../../data/allSpecies.csv`;
   try {
@@ -611,15 +590,5 @@ export const loadGearTypesDataFromLocalFile = async (gearTypesFilePath?: string)
   } catch (e) {
     logger.error(e);
     logger.error(`Cannot load gear types file from local file system, path: ${path}`);
-  }
-};
-
-export const loadRfmosDataFromLocalFile = async (rfmosFilePath?: string): Promise<string[] | undefined> => {
-  const path = rfmosFilePath || `${__dirname}/../../data/rfmoList.csv`;
-  try {
-    return await file.getRfmosDataFromCSV(path);
-  } catch (e) {
-    logger.error(e);
-    logger.error(`Cannot load rfmo list file from local file system, path: ${path}`);
   }
 }

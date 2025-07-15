@@ -9,5 +9,4 @@ export type CacheType = {
   speciesAliases?: any;
   commodityCodes: any[] | undefined;
   gearTypes?: any[];
-  rfmos?: any[];
 };
