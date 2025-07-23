@@ -31,7 +31,9 @@ describe('POST /isLegallyDue', () => {
     "id":"GBR-2023-CC-DC72A6E55-2509840834",
     "date":"2023-08-08",
     "faoArea":"FAO27",
-    "weight":123
+    "weight":123,
+    "highSeasArea": "yes",
+    "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)"
   };
   const products = [{
     "species":"Atlantic cod (COD)",

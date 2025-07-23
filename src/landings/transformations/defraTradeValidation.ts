@@ -75,6 +75,8 @@ export const toDefraTradeLanding = (landing: ICcQueryResult): IDefraTradeLanding
     species: landing.extended.species,
     flag: landing.extended.flag,
     catchArea: landing.extended.fao,
+    highSeasArea: landing.extended.highSeasArea,
+    rfmo: landing.extended.rfmo,
     homePort: landing.extended.homePort,
     fishingLicenceNumber: landing.extended.licenceNumber,
     fishingLicenceValidTo: landing.extended.licenceValidTo,

@@ -13,7 +13,7 @@ import logger from '../../src/logger';
 import { ILicence, IVessel } from '../../src/landings/types/appConfig/vessels';
 import { IEodSetting } from '../../src/landings/types/appConfig/eodSettings';
 import moment from 'moment';
-import { mockGearTypesData } from '../mockData';
+import { mockGearTypesData, mockRfmosData } from '../mockData';
 
 const allSpeciesData: any[] = [
   {
@@ -282,6 +282,8 @@ const commodityCodes: any[] = [{
 
 const gearTypesData: any[] = mockGearTypesData
 
+const rfmosData: any[] = mockRfmosData;
+
 describe('when in production mode', () => {
   let mockLoadAllSpecies;
   let mockLoadSpecies;
@@ -300,6 +302,7 @@ describe('when in production mode', () => {
   let mockGetCommodityCodes;
   let mockGetEodSettings;
   let mockLoadGearTypesData;
+  let mockGetRfmosData;
 
   let mockLoggerInfo;
   let mockLoggerError;
@@ -327,6 +330,7 @@ describe('when in production mode', () => {
     mockGetAddresses = jest.spyOn(BoomiService, 'getAddresses');
     mockGetEodSettings = jest.spyOn(EoDService, 'getEodSettings');
     mockLoadGearTypesData = jest.spyOn(SUT, 'loadGearTypesData');
+    mockGetRfmosData = jest.spyOn(SUT, 'loadRfmosDataFromAzureBlob');
 
     mockLoggerInfo = jest.spyOn(logger, 'info');
     mockLoggerError = jest.spyOn(logger, 'error');
@@ -348,6 +352,7 @@ describe('when in production mode', () => {
     mockGetSpeciesToggle.mockResolvedValue(speciesToggleData);
     mockGetAddresses.mockResolvedValue(null);
     mockLoadGearTypesData.mockResolvedValue(gearTypesData);
+    mockGetRfmosData.mockResolvedValue(rfmosData);
   });
 
   afterEach(() => {
@@ -365,6 +370,7 @@ describe('when in production mode', () => {
     mockGetSpeciesToggle.mockRestore();
     mockGetEodSettings.mockRestore();
     mockLoadGearTypesData.mockRestore();
+    mockGetRfmosData.mockRestore();
     
     mockLoggerInfo.mockRestore();
     mockLoggerError.mockRestore();
@@ -378,6 +384,7 @@ describe('when in production mode', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
     SUT.updateVesselsCache([]);
     SUT.updateVesselsOfInterestCache([]);
@@ -483,6 +490,7 @@ describe('when in production mode', () => {
       expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] getSpeciesToggle');
       expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] loadSpeciesAliases');
       expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] loadGearTypesData');
+      expect(mockLoggerDebug).toHaveBeenCalledWith('[LOAD-PROD-CONFIG] loadRfmosData');
     });
 
     describe('getCountries', () => {
@@ -553,6 +561,13 @@ describe('when in production mode', () => {
     });
   })
 
+  describe('getRfmos', () => {
+    it('should have a list of rfmos data', async () => {
+      await SUT.loadProdFishCountriesAndSpecies();
+      expect(SUT.getRfmos()).toHaveLength(20);
+    });
+  })
+
 });
 
 describe('when in development mode', () => {
@@ -575,6 +590,7 @@ describe('when in development mode', () => {
   let mockSeedBlockingRules;
   let mockGetEodSettings;
   let mockLoadGearTypesData;
+  let mockGetRfmosData;
 
   beforeEach(() => {
     appConfig.inDev = true;
@@ -594,6 +610,7 @@ describe('when in development mode', () => {
     mockLoggerInfo = jest.spyOn(logger, 'info');
     mockSeedBlockingRules = jest.spyOn(systemBlocks, 'seedBlockingRules');
     mockLoadGearTypesData = jest.spyOn(SUT, 'loadGearTypesDataFromLocalFile');
+    mockGetRfmosData = jest.spyOn(SUT, 'loadRfmosDataFromLocalFile');
 
     mockLoadAllSpecies.mockResolvedValue(allSpeciesData);
     mockLoadVesselsDataFromLocalFile.mockResolvedValue(vesselData);
@@ -608,6 +625,7 @@ describe('when in development mode', () => {
     mockGetSpeciesToggle.mockResolvedValue(speciesToggleData);
     mockSeedBlockingRules.mockResolvedValue(undefined);
     mockLoadGearTypesData.mockResolvedValue(gearTypesData);
+    mockGetRfmosData.mockResolvedValue(rfmosData);
   });
 
   afterEach(() => {
@@ -623,6 +641,7 @@ describe('when in development mode', () => {
     mockLoggerInfo.mockRestore();
     mockGetEodSettings.mockRestore();
     mockLoadGearTypesData.mockRestore();
+    mockGetRfmosData.mockRestore();
 
     appConfig.enableCountryData = enableCountryData;
     appConfig.vesselNotFoundEnabled = enableVesselNotFound;
@@ -636,6 +655,7 @@ describe('when in development mode', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
     SUT.updateVesselsOfInterestCache([]);
     SUT.updateSpeciesToggleCache({
@@ -662,6 +682,7 @@ describe('when in development mode', () => {
       expect(mockSeedVesselsOfInterest).toHaveBeenCalled();
       expect(mockGetSpeciesToggle).toHaveBeenCalled();
       expect(mockLoadGearTypesData).toHaveBeenCalled();
+      expect(mockGetRfmosData).toHaveBeenCalled();
 
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
@@ -719,6 +740,7 @@ describe('when in development mode', () => {
         speciesAliases: mockSpeciesAliases,
         commodityCodes: [],
         gearTypes: [],
+        rfmos: []
       });
     });
 
@@ -750,6 +772,7 @@ describe('when in development mode', () => {
     expect(mockLoadSeasonalFishData).toHaveBeenCalled();
     expect(mockLoadGearTypesData).toHaveBeenCalled();
     expect(mockLoadCountries).toHaveBeenCalled();
+    expect(mockGetRfmosData).toHaveBeenCalled();
 
     expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0');
     expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1');
@@ -804,6 +827,7 @@ describe('isQuotaSpecies', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
   })
 
@@ -887,6 +911,7 @@ describe('getSpeciesRiskScore', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
   })
 
@@ -1002,6 +1027,7 @@ describe('getToLiveWeightFactor', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
   });
 
@@ -1111,6 +1137,7 @@ describe('getAllConversionFactors', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
   });
 
@@ -1126,6 +1153,7 @@ describe('getAllConversionFactors', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
   });
 
@@ -1420,6 +1448,7 @@ describe('getSpeciesRiskScore', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
   });
 
@@ -1519,6 +1548,7 @@ describe('Refresh Risking Data', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
     SUT.updateEodSettingsCache([]);
 
@@ -1561,6 +1591,7 @@ describe('Refresh Risking Data', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
+      rfmos: []
     });
     SUT.updateEodSettingsCache([]);
 
@@ -1746,6 +1777,7 @@ describe('updateCache', () => {
       speciesAliases: undefined,
       commodityCodes: undefined,
       gearTypes: undefined,
+      rfmos: undefined
     });
 
     expect(SUT.getSpeciesData('uk')).toHaveLength(0);
@@ -1753,6 +1785,7 @@ describe('updateCache', () => {
     expect(SUT.getSeasonalFish()).toHaveLength(0)
     expect(SUT.getCountries()).toHaveLength(0)
     expect(SUT.getGearTypes()).toHaveLength(0)
+    expect(SUT.getRfmos()).toHaveLength(0);
   });
 });
 
@@ -2110,6 +2143,58 @@ describe('loadGearTypesData', () => {
 
 });
 
+describe('loadRfmosData', () => {
+
+  const connString = 'connection string';
+
+  let mockGetRfmosData;
+  let mockLoggerInfo;
+
+  beforeEach(() => {
+    mockGetRfmosData = jest.spyOn(blob, 'getRfmosData');
+    mockLoggerInfo = jest.spyOn(logger, 'info');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('will log being called', async () => {
+    mockGetRfmosData.mockResolvedValue('test');
+
+    await SUT.loadRfmosDataFromAzureBlob(connString);
+
+    expect(mockLoggerInfo).toHaveBeenCalledWith('[BLOB-STORAGE-DATA-LOAD][RFMO-AREAS]');
+  });
+
+  it('will call getRfmosData in blob storage', async () => {
+    mockGetRfmosData.mockResolvedValue('test');
+
+    await SUT.loadRfmosDataFromAzureBlob(connString);
+
+    expect(mockGetRfmosData).toHaveBeenCalledWith(connString);
+  });
+
+  it('will return data from blob storage', async () => {
+    mockGetRfmosData.mockResolvedValue('test');
+
+    const result = await SUT.loadRfmosDataFromAzureBlob(connString);
+
+    expect(result).toBe('test');
+  });
+
+  it('will throw an error if blob storage throws an error', async () => {
+    const error = new Error('something went wrong');
+
+    mockGetRfmosData.mockRejectedValue(error);
+
+    const expected = `[BLOB-STORAGE-LOAD-ERROR][RFMO-AREAS] ${error}`;
+
+    await expect(async () => SUT.loadRfmosDataFromAzureBlob(connString)).rejects.toThrow(expected);
+  });
+
+});
+
 describe('loadAllSpeciesFromLocalFile', () => {
 
   let mockGetSpeciesData;
@@ -2463,4 +2548,47 @@ describe('loadGearTypesDataFromLocalFile', () => {
     expect(result).toBeUndefined();
   });
 
+});
+
+describe('loadRfmosDataFromLocalFile', () => {
+
+  let mockGetRfmosData;
+  let mockLoggerError;
+
+  beforeEach(() => {
+    mockGetRfmosData = jest.spyOn(file, 'getRfmosDataFromCSV');
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('will call getRfmosDataFromCSV in file storage', async () => {
+    mockGetRfmosData.mockResolvedValue('test');
+
+    await SUT.loadRfmosDataFromLocalFile();
+
+    expect(mockGetRfmosData).toHaveBeenCalled();
+  });
+
+  it('will return data from file storage', async () => {
+    mockGetRfmosData.mockResolvedValue('test');
+
+    const result = await SUT.loadRfmosDataFromLocalFile();
+
+    expect(result).toBe('test');
+  });
+
+  it('will log an error and return void if file storage throws an error', async () => {
+
+    mockGetRfmosData.mockImplementation(() => {
+      throw 'something went wrong'
+    });
+
+    const result = await SUT.loadRfmosDataFromLocalFile();
+
+    expect(mockLoggerError).toHaveBeenCalled();
+    expect(result).toBeUndefined();
+  });
 });

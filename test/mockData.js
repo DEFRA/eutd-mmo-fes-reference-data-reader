@@ -1131,4 +1131,226 @@ module.exports = {
         'Gear code': 'FG',
         }
     ],
+    mockRfmosData: [
+        {
+            Name: 'Commission for the Conservation of Antarctic Marine Living Resources',
+            Abbreviation: 'CCAMLR',
+            'Full text': 'Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'General Fisheries Commission for the Mediterranean',
+            Abbreviation: 'GFCM',
+            'Full text': 'General Fisheries Commission for the Mediterranean (GFCM)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'North East Atlantic Fisheries Commission',
+            Abbreviation: 'NEAFC',
+            'Full text': 'North East Atlantic Fisheries Commission (NEAFC)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'Northwest Atlantic Fisheries Organization',
+            Abbreviation: 'NAFO',
+            'Full text': 'Northwest Atlantic Fisheries Organization (NAFO)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'North Pacific Fisheries Commission',
+            Abbreviation: 'NPFC',
+            'Full text': 'North Pacific Fisheries Commission (NPFC)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'South East Atlantic Fisheries Organisation',
+            Abbreviation: 'SEAFO',
+            'Full text': 'South East Atlantic Fisheries Organisation (SEAFO)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'South Pacific Regional Fisheries Management Organisation',
+            Abbreviation: 'SPRFMO',
+            'Full text': 'South Pacific Regional Fisheries Management Organisation (SPRFMO)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'Southern Indian Ocean Fisheries Agreement',
+            Abbreviation: 'SIOFA',
+            'Full text': 'Southern Indian Ocean Fisheries Agreement (SIOFA)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'Western and Central Pacific Fisheries Commission',
+            Abbreviation: 'WCPFC',
+            'Full text': 'Western and Central Pacific Fisheries Commission (WCPFC)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'Commission for the Conservation of Southern Bluefin Tuna',
+            Abbreviation: 'CCSBT',
+            'Full text': 'Commission for the Conservation of Southern Bluefin Tuna (CCSBT)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'International Commission for the Conservation of Atlantic Tunas',
+            Abbreviation: 'ICCAT',
+            'Full text': 'International Commission for the Conservation of Atlantic Tunas (ICCAT)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'Indian Ocean Tuna Commission',
+            Abbreviation: 'IOTC',
+            'Full text': 'Indian Ocean Tuna Commission (IOTC)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'Inter-American Tropical Tuna Commission',
+            Abbreviation: 'IATTC',
+            'Full text': 'Inter-American Tropical Tuna Commission (IATTC)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: 'North Atlantic Salmon Conservation Organization',
+            Abbreviation: 'NASCO',
+            'Full text': 'North Atlantic Salmon Conservation Organization (NASCO)',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: '',
+            Abbreviation: '',
+            'Full text': '',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: '',
+            Abbreviation: '',
+            'Full text': '',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: '',
+            Abbreviation: '',
+            'Full text': '',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: '',
+            Abbreviation: '',
+            'Full text': '',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: '',
+            Abbreviation: '',
+            'Full text': '',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        },
+        {
+            Name: '',
+            Abbreviation: '',
+            'Full text': '',
+            field4: '',
+            field5: '',
+            field6: '',
+            field7: '',
+            field8: '',
+            field9: ''
+        }
+    ]
 };

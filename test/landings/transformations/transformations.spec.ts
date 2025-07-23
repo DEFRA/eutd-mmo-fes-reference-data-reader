@@ -416,7 +416,7 @@ describe('about unwindCatchCerts', () => {
 describe('mapCatchCerts', () => {
   it('will surface the factor applied to the weight', () => {
     const unwoundCertificates = [
-      { documentNumber: 'CC1', status: 'COMPLETE', createdAt: '2019-07-10T08:26:06.939Z', speciesCode: 'LBE', factor: 1, pln: 'WA1', date: '2019-07-10', weight: 100, extended: { vesselOverriddenByAdmin: undefined,speciesOverriddenByAdmin:false } }
+      { documentNumber: 'CC1', status: 'COMPLETE', createdAt: '2019-07-10T08:26:06.939Z', speciesCode: 'LBE', factor: 1, pln: 'WA1', date: '2019-07-10', weight: 100, extended: { vesselOverriddenByAdmin: undefined, speciesOverriddenByAdmin: false } }
     ];
 
     const result = Array.from(Transformations.mapCatchCerts(unwoundCertificates, () => true));
@@ -433,7 +433,7 @@ describe('mapCatchCerts', () => {
       weight: 100,
       extended: {
         vesselOverriddenByAdmin: undefined,
-        speciesOverriddenByAdmin:false,
+        speciesOverriddenByAdmin: false,
         flag: undefined,
         homePort: undefined,
         imoNumber: undefined,
@@ -446,7 +446,7 @@ describe('mapCatchCerts', () => {
 
   it('will surface the licence details for the vessel', () => {
     const unwoundCertificates = [
-      { documentNumber: 'CC1', status: 'COMPLETE', createdAt: '2019-07-10T08:26:06.939Z', speciesCode: 'LBE', factor: 1, pln: 'WA1', date: '2019-07-10', weight: 100, extended: { vesselOverriddenByAdmin: undefined,  speciesOverriddenByAdmin:false } }
+      { documentNumber: 'CC1', status: 'COMPLETE', createdAt: '2019-07-10T08:26:06.939Z', speciesCode: 'LBE', factor: 1, pln: 'WA1', date: '2019-07-10', weight: 100, extended: { vesselOverriddenByAdmin: undefined, speciesOverriddenByAdmin: false } }
     ];
 
     const result = Array.from(Transformations.mapCatchCerts(unwoundCertificates, () => ({
@@ -472,7 +472,7 @@ describe('mapCatchCerts', () => {
       weight: 100,
       extended: {
         vesselOverriddenByAdmin: undefined,
-        speciesOverriddenByAdmin:false,
+        speciesOverriddenByAdmin: false,
         flag: 'GBR',
         homePort: 'FLEETWOOD',
         imoNumber: null,
@@ -485,7 +485,7 @@ describe('mapCatchCerts', () => {
 
   it('will surface the admin licence holder', () => {
     const unwoundCertificates = [
-      { documentNumber: 'CC1', status: 'COMPLETE', createdAt: '2019-07-10T08:26:06.939Z', speciesCode: 'LBE', factor: 1, pln: 'WA1', date: '2019-07-10', weight: 100, extended: { vesselOverriddenByAdmin: true, speciesOverriddenByAdmin:false, licenceHolder: 'Admin added licence holder' } }
+      { documentNumber: 'CC1', status: 'COMPLETE', createdAt: '2019-07-10T08:26:06.939Z', speciesCode: 'LBE', factor: 1, pln: 'WA1', date: '2019-07-10', weight: 100, extended: { vesselOverriddenByAdmin: true, speciesOverriddenByAdmin: false, licenceHolder: 'Admin added licence holder' } }
     ];
 
     const result = Array.from(Transformations.mapCatchCerts(unwoundCertificates, () => ({
@@ -511,7 +511,7 @@ describe('mapCatchCerts', () => {
       weight: 100,
       extended: {
         vesselOverriddenByAdmin: true,
-        speciesOverriddenByAdmin:false,
+        speciesOverriddenByAdmin: false,
         flag: 'GBR',
         homePort: 'FLEETWOOD',
         imoNumber: null,
@@ -980,7 +980,7 @@ describe('map from the structure in orchestrator to cc', () => {
               "label": "Lobster"
             },
             "factor": 5,
-            "speciesOverriddenByAdmin":false,
+            "speciesOverriddenByAdmin": false,
           },
           "landings": [
             {
@@ -1007,6 +1007,8 @@ describe('map from the structure in orchestrator to cc', () => {
                 "exportWeight": 78,
                 "gearType": "Type 1",
                 "faoArea": "FAO27",
+                "highSeasArea": "yes",
+                "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
                 "numberOfSubmissions": 0,
                 "isLegallyDue": false,
                 "riskScore": 0.25,
@@ -1040,6 +1042,8 @@ describe('map from the structure in orchestrator to cc', () => {
                 "exportWeight": 78,
                 "gearType": "Type 1",
                 "faoArea": "FAO27",
+                "highSeasArea": "yes",
+                "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
                 "numberOfSubmissions": 1,
                 "isLegallyDue": true,
                 "riskScore": 0.04,
@@ -1077,7 +1081,7 @@ describe('map from the structure in orchestrator to cc', () => {
           "presentation": { "code": "FIS", "name": "Filleted and skinned", "admin": undefined },
           "factor": 5,
           "caughtBy": [
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-10-06", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5},
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-10-06", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5 },
             { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-07-01", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.04, "speciesRiskScore": 0.2, "threshold": 1, "vesselRiskScore": 0.2 }
           ]
         }],
@@ -1185,6 +1189,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
         extended: {
           exporterName: 'Mr Bob',
           vessel: 'DAYBREAK',
+          highSeasArea: 'yes',
+          rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
           pln: 'WA1',
           species: 'Lobster',
           state: 'BAD',
@@ -1237,6 +1243,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
         extended: {
           exporterName: 'Mr Bob',
           vessel: 'DAYBREAK',
+          highSeasArea: 'yes',
+          rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
           pln: 'WA1',
           species: 'Lobster',
           state: 'BAD',
@@ -1290,6 +1298,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
         extended: {
           exporterName: 'Mr Bob',
           vessel: 'DAYBREAK',
+          highSeasArea: 'yes',
+          rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
           pln: 'WA1',
           species: 'Lobster',
           presentation: 'Cut & Fresh',
@@ -1344,6 +1354,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
         extended: {
           exporterName: 'Mr Bob',
           vessel: 'DAYBREAK',
+          highSeasArea: 'yes',
+          rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
           pln: 'WA1',
           species: 'Lobster',
           presentation: 'Cut & Fresh',
@@ -1398,6 +1410,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
         extended: {
           exporterName: 'Mr Bob',
           vessel: 'DAYBREAK',
+          highSeasArea: 'yes',
+          rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
           pln: 'WA1',
           species: 'Lobster',
           presentation: 'Cut & Fresh',
@@ -1452,6 +1466,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
         extended: {
           exporterName: 'Mr Bob',
           vessel: 'DAYBREAK',
+          highSeasArea: 'yes',
+          rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
           pln: 'WA1',
           species: 'Lobster',
           presentation: 'Cut & Fresh',
@@ -1567,6 +1583,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
               presentationName: "sliced",
               vessel: "DAYBREAK",
               fao: "FAO27",
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: "WA1",
               species: "Lobster",
               state: "FRE",
@@ -1636,6 +1654,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -1701,6 +1721,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -1771,6 +1793,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -1835,6 +1859,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -1918,6 +1944,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
                 presentationName: "sliced",
                 vessel: "DAYBREAK",
                 fao: "FAO27",
+                highSeasArea: 'yes',
+                rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
                 pln: "WA1",
                 species: "Lobster",
                 state: "FRE",
@@ -2003,6 +2031,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
                 presentationName: "sliced",
                 vessel: "DAYBREAK",
                 fao: "FAO27",
+                highSeasArea: 'yes',
+                rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
                 pln: "WA1",
                 species: "Lobster",
                 state: "FRE",
@@ -2071,6 +2101,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -2127,6 +2159,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -2182,6 +2216,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -2244,6 +2280,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -2298,6 +2336,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             extended: {
               exporterName: 'Mr Bob',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -2350,6 +2390,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
               exporterContactId: 'some-contact-id',
               exporterAccountId: 'some-account-id',
               vessel: 'DAYBREAK',
+              highSeasArea: 'yes',
+              rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
               species: 'Lobster',
               state: 'BAD',
@@ -2411,6 +2453,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             exporterContactId: 'some-contact-id',
             exporterAccountId: 'some-account-id',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2464,6 +2508,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
             exporterContactId: 'some-contact-id',
             exporterAccountId: 'some-account-id',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2521,6 +2567,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
                 exporterContactId: 'some-contact-id',
                 exporterAccountId: 'some-account-id',
                 vessel: 'DAYBREAK',
+                highSeasArea: 'yes',
+                rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
                 pln: 'WA1',
                 species: 'Lobster',
                 state: 'BAD',
@@ -2593,6 +2641,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
                 exporterContactId: 'some-contact-id',
                 exporterAccountId: 'some-account-id',
                 vessel: 'DAYBREAK',
+                highSeasArea: 'yes',
+                rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
                 pln: 'WA1',
                 species: 'Lobster',
                 state: 'BAD',
@@ -2649,6 +2699,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2702,6 +2754,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2755,6 +2809,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2821,6 +2877,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2866,6 +2924,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2930,6 +2990,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -2975,6 +3037,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -3020,6 +3084,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK 2',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -3065,6 +3131,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -3111,6 +3179,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'WITH SHELL',
@@ -3157,6 +3227,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Log',
             state: 'WET',
@@ -3254,6 +3326,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',
@@ -3299,6 +3373,8 @@ describe('When mapping from a raw catch cert output to an online validation repo
           extended: {
             exporterName: 'Mr Bob',
             vessel: 'DAYBREAK',
+            highSeasArea: 'yes',
+            rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             pln: 'WA1',
             species: 'Lobster',
             state: 'BAD',

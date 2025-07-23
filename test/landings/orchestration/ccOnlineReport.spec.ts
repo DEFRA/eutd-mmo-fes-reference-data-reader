@@ -697,6 +697,8 @@ describe('When validating an online Catch Certificate', () => {
                     "dateLanded": "2019-10-06T00:00:00.000Z",
                     "exportWeight": 78,
                     "faoArea": "FAO27",
+                    "highSeasArea": "yes",
+                    "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
                     "riskScore": 0.04,
                     "threshold": 1,
                     "speciesRiskScore": 0.2,
@@ -3344,7 +3346,9 @@ describe('When updating a landing within an online Catch Certificate', () => {
     pln: "H1100",
     date: "some-date",
     faoArea: "FAO27",
-    weight: 500
+    weight: 500,
+    highSeasArea: "yes",
+    rfmo: "General Fisheries Commission for the Mediterranean (GFCM)"
   };
 
   const product = {

@@ -68,6 +68,8 @@ describe('toLanding', () => {
       state: 'a state',
       presentation: 'a presentation',
       vessel: 'a vessel name',
+      highSeasArea: 'yes',
+      rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
       pln: ' a pln',
       dataEverExpected: true,
       landingDataExpectedDate: "2023-05-26",
@@ -414,7 +416,9 @@ describe('toDynamicsCcCase', () => {
               "id": "5a259dc5-b05c-44fe-8d3f-7ee8cc99bfca",
               "date": "2020-06-24",
               "faoArea": "FAO27",
-              "weight": 100
+              "weight": 100,
+              "highSeasArea": "yes",
+              "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)"
             }
           ]
         },
