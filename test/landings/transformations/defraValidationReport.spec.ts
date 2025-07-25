@@ -1428,8 +1428,6 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         state: 'FRE',
         stateName: 'fresh',
         commodityCode: '1234',
-        highSeasArea: "yes",
-        rfmo: "NAFO",
         commodityCodeAdmin: '1234 - ADMIN',
         investigation: {
           investigator: "Investigator Gadget",
@@ -1495,7 +1493,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
       expect(result[0].isValidationFailed).toEqual(true);
       expect(result[0].gearType).toEqual('Type 1');
       expect(result[0].highSeasArea).toEqual('yes');
-      expect(result[0].rfmo).toEqual('NAFO');
+      expect(result[0].rfmo).toEqual('General Fisheries Commission for the Mediterranean (GFCM)');
       expect(result[0].startDate).toEqual('2019-07-10');
       expect(result[0].date).toEqual('2019-07-10');
       expect(result[0].cnCode).toEqual('1234');
@@ -1567,7 +1565,6 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           state: 'FRE',
           stateName: 'fresh',
           commodityCode: '1234',
-          highSeasArea: 'yes',
           investigation: {
             investigator: "Investigator Gadget",
             status: InvestigationStatus.Open
@@ -1645,7 +1642,6 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           state: 'FRE',
           stateName: 'fresh',
           commodityCode: '1234',
-          highSeasArea: 'yes',
           investigation: {
             investigator: "Investigator Gadget",
             status: InvestigationStatus.Open
@@ -1785,7 +1781,6 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           state: 'FRE',
           stateName: 'fresh',
           commodityCode: '1234',
-          highSeasArea: 'yes',
           investigation: {
             investigator: "Investigator Gadget",
             status: InvestigationStatus.Open

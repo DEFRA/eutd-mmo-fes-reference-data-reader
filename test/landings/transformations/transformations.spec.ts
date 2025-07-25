@@ -1081,8 +1081,8 @@ describe('map from the structure in orchestrator to cc', () => {
           "presentation": { "code": "FIS", "name": "Filleted and skinned", "admin": undefined },
           "factor": 5,
           "caughtBy": [
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-10-06", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5 },
-            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-07-01", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.04, "speciesRiskScore": 0.2, "threshold": 1, "vesselRiskScore": 0.2 }
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-10-06", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 1, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": true, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": false, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.25, "speciesRiskScore": 0.5, "threshold": 1, "vesselRiskScore": 0.5, "highSeasArea": "yes", "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)" },
+            { "cfr": "GBRC19027", "vessel": "DAYBREAK", "pln": "WA1", "startDate": "2019-10-05", "date": "2019-07-01", "weight": 78, "gearType": "Type 1", "numberOfSubmissions": 2, "faoArea": "FAO27", "flag": "GBR", "id": "e5b7332b-945f-4bfd-8345-e24ee19386ae", "vesselOverriddenByAdmin": undefined, "licenceHolder": "MR JOHN DOE", "dataEverExpected": false, "landingDataEndDate": undefined, "landingDataExpectedDate": undefined, "isLegallyDue": true, "exporterRiskScore": 1, "isSpeciesRiskEnabled": false, "riskScore": 0.04, "speciesRiskScore": 0.2, "threshold": 1, "vesselRiskScore": 0.2, "highSeasArea": "yes", "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)" },
           ]
         }],
       "exporterDetails": {
@@ -1724,7 +1724,7 @@ describe('When mapping from a raw catch cert output to an online validation repo
               highSeasArea: 'yes',
               rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
-              species: 'Lobster',
+              species: 'Lobster', 
               state: 'BAD',
               commodityCode: '1234',
               status: 'COMPLETE',
