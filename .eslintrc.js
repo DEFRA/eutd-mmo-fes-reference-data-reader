@@ -13,7 +13,7 @@ module.exports = {
     /* This rule is deprecated but is still included in the plugins so disabled here
            to use the new @typescript-eslint/naming-convention */
     '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/no-unused-vars': [ 'warn', { argsIgnorePattern: '^_' } ],
+    '@typescript-eslint/no-unused-vars': [ 'error', { argsIgnorePattern: '^_' } ],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',

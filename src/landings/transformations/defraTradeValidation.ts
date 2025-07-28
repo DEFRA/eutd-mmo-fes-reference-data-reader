@@ -1,5 +1,12 @@
 import moment from "moment";
-import { ICcQueryResult, IDynamicsLanding, toDefraCcLandingStatus, IDefraTradeLanding, IDefraTradeCatchCertificate, CertificateStatus, toTransportations, CatchCertificateTransport } from 'mmo-shared-reference-data';
+import {
+  ICcQueryResult,
+  IDynamicsLanding,
+  toDefraCcLandingStatus,
+  IDefraTradeLanding,
+  IDefraTradeCatchCertificate,
+  CertificateStatus
+} from 'mmo-shared-reference-data';
 import { IDefraTradeProcessingStatement, IDefraTradeProcessingStatementCatch, IDefraTradeSdPsStatus, IDefraTradeStorageDocument, IDefraTradeStorageDocumentProduct } from "../types/defraTradeSdPsCase";
 import { IDocument } from "../types/document";
 import { IDynamicsCatchCertificateCase } from "../types/dynamicsCcCase";

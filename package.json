@@ -11,7 +11,8 @@
     "debug:start": "cross-env NODE_ENV=development npm-run-all build start-debug --print-label",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "commitLint": "eslint . --ext .ts --max-warnings=0"
+    "commitLint": "eslint . --ext .ts --max-warnings=0",
+    "prepare": "husky || true"
   },
   "author": "",
   "license": "ISC",
