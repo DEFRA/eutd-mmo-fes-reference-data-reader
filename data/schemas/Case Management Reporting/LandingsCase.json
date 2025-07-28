@@ -23,6 +23,8 @@
         "scientificName": "scientific name",
         "weight": 1000,
         "gearType": "Type 1",
+        "highSeasArea": "yes",
+        "rfmo": "North Pacific Fisheries Commission (NPFC)",
         "speciesAlias": "Y",
         "speciesAnomaly": "CAA",
         "numberOfTotalSubmissions": 1,

@@ -76,6 +76,8 @@
           "vesselAdministration": "Northern Ireland",
           "weight": 500,
           "gearType": "Type 1",
+          "highSeasArea": "yes",
+          "rfmo": "North Pacific Fisheries Commission (NPFC)",
           "speciesAlias": "Y",
           "speciesAnomaly": "SQR",
           "numberOfTotalSubmissions": 1,
@@ -417,6 +419,40 @@
         },
         "gearType": {
           "type": "string"
+        },
+        "highSeasArea": {
+          "description": "The high seas area fish was caught in",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "yes",
+            "no"
+          ]
+        },
+        "rfmo": {
+          "description": "The Regional Fisheries Management Organisation the fish was caught in",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+            "General Fisheries Commission for the Mediterranean (GFCM)",
+            "North East Atlantic Fisheries Commission (NEAFC)",
+            "Northwest Atlantic Fisheries Organization (NAFO)",
+            "North Pacific Fisheries Commission (NPFC)",
+            "South East Atlantic Fisheries Organisation (SEAFO)",
+            "South Pacific Regional Fisheries Management Organisation (SPRFMO)",
+            "Southern Indian Ocean Fisheries Agreement (SIOFA)",
+            "Western and Central Pacific Fisheries Commission (WCPFC)",
+            "Commission for the Conservation of Southern Bluefin Tuna (CCSBT)",
+            "International Commission for the Conservation of Atlantic Tunas (ICCAT)",
+            "Indian Ocean Tuna Commission (IOTC)",
+            "Inter-American Tropical Tuna Commission (IATTC)",
+            "North Atlantic Salmon Conservation Organization (NASCO)"
+          ]
         },
         "speciesAlias": {
           "description": "status (Y/N) of certain species mismatching during real-time validation and retrospective validation",

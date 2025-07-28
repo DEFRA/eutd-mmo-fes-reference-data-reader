@@ -5730,6 +5730,8 @@ describe('Dynamics Validation', () => {
         licenceHolder: 'MASTER OF VESSEL',
         fao: 'FAO27',
         pln: 'WA1',
+        highSeasArea: 'yes',
+        rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
         species: 'Lobster',
         speciesAdmin: 'Lobster Admin',
         scientificName: "Gadus morhua",
@@ -5766,6 +5768,8 @@ describe('Dynamics Validation', () => {
       expect(result.source).toBeUndefined();
       expect(result.weight).toEqual(122);
       expect(result.gearType).toEqual('Type 1');
+      expect(result.highSeasArea).toEqual("yes");
+      expect(result.rfmo).toEqual("General Fisheries Commission for the Mediterranean (GFCM)");
       expect(result.numberOfTotalSubmissions).toEqual(1);
       expect(result.risking?.overuseInfo).toEqual(["CC2", "CC3"]);
       expect(result.vesselOverriddenByAdmin).toBe(false);
