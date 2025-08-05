@@ -5,4 +5,4 @@ export const capitalize = (s: string): string => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export const equalsIgnoreCase = (a?: string, b?: string) => (a ?? "").toLowerCase() === (b ?? "").toLowerCase();
+export const equalsIgnoreCase = (a?: string, b?: string) => (a ?? '').localeCompare(b ?? '', undefined, { sensitivity: 'accent' }) === 0;

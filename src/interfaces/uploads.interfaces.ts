@@ -15,6 +15,10 @@ export interface IUploadedLanding {
   gearCategory?: string,
   gearName?: string,
   gearCode?: string,
+  rfmoCode?: string,
+  rfmoName?: string,
+  eezCode?: string,
+  eezName?: string,
   errors : Array<IErrorObject | string>
 }
 

@@ -5,6 +5,8 @@ import {
   getSeasonalFish,
   getGearTypes,
   getVesselsData,
+  getCountries,
+  getRfmos,
 } from "../data/cache";
 import { faoAreas } from "../data/faoAreas";
 import { IProduct, ISeasonalFishPeriod, ICommodityCode } from "../interfaces/products.interfaces";
@@ -15,6 +17,7 @@ import { GearRecord } from "../interfaces/gearTypes.interface";
 import { equalsIgnoreCase } from "../utils/string";
 
 const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
+const isoCountryCodeRegex = /^[A-Z]{2,3}$/;
 
 export const validateLandings = (landings: IUploadedLanding[], products: IProduct[], landingLimitDaysInFuture: number): IUploadedLanding[] => {
   const seasonalRestrictions = getSeasonalFish();
@@ -35,6 +38,8 @@ export const validateLandings = (landings: IUploadedLanding[], products: IProduc
       validateProduct,
       validateLandingDate,
       validateFaoAreaForLanding,
+      validateRfmoCodeForLanding,
+      validateEezCodeForLanding,
       validateVesselForLanding,
       validateGearCode,
       validateExportWeightForLanding,
@@ -199,12 +204,52 @@ export const validateGearCodeForLanding = (landing: IUploadedLanding, gearRecord
   if (!gearCodeRegex.test(landing.gearCode)) {
     landing.errors.push('validation.gearCode.string.invalid');
   } else {
-    const gearRecord = gearRecords.find(r => r["Gear code"].toLowerCase() === landing.gearCode?.toLowerCase());
+    const gearRecord = gearRecords.find(r => equalsIgnoreCase(landing.gearCode, r["Gear code"]));
     if (!gearRecord) {
       landing.errors.push('validation.gearCode.string.unknown');
     } else {
       landing.gearCategory = gearRecord["Gear category"];
       landing.gearName = gearRecord["Gear name"];
+    }
+  }
+
+  return landing;
+}
+
+export const validateRfmoCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {
+  if (!landing.rfmoCode) return landing;
+
+  const rfmoRecord = getRfmos()?.find(r => equalsIgnoreCase(landing.rfmoCode, r['Abbreviation']));
+  if (!rfmoRecord) {
+    landing.errors.push('validation.rfmoCode.string.unknown');
+  } else {
+    landing.rfmoName = rfmoRecord['Full text'];
+  }
+
+  return landing;
+}
+
+export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {
+  if (!landing.eezCode) return landing;
+
+  const codes = landing.eezCode.split(';')
+    .map(c => c.trim().toUpperCase())
+    .filter(c => c);
+  const validCodes = [...new Set(codes.filter(c => isoCountryCodeRegex.test(c)))];
+
+  if (!validCodes.length || validCodes.length !== codes.length) {
+    landing.errors.push('validation.eezCode.string.invalid');
+  } else {
+    const getEezNameByCode = (code: string) => getCountries()?.
+      find(c => equalsIgnoreCase(code, c.isoCodeAlpha3) || equalsIgnoreCase(code, c.isoCodeAlpha2))?.officialCountryName;
+    const eezNames = validCodes.map(getEezNameByCode).filter(eez => eez);
+    if (new Set(eezNames).size !== eezNames.length) {
+      // detect duplicate codes e.g. FR;FRA
+      landing.errors.push('validation.eezCode.string.invalid');
+    } else if (validCodes.length !== eezNames.length) {
+      landing.errors.push('validation.eezCode.string.unknown');
+    } else {
+      landing.eezName = eezNames.join(', ');
     }
   }
 

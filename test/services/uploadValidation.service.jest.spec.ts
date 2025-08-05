@@ -48,7 +48,48 @@ describe('uploadValidation.service', () => {
       "vesselLength": 7.32,
       "licenceHolderName": "MR MA EDWARDS"
     },
-  ]
+  ];
+
+  const rfmoRecords = [
+    {
+      "Full text": "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+      Abbreviation: "CCAMLR",
+    },
+    {
+      "Full text": "General Fisheries Commission for the Mediterranean (GFCM)",
+      Abbreviation: "GFCM",
+    },
+    {
+      "Full text": "North East Atlantic Fisheries Commission (NEAFC)",
+      Abbreviation: "NEAFC"
+    }
+  ];
+
+  const countries = [
+    {
+      officialCountryName: "United Kingdom of Great Britain and Northern Ireland",
+      isoCodeAlpha2: "GB",
+      isoCodeAlpha3: "GBR",
+    },
+    {
+      officialCountryName: "France",
+      isoCodeAlpha2: "FR",
+      isoCodeAlpha3: "FRA",
+    },
+    {
+      officialCountryName: "Germany",
+      isoCodeAlpha2: "DE",
+      isoCodeAlpha3: "DEU",
+    },
+    {
+      officialCountryName: "Italy",
+      isoCodeAlpha2: "IT",
+      isoCodeAlpha3: "ITA",
+    }
+  ];
+
+  let mockGetRfmoRecords;
+  let mockGetCountries;
 
   describe('validateLandings', () => {
 
@@ -61,6 +102,8 @@ describe('uploadValidation.service', () => {
     let mockValidateProductForLanding;
     let mockValidateVesselForLanding;
     let mockValidateGearCodeForLanding;
+    let mockValidateRfmoCodeForLanding;
+    let mockValidateEezCodeForLanding;
 
     const seasonalFish = ['seasonal fish 1'];
     const landings = [{id: 'landing 1'}, {id: 'landing 2'}] as any[];
@@ -73,6 +116,12 @@ describe('uploadValidation.service', () => {
 
       mockGetGearTypes = jest.spyOn(DataCache, 'getGearTypes');
       mockGetGearTypes.mockReturnValue(gearRecords);
+
+      mockGetRfmoRecords = jest.spyOn(DataCache, 'getRfmos');
+      mockGetRfmoRecords.mockReturnValue(rfmoRecords);
+
+      mockGetCountries = jest.spyOn(DataCache, 'getCountries');
+      mockGetCountries.mockReturnValue(countries);
 
       mockInitialiseErrorsForLanding = jest.spyOn(SUT, 'initialiseErrorsForLanding');
       mockInitialiseErrorsForLanding.mockImplementation((landing) => landing);
@@ -94,6 +143,12 @@ describe('uploadValidation.service', () => {
 
       mockValidateGearCodeForLanding = jest.spyOn(SUT, 'validateGearCodeForLanding');
       mockValidateGearCodeForLanding.mockImplementation((landing) => landing);
+
+      mockValidateRfmoCodeForLanding = jest.spyOn(SUT, 'validateRfmoCodeForLanding');
+      mockValidateRfmoCodeForLanding.mockImplementation((landing) => landing);
+
+      mockValidateEezCodeForLanding = jest.spyOn(SUT, 'validateEezCodeForLanding');
+      mockValidateEezCodeForLanding.mockImplementation((landing) => landing);
     });
 
     afterEach(() => {
@@ -101,7 +156,7 @@ describe('uploadValidation.service', () => {
     });
 
     it('should run initialiseErrorsForLanding for each landing', () => {
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledTimes(2);
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledWith(landings[0]);
@@ -111,7 +166,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of initialiseErrorsForLanding into validateProduct', () => {
       mockInitialiseErrorsForLanding.mockImplementation((landing) => `${landing.id} - errors initialised`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
       expect(mockValidateProductForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 1 - errors initialised', favourites, seasonalFish);
@@ -121,7 +176,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateProduct into validateDateForLanding', () => {
       mockValidateProductForLanding.mockImplementation((landing) => `${landing.id} - product validated`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
       expect(mockValidateDateForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 1 - product validated', landingLimitDaysInFuture);
@@ -131,21 +186,41 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateDateForLanding into validateFaoAreaForLanding', () => {
       mockValidateDateForLanding.mockImplementation((landing) => `${landing.id} - date validated`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 1 - date validated');
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 2 - date validated');
     });
 
-    it('should pipe the result of validateFaoAreaForLanding into validateVesselForLanding', () => {
+    it('should pipe the result of validateFaoAreaForLanding into mockValidateRfmoCodeForLanding', () => {
       mockValidateFaoAreaForLanding.mockImplementation((landing) => `${landing.id} - fao area validated`);
 
-      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture, gearRecords);
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+
+      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledTimes(2);
+      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
+      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
+    });
+
+    it('should pipe the result of mockValidateRfmoCodeForLanding into mockValidateEezCodeForLanding', () => {
+      mockValidateRfmoCodeForLanding.mockImplementation((landing) => `${landing.id} - rfmo validated`);
+
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+
+      expect(mockValidateEezCodeForLanding).toHaveBeenCalledTimes(2);
+      expect(mockValidateEezCodeForLanding).toHaveBeenCalledWith('landing 1 - rfmo validated');
+      expect(mockValidateEezCodeForLanding).toHaveBeenCalledWith('landing 2 - rfmo validated');
+    });
+
+    it('should pipe the result of mockValidateEezCodeForLanding into validateVesselForLanding', () => {
+      mockValidateEezCodeForLanding.mockImplementation((landing) => `${landing.id} - eez validated`);
+
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
       expect(mockValidateVesselForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
-      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
+      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 1 - eez validated');
+      expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 2 - eez validated');
     });
 
     it('should pipe the result of validateVesselForLanding into validateGearCodeForLanding', () => {
@@ -903,6 +978,123 @@ describe('uploadValidation.service', () => {
       expect(result.gearCategory).toBeUndefined()
       expect(result.gearName).toBeUndefined();
       expect(result.errors).toStrictEqual(['validation.gearCode.string.unknown']);
+    });
+  });
+
+  describe('validateRfmoCodeForLanding', () => {
+
+    beforeEach(() => {
+      mockGetRfmoRecords = jest.spyOn(DataCache, 'getRfmos');
+      mockGetRfmoRecords.mockReturnValue(rfmoRecords);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    })
+
+    it('should enrich the landing with the RFMO name when RFMO code exists', () => {
+      const result = SUT.validateRfmoCodeForLanding({ errors: [], rfmoCode: 'NEAFC' });
+
+      expect(result.rfmoName).toEqual('North East Atlantic Fisheries Commission (NEAFC)');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should not enrich or return an error when RFMO code is not passed', () => {
+      const result = SUT.validateRfmoCodeForLanding({ errors: [] });
+
+      expect(result.rfmoName).toBeUndefined()
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should return an error when RFMO code does not exist', () => {
+      const result = SUT.validateRfmoCodeForLanding({ errors: [], rfmoCode: 'ABC' });
+
+      expect(result.rfmoName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['validation.rfmoCode.string.unknown']);
+    });
+  });
+
+  describe('validateEezCodeForLanding', () => {
+
+    beforeEach(() => {
+      mockGetCountries = jest.spyOn(DataCache, 'getCountries');
+      mockGetCountries.mockReturnValue(countries);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    })
+
+    it('should enrich the landing with the country name when EEZ code exists', () => {
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA' });
+
+      expect(result.eezName).toEqual('France');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should enrich the landing with multiple country names when multiple EEZ codes exist', () => {
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'GB;FRA' });
+
+      expect(result.eezName).toEqual('United Kingdom of Great Britain and Northern Ireland, France');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should skip empty items when a multi-select EEZ value is passed', () => {
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FR;;GB;;;DEU' });
+
+      expect(result.eezName).toEqual('France, United Kingdom of Great Britain and Northern Ireland, Germany');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should not enrich or return an error when EEZ code is not passed', () => {
+      const result = SUT.validateEezCodeForLanding({ errors: [] });
+
+      expect(result.eezName).toBeUndefined()
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should return an error when EEZ code is not valid', () => {
+      const tooShortResult = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'A' });
+      const tooLongResult = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'ABCD' });
+
+      expect(tooShortResult.eezName).toBeUndefined();
+      expect(tooLongResult.eezName).toBeUndefined();
+      expect(tooShortResult.errors).toStrictEqual(['validation.eezCode.string.invalid']);
+      expect(tooLongResult.errors).toStrictEqual(['validation.eezCode.string.invalid']);
+    });
+
+    it('should return an error when EEZ code is empty multi-select value', () => {
+      const oneSemiComma = SUT.validateEezCodeForLanding({ errors: [], eezCode: ';' });
+      const twoSemiCommas = SUT.validateEezCodeForLanding({ errors: [], eezCode: ';;' });
+
+      expect(oneSemiComma.eezName).toBeUndefined();
+      expect(twoSemiCommas.eezName).toBeUndefined();
+      expect(oneSemiComma.errors).toStrictEqual(['validation.eezCode.string.invalid']);
+      expect(twoSemiCommas.errors).toStrictEqual(['validation.eezCode.string.invalid']);
+    });
+
+    it('should return an error when multiple EEZ codes are provided and one or more are invalid', () => {
+      // SCOT is not a valid ISO code (2-3 chars)
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA;SCOT;DEU' });
+
+      expect(result.eezName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['validation.eezCode.string.invalid']);
+    });
+
+    it('should return an error when multiple EEZ codes are provided and one or more dont exist', () => {
+      // UK/GER are not correct ISO codes
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA;UK;GER' });
+
+      expect(result.eezName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['validation.eezCode.string.unknown']);
+    });
+
+    it('should return an error when multiple EEZ codes are provided with duplicate codes', () => {
+      // FRA/FR are the same country
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA;GB;FR' });
+
+      expect(result.eezName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['validation.eezCode.string.invalid']);
     });
   });
 
