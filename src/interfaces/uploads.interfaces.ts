@@ -15,6 +15,7 @@ export interface IUploadedLanding {
   gearCategory?: string,
   gearName?: string,
   gearCode?: string,
+  highSeasArea?: string;
   rfmoCode?: string,
   rfmoName?: string,
   eezCode?: string,

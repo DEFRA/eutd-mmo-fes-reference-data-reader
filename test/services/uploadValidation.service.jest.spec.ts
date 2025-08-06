@@ -99,6 +99,7 @@ describe('uploadValidation.service', () => {
     let mockValidateDateForLanding;
     let mockValidateExportWeightForLanding;
     let mockValidateFaoAreaForLanding;
+    let mockValidateHighSeasAreaForLanding;
     let mockValidateProductForLanding;
     let mockValidateVesselForLanding;
     let mockValidateGearCodeForLanding;
@@ -134,6 +135,9 @@ describe('uploadValidation.service', () => {
 
       mockValidateFaoAreaForLanding = jest.spyOn(SUT, 'validateFaoAreaForLanding');
       mockValidateFaoAreaForLanding.mockImplementation((landing) => landing);
+
+      mockValidateHighSeasAreaForLanding = jest.spyOn(SUT, 'validateHighSeasAreaForLanding');
+      mockValidateHighSeasAreaForLanding.mockImplementation((landing) => landing);
 
       mockValidateProductForLanding = jest.spyOn(SUT, 'validateProductForLanding');
       mockValidateProductForLanding.mockImplementation((landing) => landing);
@@ -193,14 +197,24 @@ describe('uploadValidation.service', () => {
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 2 - date validated');
     });
 
-    it('should pipe the result of validateFaoAreaForLanding into mockValidateRfmoCodeForLanding', () => {
+    it('should pipe the result of validateFaoAreaForLanding into validateHighSeasAreaForLanding', () => {
       mockValidateFaoAreaForLanding.mockImplementation((landing) => `${landing.id} - fao area validated`);
 
       SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
 
+      expect(mockValidateHighSeasAreaForLanding).toHaveBeenCalledTimes(2);
+      expect(mockValidateHighSeasAreaForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
+      expect(mockValidateHighSeasAreaForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
+    });
+
+    it('should pipe the result of validateHighSeasAreaForLanding into mockValidateRfmoCodeForLanding', () => {
+      mockValidateHighSeasAreaForLanding.mockImplementation((landing) => `${landing.id} - high seas area validated`);
+
+      SUT.validateLandings(landings, favourites, landingLimitDaysInFuture);
+
       expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledTimes(2);
-      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
-      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 2 - fao area validated');
+      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 1 - high seas area validated');
+      expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 2 - high seas area validated');
     });
 
     it('should pipe the result of mockValidateRfmoCodeForLanding into mockValidateEezCodeForLanding', () => {
@@ -1153,6 +1167,64 @@ describe('uploadValidation.service', () => {
 
     });
 
+  });
+
+  describe('validateHighSeasAreaForLanding', () => {
+
+    const uploadedLanding = {
+      rowNumber : undefined,
+      originalRow : undefined,
+      productId : undefined,
+      product : undefined,
+      landingDate: undefined,
+      faoArea: faoAreas[0],
+      highSeasArea: "yes",
+      vessel : undefined,
+      vesselPln: undefined,
+      exportWeight: undefined,
+      errors : []
+    }
+
+    it('should return an error if the high seas area is invalid', () => {
+
+      const result = SUT.validateHighSeasAreaForLanding(
+        {
+          ...uploadedLanding,
+          highSeasArea: 'invalid',
+          errors: []
+        }
+      );
+
+      expect(result.errors).toStrictEqual(['error.highSeasArea.any.invalid']);
+
+    });
+
+    it('should return no errors if the high seas area is valid', () => {
+
+      const result = SUT.validateHighSeasAreaForLanding(
+        {
+          ...uploadedLanding,
+          errors: []
+        }
+      );
+
+      expect(result.errors).toStrictEqual([]);
+
+    });
+
+    it('should return an error if the high seas area is empty', () => {
+
+      const result = SUT.validateHighSeasAreaForLanding(
+        {
+          ...uploadedLanding,
+          highSeasArea: '',
+          errors: []
+        }
+      );
+
+      expect(result.errors).toStrictEqual([]);
+
+    });
   });
 
 });

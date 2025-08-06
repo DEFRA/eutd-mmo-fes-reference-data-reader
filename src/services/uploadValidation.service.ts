@@ -38,6 +38,7 @@ export const validateLandings = (landings: IUploadedLanding[], products: IProduc
       validateProduct,
       validateLandingDate,
       validateFaoAreaForLanding,
+      validateHighSeasAreaForLanding,
       validateRfmoCodeForLanding,
       validateEezCodeForLanding,
       validateVesselForLanding,
@@ -212,6 +213,16 @@ export const validateGearCodeForLanding = (landing: IUploadedLanding, gearRecord
       landing.gearName = gearRecord["Gear name"];
     }
   }
+
+  return landing;
+}
+
+export const validateHighSeasAreaForLanding = (landing: IUploadedLanding): IUploadedLanding => {
+  if (landing.highSeasArea && ["yes", "no"].indexOf(landing.highSeasArea.toLowerCase()) === -1) {
+    landing.errors.push('error.highSeasArea.any.invalid');
+  }
+
+  landing.highSeasArea = landing.highSeasArea?.toLowerCase();
 
   return landing;
 }
