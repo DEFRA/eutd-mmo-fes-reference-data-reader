@@ -114,6 +114,20 @@
               "flag": "GBR",
               "cfr": "GBRC1121091"
             },
+            "exclusiveEconomicZones": [
+              {
+                "officialCountryName": "Nigeria", 
+                "isoCodeAlpha2": "NG", 
+                "isoCodeAlpha3": "NGA", 
+                "isoNumericCode": "566"
+              }, 
+              { 
+                "officialCountryName": "France",
+                "isoCodeAlpha2": "FR",
+                "isoCodeAlpha3": "FRA",
+                "isoNumericCode": "250"
+              }
+            ],
             "exportWeight": 5,
             "gearType": "Category 1",
             "highSeasArea": "yes",
@@ -188,6 +202,20 @@
               "flag": "GBR",
               "cfr": "GBRC1121091"
             },
+            "exclusiveEconomicZones": [
+              {
+                "officialCountryName": "Nigeria", 
+                "isoCodeAlpha2": "NG", 
+                "isoCodeAlpha3": "NGA", 
+                "isoNumericCode": "566"
+              }, 
+              { 
+                "officialCountryName": "France",
+                "isoCodeAlpha2": "FR",
+                "isoCodeAlpha3": "FRA",
+                "isoNumericCode": "250"
+              }
+            ],
             "exportWeight": 2,
             "gearType": "Category 1",
             "highSeasArea": "",
@@ -549,6 +577,39 @@
                     "Pending Landing Data - Elog Species",
                     "Validation Failure - Weight And Overuse"
                   ]
+                },
+                "exclusiveEconomicZones": {
+                  "type": "array",
+                  "description": "The Exclusive Economic Zones where fish were caught",
+                  "maxItems": 5,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "officialCountryName": {
+                        "type": "string",
+                        "description": "The official country name for the EEZ"
+                      },
+                      "isoCodeAlpha2": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}$",
+                        "description": "2-letter ISO country code"
+                      },
+                      "isoCodeAlpha3": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "description": "3-letter ISO country code"
+                      },
+                      "isoNumericCode": {
+                        "type": "string",
+                        "pattern": "^[0-9]{3}$",
+                        "description": "Numeric ISO country code"
+                      }
+                    },
+                    "required": [
+                      "officialCountryName"
+                    ],
+                    "additionalProperties": false
+                  }
                 }
             },
             "required" : [

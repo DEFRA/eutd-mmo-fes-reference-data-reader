@@ -1823,6 +1823,20 @@ describe("Report Submitted", () => {
             pln: 'WA1',
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             species: 'Lobster',
             exclusiveEconomicZones: [
               {
@@ -1933,6 +1947,20 @@ describe("Report Submitted", () => {
             pln: 'WA1',
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             species: 'Lobster',
             exclusiveEconomicZones: [
               {
@@ -2030,6 +2058,20 @@ describe("Report Submitted", () => {
             pln: 'WA1',
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             species: 'Lobster',
             exclusiveEconomicZones: [
               {
@@ -2140,6 +2182,20 @@ describe("Report Submitted", () => {
             pln: 'WA1',
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             species: 'Lobster',
             exclusiveEconomicZones: [
               {
@@ -2255,6 +2311,20 @@ describe("Report Submitted", () => {
             pln: 'WA1',
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             species: 'Lobster',
             exclusiveEconomicZones: [
               {

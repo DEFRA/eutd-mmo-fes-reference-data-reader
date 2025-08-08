@@ -84,6 +84,20 @@ describe('toLanding', () => {
         }
       ], 
       rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+      exclusiveEconomicZones: [
+        {
+          officialCountryName: "Nigeria", 
+          isoCodeAlpha2: "NG", 
+          isoCodeAlpha3: "NGA", 
+          isoNumericCode: "566"
+        }, 
+        { 
+          officialCountryName: "France",
+          isoCodeAlpha2: "FR",
+          isoCodeAlpha3: "FRA",
+          isoNumericCode: "250"
+        }
+      ],
       pln: ' a pln',
       dataEverExpected: true,
       landingDataExpectedDate: "2023-05-26",

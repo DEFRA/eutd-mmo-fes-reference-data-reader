@@ -1522,6 +1522,20 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         }
       ]);
       expect(result[0].rfmo).toEqual('General Fisheries Commission for the Mediterranean (GFCM)');
+      expect(result[0].exclusiveEconomicZones).toEqual([
+        {
+          officialCountryName: "Nigeria",
+          isoCodeAlpha2: "NG",
+          isoCodeAlpha3: "NGA",
+          isoNumericCode: "566"
+        },
+        {
+          officialCountryName: "France",
+          isoCodeAlpha2: "FR",
+          isoCodeAlpha3: "FRA",
+          isoNumericCode: "250"
+        }
+      ]);
       expect(result[0].startDate).toEqual('2019-07-10');
       expect(result[0].date).toEqual('2019-07-10');
       expect(result[0].cnCode).toEqual('1234');
