@@ -1,7 +1,6 @@
 import * as cache from '../../src/data/cache';
 import * as Hapi from '@hapi/hapi';
 import { gearTypeRoutes } from '../../src/handler/gearTypes';
-import { beforeEach } from 'node:test';
 import { mockGearTypesData } from '../mockData';
 
 const moment = require('moment');

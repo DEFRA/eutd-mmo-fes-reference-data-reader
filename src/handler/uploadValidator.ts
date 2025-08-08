@@ -15,9 +15,9 @@ export const uploadValidatorRoutes = (server : Hapi.Server) => {
         logger.info('[UPLOAD-LANDINGS][VALIDATE]');
 
         try {
-          const { landings, products, landingLimitDaysInFuture } = req.payload as UploadValidatorPayload
+          const { products, landingLimitDaysInFuture, rows, landings } = req.payload as UploadValidatorPayload
 
-          const result = validateLandings(landings, products, landingLimitDaysInFuture);
+          const result = await validateLandings( products, landingLimitDaysInFuture, rows, landings);
 
           return h.response(result);
         }
@@ -42,7 +42,8 @@ export const uploadValidatorRoutes = (server : Hapi.Server) => {
 };
 
 export const landingValidationSchema = Joi.object().keys({
-  landings: Joi.array().required().items(Joi.object()),
   products: Joi.array().required().items(Joi.object()),
-  landingLimitDaysInFuture: Joi.number().min(0).required()
+  landingLimitDaysInFuture: Joi.number().min(0).required(),
+  landings: Joi.array().required().items(Joi.object()).optional(),
+  rows: Joi.array().required().items(Joi.string()).optional(),
 });

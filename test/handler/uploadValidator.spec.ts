@@ -45,9 +45,10 @@ describe('uploadValidator', () => {
       method: "POST",
       url: "/v1/upload/landings/validate",
       payload: {
-        landings,
         products,
-        landingLimitDaysInFuture
+        landingLimitDaysInFuture,
+        landings,
+        rows: undefined
       }
     };
 
@@ -64,7 +65,7 @@ describe('uploadValidator', () => {
     it('should call validate landings', async () => {
       await server.inject({...request});
 
-      expect(mockValidateLandings).toHaveBeenCalledWith(landings, products, landingLimitDaysInFuture);
+      expect(mockValidateLandings).toHaveBeenCalledWith(products, landingLimitDaysInFuture, undefined, landings);
     });
 
     it('should return the validation result', async () => {
@@ -104,9 +105,9 @@ describe('uploadValidator', () => {
   describe('landingValidationSchema', () => {
 
     const valid = {
-      landings: [{id: 'landing 1'}],
       products: [{id: 'landing 2'}],
-      landingLimitDaysInFuture: 7
+      landingLimitDaysInFuture: 7,
+      landings: [{id: 'landing 1'}],
     };
 
     it('should return no errors for a valid input', () => {
@@ -114,17 +115,6 @@ describe('uploadValidator', () => {
 
       expect(result.value).toStrictEqual(valid);
       expect(result.error).toBeUndefined();
-    });
-
-    it('should require landings', () => {
-      const input = {
-        ...valid,
-        landings: undefined
-      };
-
-      const result = landingValidationSchema.validate(input);
-
-      expect(result.error).not.toBeUndefined();
     });
 
     it('should require landings to be an array', () => {
@@ -261,4 +251,41 @@ describe('uploadValidator', () => {
 
   });
 
-});
+  describe('landingValidationSchema for rows', () => {
+    const valid = {
+      products: [{id: 'landing 2'}],
+      landingLimitDaysInFuture: 7,
+      rows: ['PRD738,09/12/2020,10/12/2020,FAO18,Yes,CHN;SJM,IOTC,H1100,PS,100'],
+      landings: undefined,
+    };
+
+    it('should return no errors for a valid input', () => {
+      const result = landingValidationSchema.validate(valid);
+
+      expect(result.value).toStrictEqual(valid);
+      expect(result.error).toBeUndefined();
+    });
+
+    it('should require rows to be an array of strings', () => {
+      const input = {
+        ...valid,
+        rows: 'hello'
+      };
+
+      const result = landingValidationSchema.validate(input);
+
+      expect(result.error).not.toBeUndefined();
+    });
+
+    it('should allow an empty rows array', () => {
+      const input = {
+        ...valid,
+        rows: []
+      };
+
+      const result = landingValidationSchema.validate(input);
+
+      expect(result.error).toBeUndefined();
+    });
+  })
+})

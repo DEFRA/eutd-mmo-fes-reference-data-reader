@@ -1,7 +1,6 @@
 import * as cache from '../../src/data/cache';
 import * as Hapi from '@hapi/hapi';
 import { rfmoRoutes } from '../../src/handler/rfmo';
-import { beforeEach } from 'node:test';
 import { mockRfmosData } from '../mockData';
 
 const rfmosMock = jest.spyOn(cache, 'getRfmos');
