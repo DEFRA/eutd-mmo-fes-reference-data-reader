@@ -75,6 +75,20 @@
           "homePort": "PLYMOUTH",
           "catchArea": "FAO18",
           "highSeasArea": "yes",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ], 
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
           "fishingLicenceNumber": "50424",
           "fishingLicenceValidTo": "2030-12-31T00:00:00",
@@ -603,6 +617,42 @@
             "yes",
             "no"
           ]
+        },
+        "exclusiveEconomicZones": {
+          "description": "The Exclusive Economic Zone fish was caught in",
+          "type": [
+            "array",
+            "null"
+          ],
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "officialCountryName": {
+                "type": "string",
+                "description": "The official country name for the EEZ"
+              },
+              "isoCodeAlpha2": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "description": "2-letter ISO country code"
+              },
+              "isoCodeAlpha3": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$",
+                "description": "3-letter ISO country code"
+              },
+              "isoNumericCode": {
+                "type": "string",
+                "pattern": "^[0-9]{3}$",
+                "description": "Numeric ISO country code"
+              }
+            },
+            "required": [
+              "officialCountryName"
+            ],
+            "additionalProperties": false
+          }
         },
         "rfmo": {
           "description": "The Regional Fisheries Management Organisation the fish was caught in",

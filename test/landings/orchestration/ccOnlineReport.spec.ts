@@ -699,6 +699,20 @@ describe('When validating an online Catch Certificate', () => {
                     "faoArea": "FAO27",
                     "highSeasArea": "yes",
                     "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+                    "exclusiveEconomicZones": [
+                      {
+                        "officialCountryName": "Nigeria", 
+                        "isoCodeAlpha2": "NG", 
+                        "isoCodeAlpha3": "NGA", 
+                        "isoNumericCode": "566"
+                      }, 
+                      { 
+                        "officialCountryName": "France",
+                        "isoCodeAlpha2": "FR",
+                        "isoCodeAlpha3": "FRA",
+                        "isoNumericCode": "250"
+                      }
+                    ],
                     "riskScore": 0.04,
                     "threshold": 1,
                     "speciesRiskScore": 0.2,
@@ -3348,7 +3362,21 @@ describe('When updating a landing within an online Catch Certificate', () => {
     faoArea: "FAO27",
     weight: 500,
     highSeasArea: "yes",
-    rfmo: "General Fisheries Commission for the Mediterranean (GFCM)"
+    rfmo: "General Fisheries Commission for the Mediterranean (GFCM)",
+    exclusiveEconomicZones: [
+      {
+        officialCountryName: "Nigeria", 
+        isoCodeAlpha2: "NG", 
+        isoCodeAlpha3: "NGA", 
+        isoNumericCode: "566"
+      }, 
+      { 
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      }
+    ],
   };
 
   const product = {

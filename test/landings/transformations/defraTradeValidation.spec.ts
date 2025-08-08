@@ -77,6 +77,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
               "date": "2023-08-31",
               "startDate": "2023-08-31",
               "faoArea": "FAO27",
+              "highSeas": false,
               "weight": 122,
               "gearCategory": "Traps",
               "gearType": "Stationary uncovered pound nets (FPN)",
@@ -301,6 +302,20 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "weight": 89,
         "highSeasArea": "yes",
         "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+        "exclusiveEconomicZones": [
+          {
+            "officialCountryName": "Nigeria", 
+            "isoCodeAlpha2": "NG", 
+            "isoCodeAlpha3": "NGA", 
+            "isoNumericCode": "566"
+          }, 
+          { 
+            "officialCountryName": "France",
+            "isoCodeAlpha2": "FR",
+            "isoCodeAlpha3": "FRA",
+            "isoNumericCode": "250"
+          }
+        ],
         "numberOfTotalSubmissions": 1,
         "vesselOverriddenByAdmin": false,
         "speciesOverriddenByAdmin": false,
@@ -519,6 +534,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
           gearType: "Stationary uncovered pound nets (FPN)",
           highSeasArea: undefined,
           rfmo: undefined,
+          exclusiveEconomicZones: undefined,
           numberOfTotalSubmissions: 1,
           vesselOverriddenByAdmin: false,
           speciesOverriddenByAdmin: false,
@@ -674,6 +690,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
           gearType: "Stationary uncovered pound nets (FPN)",
           highSeasArea: undefined,
           rfmo: undefined,
+          exclusiveEconomicZones: undefined,
           numberOfTotalSubmissions: 1,
           vesselOverriddenByAdmin: false,
           speciesOverriddenByAdmin: false,
@@ -774,14 +791,18 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
                 licenceHolder: "MR S CLARY-BROM ",
                 id: "GBR-2023-CC-C58DF9A73-1777642314",
                 date: "2023-08-31",
+                startDate: "2023-08-31",
                 faoArea: "FAO27",
+                highSeas: false,
                 weight: 122,
+                gearCategory: "Traps",
+                gearType: "Stationary uncovered pound nets (FPN)",
                 numberOfSubmissions: 1,
                 isLegallyDue: false,
                 dataEverExpected: true,
                 landingDataExpectedDate: "2023-08-31",
                 landingDataEndDate: "2023-09-02",
-                _status: "PENDING_LANDING_DATA"
+                "_status": "PENDING_LANDING_DATA"
               },
               {
                 vessel: "WIRON 5",
@@ -795,14 +816,18 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
                 licenceHolder: "INTERFISH WIRONS LIMITED",
                 id: "GBR-2023-CC-C58DF9A73-1777642314",
                 date: "2023-08-31",
+                startDate: "2023-08-31",
                 faoArea: "FAO27",
+                highSeas: false,
                 weight: 122,
+                gearCategory: "Traps",
+                gearType: "Stationary uncovered pound nets (FPN)",
                 numberOfSubmissions: 1,
                 isLegallyDue: false,
                 dataEverExpected: true,
                 landingDataExpectedDate: "2023-08-31",
                 landingDataEndDate: "2023-09-02",
-                _status: "PENDING_LANDING_DATA"
+                "_status": "PENDING_LANDING_DATA"
               }
             ]
           }
@@ -819,6 +844,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         status: 'COMPLETE',
         rssNumber: 'C20415',
         da: 'Scotland',
+        startDate: '2023-08-31',
         dateLanded: '2023-08-31',
         species: 'BSF',
         weightOnCert: 121,
@@ -968,8 +994,12 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
                 licenceHolder: "MR S CLARY-BROM ",
                 id: "GBR-2023-CC-C58DF9A73-1777642314",
                 date: "2023-08-31",
+                startDate: "2023-08-31",
                 faoArea: "FAO27",
+                highSeas: false,
                 weight: 122,
+                gearCategory: "Traps",
+                gearType: "Stationary uncovered pound nets (FPN)",
                 numberOfSubmissions: 1,
                 isLegallyDue: false,
                 dataEverExpected: true,
@@ -1088,6 +1118,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
                 licenceHolder: "MR S CLARY-BROM ",
                 id: "GBR-2023-CC-C58DF9A73-1777642314",
                 date: "2023-08-31",
+                startDate: "2023-08-31",
                 faoArea: "FAO27",
                 weight: 122,
                 numberOfSubmissions: 1,
@@ -1956,7 +1987,7 @@ describe('When mapping fron an ISdPsQueryResult to a IDefraTradeStorageDocumentP
       const input: ISdPsQueryResult = {
         documentNumber: "SD1",
         catchCertificateNumber: "SD2",
-        documentType: "PS",
+        documentType: "SD",
         createdAt: "2020-01-01",
         status: "COMPLETE",
         species: "COD",

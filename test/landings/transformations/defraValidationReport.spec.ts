@@ -1421,6 +1421,20 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         fao: 'FAO27',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Nigeria", 
+            isoCodeAlpha2: "NG", 
+            isoCodeAlpha3: "NGA", 
+            isoNumericCode: "566"
+          }, 
+          { 
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          }
+        ],
         pln: 'WA1',
         flag: 'GBR',
         cfr: 'GBRC20514',
@@ -1493,6 +1507,20 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
       expect(result[0].isValidationFailed).toEqual(true);
       expect(result[0].gearType).toEqual('Type 1');
       expect(result[0].highSeasArea).toEqual('yes');
+      expect(result[0].exclusiveEconomicZones).toEqual([
+        {
+          officialCountryName: "Nigeria", 
+          isoCodeAlpha2: "NG", 
+          isoCodeAlpha3: "NGA", 
+          isoNumericCode: "566"
+        }, 
+        { 
+          officialCountryName: "France",
+          isoCodeAlpha2: "FR",
+          isoCodeAlpha3: "FRA",
+          isoNumericCode: "250"
+        }
+      ]);
       expect(result[0].rfmo).toEqual('General Fisheries Commission for the Mediterranean (GFCM)');
       expect(result[0].startDate).toEqual('2019-07-10');
       expect(result[0].date).toEqual('2019-07-10');
@@ -1560,6 +1588,20 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           fao: 'FAO27',
           highSeasArea: 'yes',
           rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+          exclusiveEconomicZones: [
+            {
+              officialCountryName: "Nigeria", 
+              isoCodeAlpha2: "NG", 
+              isoCodeAlpha3: "NGA", 
+              isoNumericCode: "566"
+            }, 
+            { 
+              officialCountryName: "France",
+              isoCodeAlpha2: "FR",
+              isoCodeAlpha3: "FRA",
+              isoNumericCode: "250"
+            }
+          ],
           pln: 'WA1',
           species: 'Lobster',
           state: 'FRE',
@@ -1637,6 +1679,20 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           fao: 'FAO27',
           highSeasArea: 'yes',
           rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+          exclusiveEconomicZones: [
+            {
+              officialCountryName: "Nigeria", 
+              isoCodeAlpha2: "NG", 
+              isoCodeAlpha3: "NGA", 
+              isoNumericCode: "566"
+            }, 
+            { 
+              officialCountryName: "France",
+              isoCodeAlpha2: "FR",
+              isoCodeAlpha3: "FRA",
+              isoNumericCode: "250"
+            }
+          ], 
           pln: 'WA1',
           species: 'Lobster',
           state: 'FRE',
@@ -1776,6 +1832,20 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
           fao: 'FAO27',
           highSeasArea: 'yes',
           rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+          exclusiveEconomicZones: [
+            {
+              officialCountryName: "Nigeria", 
+              isoCodeAlpha2: "NG", 
+              isoCodeAlpha3: "NGA", 
+              isoNumericCode: "566"
+            }, 
+            { 
+              officialCountryName: "France",
+              isoCodeAlpha2: "FR",
+              isoCodeAlpha3: "FRA",
+              isoNumericCode: "250"
+            }
+          ], 
           pln: 'WA1',
           species: 'Lobster',
           state: 'FRE',

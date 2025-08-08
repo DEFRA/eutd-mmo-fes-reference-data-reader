@@ -33,7 +33,21 @@ describe('POST /isLegallyDue', () => {
     "faoArea":"FAO27",
     "weight":123,
     "highSeasArea": "yes",
-    "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)"
+    "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+    "exclusiveEconomicZones": [
+      {
+        "officialCountryName": "Nigeria", 
+        "isoCodeAlpha2": "NG", 
+        "isoCodeAlpha3": "NGA", 
+        "isoNumericCode": "566"
+      }, 
+      { 
+        "officialCountryName": "France",
+        "isoCodeAlpha2": "FR",
+        "isoCodeAlpha3": "FRA",
+        "isoNumericCode": "250"
+      }
+    ], 
   };
   const products = [{
     "species":"Atlantic cod (COD)",

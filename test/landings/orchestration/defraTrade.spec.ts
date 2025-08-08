@@ -130,6 +130,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "speciesAlias": "N",
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "weight": 89,
           "gearType": "Type 1",
           "numberOfTotalSubmissions": 1,
@@ -384,6 +398,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "weight": 89,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "gearType": "Type 1",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
@@ -477,6 +505,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         fao: 'FAO27',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Nigeria", 
+            isoCodeAlpha2: "NG", 
+            isoCodeAlpha3: "NGA", 
+            isoNumericCode: "566"
+          }, 
+          { 
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          }
+        ],
         pln: 'SS229',
         species: 'Lobster',
         scientificName: "Aphanopus carbo",
@@ -567,6 +609,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "weight": 122,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -852,6 +908,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "weight": 89,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "gearType": "Type 1",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
@@ -945,6 +1015,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         fao: 'FAO27',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Nigeria", 
+            isoCodeAlpha2: "NG", 
+            isoCodeAlpha3: "NGA", 
+            isoNumericCode: "566"
+          }, 
+          { 
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          }
+        ],
         pln: 'SS229',
         species: 'Lobster',
         scientificName: "Aphanopus carbo",
@@ -1035,6 +1119,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "weight": 122,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -1927,6 +2025,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         fao: 'FAO27',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Nigeria", 
+            isoCodeAlpha2: "NG", 
+            isoCodeAlpha3: "NGA", 
+            isoNumericCode: "566"
+          }, 
+          { 
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          }
+        ],
         pln: 'SS229',
         species: 'Lobster',
         scientificName: "Aphanopus carbo",
@@ -2017,6 +2129,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "weight": 122,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -4370,6 +4496,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "speciesAlias": "N",
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "weight": 89,
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
@@ -4465,6 +4605,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         fao: 'FAO27',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Nigeria", 
+            isoCodeAlpha2: "NG", 
+            isoCodeAlpha3: "NGA", 
+            isoNumericCode: "566"
+          }, 
+          { 
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          }
+        ],
         pln: 'SS229',
         species: 'Lobster',
         scientificName: "Aphanopus carbo",
@@ -4555,6 +4709,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "weight": 122,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -4732,6 +4900,20 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
           "weight": 89,
           "highSeasArea": "yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
+          "exclusiveEconomicZones": [
+            {
+              "officialCountryName": "Nigeria", 
+              "isoCodeAlpha2": "NG", 
+              "isoCodeAlpha3": "NGA", 
+              "isoNumericCode": "566"
+            }, 
+            { 
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            }
+          ],
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,

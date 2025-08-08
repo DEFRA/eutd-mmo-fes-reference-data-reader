@@ -1642,6 +1642,20 @@ describe("Report Submitted", () => {
         pln: 'WA1',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Nigeria", 
+            isoCodeAlpha2: "NG", 
+            isoCodeAlpha3: "NGA", 
+            isoNumericCode: "566"
+          }, 
+          { 
+            officialCountryName: "France",
+            isoCodeAlpha2: "FR",
+            isoCodeAlpha3: "FRA",
+            isoNumericCode: "250"
+          }
+        ],
         species: 'Lobster',
         state: 'FRE',
         stateName: 'fresh',
@@ -1810,6 +1824,20 @@ describe("Report Submitted", () => {
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             species: 'Lobster',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ], 
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -1906,6 +1934,20 @@ describe("Report Submitted", () => {
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             species: 'Lobster',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -1989,6 +2031,20 @@ describe("Report Submitted", () => {
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             species: 'Lobster',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2085,6 +2141,20 @@ describe("Report Submitted", () => {
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             species: 'Lobster',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2186,6 +2256,20 @@ describe("Report Submitted", () => {
             highSeasArea: 'yes',
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             species: 'Lobster',
+            exclusiveEconomicZones: [
+              {
+                officialCountryName: "Nigeria", 
+                isoCodeAlpha2: "NG", 
+                isoCodeAlpha3: "NGA", 
+                isoNumericCode: "566"
+              }, 
+              { 
+                officialCountryName: "France",
+                isoCodeAlpha2: "FR",
+                isoCodeAlpha3: "FRA",
+                isoNumericCode: "250"
+              }
+            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2479,6 +2563,20 @@ describe('Report Cc Landing Update', () => {
       fao: 'FAO27',
       pln: 'WA1',
       species: 'Lobster',
+      exclusiveEconomicZones: [
+        {
+          officialCountryName: "Nigeria", 
+          isoCodeAlpha2: "NG", 
+          isoCodeAlpha3: "NGA", 
+          isoNumericCode: "566"
+        }, 
+        { 
+          officialCountryName: "France",
+          isoCodeAlpha2: "FR",
+          isoCodeAlpha3: "FRA",
+          isoNumericCode: "250"
+        }
+      ],
       state: 'FRE',
       stateName: 'fresh',
       commodityCode: '1234',
