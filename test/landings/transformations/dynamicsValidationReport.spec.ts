@@ -5732,6 +5732,14 @@ describe('Dynamics Validation', () => {
         pln: 'WA1',
         highSeasArea: 'yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
+        exclusiveEconomicZones: [
+          {
+            officialCountryName: "Netherlands",
+            isoCodeAlpha2: "NL",
+            isoCodeAlpha3: "NLD", 
+            isoNumericCode: "528"
+          }
+        ],
         species: 'Lobster',
         speciesAdmin: 'Lobster Admin',
         scientificName: "Gadus morhua",
@@ -5768,6 +5776,14 @@ describe('Dynamics Validation', () => {
       expect(result.source).toBeUndefined();
       expect(result.weight).toEqual(122);
       expect(result.gearType).toEqual('Type 1');
+      expect(result.exclusiveEconomicZones).toEqual([
+        {
+          officialCountryName: "Netherlands",
+          isoCodeAlpha2: "NL", 
+          isoCodeAlpha3: "NLD",
+          isoNumericCode: "528"
+        }
+      ]);
       expect(result.highSeasArea).toEqual("yes");
       expect(result.rfmo).toEqual("General Fisheries Commission for the Mediterranean (GFCM)");
       expect(result.numberOfTotalSubmissions).toEqual(1);

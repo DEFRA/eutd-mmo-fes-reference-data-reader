@@ -25,6 +25,20 @@
         "gearType": "Type 1",
         "highSeasArea": "yes",
         "rfmo": "North Pacific Fisheries Commission (NPFC)",
+        "exclusiveEconomicZones": [
+          {
+            "officialCountryName": "Germany",
+            "isoCodeAlpha2": "DE",
+            "isoCodeAlpha3": "DEU",
+            "isoNumericCode": "276"
+          },
+          {
+            "officialCountryName": "France",
+            "isoCodeAlpha2": "FR",
+            "isoCodeAlpha3": "FRA",
+            "isoNumericCode": "250"
+          }
+        ],
         "speciesAlias": "Y",
         "speciesAnomaly": "CAA",
         "numberOfTotalSubmissions": 1,
@@ -484,6 +498,49 @@
               "type": "string"
             }
           }
+        },
+        "exclusiveEconomicZones": {
+          "description": "The Exclusive Economic Zones where fish were caught",
+          "type": [
+            "array",
+            "null"
+          ],
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "officialCountryName": {
+                "type": "string",
+                "description": "The official country name for the EEZ"
+              },
+              "isoCodeAlpha2": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "description": "2-letter ISO country code"
+              },
+              "isoCodeAlpha3": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$",
+                "description": "3-letter ISO country code"
+              },
+              "isoNumericCode": {
+                "type": "string",
+                "pattern": "^[0-9]{3}$",
+                "description": "Numeric ISO country code"
+              }
+            },
+            "required": [
+              "officialCountryName",
+              "isoCodeAlpha2",
+              "isoCodeAlpha3",
+              "isoNumericCode"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "highSeas": {
+          "type": "boolean",
+          "description": "Indicates if the catch was taken in high seas (outside any EEZ)"
         }
       },
       "additionalProperties": false,
