@@ -58,8 +58,8 @@ export const initialiseErrorsForLanding = (landing: IUploadedLanding): IUploaded
 
 export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDaysInFuture: number): IUploadedLanding => {
   const { errors } = landing;
-  const startDate = landing.startDate ? moment(landing.startDate, 'DD/MM/YYYY', true) : null;
-  const landingDate = landing.landingDate ? moment(landing.landingDate, 'DD/MM/YYYY', true) : null;
+  const startDate = landing.startDate ? moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true) : null;
+  const landingDate = landing.landingDate ? moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true) : null;
 
    // only validate the start date if set
    if (startDate && !startDate.isValid()) {

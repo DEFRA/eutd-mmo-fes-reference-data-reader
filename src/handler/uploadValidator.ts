@@ -44,6 +44,6 @@ export const uploadValidatorRoutes = (server : Hapi.Server) => {
 export const landingValidationSchema = Joi.object().keys({
   products: Joi.array().required().items(Joi.object()),
   landingLimitDaysInFuture: Joi.number().min(0).required(),
-  landings: Joi.array().required().items(Joi.object()).optional(),
-  rows: Joi.array().required().items(Joi.string()).optional(),
+  rows: Joi.array().items(Joi.string()).optional(),
+  landings: Joi.array().items(Joi.object()).optional(),
 });
