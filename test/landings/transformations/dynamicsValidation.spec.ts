@@ -71,33 +71,25 @@ describe('toLanding', () => {
       highSeasArea: 'yes',
       exclusiveEconomicZones: [
         {
-          officialCountryName: "Nigeria", 
-          isoCodeAlpha2: "NG", 
-          isoCodeAlpha3: "NGA", 
+          officialCountryName: "Nigeria",
+          isoCodeAlpha2: "NG",
+          isoCodeAlpha3: "NGA",
           isoNumericCode: "566"
-        }, 
-        { 
-          officialCountryName: "France",
-          isoCodeAlpha2: "FR",
-          isoCodeAlpha3: "FRA",
-          isoNumericCode: "250"
-        }
-      ], 
-      rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
-      exclusiveEconomicZones: [
+        },
         {
-          officialCountryName: "Nigeria", 
-          isoCodeAlpha2: "NG", 
-          isoCodeAlpha3: "NGA", 
-          isoNumericCode: "566"
-        }, 
-        { 
           officialCountryName: "France",
           isoCodeAlpha2: "FR",
           isoCodeAlpha3: "FRA",
           isoNumericCode: "250"
+        },
+        {
+          officialCountryName: "Northen Ireland",
+          isoCodeAlpha2: "NI",
+          isoCodeAlpha3: null,
+          isoNumericCode: null
         }
       ],
+      rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
       pln: ' a pln',
       dataEverExpected: true,
       landingDataExpectedDate: "2023-05-26",
@@ -393,6 +385,11 @@ describe('toLanding', () => {
     expect(result.dateDataReceived).toBeUndefined();
 
   });
+
+  it('should set a comma separated list for added EEZs', () => {
+    const result = toLanding(sampleICcQueryResult);
+    expect(result.exclusiveEconomicZones).toEqual("NGA,FRA,NI");
+  });
 });
 
 describe('toDynamicsCcCase', () => {
@@ -448,12 +445,12 @@ describe('toDynamicsCcCase', () => {
               "highSeasArea": "yes",
               "exclusiveEconomicZones": [
                 {
-                  "officialCountryName": "Nigeria", 
-                  "isoCodeAlpha2": "NG", 
-                  "isoCodeAlpha3": "NGA", 
+                  "officialCountryName": "Nigeria",
+                  "isoCodeAlpha2": "NG",
+                  "isoCodeAlpha3": "NGA",
                   "isoNumericCode": "566"
-                }, 
-                { 
+                },
+                {
                   "officialCountryName": "France",
                   "isoCodeAlpha2": "FR",
                   "isoCodeAlpha3": "FRA",

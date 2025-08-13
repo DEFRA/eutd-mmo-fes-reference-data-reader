@@ -76,22 +76,9 @@
           "vesselAdministration": "Northern Ireland",
           "weight": 500,
           "gearType": "Type 1",
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "North Pacific Fisheries Commission (NPFC)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria",
-              "isoCodeAlpha2": "NG",
-              "isoCodeAlpha3": "NGR",
-              "isoNumericCode": "566"
-            },
-            {
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],  
+          "exclusiveEconomicZones": "NGR,FRA",
           "speciesAlias": "Y",
           "speciesAnomaly": "SQR",
           "numberOfTotalSubmissions": 1,
@@ -441,8 +428,8 @@
             "null"
           ],
           "enum": [
-            "yes",
-            "no"
+            "Yes",
+            "No"
           ]
         },
         "rfmo": {
@@ -469,40 +456,11 @@
           ]
         },
         "exclusiveEconomicZones": {
-          "description": "The Exclusive Economic Zone fish was caught in",
+          "description": "The Exclusive Economic Zones where fish were caught",
           "type": [
-            "array",
+            "string",
             "null"
-          ],
-          "maxItems": 5,
-          "items": {
-            "type": "object",
-            "properties": {
-              "officialCountryName": {
-                "type": "string",
-                "description": "The official country name for the EEZ"
-              },
-              "isoCodeAlpha2": {
-                "type": "string",
-                "pattern": "^[A-Z]{2}$",
-                "description": "2-letter ISO country code"
-              },
-              "isoCodeAlpha3": {
-                "type": "string",
-                "pattern": "^[A-Z]{3}$",
-                "description": "3-letter ISO country code"
-              },
-              "isoNumericCode": {
-                "type": "string",
-                "pattern": "^[0-9]{3}$",
-                "description": "Numeric ISO country code"
-              }
-            },
-            "required": [
-              "officialCountryName"
-            ],
-            "additionalProperties": false
-          }
+          ]
         },
         "speciesAlias": {
           "description": "status (Y/N) of certain species mismatching during real-time validation and retrospective validation",

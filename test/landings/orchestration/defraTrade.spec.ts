@@ -128,22 +128,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "vesselAdministration": "Scotland",
           "licenceHolder": "C & J SHELLFISH LTD",
           "speciesAlias": "N",
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "weight": 89,
           "gearType": "Type 1",
           "numberOfTotalSubmissions": 1,
@@ -396,22 +383,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "licenceHolder": "C & J SHELLFISH LTD",
           "speciesAlias": "N",
           "weight": 89,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "gearType": "Type 1",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
@@ -503,16 +477,16 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         presentationName: 'sliced',
         vessel: 'AGAN BORLOWEN',
         fao: 'FAO27',
-        highSeasArea: 'yes',
+        highSeasArea: 'Yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
         exclusiveEconomicZones: [
           {
-            officialCountryName: "Nigeria", 
-            isoCodeAlpha2: "NG", 
-            isoCodeAlpha3: "NGA", 
+            officialCountryName: "Nigeria",
+            isoCodeAlpha2: "NG",
+            isoCodeAlpha3: "NGA",
             isoNumericCode: "566"
-          }, 
-          { 
+          },
+          {
             officialCountryName: "France",
             isoCodeAlpha2: "FR",
             isoCodeAlpha3: "FRA",
@@ -607,22 +581,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "source": "CATCH_RECORDING",
           "speciesAlias": "N",
           "weight": 122,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -906,22 +867,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "licenceHolder": "C & J SHELLFISH LTD",
           "speciesAlias": "N",
           "weight": 89,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "gearType": "Type 1",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
@@ -1013,16 +961,16 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         presentationName: 'sliced',
         vessel: 'AGAN BORLOWEN',
         fao: 'FAO27',
-        highSeasArea: 'yes',
+        highSeasArea: 'Yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
         exclusiveEconomicZones: [
           {
-            officialCountryName: "Nigeria", 
-            isoCodeAlpha2: "NG", 
-            isoCodeAlpha3: "NGA", 
+            officialCountryName: "Nigeria",
+            isoCodeAlpha2: "NG",
+            isoCodeAlpha3: "NGA",
             isoNumericCode: "566"
-          }, 
-          { 
+          },
+          {
             officialCountryName: "France",
             isoCodeAlpha2: "FR",
             isoCodeAlpha3: "FRA",
@@ -1117,22 +1065,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "source": "CATCH_RECORDING",
           "speciesAlias": "N",
           "weight": 122,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -2023,16 +1958,16 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         presentationName: 'sliced',
         vessel: 'AGAN BORLOWEN',
         fao: 'FAO27',
-        highSeasArea: 'yes',
+        highSeasArea: 'Yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
         exclusiveEconomicZones: [
           {
-            officialCountryName: "Nigeria", 
-            isoCodeAlpha2: "NG", 
-            isoCodeAlpha3: "NGA", 
+            officialCountryName: "Nigeria",
+            isoCodeAlpha2: "NG",
+            isoCodeAlpha3: "NGA",
             isoNumericCode: "566"
-          }, 
-          { 
+          },
+          {
             officialCountryName: "France",
             isoCodeAlpha2: "FR",
             isoCodeAlpha3: "FRA",
@@ -2127,22 +2062,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "source": "CATCH_RECORDING",
           "speciesAlias": "N",
           "weight": 122,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -4494,22 +4416,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "vesselAdministration": "Scotland",
           "licenceHolder": "C & J SHELLFISH LTD",
           "speciesAlias": "N",
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "weight": 89,
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
@@ -4603,16 +4512,16 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         presentationName: 'sliced',
         vessel: 'AGAN BORLOWEN',
         fao: 'FAO27',
-        highSeasArea: 'yes',
+        highSeasArea: 'Yes',
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
         exclusiveEconomicZones: [
           {
-            officialCountryName: "Nigeria", 
-            isoCodeAlpha2: "NG", 
-            isoCodeAlpha3: "NGA", 
+            officialCountryName: "Nigeria",
+            isoCodeAlpha2: "NG",
+            isoCodeAlpha3: "NGA",
             isoNumericCode: "566"
-          }, 
-          { 
+          },
+          {
             officialCountryName: "France",
             isoCodeAlpha2: "FR",
             isoCodeAlpha3: "FRA",
@@ -4707,22 +4616,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "source": "CATCH_RECORDING",
           "speciesAlias": "N",
           "weight": 122,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,
@@ -4898,22 +4794,9 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
           "licenceHolder": "C & J SHELLFISH LTD",
           "speciesAlias": "N",
           "weight": 89,
-          "highSeasArea": "yes",
+          "highSeasArea": "Yes",
           "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-          "exclusiveEconomicZones": [
-            {
-              "officialCountryName": "Nigeria", 
-              "isoCodeAlpha2": "NG", 
-              "isoCodeAlpha3": "NGA", 
-              "isoNumericCode": "566"
-            }, 
-            { 
-              "officialCountryName": "France",
-              "isoCodeAlpha2": "FR",
-              "isoCodeAlpha3": "FRA",
-              "isoNumericCode": "250"
-            }
-          ],
+          "exclusiveEconomicZones": "NGA,FRA",
           "numberOfTotalSubmissions": 1,
           "vesselOverriddenByAdmin": false,
           "speciesOverriddenByAdmin": false,

@@ -5736,7 +5736,7 @@ describe('Dynamics Validation', () => {
           {
             officialCountryName: "Netherlands",
             isoCodeAlpha2: "NL",
-            isoCodeAlpha3: "NLD", 
+            isoCodeAlpha3: "NLD",
             isoNumericCode: "528"
           }
         ],
@@ -5776,14 +5776,7 @@ describe('Dynamics Validation', () => {
       expect(result.source).toBeUndefined();
       expect(result.weight).toEqual(122);
       expect(result.gearType).toEqual('Type 1');
-      expect(result.exclusiveEconomicZones).toEqual([
-        {
-          officialCountryName: "Netherlands",
-          isoCodeAlpha2: "NL", 
-          isoCodeAlpha3: "NLD",
-          isoNumericCode: "528"
-        }
-      ]);
+      expect(result.exclusiveEconomicZones).toEqual("NLD");
       expect(result.highSeasArea).toEqual("yes");
       expect(result.rfmo).toEqual("General Fisheries Commission for the Mediterranean (GFCM)");
       expect(result.numberOfTotalSubmissions).toEqual(1);

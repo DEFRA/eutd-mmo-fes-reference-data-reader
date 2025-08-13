@@ -173,6 +173,17 @@ const buildRiskingSection = (
   };
 };
 
+const addEEZCode = (acc: string, code: string) => acc ? `${acc},${code}` : code;
+const buildEEZ = (countries: ICountry): string | undefined  => {
+  if (!Array.isArray(countries) || countries.length === 0)
+    return;
+
+  return countries.reduce((acc: string, zone: ICountry) => {
+    const code = zone.isoCodeAlpha3 ?? zone.isoCodeAlpha2;
+    return code ?  addEEZCode(acc, code): acc;
+  }, '');
+}
+
 export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoType): IDynamicsLanding {
   const ccBatchReportForLanding: ICcBatchValidationReport = Array.from(ccBatchReport([validatedLanding][Symbol.iterator]()))[0];
   const hasLegalTimeLimitPassed = getLegalTimeLimitStatus(validatedLanding);
@@ -208,7 +219,7 @@ export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoT
     weight: validatedLanding.rawWeightOnCert,
     gearType: validatedLanding.gearType,
     highSeasArea: validatedLanding.extended.highSeasArea,
-    exclusiveEconomicZones: validatedLanding.extended.exclusiveEconomicZones,
+    exclusiveEconomicZones: buildEEZ(validatedLanding.extended.exclusiveEconomicZones),
     rfmo: validatedLanding.extended.rfmo,
     numberOfTotalSubmissions: validatedLanding.extended.numberOfSubmissions,
     vesselOverriddenByAdmin: validatedLanding.extended.vesselOverriddenByAdmin === true,
