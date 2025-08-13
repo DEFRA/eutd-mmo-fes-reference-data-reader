@@ -1,5 +1,4 @@
 import moment from "moment";
-import csv from "csvtojson";
 import { commoditySearch } from "../controllers/species";
 import { vesselSearch } from "../controllers/vessel";
 import {
@@ -11,18 +10,16 @@ import {
 } from "../data/cache";
 import { faoAreas } from "../data/faoAreas";
 import { IProduct, ISeasonalFishPeriod, ICommodityCode } from "../interfaces/products.interfaces";
-import { IUploadedLanding, UploadedLandingMeta } from "../interfaces/uploads.interfaces";
+import { IUploadedLanding } from "../interfaces/uploads.interfaces";
 import { IVessel } from "../interfaces/vessels.interfaces";
 import { pipe } from "../utils/functions";
 import { GearRecord } from "../interfaces/gearTypes.interface";
 import { equalsIgnoreCase } from "../utils/string";
-import { checkPresentField } from "../utils/landings";
 
 const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
 const isoCountryCodeRegex = /^[A-Z]{2,3}$/;
 
-export const validateLandings = async (products: IProduct[], landingLimitDaysInFuture: number, rows?: string[], uploadedLandings?: IUploadedLanding[]): Promise<IUploadedLanding[]> => {
-  const landings :IUploadedLanding[] = rows ? await parseCsvRows(rows): uploadedLandings;
+export const validateLandings = async (products: IProduct[], landingLimitDaysInFuture: number, landings: IUploadedLanding[]): Promise<IUploadedLanding[]> => {
   const seasonalRestrictions = getSeasonalFish();
 
   const validateProduct = (landing: IUploadedLanding) =>
@@ -32,7 +29,7 @@ export const validateLandings = async (products: IProduct[], landingLimitDaysInF
     validateDateForLanding(landing, landingLimitDaysInFuture);
 
   const gearRecords = getGearTypes();
-  const validateGearCode = (landing: IUploadedLanding) => 
+  const validateGearCode = (landing: IUploadedLanding) =>
     validateGearCodeForLanding(landing, gearRecords);
 
   return landings.map(l =>
@@ -64,7 +61,7 @@ export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDa
    // only validate the start date if set
    if (startDate && !startDate.isValid()) {
     errors.push('error.startDate.date.base');
-  } 
+  }
 
   if (!landingDate) {
     errors.push('error.dateLanded.date.missing');
@@ -115,7 +112,7 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
     landing.errors.push('error.vesselPln.any.missing');
     return landing;
   }
-  
+
   const knownVessels = getVesselsData();
   if (!knownVessels.find(v => equalsIgnoreCase(landing.vesselPln, v.registrationNumber) || equalsIgnoreCase(landing.vesselPln, v.fishingVesselName))) {
     landing.errors.push('error.vesselPln.any.exists');
@@ -290,83 +287,3 @@ const hasSeasonalFishingRestriction = (landingDate: string, speciesCode: string,
       moment(period.validFrom).isSameOrBefore(landingDate) &&
       moment(landingDate).isSameOrBefore(period.validTo)
   );
-
-export const parseCsvRows = async (rows: string[]) => {
-  // Get List of RFMO codes
-  const rfmoCodeList = [
-    ...new Set(
-      getRfmos()
-        .map((rfmo) => rfmo['Abbreviation'])
-        .filter((code) => code && code.trim() !== ''),
-    ),
-  ];
-  // Get List of Gear Type codes
-  const gearTypeCodeList = [
-    ...new Set(getGearTypes().map((gear) => gear['Gear code'])),
-  ];
-  const highSeasAreaList = ['YES', 'NO'];
-
-  // CSV Header field names and indexes
-  const allKeys = Object.keys(UploadedLandingMeta);
-  const optionalKeys = allKeys.filter(
-    (k: string) => UploadedLandingMeta[k].optional,
-  );
-  const mandatoryKeys = allKeys.filter(
-    (k: string) => !UploadedLandingMeta[k].optional,
-  );
-
-  let headers = allKeys;
-
-  let rowNumber = 1;
-  const landings: IUploadedLanding[] = await Promise.all(
-    rows.map(async (originalRow) => {
-      const cells = originalRow.split(',');
-
-      if (cells.length === allKeys.length - optionalKeys.length) {
-        // mandatory fields only
-        headers = allKeys.filter((k) => !optionalKeys.includes(k));
-      } else if (cells.length > allKeys.length - optionalKeys.length) {
-        const filteredKeys = [...mandatoryKeys];
-        const {
-          isStartDatePresent,
-          isHighSeasAreaPresent,
-          isRfmoPresent,
-          isEezPresent,
-          isGearCodePresent,
-        } = checkPresentField(
-          cells,
-          allKeys,
-          highSeasAreaList,
-          gearTypeCodeList,
-          rfmoCodeList,
-        );
-        if (isStartDatePresent) filteredKeys.push('startDate');
-        if (isHighSeasAreaPresent) filteredKeys.push('highSeasArea');
-        if (isEezPresent) filteredKeys.push('eezCode');
-        if (isRfmoPresent) filteredKeys.push('rfmoCode');
-        if (isGearCodePresent) filteredKeys.push('gearCode');
-
-        headers = allKeys.filter((k) => filteredKeys.includes(k));
-      }
-
-      const params = {
-        noheader: true,
-        headers,
-        checkColumn: true,
-      };
-
-      const json: IUploadedLanding[] =  await csv(params).fromString(originalRow);
-      const landing: IUploadedLanding = {
-        ...json[0],
-        rowNumber,
-        originalRow,
-        errors: [],
-      };
-
-      rowNumber++;
-
-      return landing;
-    }),
-  );
-  return landings;
-};

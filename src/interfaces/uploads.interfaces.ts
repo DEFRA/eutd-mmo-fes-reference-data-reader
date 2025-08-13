@@ -28,18 +28,3 @@ export interface IErrorObject {
   key: string;
   params: (number | string)[];
 }
-export interface UploadedLandedFieldMeta {
-  optional?: boolean;
-}
-export const UploadedLandingMeta: Record<string, UploadedLandedFieldMeta> = {
-  productId: {},
-  startDate: { optional: true },
-  landingDate: {},
-  faoArea: {},
-  highSeasArea: { optional: true },
-  eezCode: { optional: true },
-  rfmoCode: { optional: true },
-  vesselPln: {},
-  gearCode: { optional: true },
-  exportWeight: {},
-};

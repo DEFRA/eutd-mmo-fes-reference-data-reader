@@ -164,7 +164,7 @@ describe('uploadValidation.service', () => {
     });
 
     it('should run initialiseErrorsForLanding for each landing', () => {
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledTimes(2);
       expect(mockInitialiseErrorsForLanding).toHaveBeenCalledWith(landings[0]);
@@ -174,7 +174,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of initialiseErrorsForLanding into validateProduct', () => {
       mockInitialiseErrorsForLanding.mockImplementation((landing) => `${landing.id} - errors initialised`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateProductForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateProductForLanding).toHaveBeenCalledWith('landing 1 - errors initialised', favourites, seasonalFish);
@@ -184,7 +184,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateProduct into validateDateForLanding', () => {
       mockValidateProductForLanding.mockImplementation((landing) => `${landing.id} - product validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateDateForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateDateForLanding).toHaveBeenCalledWith('landing 1 - product validated', landingLimitDaysInFuture);
@@ -194,7 +194,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateDateForLanding into validateFaoAreaForLanding', () => {
       mockValidateDateForLanding.mockImplementation((landing) => `${landing.id} - date validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateFaoAreaForLanding).toHaveBeenCalledWith('landing 1 - date validated');
@@ -204,7 +204,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateFaoAreaForLanding into validateHighSeasAreaForLanding', () => {
       mockValidateFaoAreaForLanding.mockImplementation((landing) => `${landing.id} - fao area validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateHighSeasAreaForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateHighSeasAreaForLanding).toHaveBeenCalledWith('landing 1 - fao area validated');
@@ -214,7 +214,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateHighSeasAreaForLanding into mockValidateRfmoCodeForLanding', () => {
       mockValidateHighSeasAreaForLanding.mockImplementation((landing) => `${landing.id} - high seas area validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateRfmoCodeForLanding).toHaveBeenCalledWith('landing 1 - high seas area validated');
@@ -224,7 +224,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of mockValidateRfmoCodeForLanding into mockValidateEezCodeForLanding', () => {
       mockValidateRfmoCodeForLanding.mockImplementation((landing) => `${landing.id} - rfmo validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateEezCodeForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateEezCodeForLanding).toHaveBeenCalledWith('landing 1 - rfmo validated');
@@ -234,7 +234,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of mockValidateEezCodeForLanding into validateVesselForLanding', () => {
       mockValidateEezCodeForLanding.mockImplementation((landing) => `${landing.id} - eez validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateVesselForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateVesselForLanding).toHaveBeenCalledWith('landing 1 - eez validated');
@@ -244,7 +244,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateVesselForLanding into validateGearCodeForLanding', () => {
       mockValidateVesselForLanding.mockImplementation((landing) => `${landing.id} - vessel validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateGearCodeForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateGearCodeForLanding).toHaveBeenCalledWith('landing 1 - vessel validated', gearRecords);
@@ -254,7 +254,7 @@ describe('uploadValidation.service', () => {
     it('should pipe the result of validateGearCodeForLanding into validateExportWeightForLanding', () => {
       mockValidateGearCodeForLanding.mockImplementation((landing) => `${landing.id} - gear code validated`);
 
-      SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings);
+      SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(mockValidateExportWeightForLanding).toHaveBeenCalledTimes(2);
       expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 1 - gear code validated');
@@ -264,7 +264,7 @@ describe('uploadValidation.service', () => {
     it('should return the result of validateExportWeightForLanding', async () => {
       mockValidateExportWeightForLanding.mockImplementation((landing) => `${landing.id} - export weight validated`);
 
-      const result = await SUT.validateLandings(favourites, landingLimitDaysInFuture, undefined, landings, gearRecords);
+      const result = await SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
       expect(result).toStrictEqual([
         'landing 1 - export weight validated',
@@ -325,7 +325,7 @@ describe('uploadValidation.service', () => {
     const landingLimitDaysInFuture = 7;
 
     it('should return an error if the landingDate is missing', () => {
-      
+
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -339,7 +339,7 @@ describe('uploadValidation.service', () => {
     });
 
     it('should return an error if the landingDate is empty', () => {
-      
+
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -349,7 +349,7 @@ describe('uploadValidation.service', () => {
       );
 
       expect(result.errors).toStrictEqual(['error.dateLanded.date.missing']);
-    
+
     });
 
     it('should return an error if the landingDate is invalid', () => {
@@ -989,7 +989,7 @@ describe('uploadValidation.service', () => {
       expect(result.gearName).toBeUndefined();
       expect(result.errors).toStrictEqual(['validation.gearCode.string.invalid']);
     });
-    
+
     it('should return an error when gear code does not exist', () => {
       const result = SUT.validateGearCodeForLanding({ errors: [], gearCode: 'XYZ' }, gearRecords);
 
@@ -1268,141 +1268,6 @@ describe('uploadValidation.service', () => {
 
       expect(result.errors).toStrictEqual([]);
 
-    });
-  });
-  describe('parseCsvRows', () => {
-    let csvPayload: string[];
-    let parseCsvResponse: any[];
-    let mockGetGearTypes: jest.SpyInstance;
-    let mockGetRfmoRecords: jest.SpyInstance;
-    beforeEach(() => {
-      mockGetGearTypes = jest.spyOn(DataCache, 'getGearTypes');
-      mockGetGearTypes.mockReturnValue(gearRecords);
-
-      mockGetRfmoRecords = jest.spyOn(DataCache, 'getRfmos');
-      mockGetRfmoRecords.mockReturnValue(rfmoRecords);
-    })
-
-    it('should call the parseCsvRows function with the correct payload', async () => {
-      csvPayload = [`PRD738,09/12/2020,10/12/2020,FAO18,YES,FRA,GFCM,H1100,PS,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        startDate: '09/12/2020',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        highSeasArea: 'YES',
-        eezCode: 'FRA',
-        rfmoCode: 'GFCM',
-        vesselPln: 'H1100',
-        gearCode: 'PS',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,09/12/2020,10/12/2020,FAO18,YES,FRA,GFCM,H1100,PS,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
-    });
-
-    it('should call the parseCsvRows function with only mandatory fields', async () => {
-      csvPayload = [`PRD738,10/12/2020,FAO18,H1100,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        vesselPln: 'H1100',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,10/12/2020,FAO18,H1100,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
-    });
-
-    it('should call the parseCsvRows function with optional field as start data', async () => {
-      csvPayload = [`PRD738,09/12/2020,10/12/2020,FAO18,H1100,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        startDate: '09/12/2020',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        vesselPln: 'H1100',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,09/12/2020,10/12/2020,FAO18,H1100,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
-    });
-
-    it('should call the parseCsvRows function with optional field as high seas area', async () => {
-      csvPayload = [`PRD738,10/12/2020,FAO18,YES,H1100,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        highSeasArea: 'YES',
-        vesselPln: 'H1100',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,10/12/2020,FAO18,YES,H1100,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
-    });
-
-    it('should call the parseCsvRows function with optional field as EEZ', async () => {
-      csvPayload = [`PRD738,10/12/2020,FAO18,FRA;DEU,H1100,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        eezCode: 'FRA;DEU',
-        vesselPln: 'H1100',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,10/12/2020,FAO18,FRA;DEU,H1100,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
-    });
-
-    it('should call the parseCsvRows function with optional field as RFMO', async () => {
-      csvPayload = [`PRD738,10/12/2020,FAO18,GFCM,H1100,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        rfmoCode: 'GFCM',
-        vesselPln: 'H1100',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,10/12/2020,FAO18,GFCM,H1100,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
-    });
-
-    it('should call the parseCsvRows function with optional field as Gear type', async () => {
-      csvPayload = [`PRD738,10/12/2020,FAO18,H1100,PS,100`];
-      parseCsvResponse = [{
-        productId: 'PRD738',
-        landingDate: '10/12/2020',
-        faoArea: 'FAO18',
-        vesselPln: 'H1100',
-        gearCode: 'PS',
-        exportWeight: '100',
-        rowNumber: 1,
-        originalRow: 'PRD738,10/12/2020,FAO18,H1100,PS,100',
-        errors: []
-      }];
-      const result = await SUT.parseCsvRows(csvPayload)
-      expect(result).toStrictEqual(parseCsvResponse);
     });
   });
 
