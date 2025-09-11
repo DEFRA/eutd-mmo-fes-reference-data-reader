@@ -25,11 +25,11 @@
         "companyName": "FISH LTD",
         "address": {
           "building_number": "123",
-					"sub_building_name": "Unit 1",
-					"building_name": "CJC Fish Ltd",
-					"street_name": "17  Old Edinburgh Road",
-					"county": "West Midlands",
-					"country": "England",
+          "sub_building_name": "Unit 1",
+          "building_name": "CJC Fish Ltd",
+          "street_name": "17  Old Edinburgh Road",
+          "county": "West Midlands",
+          "country": "England",
           "line1": "Vue Red",
           "city": "ROWTR",
           "postCode": "WN90 23A"
@@ -37,49 +37,58 @@
       },
       "documentUrl": "http://tst-gov.uk/asfd9asdfasdf0jsaf.pdf",
       "documentDate": "2019-01-01 05:05:05",
-      "caseType1" : "SD",
-      "caseType2"	: "Real Time Validation - Overuse Failure",
-      "numberOfFailedSubmissions" : 4,
-      "documentNumber" : "GBR-SD-234234-234-234",
+      "caseType1": "SD",
+      "caseType2": "Real Time Validation - Overuse Failure",
+      "numberOfFailedSubmissions": 4,
+      "documentNumber": "GBR-SD-234234-234-234",
       "clonedFrom": "GBR-2023-CC-620ACD3D6",
       "parentDocumentVoid": false,
-      "exporterId" : "2342352342234",
-      "companyName" : "Bob's Fisheries LTD",
+      "exporterId": "2342352342234",
+      "companyName": "Bob's Fisheries LTD",
       "exportedTo": {
         "officialCountryName": "Nigeria",
         "isoCodeAlpha2": "NG",
         "isoCodeAlpha3": "NGR"
       },
-      "products" : [
+      "products": [
         {
-          "foreignCatchCertificateNumber" : "FR-SD-234234-23423-234234",
-          "species" : "HER",
-          "cnCode" : "324234324432234",
+          "foreignCatchCertificateNumber": "FR-SD-234234-23423-234234",
+          "species": "HER",
+          "cnCode": "324234324432234",
           "commodityCodeDescription": "some decriptions",
           "scientificName": "scientific name",
-          "importedWeight" : 500,
-          "exportedWeight" : 700,
+          "importedWeight": 500,
+          "exportedWeight": 700,
           "isDocumentIssuedInUK": true,
-          "validation" : {
-            "status" : "Overuse Failure",
-            "totalWeightExported" : 700,
-            "weightExceededAmount" : 200,
-            "overuseInfo" : ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-
+          "netWeightProductArrival": 9999999.99,
+          "netWeightFisheryProductArrival": 9999999.99,
+          "netWeightProductDeparture": 9999999.99,
+          "netWeightFisheryProductDeparture": 999999.99,
+          "validation": {
+            "status": "Overuse Failure",
+            "totalWeightExported": 700,
+            "weightExceededAmount": 200,
+            "overuseInfo": [
+              "GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"
+            ]
           }
         },
         {
-          "foreignCatchCertificateNumber" : "IRL-SD-4324-423423-234234",
-          "species" : "SAL",
-          "cnCode" : "523842358",
+          "foreignCatchCertificateNumber": "IRL-SD-4324-423423-234234",
+          "species": "SAL",
+          "cnCode": "523842358",
           "commodityCodeDescription": "some decriptions",
           "scientificName": "scientific name",
-          "importedWeight" : 200,
-          "exportedWeight" : 300,
+          "importedWeight": 200,
+          "exportedWeight": 300,
           "isDocumentIssuedInUK": false,
-          "validation" : {
-            "status" : "Validation Success",
-            "totalWeightExported" : 300
+          "netWeightProductArrival": 9999999.99,
+          "netWeightFisheryProductArrival": 9999999.99,
+          "netWeightProductDeparture": 9999999.99,
+          "netWeightFisheryProductDeparture": 999999.99,
+          "validation": {
+            "status": "Validation Success",
+            "totalWeightExported": 300
           }
         }
       ],
@@ -108,11 +117,11 @@
         "companyName": "FISH LTD",
         "address": {
           "building_number": "123",
-					"sub_building_name": "Unit 1",
-					"building_name": "CJC Fish Ltd",
-					"street_name": "17  Old Edinburgh Road",
-					"county": "West Midlands",
-					"country": "England",
+          "sub_building_name": "Unit 1",
+          "building_name": "CJC Fish Ltd",
+          "street_name": "17  Old Edinburgh Road",
+          "county": "West Midlands",
+          "country": "England",
           "line1": "Vue Red",
           "city": "ROWTR",
           "postCode": "WN90 23A"
@@ -120,19 +129,19 @@
       },
       "documentUrl": "http://tst-gov.uk/asfd9asdfasdf0jsaf.pdf",
       "documentDate": "2019-01-01 05:05:05",
-      "caseType1" : "SD",
-      "caseType2"	: "Void by an Exporter",
-      "numberOfFailedSubmissions" : 4,
-      "documentNumber" : "GBR-SD-234234-234-234",
+      "caseType1": "SD",
+      "caseType2": "Void by an Exporter",
+      "numberOfFailedSubmissions": 4,
+      "documentNumber": "GBR-SD-234234-234-234",
       "clonedFrom": "GBR-2023-CC-620ACD3D6",
       "parentDocumentVoid": false,
-      "exporterId" : "2342352342234",
+      "exporterId": "2342352342234",
       "exportedTo": {
         "officialCountryName": "Nigeria",
         "isoCodeAlpha2": "NG",
         "isoCodeAlpha3": "NGR"
       },
-      "companyName" : "Bob's Fisheries LTD",
+      "companyName": "Bob's Fisheries LTD",
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
       "requestedByAdmin": false
@@ -143,15 +152,51 @@
     "address": {
       "type": "object",
       "properties": {
-        "line1": { "type": "string" },
-        "sub_building_name": { "type": ["string", "null"] },
-        "building_number": { "type": ["string", "null"] },
-        "building_name": { "type": ["string", "null"] },
-        "street_name": { "type": ["string", "null"]},
-        "county": { "type": ["string", "null"] },
-        "country": { "type": ["string", "null"] },
-        "city": { "type": "string" },
-        "postCode": { "type": "string" }
+        "line1": {
+          "type": "string"
+        },
+        "sub_building_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "building_number": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "building_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "street_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "county": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "country": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "city": {
+          "type": "string"
+        },
+        "postCode": {
+          "type": "string"
+        }
       },
       "required": [
         "line1",
@@ -162,24 +207,81 @@
     "dynamicsAddress": {
       "type": "object",
       "properties": {
-        "defra_addressid": { "type": "string" },
-        "defra_buildingname": { "type": ["string", "null"] },
-        "defra_county": { "type": "string" },
-        "defra_dependentlocality": { "type": ["string", "null"] },
-        "defra_fromcompanieshouse": { "type": "boolean" },
-        "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": { "type": "string" },
-        "defra_internationalpostalcode": { "type": ["string", "null"] },
-        "defra_locality": { "type": ["string", "null"] },
-        "defra_postcode": { "type": "string" },
-        "defra_premises": { "type": ["string", "null"] },
-        "defra_street": { "type": "string" },
-        "defra_subbuildingname": { "type": ["string", "null"] },
-        "defra_towntext": { "type": "string" },
-        "defra_uprn": { "type": ["string", "null"] },
-        "_defra_country_value": { "type": "string" },
-        "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": { "type": "string" },
-        "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": { "type": "string" },
-        "_defra_country_value_OData_Community_Display_V1_FormattedValue": { "type": "string" }
+        "defra_addressid": {
+          "type": "string"
+        },
+        "defra_buildingname": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "defra_county": {
+          "type": "string"
+        },
+        "defra_dependentlocality": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "defra_fromcompanieshouse": {
+          "type": "boolean"
+        },
+        "defra_fromcompanieshouse_OData_Community_Display_V1_FormattedValue": {
+          "type": "string"
+        },
+        "defra_internationalpostalcode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "defra_locality": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "defra_postcode": {
+          "type": "string"
+        },
+        "defra_premises": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "defra_street": {
+          "type": "string"
+        },
+        "defra_subbuildingname": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "defra_towntext": {
+          "type": "string"
+        },
+        "defra_uprn": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "_defra_country_value": {
+          "type": "string"
+        },
+        "_defra_country_value_Microsoft_Dynamics_CRM_associatednavigationproperty": {
+          "type": "string"
+        },
+        "_defra_country_value_Microsoft_Dynamics_CRM_lookuplogicalname": {
+          "type": "string"
+        },
+        "_defra_country_value_OData_Community_Display_V1_FormattedValue": {
+          "type": "string"
+        }
       },
       "required": [
         "defra_addressid",
@@ -211,11 +313,14 @@
         "overuseInfo": {
           "type": "array",
           "items": {
-            "type":"string"
+            "type": "string"
           }
         }
       },
-      "required": ["status","totalWeightExported"],
+      "required": [
+        "status",
+        "totalWeightExported"
+      ],
       "additionalProperties": false
     },
     "product": {
@@ -243,11 +348,27 @@
           "type": "number"
         },
         "exportedWeight": {
-          "type" : "number"
+          "type": "number"
         },
         "isDocumentIssuedInUK": {
           "type": "boolean",
           "description": "Flag to identify whether the certificate was issued in the UK"
+        },
+        "netWeightProductArrival": {
+          "type": "number",
+          "description": "net weight of product on arrival provided on /add-product-to-this-consignments"
+        },
+        "netWeightFisheryProductArrival": {
+          "type": "number",
+          "description": "net weight of fishery products on arrival provided on /add-product-to-this-consignments"
+        },
+        "netWeightProductDeparture": {
+          "type": "number",
+          "description": "net weight of product on departure provided on /departure-product-summary"
+        },
+        "netWeightFisheryProductDeparture": {
+          "type": "number",
+          "description": "net weight of fishery products on departure provided on /departure-product-summary"
         },
         "validation": {
           "type": "object",
@@ -314,8 +435,8 @@
         "Void by SMO/PMO"
       ]
     },
-    "numberOfFailedSubmissions" : {
-      "type" : "number",
+    "numberOfFailedSubmissions": {
+      "type": "number",
       "description": "The total number of failed submission attempts executed by the user"
     },
     "documentNumber": {
@@ -338,8 +459,8 @@
     "exporterId": {
       "type": "string"
     },
-    "companyName" : {
-      "type" : "string"
+    "companyName": {
+      "type": "string"
     },
     "products": {
       "type": "array",
