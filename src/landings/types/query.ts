@@ -40,6 +40,10 @@ export interface ISdPsQueryResult {
   dateOfUnloading?: string;
   placeOfUnloading?: string;
   transportUnloadedFrom?: string;
+  netWeightProductArrival: number,
+  netWeightFisheryProductArrival: number,
+  netWeightProductDeparture: number,
+  netWeightFisheryProductDeparture: number,
 }
 
 export interface ISdPsQueryResultModel extends ISdPsQueryResult, Document {}

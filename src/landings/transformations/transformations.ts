@@ -461,7 +461,11 @@ export function mapStorageDocumentToSD(redisSD) {
       dateOfUnloading: _.dateOfUnloading,
       placeOfUnloading: _.placeOfUnloading,
       transportUnloadedFrom: _.transportUnloadedFrom,
-      scientificName: _.scientificName
+      scientificName: _.scientificName,
+      netWeightProductArrival: _.netWeightProductArrival,
+      netWeightFisheryProductArrival: _.netWeightFisheryProductArrival,
+      netWeightProductDeparture: _.netWeightProductDeparture,
+      netWeightFisheryProductDeparture: _.netWeightFisheryProductDeparture
     })));
 }
 

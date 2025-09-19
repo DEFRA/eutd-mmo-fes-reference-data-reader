@@ -842,7 +842,11 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "transportUnloadedFrom": "234",
           "certificateNumber": "fasdfnasdfjasdfjaisdf8asdf8as",
           "certificateType": "uk",
-          "weightOnCC": "1000"
+          "weightOnCC": "1000",
+          "netWeightFisheryProductArrival": "10",
+          "netWeightFisheryProductDeparture": "10",
+          "netWeightProductArrival": "10",
+          "netWeightProductDeparture": "10"
         },
         {
           "product": "Argentine anchovy (ANA)",
@@ -925,7 +929,11 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             dateOfUnloading: "01/10/2019",
             placeOfUnloading: "351",
             transportUnloadedFrom: "234",
-            scientificName: "Gadus morhua"
+            scientificName: "Gadus morhua",
+            netWeightFisheryProductArrival: "10",
+            netWeightFisheryProductDeparture: "10",
+            netWeightProductArrival: "10",
+            netWeightProductDeparture: "10"
           },
           {
             certificateNumber: '2',
@@ -938,7 +946,11 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             dateOfUnloading: "09/07/2019",
             placeOfUnloading: "DOVER",
             transportUnloadedFrom: "234",
-            scientificName: "Argentine anchovy"
+            scientificName: "Argentine anchovy",
+            netWeightFisheryProductArrival: undefined,
+            netWeightFisheryProductDeparture: undefined,
+            netWeightProductArrival: undefined,
+            netWeightProductDeparture: undefined
           }
         ],
         exporterDetails: {
@@ -1724,7 +1736,7 @@ describe('When mapping from a raw catch cert output to an online validation repo
               highSeasArea: 'yes',
               rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
               pln: 'WA1',
-              species: 'Lobster', 
+              species: 'Lobster',
               state: 'BAD',
               commodityCode: '1234',
               status: 'COMPLETE',

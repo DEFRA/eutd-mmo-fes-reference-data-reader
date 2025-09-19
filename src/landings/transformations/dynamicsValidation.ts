@@ -562,6 +562,10 @@ export function toSdProduct(validatedSdProducts: ISdPsQueryResult): IDynamicsSto
     scientificName: validatedSdProducts.scientificName,
     importedWeight: validatedSdProducts.weightOnFCC,
     exportedWeight: validatedSdProducts.weightOnDoc,
+    netWeightProductArrival: validatedSdProducts.netWeightProductArrival,
+    netWeightFisheryProductArrival: validatedSdProducts.netWeightFisheryProductArrival,
+    netWeightProductDeparture: validatedSdProducts.netWeightProductDeparture,
+    netWeightFisheryProductDeparture: validatedSdProducts.netWeightFisheryProductDeparture,
     validation: {
       totalWeightExported: validatedSdProducts.weightOnAllDocs,
       status: status,

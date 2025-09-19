@@ -82,7 +82,7 @@
           "fishingLicenceValidTo": "2030-12-31T00:00:00",
           "imo": null,
           "weight": 500,
-          "gearType": "Type 1",
+          "gearType": "Stationary uncovered pound nets (FPN)",
           "speciesAlias": "Y",
           "speciesAnomaly": "SQR",
           "numberOfTotalSubmissions": 1,
