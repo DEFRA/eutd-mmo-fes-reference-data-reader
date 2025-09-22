@@ -843,10 +843,10 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "certificateNumber": "fasdfnasdfjasdfjaisdf8asdf8as",
           "certificateType": "uk",
           "weightOnCC": "1000",
-          "netWeightFisheryProductArrival": "10",
-          "netWeightFisheryProductDeparture": "10",
-          "netWeightProductArrival": "10",
-          "netWeightProductDeparture": "10"
+          "netWeightProductArrival": 9999999.99,
+          "netWeightFisheryProductArrival": 9999999.99,
+          "netWeightProductDeparture": 9999999.99,
+          "netWeightFisheryProductDeparture": 999999.99,
         },
         {
           "product": "Argentine anchovy (ANA)",
@@ -859,7 +859,11 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "transportUnloadedFrom": "234",
           "certificateNumber": "2",
           "certificateType": "uk",
-          "weightOnCC": "20000"
+          "weightOnCC": "20000",
+          "netWeightProductArrival": 9999999.99,
+          "netWeightFisheryProductArrival": 9999999.99,
+          "netWeightProductDeparture": 9999999.99,
+          "netWeightFisheryProductDeparture": 999999.99,
         }
       ],
       "storageFacilities": [
@@ -930,10 +934,10 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             placeOfUnloading: "351",
             transportUnloadedFrom: "234",
             scientificName: "Gadus morhua",
-            netWeightFisheryProductArrival: "10",
-            netWeightFisheryProductDeparture: "10",
-            netWeightProductArrival: "10",
-            netWeightProductDeparture: "10"
+            netWeightProductArrival: 9999999.99,
+            netWeightFisheryProductArrival: 9999999.99,
+            netWeightProductDeparture: 9999999.99,
+            netWeightFisheryProductDeparture: 999999.99,
           },
           {
             certificateNumber: '2',
@@ -947,10 +951,10 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             placeOfUnloading: "DOVER",
             transportUnloadedFrom: "234",
             scientificName: "Argentine anchovy",
-            netWeightFisheryProductArrival: undefined,
-            netWeightFisheryProductDeparture: undefined,
-            netWeightProductArrival: undefined,
-            netWeightProductDeparture: undefined
+            netWeightProductArrival: 9999999.99,
+            netWeightFisheryProductArrival: 9999999.99,
+            netWeightProductDeparture: 9999999.99,
+            netWeightFisheryProductDeparture: 999999.99,
           }
         ],
         exporterDetails: {

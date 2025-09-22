@@ -141,6 +141,8 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         netWeightFisheryProductArrival: cat.netWeightFisheryProductArrival,
         netWeightProductDeparture: cat.netWeightProductDeparture,
         netWeightFisheryProductDeparture: cat.netWeightFisheryProductDeparture,
+        productDescription: cat.productDescription,
+        supportingDocuments: cat.supportingDocuments?.join(',')
       }
 
     if (doc.__t === 'processingStatement') {

@@ -15,7 +15,7 @@ import { toDefraSdStorageFacility, toTransportation } from "./defraValidation";
 import { toLanding, } from "./dynamicsValidation";
 import { Catch, Product } from "../persistence/catchCert";
 import { IDynamicsProcessingStatementCase, IDynamicsStorageDocumentCase } from "../types/dynamicsSdPsCase";
-import { CertificateAuthority, CertificateStorageFacility, CertificateTransport } from "../types/defraValidation";
+import { CertificateAuthority, CertificateTransport } from "../types/defraValidation";
 import { ApplicationConfig } from "../../config";
 import { getTotalRiskScore, isHighRisk } from "../query/isHighRisk";
 
@@ -201,6 +201,12 @@ export function toDefraTradeSdProduct(validatedSdProducts: ISdPsQueryResult): ID
     dateOfUnloading: moment(validatedSdProducts.dateOfUnloading, 'DD/MM/YYYY').format('YYYY-MM-DD'),
     placeOfUnloading: validatedSdProducts.placeOfUnloading,
     transportUnloadedFrom: validatedSdProducts.transportUnloadedFrom,
+    supportingDocuments: validatedSdProducts.supportingDocuments,
+    productDescription: validatedSdProducts.productDescription,
+    netWeightProductArrival: validatedSdProducts.netWeightProductArrival,
+    netWeightFisheryProductArrival: validatedSdProducts.netWeightFisheryProductArrival,
+    netWeightProductDeparture: validatedSdProducts.netWeightProductDeparture,
+    netWeightFisheryProductDeparture: validatedSdProducts.netWeightFisheryProductDeparture
   }
 }
 
@@ -209,6 +215,7 @@ export const toDefraTradeProduct = (product: ISdPsQueryResult): IDefraTradeStora
 
 export const toDefraTradeSd = (document: IDocument, documentCase: IDynamicsStorageDocumentCase, sdQueryResults: ISdPsQueryResult[] | null): IDefraTradeStorageDocument => {
   const transportation: CertificateTransport = toTransportation(document.exportData?.transportation);
+  const arrivalTransportation: CertificateTransport = toTransportation(document.exportData?.arrivalTransportation);
   Object.keys(transportation).forEach(key => transportation[key] === undefined && delete transportation[key]);
 
   transportation.exportDate = moment(transportation.exportDate, ['DD/MM/YYYY', 'DD/M/YYYY', 'D/MM/YYYY']).isValid() ? moment(transportation.exportDate, ['DD/MM/YYYY', 'DD/M/YYYY', 'D/MM/YYYY']).format('YYYY-MM-DD') : moment.utc().format('YYYY-MM-DD');
@@ -216,9 +223,10 @@ export const toDefraTradeSd = (document: IDocument, documentCase: IDynamicsStora
   return {
     ...documentCase,
     products: Array.isArray(sdQueryResults) ? sdQueryResults.map((_: ISdPsQueryResult) => toDefraTradeProduct(_)) : null,
-    storageFacilities: document?.exportData.storageFacilities.map((_: CertificateStorageFacility) => toDefraSdStorageFacility(_)),
+    storageFacilities: document.exportData.storageFacilities.map((_) => toDefraSdStorageFacility(_)),
     exportedTo: document.exportData?.exportedTo,
     transportation,
+    arrivalTransportation,
     authority: toAuthority()
   }
 };

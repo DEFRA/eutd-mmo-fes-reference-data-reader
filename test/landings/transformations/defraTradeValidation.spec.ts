@@ -92,88 +92,88 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         }
       ],
       "transportations": [{
-          "id": '0',
-          "freightBillNumber": '0',
-          "vehicle": "truck",
-          "departurePlace": "Hull",
-          "nationalityOfVehicle": "",
-          "registrationNumber": "",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": '0',
-          "freightBillNumber": '0',
-          "vehicle": "plane",
-          "departurePlace": "Hull",
-          "flightNumber": "",
-          "containerNumber": "",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": '0',
-          "freightBillNumber": '0',
-          "vehicle": "train",
-          "departurePlace": "Hull",
-          "railwayBillNumber": "",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": '0',
-          "freightBillNumber": '0',
-          "vehicle": "containerVessel",
-          "departurePlace": "Hull",
-          "vesselName": "",
-          "flagState": "",
-          "containerNumber": "",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "transportDocuments": [{
-            "name": "Invoice",
-            "reference": "INV001"
-          }]
-        }, {
-          "id": '0',
-          "freightBillNumber": '0',
-          "vehicle": "unknown",
-          "departurePlace": "Hull",
-          "nationalityOfVehicle": "",
-          "registrationNumber": "",
-          "exportedTo": {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          "transportDocuments": []
-        }
+        "id": '0',
+        "freightBillNumber": '0',
+        "vehicle": "truck",
+        "departurePlace": "Hull",
+        "nationalityOfVehicle": "",
+        "registrationNumber": "",
+        "exportedTo": {
+          "officialCountryName": "Nigeria",
+          "isoCodeAlpha2": "NG",
+          "isoCodeAlpha3": "NGA",
+          "isoNumericCode": "566"
+        },
+        "transportDocuments": [{
+          "name": "Invoice",
+          "reference": "INV001"
+        }]
+      }, {
+        "id": '0',
+        "freightBillNumber": '0',
+        "vehicle": "plane",
+        "departurePlace": "Hull",
+        "flightNumber": "",
+        "containerNumber": "",
+        "exportedTo": {
+          "officialCountryName": "Nigeria",
+          "isoCodeAlpha2": "NG",
+          "isoCodeAlpha3": "NGA",
+          "isoNumericCode": "566"
+        },
+        "transportDocuments": [{
+          "name": "Invoice",
+          "reference": "INV001"
+        }]
+      }, {
+        "id": '0',
+        "freightBillNumber": '0',
+        "vehicle": "train",
+        "departurePlace": "Hull",
+        "railwayBillNumber": "",
+        "exportedTo": {
+          "officialCountryName": "Nigeria",
+          "isoCodeAlpha2": "NG",
+          "isoCodeAlpha3": "NGA",
+          "isoNumericCode": "566"
+        },
+        "transportDocuments": [{
+          "name": "Invoice",
+          "reference": "INV001"
+        }]
+      }, {
+        "id": '0',
+        "freightBillNumber": '0',
+        "vehicle": "containerVessel",
+        "departurePlace": "Hull",
+        "vesselName": "",
+        "flagState": "",
+        "containerNumber": "",
+        "exportedTo": {
+          "officialCountryName": "Nigeria",
+          "isoCodeAlpha2": "NG",
+          "isoCodeAlpha3": "NGA",
+          "isoNumericCode": "566"
+        },
+        "transportDocuments": [{
+          "name": "Invoice",
+          "reference": "INV001"
+        }]
+      }, {
+        "id": '0',
+        "freightBillNumber": '0',
+        "vehicle": "unknown",
+        "departurePlace": "Hull",
+        "nationalityOfVehicle": "",
+        "registrationNumber": "",
+        "exportedTo": {
+          "officialCountryName": "Nigeria",
+          "isoCodeAlpha2": "NG",
+          "isoCodeAlpha3": "NGA",
+          "isoNumericCode": "566"
+        },
+        "transportDocuments": []
+      }
       ],
       "conservation": {
         "conservationReference": "UK Fisheries Policy"
@@ -304,12 +304,12 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
         "exclusiveEconomicZones": [
           {
-            "officialCountryName": "Nigeria", 
-            "isoCodeAlpha2": "NG", 
-            "isoCodeAlpha3": "NGA", 
+            "officialCountryName": "Nigeria",
+            "isoCodeAlpha2": "NG",
+            "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
-          }, 
-          { 
+          },
+          {
             "officialCountryName": "France",
             "isoCodeAlpha2": "FR",
             "isoCodeAlpha3": "FRA",
@@ -1465,6 +1465,17 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
         "vehicle": "truck",
         "cmr": true,
         "exportDate": "05/09/2023"
+      },
+      "arrivalTransportation": {
+        "exportedTo": {
+          "officialCountryName": "Afghanistan",
+          "isoCodeAlpha2": "AF",
+          "isoCodeAlpha3": "AFG",
+          "isoNumericCode": "004"
+        },
+        "vehicle": "truck",
+        "cmr": true,
+        "exportDate": "05/09/2023"
       }
     },
     "userReference": "some-reference",
@@ -1610,7 +1621,10 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
           "postCode": "NE4 7YH",
           "county": "TYNESIDE",
           "country": "ENGLAND"
-        }
+        },
+        "approvalNumber": undefined,
+        "arrivalDate": undefined,
+        "productHandling": undefined,
       }
     ];
 
@@ -1635,7 +1649,13 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
         "totalWeightExported": 100,
         "weightExceededAmount": 100,
         "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-      }
+      },
+      "netWeightProductArrival": undefined,
+      "netWeightFisheryProductArrival": undefined,
+      "netWeightProductDeparture": undefined,
+      "netWeightFisheryProductDeparture": undefined,
+      "productDescription": undefined,
+      "supportingDocuments": undefined
     };
 
     expect(result.products?.[0]).toStrictEqual(expected);

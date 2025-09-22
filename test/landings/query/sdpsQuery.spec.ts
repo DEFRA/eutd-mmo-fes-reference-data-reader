@@ -28,7 +28,7 @@ describe('low level transformations', () => {
       'storageDocument',
       [
         { certificateNumber: 'FCC051', certificateType: 'uk', product: 'cats', scientificName: "some scientific name 1", weightOnCC: 500.51, productWeight: 500.51, dateOfUnloading: "15/06/2020", placeOfUnloading: "Dover", transportUnloadedFrom: "BA078" },
-        { certificateNumber: 'FCC051', certificateType: 'non_uk', product: 'dogs', scientificName: "some scientific name 2", weightOnCC: 500.51, productWeight: 200.29, dateOfUnloading: "15/06/2020", placeOfUnloading: "Hull", transportUnloadedFrom: "EF078" }
+        { certificateNumber: 'FCC051', certificateType: 'non_uk', product: 'dogs', scientificName: "some scientific name 2", weightOnCC: 500.51, productWeight: 200.29, dateOfUnloading: "15/06/2020", placeOfUnloading: "Hull", transportUnloadedFrom: "EF078", supportingDocuments: ['PS','CC'] }
       ]
     )
 
@@ -40,7 +40,7 @@ describe('low level transformations', () => {
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'storageDocument',
         extended: { url: 'http://www.bob.com' },
         certificateNumber: 'FCC051', certificateType: 'non_uk', da: 'England', species: 'dogs', scientificName: "some scientific name 2", weight: 200.29, weightOnCC: 500.51,
-        dateOfUnloading: "15/06/2020", placeOfUnloading: "Hull", transportUnloadedFrom: "EF078" }
+        dateOfUnloading: "15/06/2020", placeOfUnloading: "Hull", transportUnloadedFrom: "EF078", supportingDocuments: "PS,CC" }
     ]
 
     const res = Query.unwindAndMapCatches(document, identity)

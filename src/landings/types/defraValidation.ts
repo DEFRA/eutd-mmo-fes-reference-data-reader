@@ -107,12 +107,19 @@ export interface CertificatePlant {
 export interface CertificateStorageFacility {
     name?: string;
     address: CertificateAddress;
+    arrivalDate?: string,
+    approvalNumber?: string,
+    productHandling?: string
 }
 
 interface ModeOfTransport {
     modeofTransport: string;
     exportLocation?: string;
     exportDate?: string;
+    freightbillNumber?: string;
+    countryofDeparture?: string;
+    whereDepartsFrom?: string;
+    departureDate?: string;
 }
 
 export interface Truck extends ModeOfTransport {
@@ -128,6 +135,7 @@ export interface Train extends ModeOfTransport {
 export interface Plane extends ModeOfTransport {
     flightNumber: string;
     containerId: string;
+    airwaybillNumber?: string;
 }
 
 export interface Vessel extends ModeOfTransport {

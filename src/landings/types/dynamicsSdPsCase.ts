@@ -67,10 +67,15 @@ export interface IDynamicsStorageDocumentProduct {
     scientificName: string;
     importedWeight: number;
     exportedWeight: number;
-    netWeightProductArrival: number,
-    netWeightFisheryProductArrival: number,
-    netWeightProductDeparture: number,
-    netWeightFisheryProductDeparture: number,
+    dateOfUnloading?: string
+    supportingDocuments?: string,
+    placeOfUnloading?: string,
+    transportUnloadedFrom?: string,
+    productDescription?: string,
+    netWeightProductArrival?: number,
+    netWeightFisheryProductArrival?: number,
+    netWeightProductDeparture?: number,
+    netWeightFisheryProductDeparture?: number,
     validation: IDynamicsStorageDocumentValidation;
 }
 

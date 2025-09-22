@@ -345,7 +345,10 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
          line1: sdStorageFacility.facilityAddressOne,
          city: sdStorageFacility.facilityTownCity,
          postCode: sdStorageFacility.facilityPostcode
-      }
+      },
+      arrivalDate: sdStorageFacility.facilityArrivalDate,
+      approvalNumber: sdStorageFacility.facilityApprovalNumber,
+      productHandling: sdStorageFacility.facilityStorage
    } : undefined;
 }
 
@@ -361,14 +364,22 @@ export function toTransportation(transportation): CertificateTransport {
             nationality: transportation.nationalityOfVehicle,
             registration: transportation.registrationNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate
+            exportDate: transportation.exportDate,
+            freightbillNumber: transportation.freightbillNumber,
+            countryofDeparture: transportation.countryofDeparture,
+            whereDepartsFrom: transportation.whereDepartsFrom,
+            departureDate: transportation.departureDate
          }
       case TRANSPORT_VEHICLE_TRAIN:
          return {
             modeofTransport: transportation.vehicle,
             billNumber: transportation.railwayBillNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate
+            exportDate: transportation.exportDate,
+            freightbillNumber: transportation.freightbillNumber,
+            countryofDeparture: transportation.countryofDeparture,
+            whereDepartsFrom: transportation.whereDepartsFrom,
+            departureDate: transportation.departureDate
          }
       case TRANSPORT_VEHICLE_PLANE:
          return {
@@ -376,7 +387,12 @@ export function toTransportation(transportation): CertificateTransport {
             flightNumber: transportation.flightNumber,
             containerId: transportation.containerNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate
+            exportDate: transportation.exportDate,
+            freightbillNumber: transportation.freightbillNumber,
+            airwaybillNumber: transportation.airwaybillNumber,
+            countryofDeparture: transportation.countryofDeparture,
+            whereDepartsFrom: transportation.whereDepartsFrom,
+            departureDate: transportation.departureDate
          }
       case TRANSPORT_VEHICLE_CONTAINER_VESSEL:
          return {
@@ -385,13 +401,21 @@ export function toTransportation(transportation): CertificateTransport {
             flag: transportation.flagState,
             containerId: transportation.containerNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate
+            exportDate: transportation.exportDate,
+            freightbillNumber: transportation.freightbillNumber,
+            countryofDeparture: transportation.countryofDeparture,
+            whereDepartsFrom: transportation.whereDepartsFrom,
+            departureDate: transportation.departureDate
          }
       default:
          return {
             modeofTransport: transportation.vehicle,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate
+            exportDate: transportation.exportDate,
+            freightbillNumber: transportation.freightbillNumber,
+            countryofDeparture: transportation.countryofDeparture,
+            whereDepartsFrom: transportation.whereDepartsFrom,
+            departureDate: transportation.departureDate
          }
    }
 }

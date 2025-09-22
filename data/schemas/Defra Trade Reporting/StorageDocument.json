@@ -61,6 +61,12 @@
           "dateOfUnloading": "2023-08-25",
           "placeOfUnloading": "Dover",
           "transportUnloadedFrom": "Train",
+          "netWeightProductArrival": 9999999.99,
+          "netWeightFisheryProductArrival": 9999999.99,
+          "netWeightProductDeparture": 9999999.99,
+          "netWeightFisheryProductDeparture": 999999.99,
+          "supportingDocuments": "testDocument",
+          "productDescription": "Some Product Description",
           "validation": {
             "status": "Validation Failure - Overuse",
             "totalWeightExported": 700,
@@ -97,7 +103,10 @@
             "street_name": "HAMPSHIRE COURT",
             "county": "TYNESIDE",
             "country": "ENGLAND"
-          }
+          },
+          "arrivalDate": "2025-08-12",
+          "approvalNumber": "UK/ABC",
+          "productHandling": "chilled"
         }
       ],
       "transportation": {
@@ -107,6 +116,14 @@
         "containerId": "velit quis commodo aliqua sint",
         "exportLocation": "DOVER",
         "exportDate": "2023-01-01"
+      },
+      "arrivalTransportation": {
+        "modeofTransport": "truck",
+        "name": "magna logistics",
+        "flag": "test flag",
+        "containerId": "TRK-4589",
+        "exportLocation": "UK",
+        "exportDate": "2023-01-10"
       },
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
@@ -199,6 +216,14 @@
         "containerId": "velit quis commodo aliqua sint",
         "exportLocation": "DOVER",
         "exportDate": "2023-01-01"
+      },
+      "arrivalTransportation": {
+        "modeofTransport": "truck",
+        "name": "magna logistics",
+        "flag": "test flag",
+        "containerId": "TRK-4589",
+        "exportLocation": "UK",
+        "exportDate": "2023-01-10"
       },
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
@@ -449,6 +474,30 @@
           "description": "Details of transport (unloaded from)",
           "type": "string"
         },
+        "netWeightProductArrival": {
+          "type": "string",
+          "description": "net weight of product on arrival provided on /add-product-to-this-consignments"
+        },
+        "netWeightFisheryProductArrival": {
+          "type": "string",
+          "description": "net weight of fishery products on arrival provided on /add-product-to-this-consignments"
+        },
+        "netWeightProductDeparture": {
+          "type": "string",
+          "description": "net weight of product on departure provided on /departure-product-summary"
+        },
+        "netWeightFisheryProductDeparture": {
+          "type": "string",
+          "description": "net weight of fishery products on departure provided on /departure-product-summary"
+        },
+        "supportingDocuments": {
+          "type": "string",
+          "description": "reference numbers for any supporting documents when a processing statement is provided as foreign document number"
+        },
+        "productDescription": {
+          "type": "string",
+          "description": "Description of the product added to the consignment"
+        },
         "validation": {
           "type": "object",
           "items": {
@@ -517,6 +566,21 @@
         },
         "flag": {
           "type": "string"
+        },
+        "freightbillNumber": {
+          "type": "string"
+        },
+        "airwaybillNumber" : {
+          "type": "string"
+        },
+        "countryofDeparture": {
+          "type": "string"
+        },
+        "whereDepartsFrom": {
+          "type": "string"
+        },
+        "departureDate": {
+          "type": "string"
         }
       },
       "anyOf": [
@@ -568,6 +632,70 @@
         }
       ]
     },
+    "arrivalTransportation": {
+      "type": "object",
+      "description": "Details of Transport (Vessel / flight number / railway bill / truck registration)",
+      "required": [
+        "modeofTransport"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "modeofTransport": {
+          "enum": [
+            "truck",
+            "train",
+            "plane",
+            "vessel"
+          ]
+        },
+        "exportDate": {
+          "description": "Date / Port of Place of Departure",
+          "type": "string"
+        },
+        "hasRoadTransportDocument": {
+          "type": "boolean"
+        },
+        "nationality": {
+          "type": "string"
+        },
+        "registration": {
+          "type": "string"
+        },
+        "exportLocation": {
+          "type": "string"
+        },
+        "billNumber": {
+          "type": "string"
+        },
+        "flightNumber": {
+          "type": "string"
+        },
+        "containerId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "flag": {
+          "type": "string"
+        },
+        "freightbillNumber": {
+          "type": "string"
+        },
+        "airwaybillNumber" : {
+          "type": "string"
+        },
+        "countryofDeparture": {
+          "type": "string"
+        },
+        "whereDepartsFrom": {
+          "type": "string"
+        },
+        "departureDate": {
+          "type": "string"
+        }
+      }
+    },
     "storageFacility": {
       "type": "object",
       "description": "Storage facility details",
@@ -581,6 +709,18 @@
         },
         "address": {
           "$ref": "#/definitions/address"
+        },
+        "arrivalDate": {
+          "type": "string",
+          "description": "Consignments Arrival Date provided from /add-storage-facility-details"
+        },
+        "approvalNumber": {
+          "type": "string",
+          "description": "Storage facility approval number provided from add-storage-facility-approval"
+        },
+        "productHandling":{
+          "type": "string",
+          "description": "Product Handling provided from add-storage-facility-approval"
         }
       }
     },
@@ -725,6 +865,9 @@
       }
     },
     "transportation": {
+      "$ref": "#/definitions/transportation"
+    },
+    "arrivalTransportation": {
       "$ref": "#/definitions/transportation"
     },
     "authority": {
