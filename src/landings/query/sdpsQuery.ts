@@ -100,6 +100,12 @@ const getExtentedObject = (item) => {
   if (item.dateOfUnloading !== undefined) newObj.dateOfUnloading = item.dateOfUnloading;
   if (item.placeOfUnloading !== undefined) newObj.placeOfUnloading = item.placeOfUnloading;
   if (item.transportUnloadedFrom !== undefined) newObj.transportUnloadedFrom = item.transportUnloadedFrom;
+  if (item.netWeightProductArrival !== undefined) newObj.netWeightProductArrival = item.netWeightProductArrival;
+  if (item.netWeightFisheryProductArrival !== undefined) newObj.netWeightFisheryProductArrival = item.netWeightFisheryProductArrival;
+  if (item.netWeightProductDeparture !== undefined) newObj.netWeightProductDeparture = item.netWeightProductDeparture;
+  if (item.netWeightFisheryProductDeparture !== undefined) newObj.netWeightFisheryProductDeparture = item.netWeightFisheryProductDeparture;
+  if (item.productDescription !== undefined) newObj.productDescription = item.productDescription;
+  if (item.supportingDocuments !== undefined) newObj.supportingDocuments = item.supportingDocuments;
   return newObj;
 }
 
