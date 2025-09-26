@@ -8401,6 +8401,50 @@ describe('Dynamics Validation', () => {
       expect(result.scientificName).toBe("Gadus morhua");
     });
 
+    it('will map undefined for netWeightProductArrival, netWeightFisheryProductArrival, netWeightProductDeparture and netWeightFisheryProductDeparture', () => {
+      const result = toSdProduct(input);
+
+      expect(result.netWeightProductArrival).toBeUndefined();
+      expect(result.netWeightFisheryProductArrival).toBeUndefined();
+      expect(result.netWeightProductDeparture).toBeUndefined();
+      expect(result.netWeightFisheryProductDeparture).toBeUndefined();
+    });
+
+    it('will map 10 for netWeightProductArrival, netWeightFisheryProductArrival, netWeightProductDeparture and netWeightFisheryProductDeparture', () => {
+      const result = toSdProduct({
+        documentNumber: "SD1",
+        catchCertificateNumber: "SD2",
+        catchCertificateType: "uk",
+        documentType: "SD",
+        createdAt: "2020-01-01",
+        status: "COMPLETE",
+        species: "Atlantic cod (COD)",
+        scientificName: "Gadus morhua",
+        commodityCode: "FRESHCOD",
+        weightOnDoc: 100,
+        weightOnAllDocs: 150,
+        weightOnFCC: 200,
+        weightAfterProcessing: 80,
+        isOverAllocated: false,
+        overUsedInfo: [],
+        isMismatch: false,
+        overAllocatedByWeight: 0,
+        da: null,
+        netWeightFisheryProductArrival: "10",
+        netWeightProductArrival: "10",
+        netWeightProductDeparture: "10",
+        netWeightFisheryProductDeparture: "10",
+        extended: {
+          id: 'SD2-1610018839',
+        }
+      });
+
+      expect(result.netWeightProductArrival).toBe(10);
+      expect(result.netWeightFisheryProductArrival).toBe(10);
+      expect(result.netWeightProductDeparture).toBe(10);
+      expect(result.netWeightFisheryProductDeparture).toBe(10);
+    });
+
     describe("The validation within IDynamicsStorageDocumentProduct", () => {
       it('will contain totalUsedWeightAgainstCertificate', () => {
         const result = toSdProduct(input);
