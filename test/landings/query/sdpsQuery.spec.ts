@@ -703,8 +703,8 @@ describe('tests at the query level', () => {
       '22345',
         'storageDocument',
         [
-          { certificateNumber: 'toString', certificateType: 'uk', product: 'toString', scientificName: 'some scientific name', weightOnCC: 500, productWeight: 500 },
-          { certificateNumber: 'toString', certificateType: 'uk', product: 'values', scientificName: 'some scientific name', weightOnCC: 500, productWeight: 500 },
+          { certificateNumber: 'toString', certificateType: 'uk', product: 'toString', scientificName: 'some scientific name', weightOnCC: 500, productWeight: 500, productDescription: "productDescription", supportingDocuments: ['Document-1'], netWeightProductArrival: 10, netWeightFisheryProductArrival: 10, netWeightProductDeparture: 10, netWeightFisheryProductDeparture: 10 },
+          { certificateNumber: 'toString', certificateType: 'uk', product: 'values', scientificName: 'some scientific name', weightOnCC: 500, productWeight: 500, productDescription: "productDescription", supportingDocuments: ['Document-1'], netWeightProductArrival: 10, netWeightFisheryProductArrival: 10, netWeightProductDeparture: 10, netWeightFisheryProductDeparture: 10  },
           { certificateNumber: 'bob', certificateType: 'uk', product: 'COD', scientificName: 'some scientific name', weightOnCC: 500, productWeight: 500 },
         ]
       )
