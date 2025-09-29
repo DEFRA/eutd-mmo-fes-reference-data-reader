@@ -85,6 +85,12 @@ export interface StorageDocumentReportCatch {
     isImportWeightMismatch?: boolean;
     overUseExceededAmount?: number;
     isDocumentIssuedInUK?: boolean;
+    supportingDocuments?: string;
+    productDescription?: string;
+    netWeightProductArrival?: string;
+    netWeightFisheryProductArrival?: string;
+    netWeightProductDeparture?: string;
+    netWeightFisheryProductDeparture?: string;
 }
 
 export interface CertificateConsignment {
@@ -195,24 +201,25 @@ export interface IDefraValidationProcessingStatement {
 }
 
 export interface IDefraValidationStorageDocument {
-    documentType:       string;
-    documentNumber:     string;
-    status:             string;
-    devolvedAuthority?: string;
-    dateCreated?:       Date;
-    lastUpdated?:       Date;
-    created?:           Created;
-    userReference?:     string;
-    audits?:            CertificateAudit[];
-    exporterDetails?:   CertificateCompany;
-    products?:          StorageDocumentReportCatch[];
-    storageFacilities?: CertificateStorageFacility[];
-    transportation?:    CertificateTransport;
-    documentUri?:       string;
-    failedSubmissions?: number;
-    _correlationId:     string;
-    requestedByAdmin:   boolean;
-    exportedTo?:        ICountry;
+    documentType:           string;
+    documentNumber:         string;
+    status:                 string;
+    devolvedAuthority?:     string;
+    dateCreated?:           Date;
+    lastUpdated?:           Date;
+    created?:               Created;
+    userReference?:         string;
+    audits?:                CertificateAudit[];
+    exporterDetails?:       CertificateCompany;
+    products?:              StorageDocumentReportCatch[];
+    storageFacilities?:     CertificateStorageFacility[];
+    transportation?:        CertificateTransport;
+    arrivalTransportation?: CertificateTransport;
+    documentUri?:           string;
+    failedSubmissions?:     number;
+    _correlationId:         string;
+    requestedByAdmin:       boolean;
+    exportedTo?:            ICountry;
     clonedFrom?:            string;
     parentDocumentVoid?:    boolean;
 }
@@ -252,29 +259,30 @@ export const DefraValidationProcessingStatementSchema = new Schema ({
 });
 
 export const DefraValidationStorageDocumentSchema = new Schema ({
-    documentType:       { type: String,  required: true  },
-    documentNumber:     { type: String,  required: true  },
-    status:             { type: String,  required: true  },
-    _correlationId:     { type: String,  required: true  },
-    requestedByAdmin:   { type: Boolean, required: false, default: false },
-    lastUpdated:        { type: Date,    required: false, default: Date.now },
-    devolvedAuthority:  { type: String,  required: false },
-    contactId:          { type: String,  required: false },
-    accountId:          { type: String,  required: false },
-    dateCreated:        { type: Date,    required: false },
-    created:            { type: Object,  required: false },
-    userReference:      { type: String,  required: false },
-    audits:             { type: [Schema.Types.Mixed],  required: false },
-    exporterDetails:    { type: Object,  required: false },
-    products:           { type: [Schema.Types.Mixed],  required: false },
-    storageFacilities:  { type: [Schema.Types.Mixed],  required: false },
-    transportation:     { type: Schema.Types.Mixed,    required: false },
-    documentUri:        { type: String,  required: false },
-    exportedTo:         { type: countrySchema, required: false },
-    failedSubmissions:  { type: Number,  required: false },
-    _processed:         { type: Boolean, required: false, default: false },
-    clonedFrom:         { type: String, required: false },
-    parentDocumentVoid: { type: Boolean, required: false }
+    documentType:               { type: String,  required: true  },
+    documentNumber:             { type: String,  required: true  },
+    status:                     { type: String,  required: true  },
+    _correlationId:             { type: String,  required: true  },
+    requestedByAdmin:           { type: Boolean, required: false, default: false },
+    lastUpdated:                { type: Date,    required: false, default: Date.now },
+    devolvedAuthority:          { type: String,  required: false },
+    contactId:                  { type: String,  required: false },
+    accountId:                  { type: String,  required: false },
+    dateCreated:                { type: Date,    required: false },
+    created:                    { type: Object,  required: false },
+    userReference:              { type: String,  required: false },
+    audits:                     { type: [Schema.Types.Mixed],  required: false },
+    exporterDetails:            { type: Object,  required: false },
+    products:                   { type: [Schema.Types.Mixed],  required: false },
+    storageFacilities:          { type: [Schema.Types.Mixed],  required: false },
+    transportation:             { type: Schema.Types.Mixed,    required: false },
+    arrivalTransportation:      { type: Schema.Types.Mixed,    required: false },
+    documentUri:                { type: String,  required: false },
+    exportedTo:                 { type: countrySchema, required: false },
+    failedSubmissions:          { type: Number,  required: false },
+    _processed:                 { type: Boolean, required: false, default: false },
+    clonedFrom:                 { type: String, required: false },
+    parentDocumentVoid:         { type: Boolean, required: false }
 });
 
 export const DefraValidationCatchCertificateSchema = new Schema ({

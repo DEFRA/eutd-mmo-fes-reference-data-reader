@@ -665,6 +665,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         expect(result.products).toBeUndefined();
         expect(result.storageFacilities).toBeUndefined();
         expect(result.transportation).toBeUndefined();
+        expect(result.arrivalTransportation).toBeUndefined();
 
         expect(result.documentUri).toBeUndefined();
         expect(result.failedSubmissions).toBeUndefined();
@@ -736,7 +737,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
             "isoCodeAlpha2": "NG",
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
-          }
+          },
         },
         "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf",
         "numberOfFailedAttempts": 5
@@ -773,6 +774,7 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         expect(result.products).toBeUndefined();
         expect(result.storageFacilities).toBeUndefined();
         expect(result.transportation).toBeUndefined();
+        expect(result.arrivalTransportation).toBeUndefined();
 
         expect(result.documentUri).toBeUndefined();
         expect(result.failedSubmissions).toBeUndefined();
@@ -880,7 +882,86 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
             "isoCodeAlpha2": "NG",
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
+          },
+          "transportations": [{
+            "id": '0',
+            "vehicle": "truck",
+            "departurePlace": "Hull",
+            "nationalityOfVehicle": "",
+            "registrationNumber": "",
+            "exportedTo": {
+              "officialCountryName": "Nigeria",
+              "isoCodeAlpha2": "NG",
+              "isoCodeAlpha3": "NGA",
+              "isoNumericCode": "566"
+            },
+            "transportDocuments": [{
+              "name": "Invoice",
+              "reference": "INV001"
+            }]
+          }, {
+            "id": '0',
+            "vehicle": "plane",
+            "departurePlace": "Hull",
+            "flightNumber": "",
+            "containerNumber": "",
+            "exportedTo": {
+              "officialCountryName": "Nigeria",
+              "isoCodeAlpha2": "NG",
+              "isoCodeAlpha3": "NGA",
+              "isoNumericCode": "566"
+            },
+            "transportDocuments": [{
+              "name": "Invoice",
+              "reference": "INV001"
+            }]
+          }, {
+            "id": '0',
+            "vehicle": "train",
+            "departurePlace": "Hull",
+            "railwayBillNumber": "",
+            "exportedTo": {
+              "officialCountryName": "Nigeria",
+              "isoCodeAlpha2": "NG",
+              "isoCodeAlpha3": "NGA",
+              "isoNumericCode": "566"
+            },
+            "transportDocuments": [{
+              "name": "Invoice",
+              "reference": "INV001"
+            }]
+          }, {
+            "id": '0',
+            "vehicle": "containerVessel",
+            "departurePlace": "Hull",
+            "vesselName": "",
+            "flagState": "",
+            "containerNumber": "",
+            "exportedTo": {
+              "officialCountryName": "Nigeria",
+              "isoCodeAlpha2": "NG",
+              "isoCodeAlpha3": "NGA",
+              "isoNumericCode": "566"
+            },
+            "transportDocuments": [{
+              "name": "Invoice",
+              "reference": "INV001"
+            }]
+          }, {
+            "id": '0',
+            "vehicle": "unknown",
+            "departurePlace": "Hull",
+            "nationalityOfVehicle": "",
+            "registrationNumber": "",
+            "exportedTo": {
+              "officialCountryName": "Nigeria",
+              "isoCodeAlpha2": "NG",
+              "isoCodeAlpha3": "NGA",
+              "isoNumericCode": "566"
+            },
+            "transportDocuments": []
           }
+          ],
         },
         "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf",
         "numberOfFailedAttempts": 5
@@ -1051,7 +1132,58 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
               "transportation": {
                 "vehicle": "truck",
                 "cmr": true
+              },
+              "arrivalTransportation": [{
+                "id": '0',
+                "vehicle": "truck",
+                "departurePlace": "Hull",
+                "nationalityOfVehicle": "Uk",
+                "registrationNumber": "ABC",
+                "freightBillNumber": "ABC123",
+                "departureCountry": "United Kingdom",
+                "departurePort": "Hull",
+                "exportDate": "2023-08-31"
+              }, {
+                "id": '0',
+                "vehicle": "plane",
+                "departurePlace": "Hull",
+                "flightNumber": "SK123",
+                "containerNumber": "CON121",
+                "freightBillNumber": "ABC123",
+                "departureCountry": "United Kingdom",
+                "departurePort": "Hull",
+                "exportDate": "2023-08-31",
+              }, {
+                "id": '0',
+                "vehicle": "train",
+                "railwayBillNumber": "ABC123",
+                "freightBillNumber": "ABC123",
+                "departureCountry": "United Kingdom",
+                "departurePort": "Hull",
+                "exportDate": "2023-08-31",
+              }, {
+                "id": '0',
+                "vehicle": "containerVessel",
+                "departurePlace": "Hull",
+                "vesselName": "",
+                "flagState": "",
+                "containerNumber": "CON121",
+                "freightBillNumber": "ABC123",
+                "departureCountry": "United Kingdom",
+                "departurePort": "Hull",
+                "exportDate": "2023-08-31",
+              }, {
+                "id": '0',
+                "vehicle": "unknown",
+                "departurePlace": "Hull",
+                "nationalityOfVehicle": "",
+                "registrationNumber": "",
+                "freightBillNumber": "",
+                "departureCountry": "United Kingdom",
+                "departurePort": "Hull",
+                "exportDate": "2023-08-31",
               }
+              ],
             },
             "numberOfFailedAttempts": 5
           };
@@ -1281,7 +1413,58 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
             "isoCodeAlpha2": "NG",
             "isoCodeAlpha3": "NGA",
             "isoNumericCode": "566"
-          }
+          },
+          "arrivalTransportation": [{
+              "id": '0',
+              "vehicle": "truck",
+              "departurePlace": "Hull",
+              "nationalityOfVehicle": "Uk",
+              "registrationNumber": "ABC",
+              "freightBillNumber": "ABC123",
+              "departureCountry": "United Kingdom",
+              "departurePort": "Hull",
+              "exportDate": "2023-08-31"
+            }, {
+              "id": '0',
+              "vehicle": "plane",
+              "departurePlace": "Hull",
+              "flightNumber": "SK123",
+              "containerNumber": "CON121",
+              "freightBillNumber": "ABC123",
+              "departureCountry": "United Kingdom",
+              "departurePort": "Hull",
+              "exportDate": "2023-08-31",
+            }, {
+              "id": '0',
+              "vehicle": "train",
+              "railwayBillNumber": "ABC123",
+              "freightBillNumber": "ABC123",
+              "departureCountry": "United Kingdom",
+              "departurePort": "Hull",
+              "exportDate": "2023-08-31",
+            }, {
+              "id": '0',
+              "vehicle": "containerVessel",
+              "departurePlace": "Hull",
+              "vesselName": "",
+              "flagState": "",
+              "containerNumber": "CON121",
+              "freightBillNumber": "ABC123",
+              "departureCountry": "United Kingdom",
+              "departurePort": "Hull",
+              "exportDate": "2023-08-31",
+            }, {
+              "id": '0',
+              "vehicle": "unknown",
+              "departurePlace": "Hull",
+              "nationalityOfVehicle": "",
+              "registrationNumber": "",
+              "freightBillNumber": "",
+              "departureCountry": "United Kingdom",
+              "departurePort": "Hull",
+              "exportDate": "2023-08-31",
+            }
+          ],
         },
         "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf"
       };
@@ -1984,7 +2167,14 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         },
         dateOfUnloading: "12/12/2019",
         placeOfUnloading: "DOVER",
-        transportUnloadedFrom: "BA078"
+        transportUnloadedFrom: "BA078",
+        productDescription: "Fresh cod",
+        supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+        netWeightProductArrival: "100",
+        netWeightFisheryProductArrival: "110",
+        netWeightProductDeparture: "90",
+        netWeightFisheryProductDeparture: "95"
+
       }];
 
       const result = toProducts(queryResult);
@@ -2002,6 +2192,12 @@ describe('Mapping data for DEFRA Central Reporting HUB', () => {
         isOverUse: false,
         isImportWeightMismatch: false,
         overUseExceededAmount: 0,
+        productDescription: "Fresh cod",
+        supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+        netWeightProductArrival: "100",
+        netWeightFisheryProductArrival: "110",
+        netWeightProductDeparture: "90",
+        netWeightFisheryProductDeparture: "95",
         isDocumentIssuedInUK: false
       }]);
     })

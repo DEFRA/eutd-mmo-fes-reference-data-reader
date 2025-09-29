@@ -251,6 +251,10 @@ function populateExportData(result: IDefraValidationStorageDocument, storageDocu
       result.transportation = toTransportation(exportData.transportation);
    }
 
+   if (exportData.arrivalTransportation) {
+      result.arrivalTransportation = toTransportation(exportData.arrivalTransportation);
+   }
+
    if (exportData.exportedTo) {
       result.exportedTo = exportData.exportedTo;
    }
@@ -365,9 +369,9 @@ export function toTransportation(transportation): CertificateTransport {
             registration: transportation.registrationNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightbillNumber,
-            countryofDeparture: transportation.countryofDeparture,
-            whereDepartsFrom: transportation.whereDepartsFrom,
+            freightbillNumber: transportation.freightBillNumber,
+            countryofDeparture: transportation.departureCountry,
+            whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
          }
       case TRANSPORT_VEHICLE_TRAIN:
@@ -376,9 +380,9 @@ export function toTransportation(transportation): CertificateTransport {
             billNumber: transportation.railwayBillNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightbillNumber,
-            countryofDeparture: transportation.countryofDeparture,
-            whereDepartsFrom: transportation.whereDepartsFrom,
+            freightbillNumber: transportation.freightBillNumber,
+            countryofDeparture: transportation.departureCountry,
+            whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
          }
       case TRANSPORT_VEHICLE_PLANE:
@@ -388,10 +392,10 @@ export function toTransportation(transportation): CertificateTransport {
             containerId: transportation.containerNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightbillNumber,
+            freightbillNumber: transportation.freightBillNumber,
             airwaybillNumber: transportation.airwaybillNumber,
-            countryofDeparture: transportation.countryofDeparture,
-            whereDepartsFrom: transportation.whereDepartsFrom,
+            countryofDeparture: transportation.departureCountry,
+            whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
          }
       case TRANSPORT_VEHICLE_CONTAINER_VESSEL:
@@ -402,9 +406,9 @@ export function toTransportation(transportation): CertificateTransport {
             containerId: transportation.containerNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightbillNumber,
-            countryofDeparture: transportation.countryofDeparture,
-            whereDepartsFrom: transportation.whereDepartsFrom,
+            freightbillNumber: transportation.freightBillNumber,
+            countryofDeparture: transportation.departureCountry,
+            whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
          }
       default:
@@ -412,9 +416,9 @@ export function toTransportation(transportation): CertificateTransport {
             modeofTransport: transportation.vehicle,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightbillNumber,
+            freightbillNumber: transportation.freightBillNumber,
             countryofDeparture: transportation.countryofDeparture,
-            whereDepartsFrom: transportation.whereDepartsFrom,
+            whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
          }
    }
@@ -540,7 +544,13 @@ export function toProducts(queryRes: ISdPsQueryResult[]): StorageDocumentReportC
          isOverUse: row.isOverAllocated,
          isImportWeightMismatch: row.isMismatch,
          overUseExceededAmount: row.overAllocatedByWeight,
-         isDocumentIssuedInUK: row.catchCertificateType === 'uk'
+         isDocumentIssuedInUK: row.catchCertificateType === 'uk',
+         productDescription: row.productDescription,
+         netWeightProductArrival: row.netWeightProductArrival,
+         netWeightFisheryProductArrival: row.netWeightFisheryProductArrival,
+         netWeightProductDeparture: row.netWeightProductDeparture,
+         netWeightFisheryProductDeparture: row.netWeightFisheryProductDeparture,
+         supportingDocuments: row.supportingDocuments,
       }
    })
 }

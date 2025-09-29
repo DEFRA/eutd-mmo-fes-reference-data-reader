@@ -562,6 +562,8 @@ export function toSdProduct(validatedSdProducts: ISdPsQueryResult): IDynamicsSto
     scientificName: validatedSdProducts.scientificName,
     importedWeight: validatedSdProducts.weightOnFCC,
     exportedWeight: validatedSdProducts.weightOnDoc,
+    productDescription: validatedSdProducts.productDescription,
+    supportingDocuments: validatedSdProducts.supportingDocuments,
     netWeightProductArrival: validatedSdProducts.netWeightProductArrival ? parseInt(validatedSdProducts.netWeightProductArrival, 10) : undefined,
     netWeightFisheryProductArrival: validatedSdProducts.netWeightFisheryProductArrival ? parseInt(validatedSdProducts.netWeightFisheryProductArrival, 10) : undefined,
     netWeightProductDeparture: validatedSdProducts.netWeightProductDeparture ? parseInt(validatedSdProducts.netWeightProductDeparture, 10) : undefined,

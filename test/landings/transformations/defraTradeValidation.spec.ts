@@ -93,7 +93,6 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
       ],
       "transportations": [{
         "id": '0',
-        "freightBillNumber": '0',
         "vehicle": "truck",
         "departurePlace": "Hull",
         "nationalityOfVehicle": "",
@@ -110,7 +109,6 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         }]
       }, {
         "id": '0',
-        "freightBillNumber": '0',
         "vehicle": "plane",
         "departurePlace": "Hull",
         "flightNumber": "",
@@ -127,7 +125,6 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         }]
       }, {
         "id": '0',
-        "freightBillNumber": '0',
         "vehicle": "train",
         "departurePlace": "Hull",
         "railwayBillNumber": "",
@@ -143,7 +140,6 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         }]
       }, {
         "id": '0',
-        "freightBillNumber": '0',
         "vehicle": "containerVessel",
         "departurePlace": "Hull",
         "vesselName": "",
@@ -161,7 +157,6 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         }]
       }, {
         "id": '0',
-        "freightBillNumber": '0',
         "vehicle": "unknown",
         "departurePlace": "Hull",
         "nationalityOfVehicle": "",
@@ -173,6 +168,57 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
           "isoNumericCode": "566"
         },
         "transportDocuments": []
+      }
+      ],
+      "arrivalTransportation": [{
+        "id": '0',
+        "vehicle": "truck",
+        "departurePlace": "Hull",
+        "nationalityOfVehicle": "Uk",
+        "registrationNumber": "ABC",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31"
+      }, {
+        "id": '0',
+        "vehicle": "plane",
+        "departurePlace": "Hull",
+        "flightNumber": "SK123",
+        "containerNumber": "CON121",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }, {
+        "id": '0',
+        "vehicle": "train",
+        "railwayBillNumber": "ABC123",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }, {
+        "id": '0',
+        "vehicle": "containerVessel",
+        "departurePlace": "Hull",
+        "vesselName": "",
+        "flagState": "",
+        "containerNumber": "CON121",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }, {
+        "id": '0',
+        "vehicle": "unknown",
+        "departurePlace": "Hull",
+        "nationalityOfVehicle": "",
+        "registrationNumber": "",
+        "freightBillNumber": "",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
       }
       ],
       "conservation": {
@@ -300,7 +346,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "licenceHolder": "C & J SHELLFISH LTD",
         "speciesAlias": "N",
         "weight": 89,
-        "highSeasArea": "yes",
+        "highSeasArea": "Yes",
         "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
         "exclusiveEconomicZones": [
           {
@@ -1926,6 +1972,12 @@ describe('When mapping fron an ISdPsQueryResult to a IDefraTradeStorageDocumentP
     overUsedInfo: [],
     isMismatch: false,
     overAllocatedByWeight: 0,
+    netWeightFisheryProductArrival: '90',
+    netWeightProductArrival: '95',
+    netWeightFisheryProductDeparture: '85',
+    netWeightProductDeparture: '80',
+    productDescription: "A lovely product",
+    supportingDocuments: "doc1, doc2",
     da: null,
     extended: {
       id: 'SD2-1610018839',
@@ -1966,6 +2018,42 @@ describe('When mapping fron an ISdPsQueryResult to a IDefraTradeStorageDocumentP
     const result = SUT.toDefraTradeSdProduct(input);
 
     expect(result.scientificName).toBe("Gadus morhua");
+  });
+
+  it('will map netWeightFisheryProductArrival', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.netWeightFisheryProductArrival).toBe("90");
+  });
+
+  it('will map netWeightProductArrival', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.netWeightProductArrival).toBe("95");
+  });
+
+  it('will map netWeightFisheryProductDeparture', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.netWeightFisheryProductDeparture).toBe("85");
+  });
+
+  it('will map netWeightProductDeparture', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.netWeightProductDeparture).toBe("80");
+  });
+
+  it('will map productDescription', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.productDescription).toBe("A lovely product");
+  });
+
+  it('will map supportingDocuments', () => {
+    const result = SUT.toDefraTradeSdProduct(input);
+
+    expect(result.supportingDocuments).toBe("doc1, doc2");
   });
 
   describe("The validation within IDynamicsStorageDocumentProduct", () => {

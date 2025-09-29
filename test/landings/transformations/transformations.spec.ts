@@ -847,6 +847,8 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "netWeightFisheryProductArrival": 9999999.99,
           "netWeightProductDeparture": 9999999.99,
           "netWeightFisheryProductDeparture": 999999.99,
+          "productDescription": "Sample product description",
+          "supportingDocuments": "sample document1, sample document2",
         },
         {
           "product": "Argentine anchovy (ANA)",
@@ -864,6 +866,8 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "netWeightFisheryProductArrival": 9999999.99,
           "netWeightProductDeparture": 9999999.99,
           "netWeightFisheryProductDeparture": 999999.99,
+          "productDescription": undefined,
+          "supportingDocuments": undefined,
         }
       ],
       "storageFacilities": [
@@ -896,6 +900,57 @@ describe('when mapping from a mongo storage document to domain SD', () => {
         "user_id": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
         "cmr": "true"
       },
+      "arrivalTransportation": [{
+        "id": '0',
+        "vehicle": "truck",
+        "departurePlace": "Hull",
+        "nationalityOfVehicle": "Uk",
+        "registrationNumber": "ABC",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31"
+      }, {
+        "id": '0',
+        "vehicle": "plane",
+        "departurePlace": "Hull",
+        "flightNumber": "SK123",
+        "containerNumber": "CON121",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }, {
+        "id": '0',
+        "vehicle": "train",
+        "railwayBillNumber": "ABC123",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }, {
+        "id": '0',
+        "vehicle": "containerVessel",
+        "departurePlace": "Hull",
+        "vesselName": "",
+        "flagState": "",
+        "containerNumber": "CON121",
+        "freightBillNumber": "ABC123",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }, {
+        "id": '0',
+        "vehicle": "unknown",
+        "departurePlace": "Hull",
+        "nationalityOfVehicle": "",
+        "registrationNumber": "",
+        "freightBillNumber": "",
+        "departureCountry": "United Kingdom",
+        "departurePort": "Hull",
+        "exportDate": "2023-08-31",
+      }
+      ],
       "exporter": {
         "exporterCompanyName": "BONZO",
         "preLoadedCompanyName": true,
@@ -938,6 +993,8 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             netWeightFisheryProductArrival: 9999999.99,
             netWeightProductDeparture: 9999999.99,
             netWeightFisheryProductDeparture: 999999.99,
+            productDescription: "Sample product description",
+            supportingDocuments: "sample document1, sample document2",
           },
           {
             certificateNumber: '2',
@@ -955,6 +1012,8 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             netWeightFisheryProductArrival: 9999999.99,
             netWeightProductDeparture: 9999999.99,
             netWeightFisheryProductDeparture: 999999.99,
+            productDescription: undefined,
+            supportingDocuments: undefined,
           }
         ],
         exporterDetails: {

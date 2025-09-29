@@ -91,6 +91,14 @@
         "modeofTransport" : "truck",
         "hasRoadTransportDocument": false
       },
+      "arrivalTransportation": {
+        "modeofTransport": "truck",
+        "name": "magna logistics",
+        "flag": "test flag",
+        "containerId": "TRK-4589",
+        "exportLocation": "UK",
+        "exportDate": "2023-01-10"
+      },
       "storageFacilities" : [{
         "name": "Fish Food LTD.",
         "address": {
@@ -98,7 +106,10 @@
             "line2": "Ramland",
             "city": "Baureport",
             "postCode": "NE40 3AJ"
-        }
+        },
+        "arrivalDate": "2025-08-12",
+        "approvalNumber": "UK/ABC",
+        "productHandling": "chilled"
       }],
       "products" : [{
         "species" : "Atlantic Herring (HER)",
@@ -107,13 +118,19 @@
         "productWeight" : 1000,
         "dateOfUnloading" :"2019-01-01 05:05:05",
         "placeOfUnloading" : "Devon",
-        "transportUnloadedForm" : "234235235235",
+        "transportUnloadedFrom" : "234235235235",
         "certificateNumber" : "IT-2342329-23523-235",
         "weightOnCertificate" : 500,
         "isOverUse" : true,
         "overUseExceededAmount" : 500,
         "isImportWeightMismatch" : false,
-        "isDocumentIssuedInUK": true
+        "isDocumentIssuedInUK": true,
+        "netWeightProductArrival": 9999999.99,
+        "netWeightFisheryProductArrival": 9999999.99,
+        "netWeightProductDeparture": 9999999.99,
+        "netWeightFisheryProductDeparture": 999999.99,
+        "supportingDocuments": "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+        "productDescription": "Atlantic Herring is a fish species found in the North Atlantic Ocean."
       }],
       "_correlationId" : "c03483ba-86ed-49be-ba9d-695ea27b3951",
       "requestedByAdmin" : false
@@ -218,7 +235,10 @@
             "type" : "object",
             "properties" : {
                 "name" : {"type" : "string"},
-                "address": {"$ref" : "#/definitions/address"}
+                "address": {"$ref" : "#/definitions/address"},
+                "arrivalDate": { "type": "string" },
+                "approvalNumber": { "type": "string" },
+                "productHandling":{ "type": "string" }
             }
         },
         "product" : {
@@ -229,7 +249,13 @@
                 "productWeight" : {"type" : "number"},
                 "dateOfUnloading" : {"type" : "string"},
                 "placeOfUnloading" : {"type" : "string"},
-                "transportUnloadedForm" : {"type" : "string"},
+                "transportUnloadedFrom" : {"type" : "string"},
+                "netWeightProductArrival": { "type": "string" },
+                "netWeightFisheryProductArrival": { "type": "string" },
+                "netWeightProductDeparture": { "type": "string" },
+                "netWeightFisheryProductDeparture": { "type": "string" },
+                "supportingDocuments": { "type": "string" },
+                "productDescription": { "type": "string" },
                 "certificateNumber" : {"type" : "string"},
                 "weightOnCertificate" : {"type" : "number"},
                 "cnCode" : {"type" : "string"},
@@ -242,7 +268,7 @@
                 }
             },
             "required" : ["species","productWeight","dateOfUnloading","placeOfUnloading",
-                "transportUnloadedForm","certificateNumber","weightOnCertificate"]
+                "transportUnloadedFrom","certificateNumber","weightOnCertificate"]
         }
     },
     "properties": {
@@ -372,7 +398,12 @@
               "flightNumber": { "type": "string" },
               "containerId": { "type": "string" },
               "name": { "type": "string" },
-              "flag": { "type": "string" }
+              "flag": { "type": "string" },
+              "freightbillNumber": { "type": "string" },
+              "airwaybillNumber" : { "type": "string" },
+              "countryofDeparture": { "type": "string" },
+              "whereDepartsFrom": { "type": "string" },
+              "departureDate": { "type": "string" }
             },
             "anyOf": [{
                 "properties": {
@@ -416,6 +447,70 @@
                 ]
               }
             ]
+        },
+        "arrivalTransportation": {
+          "type": "object",
+          "description": "Details of Transport (Vessel / flight number / railway bill / truck registration)",
+          "required": [
+            "modeofTransport"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "modeofTransport": {
+              "enum": [
+                "truck",
+                "train",
+                "plane",
+                "vessel"
+              ]
+            },
+            "exportDate": {
+              "description": "Date / Port of Place of Departure",
+              "type": "string"
+            },
+            "hasRoadTransportDocument": {
+              "type": "boolean"
+            },
+            "nationality": {
+              "type": "string"
+            },
+            "registration": {
+              "type": "string"
+            },
+            "exportLocation": {
+              "type": "string"
+            },
+            "billNumber": {
+              "type": "string"
+            },
+            "flightNumber": {
+              "type": "string"
+            },
+            "containerId": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "flag": {
+              "type": "string"
+            },
+            "freightbillNumber": {
+              "type": "string"
+            },
+            "airwaybillNumber" : {
+              "type": "string"
+            },
+            "countryofDeparture": {
+              "type": "string"
+            },
+            "whereDepartsFrom": {
+              "type": "string"
+            },
+            "departureDate": {
+              "type": "string"
+            }
+          }
         },
         "documentUri": {
             "type": "string"

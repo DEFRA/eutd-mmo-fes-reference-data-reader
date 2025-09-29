@@ -462,6 +462,8 @@ export function mapStorageDocumentToSD(redisSD) {
       placeOfUnloading: _.placeOfUnloading,
       transportUnloadedFrom: _.transportUnloadedFrom,
       scientificName: _.scientificName,
+      productDescription: _.productDescription,
+      supportingDocuments: _.supportingDocuments,
       netWeightProductArrival: _.netWeightProductArrival,
       netWeightFisheryProductArrival: _.netWeightFisheryProductArrival,
       netWeightProductDeparture: _.netWeightProductDeparture,
