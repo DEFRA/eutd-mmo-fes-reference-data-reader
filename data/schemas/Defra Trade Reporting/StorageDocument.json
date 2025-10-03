@@ -868,7 +868,7 @@
       "$ref": "#/definitions/transportation"
     },
     "arrivalTransportation": {
-      "$ref": "#/definitions/transportation"
+      "$ref": "#/definitions/arrivalTransportation"
     },
     "authority": {
       "$ref": "#/definitions/authority"
