@@ -351,8 +351,8 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
          postCode: sdStorageFacility.facilityPostcode
       },
       arrivalDate: sdStorageFacility.facilityArrivalDate,
-      approvalNumber: sdStorageFacility.facilityApprovalNumber,
-      productHandling: sdStorageFacility.facilityStorage
+      approvalNumber: !isEmpty(sdStorageFacility.facilityApprovalNumber) ? sdStorageFacility.facilityApprovalNumber : undefined,
+      productHandling: !isEmpty(sdStorageFacility.facilityStorage) ? sdStorageFacility.facilityStorage : undefined,
    } : undefined;
 }
 
