@@ -186,6 +186,7 @@ export function providePsResult(documentNumber, correlationId, status, requestBy
       requestedByAdmin: requestByAdmin
    }
 }
+
 export function toSdDefraReport(documentNumber: string, correlationId: string, status: string, requestByAdmin: boolean, storageDocument?: IDocument): IDefraValidationStorageDocument {
    const result: IDefraValidationStorageDocument = provideResult(documentNumber, correlationId, status, requestByAdmin);
 
@@ -196,6 +197,7 @@ export function toSdDefraReport(documentNumber: string, correlationId: string, s
 
    return result;
 }
+
 function providePsExportDetails(processingStatement): CertificateCompany {
    return {
       companyName: processingStatement.exportData.exporterDetails.exporterCompanyName,
@@ -215,6 +217,7 @@ function providePsExportDetails(processingStatement): CertificateCompany {
       dynamicsAddress: processingStatement.exportData.exporterDetails._dynamicsAddress
    }
 }
+
 function populateBasicDetails(result: IDefraValidationStorageDocument, storageDocument: IDocument): void {
    result.userReference = storageDocument.userReference;
    result.dateCreated = storageDocument.createdAt;
@@ -389,11 +392,11 @@ export function toTransportation(transportation): CertificateTransport {
          return {
             modeofTransport: transportation.vehicle,
             flightNumber: transportation.flightNumber,
-            containerId: transportation.containerNumber,
+            containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
             freightbillNumber: transportation.freightBillNumber,
-            airwaybillNumber: transportation.airwaybillNumber,
+            airwaybillNumber: transportation.airwayBillNumber,
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
@@ -403,7 +406,7 @@ export function toTransportation(transportation): CertificateTransport {
             modeofTransport: TRANSPORT_VEHICLE_VESSEL,
             name: transportation.vesselName,
             flag: transportation.flagState,
-            containerId: transportation.containerNumber,
+            containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
             freightbillNumber: transportation.freightBillNumber,
