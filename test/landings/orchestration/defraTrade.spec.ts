@@ -19,9 +19,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
 
   let mockGetRssNumber;
   let mockGetVesselService;
-  let mockPersistence;
-  let mockLogInfo;
-  let mockLogError;
+  let mockPersistence: jest.SpyInstance;
+  let mockLogInfo: jest.SpyInstance;
+  let mockLogError: jest.SpyInstance;
 
   ApplicationConfig.loadEnv({
     AZURE_QUEUE_TRADE_CONNECTION_STRING: 'AZURE_QUEUE_TRADE_CONNECTION_STRING',
@@ -41,20 +41,10 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
 
     mockGetVesselService = jest.spyOn(VesselService, 'getVesselDetails');
     mockGetVesselService.mockReturnValue({
-      fishingVesselName: "AGAN BORLOWEN",
-      ircs: null,
       cfr: "GBR000C20415",
       flag: "GBR",
-      homePort: "NEWLYN",
-      registrationNumber: "SS229",
-      imo: null,
-      fishingLicenceNumber: "25072",
-      fishingLicenceValidFrom: "2014-07-01T00:00:00",
-      fishingLicenceValidTo: "2030-12-31T00:00:00",
       adminPort: "NEWLYN",
-      rssNumber: "C20415",
-      vesselLength: 6.88,
-      licenceHolderName: "MR S CLARY-BROM "
+      vesselLength: 6.88
     })
   });
 
@@ -4707,8 +4697,8 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
 });
 
 describe('azureTradeQueueEnabled feature flag turned off', () => {
-  let mockPersistence;
-  let mockLogInfo;
+  let mockPersistence: jest.SpyInstance;
+  let mockLogInfo: jest.SpyInstance;
 
   ApplicationConfig.loadEnv({
     AZURE_QUEUE_TRADE_CONNECTION_STRING: 'AZURE_QUEUE_TRADE_CONNECTION_STRING',

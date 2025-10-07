@@ -36,16 +36,16 @@ const { v4: uuid } = require('uuid');
 const mongoose = require('mongoose');
 
 
-let mongoServer;
+let mongoServer: MongoMemoryServer;
 const opts = { connectTimeoutMS: 60000, socketTimeoutMS: 600000, serverSelectionTimeoutMS: 60000 }
 
-let mockInsertSdDefraValidationReport;
-let mockInsertCcDefraValidationReport;
+let mockInsertSdDefraValidationReport: jest.SpyInstance;
+let mockInsertCcDefraValidationReport: jest.SpyInstance;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
-  await mongoose.connect(mongoUri, opts).catch(err => { console.log(err) });
+  await mongoose.connect(mongoUri, opts).catch((err: Error) => { console.log(err) });
 });
 
 beforeEach(() => {
@@ -82,9 +82,9 @@ describe("Report Draft", () => {
       "investigation": []
     };
 
-    let mockGetCertificateByDocumentNumber;
-    let mockToPsDefraReport;
-    let mockLogInfo;
+    let mockGetCertificateByDocumentNumber: jest.SpyInstance;
+    let mockToPsDefraReport: jest.SpyInstance;
+    let mockLogInfo: jest.SpyInstance;
 
     beforeEach(() => {
       mockGetCertificateByDocumentNumber = jest
@@ -156,9 +156,9 @@ describe("Report Draft", () => {
       "investigation": []
     };
 
-    let mockGetCertificateByDocumentNumber;
-    let mockToSdDefraReport;
-    let mockLogInfo;
+    let mockGetCertificateByDocumentNumber: jest.SpyInstance;
+    let mockToSdDefraReport: jest.SpyInstance;
+    let mockLogInfo: jest.SpyInstance;
 
     beforeEach(() => {
       mockGetCertificateByDocumentNumber = jest
@@ -248,9 +248,9 @@ describe("Report Draft", () => {
       "investigation": []
     };
 
-    let mockGetCertificateByDocumentNumber;
-    let mockToCcDefraReport;
-    let mockLogInfo;
+    let mockGetCertificateByDocumentNumber: jest.SpyInstance;
+    let mockToCcDefraReport: jest.SpyInstance;
+    let mockLogInfo: jest.SpyInstance;
 
     beforeEach(() => {
       mockGetCertificateByDocumentNumber = jest
@@ -314,9 +314,9 @@ describe("Report Draft", () => {
 });
 
 describe("Report Delete", () => {
-  let mockGetCertificateByDocumentNumber;
-  let mockPostCodeDaLookup;
-  let mockLogInfo;
+  let mockGetCertificateByDocumentNumber: jest.SpyInstance;
+  let mockPostCodeDaLookup: jest.SpyInstance;
+  let mockLogInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetCertificateByDocumentNumber = jest
@@ -335,7 +335,7 @@ describe("Report Delete", () => {
   });
 
   describe("When deleting a Processing Statement", () => {
-    let mockToPsDefraReport;
+    let mockToPsDefraReport: jest.SpyInstance;
 
     beforeEach(() => {
       mockToPsDefraReport = jest.spyOn(DefraMapper, 'toPsDefraReport');
@@ -468,7 +468,7 @@ describe("Report Delete", () => {
   });
 
   describe("When deleting a Storage Document", () => {
-    let mockToSdDefraReport;
+    let mockToSdDefraReport: jest.SpyInstance;
 
     beforeEach(() => {
       mockToSdDefraReport = jest.spyOn(DefraMapper, 'toSdDefraReport');
@@ -601,7 +601,7 @@ describe("Report Delete", () => {
   });
 
   describe("When deleting a Catch Certificate", () => {
-    let mockToCcDefraReport;
+    let mockToCcDefraReport: jest.SpyInstance;
 
     beforeEach(() => {
       mockToCcDefraReport = jest.spyOn(Shared, 'toCcDefraReport');
@@ -743,8 +743,8 @@ describe("Report Delete", () => {
 
 describe("Report Void", () => {
 
-  let mockLogInfo;
-  let mockAddToReportQueue;
+  let mockLogInfo: jest.SpyInstance;
+  let mockAddToReportQueue: jest.SpyInstance;
 
   beforeEach(() => {
     uuid.mockImplementation(() => 'some-uuid-correlation-id');
@@ -857,10 +857,10 @@ describe("Report Void", () => {
       }
     };
 
-    let mockToPsDefraReport;
-    let mockGetCertificateById;
-    let mockReportPs;
-    let mockToPSDefraTrade;
+    let mockToPsDefraReport: jest.SpyInstance;
+    let mockGetCertificateById: jest.SpyInstance;
+    let mockReportPs: jest.SpyInstance;
+    let mockToPSDefraTrade: jest.SpyInstance;
 
     beforeEach(() => {
       mockToPsDefraReport = jest.spyOn(DefraMapper, 'toPsDefraReport');
@@ -949,10 +949,10 @@ describe("Report Void", () => {
   });
 
   describe("When voiding a Storage Document", () => {
-    let mockGetCertificateById;
-    let mockToSdDefraReport;
-    let mockReportSd;
-    let mockToSDDefraTrade;
+    let mockGetCertificateById: jest.SpyInstance;
+    let mockToSdDefraReport: jest.SpyInstance;
+    let mockReportSd: jest.SpyInstance;
+    let mockToSDDefraTrade: jest.SpyInstance;
 
     const documentNumber = "GBR-SD-2342342-32423";
 
@@ -1148,11 +1148,11 @@ describe("Report Void", () => {
 
   describe("When voiding a Catch Certificate", () => {
 
-    let mockGetCertificateById;
-    let mockToCcDefraReport;
-    let mockToDynamicsCcCase;
-    let mockToCCDefraTrade;
-    let mockVesselIdx;
+    let mockGetCertificateById: jest.SpyInstance;
+    let mockToCcDefraReport: jest.SpyInstance;
+    let mockToDynamicsCcCase: jest.SpyInstance;
+    let mockToCCDefraTrade: jest.SpyInstance;
+    let mockVesselIdx: jest.SpyInstance;
 
     const documentNumber = "GBR-CC-2342342-32423";
     const backEndCc: IDocument = {
@@ -1389,12 +1389,12 @@ describe("Report Void", () => {
 
 describe("Report Submitted", () => {
 
-  let mockGetCertificate;
-  let mockToCcDefraReport;
-  let mockToCCDefraTrade;
-  let mockReportCc;
-  let mockToLandings;
-  let mockInsertCcReport;
+  let mockGetCertificate: jest.SpyInstance;
+  let mockToCcDefraReport: jest.SpyInstance;
+  let mockToCCDefraTrade: jest.SpyInstance;
+  let mockReportCc: jest.SpyInstance;
+  let mockToLandings: jest.SpyInstance;
+  let mockInsertCcReport: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetCertificate = jest.spyOn(CertificatePersistance, 'getCertificateByDocumentNumberWithNumberOfFailedAttempts');
@@ -1413,10 +1413,10 @@ describe("Report Submitted", () => {
 
     const certificateId = 'XXX-PS-XXX'
 
-    let mockLogInfo;
-    let mockReportCaseManagement;
-    let mockReportStrategicReporting;
-    let mockToPSDefraTrade;
+    let mockLogInfo: jest.SpyInstance;
+    let mockReportCaseManagement: jest.SpyInstance;
+    let mockReportStrategicReporting: jest.SpyInstance;
+    let mockToPSDefraTrade: jest.SpyInstance;
 
     beforeEach(() => {
       mockLogInfo = jest.spyOn(logger, 'info');
@@ -1499,10 +1499,10 @@ describe("Report Submitted", () => {
 
     const certificateId = 'XXX-SD-XXX'
 
-    let mockLogInfo;
-    let mockReportCaseManagement;
-    let mockReportStrategicReporting;
-    let mockToSDDefraTrade;
+    let mockLogInfo: jest.SpyInstance;
+    let mockReportCaseManagement: jest.SpyInstance;
+    let mockReportStrategicReporting: jest.SpyInstance;
+    let mockToSDDefraTrade: jest.SpyInstance;
 
     beforeEach(() => {
       mockLogInfo = jest.spyOn(logger, 'info');
@@ -1644,12 +1644,12 @@ describe("Report Submitted", () => {
         rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
         exclusiveEconomicZones: [
           {
-            officialCountryName: "Nigeria", 
-            isoCodeAlpha2: "NG", 
-            isoCodeAlpha3: "NGA", 
+            officialCountryName: "Nigeria",
+            isoCodeAlpha2: "NG",
+            isoCodeAlpha3: "NGA",
             isoNumericCode: "566"
-          }, 
-          { 
+          },
+          {
             officialCountryName: "France",
             isoCodeAlpha2: "FR",
             isoCodeAlpha3: "FRA",
@@ -1671,10 +1671,10 @@ describe("Report Submitted", () => {
       }
     }];
 
-    let mockLogInfo;
-    let mockRefreshRiskingData;
-    let mockGetExtendedValidationData;
-    let mockVesselIdx;
+    let mockLogInfo: jest.SpyInstance;
+    let mockRefreshRiskingData: jest.SpyInstance;
+    let mockGetExtendedValidationData: jest.SpyInstance;
+    let mockVesselIdx: jest.SpyInstance;
 
     beforeEach(() => {
       mockLogInfo = jest.spyOn(logger, 'info');
@@ -1825,12 +1825,12 @@ describe("Report Submitted", () => {
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             exclusiveEconomicZones: [
               {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
+                officialCountryName: "Nigeria",
+                isoCodeAlpha2: "NG",
+                isoCodeAlpha3: "NGA",
                 isoNumericCode: "566"
-              }, 
-              { 
+              },
+              {
                 officialCountryName: "France",
                 isoCodeAlpha2: "FR",
                 isoCodeAlpha3: "FRA",
@@ -1838,20 +1838,6 @@ describe("Report Submitted", () => {
               }
             ],
             species: 'Lobster',
-            exclusiveEconomicZones: [
-              {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
-                isoNumericCode: "566"
-              }, 
-              { 
-                officialCountryName: "France",
-                isoCodeAlpha2: "FR",
-                isoCodeAlpha3: "FRA",
-                isoNumericCode: "250"
-              }
-            ], 
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -1949,12 +1935,12 @@ describe("Report Submitted", () => {
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             exclusiveEconomicZones: [
               {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
+                officialCountryName: "Nigeria",
+                isoCodeAlpha2: "NG",
+                isoCodeAlpha3: "NGA",
                 isoNumericCode: "566"
-              }, 
-              { 
+              },
+              {
                 officialCountryName: "France",
                 isoCodeAlpha2: "FR",
                 isoCodeAlpha3: "FRA",
@@ -1962,20 +1948,6 @@ describe("Report Submitted", () => {
               }
             ],
             species: 'Lobster',
-            exclusiveEconomicZones: [
-              {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
-                isoNumericCode: "566"
-              }, 
-              { 
-                officialCountryName: "France",
-                isoCodeAlpha2: "FR",
-                isoCodeAlpha3: "FRA",
-                isoNumericCode: "250"
-              }
-            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2060,12 +2032,12 @@ describe("Report Submitted", () => {
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             exclusiveEconomicZones: [
               {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
+                officialCountryName: "Nigeria",
+                isoCodeAlpha2: "NG",
+                isoCodeAlpha3: "NGA",
                 isoNumericCode: "566"
-              }, 
-              { 
+              },
+              {
                 officialCountryName: "France",
                 isoCodeAlpha2: "FR",
                 isoCodeAlpha3: "FRA",
@@ -2073,20 +2045,6 @@ describe("Report Submitted", () => {
               }
             ],
             species: 'Lobster',
-            exclusiveEconomicZones: [
-              {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
-                isoNumericCode: "566"
-              }, 
-              { 
-                officialCountryName: "France",
-                isoCodeAlpha2: "FR",
-                isoCodeAlpha3: "FRA",
-                isoNumericCode: "250"
-              }
-            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2184,12 +2142,12 @@ describe("Report Submitted", () => {
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             exclusiveEconomicZones: [
               {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
+                officialCountryName: "Nigeria",
+                isoCodeAlpha2: "NG",
+                isoCodeAlpha3: "NGA",
                 isoNumericCode: "566"
-              }, 
-              { 
+              },
+              {
                 officialCountryName: "France",
                 isoCodeAlpha2: "FR",
                 isoCodeAlpha3: "FRA",
@@ -2197,20 +2155,6 @@ describe("Report Submitted", () => {
               }
             ],
             species: 'Lobster',
-            exclusiveEconomicZones: [
-              {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
-                isoNumericCode: "566"
-              }, 
-              { 
-                officialCountryName: "France",
-                isoCodeAlpha2: "FR",
-                isoCodeAlpha3: "FRA",
-                isoNumericCode: "250"
-              }
-            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2313,12 +2257,12 @@ describe("Report Submitted", () => {
             rfmo: 'General Fisheries Commission for the Mediterranean (GFCM)',
             exclusiveEconomicZones: [
               {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
+                officialCountryName: "Nigeria",
+                isoCodeAlpha2: "NG",
+                isoCodeAlpha3: "NGA",
                 isoNumericCode: "566"
-              }, 
-              { 
+              },
+              {
                 officialCountryName: "France",
                 isoCodeAlpha2: "FR",
                 isoCodeAlpha3: "FRA",
@@ -2326,20 +2270,6 @@ describe("Report Submitted", () => {
               }
             ],
             species: 'Lobster',
-            exclusiveEconomicZones: [
-              {
-                officialCountryName: "Nigeria", 
-                isoCodeAlpha2: "NG", 
-                isoCodeAlpha3: "NGA", 
-                isoNumericCode: "566"
-              }, 
-              { 
-                officialCountryName: "France",
-                isoCodeAlpha2: "FR",
-                isoCodeAlpha3: "FRA",
-                isoNumericCode: "250"
-              }
-            ],
             state: 'FRE',
             stateName: 'fresh',
             commodityCode: '1234',
@@ -2450,8 +2380,8 @@ describe("Report Submitted", () => {
     });
 
     describe('error handling', () => {
-      let mockLogWarn;
-      let mockLogError;
+      let mockLogWarn: jest.SpyInstance;
+      let mockLogError: jest.SpyInstance;
 
       beforeEach(() => {
         mockLogWarn = jest.spyOn(logger, 'warn');
@@ -2635,12 +2565,12 @@ describe('Report Cc Landing Update', () => {
       species: 'Lobster',
       exclusiveEconomicZones: [
         {
-          officialCountryName: "Nigeria", 
-          isoCodeAlpha2: "NG", 
-          isoCodeAlpha3: "NGA", 
+          officialCountryName: "Nigeria",
+          isoCodeAlpha2: "NG",
+          isoCodeAlpha3: "NGA",
           isoNumericCode: "566"
-        }, 
-        { 
+        },
+        {
           officialCountryName: "France",
           isoCodeAlpha2: "FR",
           isoCodeAlpha3: "FRA",
@@ -2661,17 +2591,17 @@ describe('Report Cc Landing Update', () => {
     }
   }];
 
-  let mockGetExtendedValidationData;
+  let mockGetExtendedValidationData: jest.SpyInstance;
 
-  let mockInsertCcReport;
-  let mockGetCertificate;
-  let mockToCcDefraReport;
-  let mockToLandings;
-  let mockReportCc;
-  let mockLogInfo;
-  let mockLogWarn;
-  let mockLogError;
-  let mockVesselIdx;
+  let mockInsertCcReport: jest.SpyInstance;
+  let mockGetCertificate: jest.SpyInstance;
+  let mockToCcDefraReport: jest.SpyInstance;
+  let mockToLandings: jest.SpyInstance;
+  let mockReportCc: jest.SpyInstance;
+  let mockLogInfo: jest.SpyInstance;
+  let mockLogWarn: jest.SpyInstance;
+  let mockLogError: jest.SpyInstance;
+  let mockVesselIdx: jest.SpyInstance;
 
   beforeEach(() => {
     mockLogInfo = jest.spyOn(logger, 'info');

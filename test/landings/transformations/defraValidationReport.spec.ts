@@ -1331,7 +1331,7 @@ describe('For storage documents', () => {
         expect(result).toEqual(expectedResult);
       });
 
-      it('will include a products array in the return results', () => {
+      it('will include a storage facility array in the return results', () => {
         const expectedResult: CertificateStorageFacility[] = [{
           name: 'Exporter Person',
           address: {
@@ -1342,6 +1342,37 @@ describe('For storage documents', () => {
         }];
 
         const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-SD-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndSd);
+        expect(result.storageFacilities).toEqual(expectedResult);
+      });
+
+      it('will include approval Number and product handling in the return results', () => {
+        const backEndWithSdStorageFacility = {
+          ...backEndSd,
+          exportData: {
+            ...backEndSd.exportData,
+            storageFacilities: [{
+              facilityName: "Exporter Person",
+              facilityAddressOne: "Building Name",
+              facilityAddressTwo: "Building Street",
+              facilityTownCity: "Town",
+              facilityPostcode: "XX12 X34",
+              facilityApprovalNumber: "approval number",
+              facilityStorage: "product handling"
+            }],
+          }
+        }
+        const expectedResult: CertificateStorageFacility[] = [{
+          name: 'Exporter Person',
+          address: {
+            line1: "Building Name",
+            city: "Town",
+            postCode: "XX12 X34"
+          },
+          approvalNumber: "approval number",
+          productHandling: "product handling"
+        }];
+
+        const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-SD-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndWithSdStorageFacility);
         expect(result.storageFacilities).toEqual(expectedResult);
       });
     });
