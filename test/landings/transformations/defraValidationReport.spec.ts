@@ -1137,7 +1137,7 @@ describe('For storage documents', () => {
               "departurePlace": "Hull",
               "nationalityOfVehicle": "Uk",
               "registrationNumber": "ABC",
-              "freightBillNumber": "ABC123",
+              "freightBillNumber": "",
               "departureCountry": "United Kingdom",
               "departurePort": "Hull",
               "exportDate": "2023-08-31"

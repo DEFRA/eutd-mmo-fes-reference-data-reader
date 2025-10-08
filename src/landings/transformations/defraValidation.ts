@@ -359,6 +359,8 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
    } : undefined;
 }
 
+const handleEmptyValue = (value) => !isEmpty(value) ? value : undefined;
+
 export function toTransportation(transportation): CertificateTransport {
    if (transportation === undefined)
       return undefined;
@@ -372,7 +374,7 @@ export function toTransportation(transportation): CertificateTransport {
             registration: transportation.registrationNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightBillNumber,
+            freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
@@ -383,7 +385,7 @@ export function toTransportation(transportation): CertificateTransport {
             billNumber: transportation.railwayBillNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightBillNumber,
+            freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
@@ -395,8 +397,8 @@ export function toTransportation(transportation): CertificateTransport {
             containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightBillNumber,
-            airwaybillNumber: transportation.airwayBillNumber,
+            freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
+            airwaybillNumber: handleEmptyValue(transportation.airwayBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
@@ -409,7 +411,7 @@ export function toTransportation(transportation): CertificateTransport {
             containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightBillNumber,
+            freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
@@ -419,7 +421,7 @@ export function toTransportation(transportation): CertificateTransport {
             modeofTransport: transportation.vehicle,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
-            freightbillNumber: transportation.freightBillNumber,
+            freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.countryofDeparture,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate
