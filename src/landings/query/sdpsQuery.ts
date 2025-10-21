@@ -21,9 +21,6 @@ interface IFlattenedCatch {
   weight: number;
   weightOnCC: number;
   weightAfterProcessing?: number;
-  dateOfUnloading?: string;
-  placeOfUnloading?: string;
-  transportUnloadedFrom?: string;
   extended: any;
 }
 
@@ -97,9 +94,6 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
 const getExtentedObject = (item) => {
   const newObj = <ISdPsQueryResult>{};
   if (item.weightAfterProcessing !== undefined) newObj.weightAfterProcessing = item.weightAfterProcessing;
-  if (item.dateOfUnloading !== undefined) newObj.dateOfUnloading = item.dateOfUnloading;
-  if (item.placeOfUnloading !== undefined) newObj.placeOfUnloading = item.placeOfUnloading;
-  if (item.transportUnloadedFrom !== undefined) newObj.transportUnloadedFrom = item.transportUnloadedFrom;
   if (item.netWeightProductArrival !== undefined) newObj.netWeightProductArrival = item.netWeightProductArrival;
   if (item.netWeightFisheryProductArrival !== undefined) newObj.netWeightFisheryProductArrival = item.netWeightFisheryProductArrival;
   if (item.netWeightProductDeparture !== undefined) newObj.netWeightProductDeparture = item.netWeightProductDeparture;
@@ -139,9 +133,6 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         commodityCode: cat.commodityCode,
         weight: parseFloat(cat.productWeight),
         weightOnCC: getWeightOnCC(cat.weightOnCC),
-        dateOfUnloading: cat.dateOfUnloading,
-        placeOfUnloading: cat.placeOfUnloading,
-        transportUnloadedFrom: cat.transportUnloadedFrom,
         scientificName: cat.scientificName,
         netWeightProductArrival: cat.netWeightProductArrival,
         netWeightFisheryProductArrival: cat.netWeightFisheryProductArrival,

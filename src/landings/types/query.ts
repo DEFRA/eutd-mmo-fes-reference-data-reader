@@ -37,9 +37,6 @@ export interface ISdPsQueryResult {
   overAllocatedByWeight: number;
   overUsedInfo: string[]; //Linked PS or SD
   isMismatch: boolean;
-  dateOfUnloading?: string;
-  placeOfUnloading?: string;
-  transportUnloadedFrom?: string;
   netWeightProductArrival?: string,
   netWeightFisheryProductArrival?: string,
   netWeightProductDeparture?: string,

@@ -108,9 +108,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"300",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                         "weightOnCC":"1000"
                     },
@@ -118,29 +115,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -197,9 +180,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"300",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                         "weightOnCC":"1000"
                     },
@@ -207,29 +187,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -286,9 +252,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"300",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                         "weightOnCC":"1000"
                     },
@@ -296,29 +259,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -375,9 +324,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"300",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                         "weightOnCC":"1000"
                     },
@@ -385,29 +331,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -464,9 +396,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"200",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"FCC051",
                         "weightOnCC":"1000"
                     },
@@ -474,29 +403,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -569,7 +484,6 @@ describe('When validating an online ps or sd', () => {
                     da: "England",
                     documentNumber: "GBR-2019-SD-DED9F3FE6",
                     documentType: "storageDocument",
-                    dateOfUnloading: "01/10/2019",
                     extended: {
                       exporterCompanyName: "BONZO",
                       investigation: undefined,
@@ -581,10 +495,8 @@ describe('When validating an online ps or sd', () => {
                     isOverAllocated: true,
                     overAllocatedByWeight: 200,
                     overUsedInfo: ["32345"],
-                    placeOfUnloading: "351",
                     species: "Atlantic herring (HER)",
                     status: "COMPLETE",
-                    transportUnloadedFrom: "234",
                     weightOnAllDocs: 1200,
                     weightOnDoc: 200,
                     weightOnFCC: 1000,
@@ -596,7 +508,6 @@ describe('When validating an online ps or sd', () => {
                     da: "England",
                     documentNumber: "GBR-2019-SD-DED9F3FE6",
                     documentType: "storageDocument",
-                    dateOfUnloading: "09/07/2019",
                     extended: {
                       exporterCompanyName: "BONZO",
                       investigation: undefined,
@@ -608,10 +519,8 @@ describe('When validating an online ps or sd', () => {
                     isOverAllocated: false,
                     overAllocatedByWeight: 0,
                     overUsedInfo:[],
-                    placeOfUnloading: "DOVER",
                     species: "Argentine anchovy (ANA)",
                     status: "COMPLETE",
-                    transportUnloadedFrom: "234",
                     weightOnAllDocs: 200,
                     weightOnDoc: 200,
                     weightOnFCC: 20000,
@@ -629,9 +538,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"2000",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                         "weightOnCC":"1000"
                     },
@@ -639,29 +545,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -724,9 +616,6 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"500",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"FCC051",
                         "weightOnCC":"1000"
                     },
@@ -734,29 +623,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Argentine anchovy (ANA)",
                         "commodityCode":"23408230498234",
                         "productWeight":"200",
-                        "dateOfUnloading":"09/07/2019",
-                        "placeOfUnloading":"DOVER",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"2",
                         "weightOnCC":"20000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 
@@ -842,9 +717,6 @@ describe('When validating an online ps or sd', () => {
                             "product":"Atlantic herring (HER)",
                             "commodityCode":"423523432",
                             "productWeight":"2000",
-                            "dateOfUnloading":"01/10/2019",
-                            "placeOfUnloading":"351",
-                            "transportUnloadedFrom":"234",
                             "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                             "weightOnCC":"1000"
                         },
@@ -852,29 +724,15 @@ describe('When validating an online ps or sd', () => {
                             "product":"Argentine anchovy (ANA)",
                             "commodityCode":"23408230498234",
                             "productWeight":"200",
-                            "dateOfUnloading":"09/07/2019",
-                            "placeOfUnloading":"DOVER",
-                            "transportUnloadedFrom":"234",
                             "certificateNumber":"2",
                             "weightOnCC":"20000"
                         }
                     ],
-                    "storageFacilities":[
-                        {
-                            "facilityName":"11",
-                            "facilityAddressOne":"11 Dessert Way",
-                            "facilityAddressTwo":"Enyt-No-Nodyalb",
-                            "facilityTownCity":"Gateshead",
-                            "facilityPostcode":"N32 5PJ"
-                        },
-                        {
-                            "facilityName":"11 THE SECOND",
-                            "facilityAddressOne":"11 Dessert Way without water",
-                            "facilityAddressTwo":"Enyt-No-Nodyalb",
-                            "facilityTownCity":"Gateshead",
-                            "facilityPostcode":"N32 5PJ"
-                        }
-                    ],
+                    "facilityName":"11",
+                    "facilityAddressOne":"11 Dessert Way",
+                    "facilityAddressTwo":"Enyt-No-Nodyalb",
+                    "facilityTownCity":"Gateshead",
+                    "facilityPostcode":"N32 5PJ",
                     "validationErrors":[
                         {
 
@@ -938,9 +796,6 @@ describe('When validating an online ps or sd', () => {
                                 "product": "Atlantic herring (HER)",
                                 "commodityCode": "423523432",
                                 "productWeight": "2000",
-                                "dateOfUnloading": "01/10/2019",
-                                "placeOfUnloading": "351",
-                                "transportUnloadedFrom": "234",
                                 "certificateNumber": "FCC051",
                                 "weightOnCC": "1000"
                             },
@@ -948,29 +803,15 @@ describe('When validating an online ps or sd', () => {
                                 "product": "Argentine anchovy (ANA)",
                                 "commodityCode": "23408230498234",
                                 "productWeight": "200",
-                                "dateOfUnloading": "09/07/2019",
-                                "placeOfUnloading": "DOVER",
-                                "transportUnloadedFrom": "234",
                                 "certificateNumber": "2",
                                 "weightOnCC": "20000"
                             }
                         ],
-                        "storageFacilities": [
-                            {
-                                "facilityName": "11",
-                                "facilityAddressOne": "11 Dessert Way",
-                                "facilityAddressTwo": "Enyt-No-Nodyalb",
-                                "facilityTownCity": "Gateshead",
-                                "facilityPostcode": "N32 5PJ"
-                            },
-                            {
-                                "facilityName": "11 THE SECOND",
-                                "facilityAddressOne": "11 Dessert Way without water",
-                                "facilityAddressTwo": "Enyt-No-Nodyalb",
-                                "facilityTownCity": "Gateshead",
-                                "facilityPostcode": "N32 5PJ"
-                            }
-                        ],
+                        "facilityName": "11",
+                        "facilityAddressOne": "11 Dessert Way",
+                        "facilityAddressTwo": "Enyt-No-Nodyalb",
+                        "facilityTownCity": "Gateshead",
+                        "facilityPostcode": "N32 5PJ",
                         "validationErrors": [
                             {}
                         ],
@@ -1052,9 +893,6 @@ describe('When validating an online ps or sd', () => {
                                 "product": "Atlantic herring (HER)",
                                 "commodityCode": "423523432",
                                 "productWeight": "200",
-                                "dateOfUnloading": "01/10/2019",
-                                "placeOfUnloading": "351",
-                                "transportUnloadedFrom": "234",
                                 "certificateNumber": "FCC051",
                                 "weightOnCC": "1000"
                             },
@@ -1062,29 +900,15 @@ describe('When validating an online ps or sd', () => {
                                 "product": "Argentine anchovy (ANA)",
                                 "commodityCode": "23408230498234",
                                 "productWeight": "200",
-                                "dateOfUnloading": "09/07/2019",
-                                "placeOfUnloading": "DOVER",
-                                "transportUnloadedFrom": "234",
                                 "certificateNumber": "2",
                                 "weightOnCC": "20000"
                             }
                         ],
-                        "storageFacilities": [
-                            {
-                                "facilityName": "11",
-                                "facilityAddressOne": "11 Dessert Way",
-                                "facilityAddressTwo": "Enyt-No-Nodyalb",
-                                "facilityTownCity": "Gateshead",
-                                "facilityPostcode": "N32 5PJ"
-                            },
-                            {
-                                "facilityName": "11 THE SECOND",
-                                "facilityAddressOne": "11 Dessert Way without water",
-                                "facilityAddressTwo": "Enyt-No-Nodyalb",
-                                "facilityTownCity": "Gateshead",
-                                "facilityPostcode": "N32 5PJ"
-                            }
-                        ],
+                        "facilityName": "11",
+                        "facilityAddressOne": "11 Dessert Way",
+                        "facilityAddressTwo": "Enyt-No-Nodyalb",
+                        "facilityTownCity": "Gateshead",
+                        "facilityPostcode": "N32 5PJ",
                         "validationErrors": [
                             {}
                         ],
@@ -1169,9 +993,6 @@ describe('When validating an online ps or sd', () => {
                                 "product":"Atlantic herring (HER)",
                                 "commodityCode":"423523432",
                                 "productWeight":"200",
-                                "dateOfUnloading":"01/10/2019",
-                                "placeOfUnloading":"351",
-                                "transportUnloadedFrom":"234",
                                 "certificateNumber":"FCC051",
                                 "weightOnCC":"1000"
                             },
@@ -1179,29 +1000,15 @@ describe('When validating an online ps or sd', () => {
                                 "product":"Argentine anchovy (ANA)",
                                 "commodityCode":"23408230498234",
                                 "productWeight":"200",
-                                "dateOfUnloading":"09/07/2019",
-                                "placeOfUnloading":"DOVER",
-                                "transportUnloadedFrom":"234",
                                 "certificateNumber":"2",
                                 "weightOnCC":"20000"
                             }
                         ],
-                        "storageFacilities":[
-                            {
-                                "facilityName":"11",
-                                "facilityAddressOne":"11 Dessert Way",
-                                "facilityAddressTwo":"Enyt-No-Nodyalb",
-                                "facilityTownCity":"Gateshead",
-                                "facilityPostcode":"N32 5PJ"
-                            },
-                            {
-                                "facilityName":"11 THE SECOND",
-                                "facilityAddressOne":"11 Dessert Way without water",
-                                "facilityAddressTwo":"Enyt-No-Nodyalb",
-                                "facilityTownCity":"Gateshead",
-                                "facilityPostcode":"N32 5PJ"
-                            }
-                        ],
+                        "facilityName":"11",
+                        "facilityAddressOne":"11 Dessert Way",
+                        "facilityAddressTwo":"Enyt-No-Nodyalb",
+                        "facilityTownCity":"Gateshead",
+                        "facilityPostcode":"N32 5PJ",
                         "validationErrors":[
                             {
 
@@ -1302,7 +1109,6 @@ describe('When validating an online ps or sd', () => {
                             da: "England",
                             documentNumber: "GBR-2019-SD-DED9F3FE6",
                             documentType: "storageDocument",
-                            dateOfUnloading: "01/10/2019",
                             extended: {
                                 exporterCompanyName: "BONZO",
                                 investigation: undefined,
@@ -1314,10 +1120,8 @@ describe('When validating an online ps or sd', () => {
                             isOverAllocated: true,
                             overAllocatedByWeight: 200,
                             overUsedInfo:["32345"],
-                            placeOfUnloading: "351",
                             species: "Atlantic herring (HER)",
                             status: "BLOCKED",
-                            transportUnloadedFrom: "234",
                             weightOnAllDocs: 1200,
                             weightOnDoc: 200,
                             weightOnFCC: 1000,
@@ -1329,7 +1133,6 @@ describe('When validating an online ps or sd', () => {
                             da: "England",
                             documentNumber: "GBR-2019-SD-DED9F3FE6",
                             documentType: "storageDocument",
-                            dateOfUnloading: "09/07/2019",
                             extended: {
                                 exporterCompanyName: "BONZO",
                                 investigation: undefined,
@@ -1341,10 +1144,8 @@ describe('When validating an online ps or sd', () => {
                             isOverAllocated: false,
                             overAllocatedByWeight: 0,
                             overUsedInfo: [],
-                            placeOfUnloading: "DOVER",
                             species: "Argentine anchovy (ANA)",
                             status: "BLOCKED",
-                            transportUnloadedFrom: "234",
                             weightOnAllDocs: 200,
                             weightOnDoc: 200,
                             weightOnFCC: 20000,
@@ -1366,9 +1167,6 @@ describe('When validating an online ps or sd', () => {
                                 "product":"Atlantic herring (HER)",
                                 "commodityCode":"423523432",
                                 "productWeight":"200",
-                                "dateOfUnloading":"01/10/2019",
-                                "placeOfUnloading":"351",
-                                "transportUnloadedFrom":"234",
                                 "certificateNumber":"FCC051",
                                 "weightOnCC":"1000"
                             },
@@ -1376,29 +1174,15 @@ describe('When validating an online ps or sd', () => {
                                 "product":"Argentine anchovy (ANA)",
                                 "commodityCode":"23408230498234",
                                 "productWeight":"200",
-                                "dateOfUnloading":"09/07/2019",
-                                "placeOfUnloading":"DOVER",
-                                "transportUnloadedFrom":"234",
                                 "certificateNumber":"2",
                                 "weightOnCC":"20000"
                             }
                         ],
-                        "storageFacilities":[
-                            {
-                                "facilityName":"11",
-                                "facilityAddressOne":"11 Dessert Way",
-                                "facilityAddressTwo":"Enyt-No-Nodyalb",
-                                "facilityTownCity":"Gateshead",
-                                "facilityPostcode":"N32 5PJ"
-                            },
-                            {
-                                "facilityName":"11 THE SECOND",
-                                "facilityAddressOne":"11 Dessert Way without water",
-                                "facilityAddressTwo":"Enyt-No-Nodyalb",
-                                "facilityTownCity":"Gateshead",
-                                "facilityPostcode":"N32 5PJ"
-                            }
-                        ],
+                        "facilityName":"11",
+                        "facilityAddressOne":"11 Dessert Way",
+                        "facilityAddressTwo":"Enyt-No-Nodyalb",
+                        "facilityTownCity":"Gateshead",
+                        "facilityPostcode":"N32 5PJ",
                         "validationErrors":[
                             {
 
@@ -1509,9 +1293,6 @@ describe('When validating an online ps or sd', () => {
                             "product": "Atlantic herring (HER)",
                             "commodityCode": "423523432",
                             "productWeight": "2000",
-                            "dateOfUnloading": "01/10/2019",
-                            "placeOfUnloading": "351",
-                            "transportUnloadedFrom": "234",
                             "certificateNumber": "FCC051",
                             "weightOnCC": "1000"
                         },
@@ -1519,29 +1300,15 @@ describe('When validating an online ps or sd', () => {
                             "product": "Argentine anchovy (ANA)",
                             "commodityCode": "23408230498234",
                             "productWeight": "200",
-                            "dateOfUnloading": "09/07/2019",
-                            "placeOfUnloading": "DOVER",
-                            "transportUnloadedFrom": "234",
                             "certificateNumber": "2",
                             "weightOnCC": "20000"
                         }
                     ],
-                    "storageFacilities": [
-                        {
-                            "facilityName": "11",
-                            "facilityAddressOne": "11 Dessert Way",
-                            "facilityAddressTwo": "Enyt-No-Nodyalb",
-                            "facilityTownCity": "Gateshead",
-                            "facilityPostcode": "N32 5PJ"
-                        },
-                        {
-                            "facilityName": "11 THE SECOND",
-                            "facilityAddressOne": "11 Dessert Way without water",
-                            "facilityAddressTwo": "Enyt-No-Nodyalb",
-                            "facilityTownCity": "Gateshead",
-                            "facilityPostcode": "N32 5PJ"
-                        }
-                    ],
+                    "facilityName": "11",
+                    "facilityAddressOne": "11 Dessert Way",
+                    "facilityAddressTwo": "Enyt-No-Nodyalb",
+                    "facilityTownCity": "Gateshead",
+                    "facilityPostcode": "N32 5PJ",
                     "validationErrors": [
                         {}
                     ],
@@ -1623,29 +1390,15 @@ describe('When validating an online ps or sd', () => {
                         "product":"Atlantic herring (HER)",
                         "commodityCode":"423523432",
                         "productWeight":"100",
-                        "dateOfUnloading":"01/10/2019",
-                        "placeOfUnloading":"351",
-                        "transportUnloadedFrom":"234",
                         "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
                         "weightOnCC":"1000"
                     }
                 ],
-                "storageFacilities":[
-                    {
-                        "facilityName":"11",
-                        "facilityAddressOne":"11 Dessert Way",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    },
-                    {
-                        "facilityName":"11 THE SECOND",
-                        "facilityAddressOne":"11 Dessert Way without water",
-                        "facilityAddressTwo":"Enyt-No-Nodyalb",
-                        "facilityTownCity":"Gateshead",
-                        "facilityPostcode":"N32 5PJ"
-                    }
-                ],
+                "facilityName":"11",
+                "facilityAddressOne":"11 Dessert Way",
+                "facilityAddressTwo":"Enyt-No-Nodyalb",
+                "facilityTownCity":"Gateshead",
+                "facilityPostcode":"N32 5PJ",
                 "validationErrors":[
                     {
 

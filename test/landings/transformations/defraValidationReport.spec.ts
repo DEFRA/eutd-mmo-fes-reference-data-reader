@@ -661,7 +661,7 @@ describe('For storage documents', () => {
 
       expect(result.exporterDetails).toBeUndefined();
       expect(result.products).toBeUndefined();
-      expect(result.storageFacilities).toBeUndefined();
+      expect(result.storageFacility).toBeUndefined();
       expect(result.transportation).toBeUndefined();
       expect(result.arrivalTransportation).toBeUndefined();
 
@@ -713,19 +713,14 @@ describe('For storage documents', () => {
           "scientificName": "Clupea harengus",
           "commodityCode": "0345603",
           "productWeight": "1000",
-          "dateOfUnloading": "12/06/2020",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078",
           "certificateNumber": "GBR-3453-3453-3443",
           "weightOnCC": "1000"
         }],
-        "storageFacilities": [{
-          "facilityName": "Exporter Person",
-          "facilityAddressOne": "Building Name",
-          "facilityAddressTwo": "Building Street",
-          "facilityTownCity": "Town",
-          "facilityPostcode": "XX12 X34"
-        }],
+        "facilityName": "Exporter Person",
+        "facilityAddressOne": "Building Name",
+        "facilityAddressTwo": "Building Street",
+        "facilityTownCity": "Town",
+        "facilityPostcode": "XX12 X34",
         "transportation": {
           "vehicle": "truck",
           "cmr": true
@@ -770,7 +765,7 @@ describe('For storage documents', () => {
 
       expect(result.exporterDetails).toBeUndefined();
       expect(result.products).toBeUndefined();
-      expect(result.storageFacilities).toBeUndefined();
+      expect(result.storageFacility).toBeUndefined();
       expect(result.transportation).toBeUndefined();
       expect(result.arrivalTransportation).toBeUndefined();
 
@@ -857,20 +852,16 @@ describe('For storage documents', () => {
           "scientificName": "Clupea harengus",
           "commodityCode": "0345603",
           "productWeight": "1000",
-          "dateOfUnloading": "12/06/2020",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078",
           "certificateNumber": "GBR-3453-3453-3443",
           "certificateType": "uk",
           "weightOnCC": "1000"
         }],
-        "storageFacilities": [{
-          "facilityName": "Exporter Person",
-          "facilityAddressOne": "Building Name",
-          "facilityAddressTwo": "Building Street",
-          "facilityTownCity": "Town",
-          "facilityPostcode": "XX12 X34"
-        }],
+        "facilityName": "Exporter Person",
+        "facilityAddressOne": "Building Name",
+        "facilityAddressTwo": "Building Street",
+        "facilityTownCity": "Town",
+        "facilityPostcode": "XX12 X34",
+        "facilityArrivalDate": "02/10/2020",
         "transportation": {
           "vehicle": "truck",
           "cmr": true
@@ -982,7 +973,7 @@ describe('For storage documents', () => {
 
       expect(result.exporterDetails).toBeUndefined();
       expect(result.products).toBeUndefined();
-      expect(result.storageFacilities).toBeUndefined();
+      expect(result.storageFacility).toBeUndefined();
       expect(result.transportation).toBeUndefined();
 
       expect(result.documentUri).toBeUndefined();
@@ -1114,19 +1105,14 @@ describe('For storage documents', () => {
               "product": "Atlantic herring (HER)",
               "commodityCode": "0345603",
               "productWeight": "1000",
-              "dateOfUnloading": "12/06/2020",
-              "placeOfUnloading": "Dover",
-              "transportUnloadedFrom": "BA078",
               "certificateNumber": "GBR-3453-3453-3443",
               "weightOnCC": "1000"
             }],
-            "storageFacilities": [{
-              "facilityName": "Exporter Person",
-              "facilityAddressOne": "Building Name",
-              "facilityAddressTwo": "Building Street",
-              "facilityTownCity": "Town",
-              "facilityPostcode": "XX12 X34"
-            }],
+            "facilityName": "Exporter Person",
+            "facilityAddressOne": "Building Name",
+            "facilityAddressTwo": "Building Street",
+            "facilityTownCity": "Town",
+            "facilityPostcode": "XX12 X34",
             "transportation": {
               "vehicle": "truck",
               "cmr": true
@@ -1223,9 +1209,6 @@ describe('For storage documents', () => {
           scientificName: "Clupea harengus",
           commodityCode: "1234",
           productWeight: "1000",
-          dateOfUnloading: "11/06/2020",
-          placeOfUnloading: "Dover",
-          transportUnloadedFrom: "BA078",
           certificateNumber: "12345",
           weightOnCC: "1000",
           certificateType: "uk"
@@ -1235,9 +1218,6 @@ describe('For storage documents', () => {
           species: "Atlantic herring (HER)",
           scientificName: "Clupea harengus",
           productWeight: 1000,
-          dateOfUnloading: "11/06/2020",
-          placeOfUnloading: "Dover",
-          transportUnloadedFrom: "BA078",
           certificateNumber: "12345",
           weightOnCertificate: 1000,
           cnCode: "1234",
@@ -1254,9 +1234,6 @@ describe('For storage documents', () => {
           species: "Atlantic herring (HER)",
           scientificName: "Clupea harengus",
           productWeight: 1000,
-          dateOfUnloading: "12/06/2020",
-          placeOfUnloading: "Dover",
-          transportUnloadedFrom: "BA078",
           certificateNumber: "GBR-3453-3453-3443",
           weightOnCertificate: 1000,
           cnCode: "0345603",
@@ -1280,7 +1257,8 @@ describe('For storage documents', () => {
           facilityName: "Exporter Person",
           facilityAddressOne: "Building Name",
           facilityTownCity: "Town",
-          facilityPostcode: "XX12 X34"
+          facilityPostcode: "XX12 X34",
+          facilityArrivalDate: "02/10/2020"
         };
 
         const expectedResult: CertificateStorageFacility = {
@@ -1289,7 +1267,8 @@ describe('For storage documents', () => {
             line1: "Building Name",
             city: "Town",
             postCode: "XX12 X34"
-          }
+          },
+          dateOfUnloading: "2020-10-02"
         };
 
         const result = toDefraSdStorageFacility(sdStorageFacility);
@@ -1308,7 +1287,8 @@ describe('For storage documents', () => {
           facilityCountry: "FacilityCountry",
           facilityCounty: "FacilityCounty",
           facilityTownCity: "Town",
-          facilityPostcode: "XX12 X34"
+          facilityPostcode: "XX12 X34",
+          facilityArrivalDate: "02/10/2020"
         };
 
         const expectedResult: CertificateStorageFacility = {
@@ -1323,7 +1303,8 @@ describe('For storage documents', () => {
             county: "FacilityCounty",
             city: "Town",
             postCode: "XX12 X34"
-          }
+          },
+          dateOfUnloading: "2020-10-02"
         };
 
         const result = toDefraSdStorageFacility(sdStorageFacility);
@@ -1332,17 +1313,18 @@ describe('For storage documents', () => {
       });
 
       it('will include a storage facility array in the return results', () => {
-        const expectedResult: CertificateStorageFacility[] = [{
+        const expectedResult: CertificateStorageFacility = {
           name: 'Exporter Person',
           address: {
             line1: "Building Name",
             city: "Town",
             postCode: "XX12 X34"
-          }
-        }];
+          },
+          dateOfUnloading: "2020-10-02"
+        };
 
         const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-SD-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndSd);
-        expect(result.storageFacilities).toEqual(expectedResult);
+        expect(result.storageFacility).toEqual(expectedResult);
       });
 
       it('will include approval Number and product handling in the return results', () => {
@@ -1350,18 +1332,17 @@ describe('For storage documents', () => {
           ...backEndSd,
           exportData: {
             ...backEndSd.exportData,
-            storageFacilities: [{
-              facilityName: "Exporter Person",
-              facilityAddressOne: "Building Name",
-              facilityAddressTwo: "Building Street",
-              facilityTownCity: "Town",
-              facilityPostcode: "XX12 X34",
-              facilityApprovalNumber: "approval number",
-              facilityStorage: "product handling"
-            }],
+            facilityName: "Exporter Person",
+            facilityAddressOne: "Building Name",
+            facilityAddressTwo: "Building Street",
+            facilityTownCity: "Town",
+            facilityPostcode: "XX12 X34",
+            facilityApprovalNumber: "approval number",
+            facilityStorage: "product handling",
+            facilityArrivalDate: "02/10/2020",
           }
         }
-        const expectedResult: CertificateStorageFacility[] = [{
+        const expectedResult: CertificateStorageFacility = {
           name: 'Exporter Person',
           address: {
             line1: "Building Name",
@@ -1369,11 +1350,12 @@ describe('For storage documents', () => {
             postCode: "XX12 X34"
           },
           approvalNumber: "approval number",
-          productHandling: "product handling"
-        }];
+          productHandling: "product handling",
+          dateOfUnloading: "2020-10-02"
+        };
 
         const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-SD-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndWithSdStorageFacility);
-        expect(result.storageFacilities).toEqual(expectedResult);
+        expect(result.storageFacility).toEqual(expectedResult);
       });
     });
   });
@@ -1422,19 +1404,14 @@ describe('For storage documents', () => {
             "scientificName": "Clupea harengus",
             "commodityCode": "0345603",
             "productWeight": "1000",
-            "dateOfUnloading": "12/06/2020",
-            "placeOfUnloading": "Dover",
-            "transportUnloadedFrom": "BA078",
             "certificateNumber": "GBR-3453-3453-3443",
             "weightOnCC": "1000"
           }],
-          "storageFacilities": [{
-            "facilityName": "Exporter Person",
-            "facilityAddressOne": "Building Name",
-            "facilityAddressTwo": "Building Street",
-            "facilityTownCity": "Town",
-            "facilityPostcode": "XX12 X34"
-          }],
+          "facilityName": "Exporter Person",
+          "facilityAddressOne": "Building Name",
+          "facilityAddressTwo": "Building Street",
+          "facilityTownCity": "Town",
+          "facilityPostcode": "XX12 X34",
           "transportation": {
             "vehicle": "truck",
             "cmr": true
@@ -1508,19 +1485,14 @@ describe('For storage documents', () => {
             "scientificName": "Clupea harengus",
             "commodityCode": "0345603",
             "productWeight": "1000",
-            "dateOfUnloading": "12/06/2020",
-            "placeOfUnloading": "Dover",
-            "transportUnloadedFrom": "BA078",
             "certificateNumber": "GBR-3453-3453-3443",
             "weightOnCC": "1000"
           }],
-          "storageFacilities": [{
-            "facilityName": "Exporter Person",
-            "facilityAddressOne": "Building Name",
-            "facilityAddressTwo": "Building Street",
-            "facilityTownCity": "Town",
-            "facilityPostcode": "XX12 X34"
-          }],
+          "facilityName": "Exporter Person",
+          "facilityAddressOne": "Building Name",
+          "facilityAddressTwo": "Building Street",
+          "facilityTownCity": "Town",
+          "facilityPostcode": "XX12 X34",
           "transportation": {
             "vehicle": "plane",
             "departurePlace": "Hull",
@@ -2248,9 +2220,6 @@ describe('toProduct', () => {
       extended: {
         id: 'SD2-1610018839',
       },
-      dateOfUnloading: "12/12/2019",
-      placeOfUnloading: "DOVER",
-      transportUnloadedFrom: "BA078",
       productDescription: "Fresh cod",
       supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
       netWeightProductArrival: "100",
@@ -2266,9 +2235,6 @@ describe('toProduct', () => {
       species: "COD",
       scientificName: "Aspidophoroides bartoni",
       productWeight: 100,
-      dateOfUnloading: "12/12/2019",
-      placeOfUnloading: "DOVER",
-      transportUnloadedFrom: "BA078",
       certificateNumber: "SD2",
       weightOnCertificate: 200,
       cnCode: "FRESHCOD",

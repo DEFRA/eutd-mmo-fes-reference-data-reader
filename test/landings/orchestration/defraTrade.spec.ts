@@ -3300,9 +3300,6 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "commodityCode": "03089090",
             "certificateNumber": "GBR-2023-CC-0123456789",
             "productWeight": "100",
-            "dateOfUnloading": "05/09/2023",
-            "placeOfUnloading": "Dover",
-            "transportUnloadedFrom": "BA078",
             "weightOnCC": "100",
             "scientificName": "Gadus morhua",
             "certificateType": "non_uk",
@@ -3311,8 +3308,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             }
           }
         ],
-        "storageFacilities": [
-          {
+        "storageFacility": {
             "facilityName": "name",
             "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
             "facilityTownCity": "NEWCASTLE UPON TYNE",
@@ -3322,9 +3318,20 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "facilityBuildingName": "LANCASTER HOUSE",
             "facilityStreetName": "HAMPSHIRE COURT",
             "facilityCounty": "TYNESIDE",
-            "facilityCountry": "ENGLAND"
-          }
-        ],
+            "facilityCountry": "ENGLAND",
+            "facilityArrivalDate": "05/09/2023"
+        },
+        "facilityName": "name",
+        "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+        "facilityTownCity": "NEWCASTLE UPON TYNE",
+        "facilityPostcode": "NE4 7YH",
+        "facilitySubBuildingName": "MMO SUB",
+        "facilityBuildingNumber": "",
+        "facilityBuildingName": "LANCASTER HOUSE",
+        "facilityStreetName": "HAMPSHIRE COURT",
+        "facilityCounty": "TYNESIDE",
+        "facilityCountry": "ENGLAND",
+        "facilityArrivalDate": "05/09/2023",
         "exporterDetails": {
           "contactId": "4704bf69-18f9-ec11-bb3d-000d3a2f806d",
           "accountId": "8504bf69-18f9-ec11-bb3d-000d3a2f806d",
@@ -3379,6 +3386,16 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "vehicle": "truck",
           "cmr": true,
           "exportDate": "05/09/2023"
+        },
+        "arrivalTransportation": {
+          "vehicle": "truck",
+          "nationalityOfVehicle": "Ukraine",
+          "registrationNumber": "BD51SMR",
+          "freightBillNumber": "BD51SMR",
+          "departureCountry": "Burundi",
+          "departurePort": "Calais-Dunkerque airport",
+          "departureDate": "17/10/2025",
+          "placeOfUnloading": "Dover"
         }
       },
       "userReference": "some-reference",
@@ -3475,10 +3492,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       isOverAllocated: true,
       overAllocatedByWeight: 300,
       overUsedInfo: [],
-      isMismatch: false,
-      dateOfUnloading: '05/09/2023',
-      placeOfUnloading: 'Dover',
-      transportUnloadedFrom: 'BA078'
+      isMismatch: false
     }]
 
     const sdBlockedResults: ISdPsQueryResult[] = [{
@@ -3505,10 +3519,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       isOverAllocated: true,
       overAllocatedByWeight: 300,
       overUsedInfo: [],
-      isMismatch: false,
-      dateOfUnloading: '05/09/2023',
-      placeOfUnloading: 'Dover',
-      transportUnloadedFrom: 'BA078'
+      isMismatch: false
     }]
 
     const body: IDefraTradeStorageDocument = {
@@ -3568,35 +3579,42 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 400,
             "status": IDefraTradeSdPsStatus.Overuse,
             "weightExceededAmount": 300
-          },
-          "dateOfUnloading": "2023-09-05",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078"
+          }
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
       "requestedByAdmin": false,
-      "storageFacilities": [
-        {
-          "name": "name",
-          "address": {
-            "building_number": "",
-            "sub_building_name": "MMO SUB",
-            "building_name": "LANCASTER HOUSE",
-            "street_name": "HAMPSHIRE COURT",
-            "county": "TYNESIDE",
-            "country": "ENGLAND",
-            "line1": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-            "city": "NEWCASTLE UPON TYNE",
-            "postCode": "NE4 7YH"
-          }
-        }
-      ],
+      "storageFacility": {
+        "name": "name",
+        "address": {
+          "building_number": "",
+          "sub_building_name": "MMO SUB",
+          "building_name": "LANCASTER HOUSE",
+          "street_name": "HAMPSHIRE COURT",
+          "county": "TYNESIDE",
+          "country": "ENGLAND",
+          "line1": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+          "city": "NEWCASTLE UPON TYNE",
+          "postCode": "NE4 7YH"
+        },
+        "dateOfUnloading": "2023-09-05"
+      },
       "transportation": {
         "modeofTransport": "truck",
         "hasRoadTransportDocument": true,
         "exportDate": "2023-09-05"
+      },
+      "arrivalTransportation": {
+        "modeofTransport": "truck",
+        "hasRoadTransportDocument": false,
+        "nationality": "Ukraine",
+        "registration": "BD51SMR",
+        "freightbillNumber": "BD51SMR",
+        "countryofDeparture": "Burundi",
+        "whereDepartsFrom": "Calais-Dunkerque airport",
+        "departureDate": "17/10/2025",
+        "placeOfUnloading": "Dover"
       },
       "authority": {
         "name": "Illegal Unreported and Unregulated (IUU) Fishing Team",
@@ -3683,8 +3701,6 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "certificateNumber": "GBR-2023-CC-0123456789",
             "productWeight": "100",
             "dateOfUnloading": "05/09/2023",
-            "placeOfUnloading": "Dover",
-            "transportUnloadedFrom": "BA078",
             "weightOnCC": "100",
             "scientificName": "Gadus morhua",
             "certificateType": "non_uk",
@@ -3693,20 +3709,17 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             }
           }
         ],
-        "storageFacilities": [
-          {
-            "facilityName": "name",
-            "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-            "facilityTownCity": "NEWCASTLE UPON TYNE",
-            "facilityPostcode": "NE4 7YH",
-            "facilitySubBuildingName": "MMO SUB",
-            "facilityBuildingNumber": "",
-            "facilityBuildingName": "LANCASTER HOUSE",
-            "facilityStreetName": "HAMPSHIRE COURT",
-            "facilityCounty": "TYNESIDE",
-            "facilityCountry": "ENGLAND"
-          }
-        ],
+        "facilityName": "name",
+        "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+        "facilityTownCity": "NEWCASTLE UPON TYNE",
+        "facilityPostcode": "NE4 7YH",
+        "facilitySubBuildingName": "MMO SUB",
+        "facilityBuildingNumber": "",
+        "facilityBuildingName": "LANCASTER HOUSE",
+        "facilityStreetName": "HAMPSHIRE COURT",
+        "facilityCounty": "TYNESIDE",
+        "facilityCountry": "ENGLAND",
+        "facilityArrivalDate": "05/09/2023",
         "exporterDetails": {
           "contactId": "4704bf69-18f9-ec11-bb3d-000d3a2f806d",
           "accountId": "8504bf69-18f9-ec11-bb3d-000d3a2f806d",
@@ -3761,7 +3774,29 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "vehicle": "truck",
           "cmr": true,
           "exportDate": "05/09/2023"
-        }
+        },
+        "arrivalTransportation": {
+          "vehicle": "truck",
+          "nationalityOfVehicle": "Ukraine",
+          "registrationNumber": "BD51SMR",
+          "freightBillNumber": "BD51SMR",
+          "departureCountry": "Burundi",
+          "departurePort": "Calais-Dunkerque airport",
+          "departureDate": "17/10/2025",
+          "placeOfUnloading": "Dover",
+          "hasRoadTransportDocument": false
+        },
+        "facilityName": "name",
+        "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+        "facilityTownCity": "NEWCASTLE UPON TYNE",
+        "facilityPostcode": "NE4 7YH",
+        "facilitySubBuildingName": "MMO SUB",
+        "facilityBuildingNumber": "",
+        "facilityBuildingName": "LANCASTER HOUSE",
+        "facilityStreetName": "HAMPSHIRE COURT",
+        "facilityCounty": "TYNESIDE",
+        "facilityCountry": "ENGLAND",
+        "facilityArrivalDate": "05/09/2023"
       },
       "userReference": "some-reference",
       "documentUri": "_ab830758-1c18-4dad-b756-e3dc10fe7efa.pdf"
@@ -3856,10 +3891,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       isOverAllocated: true,
       overAllocatedByWeight: 300,
       overUsedInfo: [],
-      isMismatch: false,
-      dateOfUnloading: '05/09/2023',
-      placeOfUnloading: 'Dover',
-      transportUnloadedFrom: 'BA078'
+      isMismatch: false
     }]
 
     const sdBlockedResults: ISdPsQueryResult[] = [{
@@ -3886,10 +3918,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       isOverAllocated: true,
       overAllocatedByWeight: 300,
       overUsedInfo: [],
-      isMismatch: false,
-      dateOfUnloading: '05/09/2023',
-      placeOfUnloading: 'Dover',
-      transportUnloadedFrom: 'BA078'
+      isMismatch: false
     }]
 
     const body: IDefraTradeStorageDocument = {
@@ -3949,35 +3978,42 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 400,
             "status": IDefraTradeSdPsStatus.Overuse,
             "weightExceededAmount": 300
-          },
-          "dateOfUnloading": "2023-09-05",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078"
+          }
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
       "requestedByAdmin": false,
-      "storageFacilities": [
-        {
-          "name": "name",
-          "address": {
-            "building_number": "",
-            "sub_building_name": "MMO SUB",
-            "building_name": "LANCASTER HOUSE",
-            "street_name": "HAMPSHIRE COURT",
-            "county": "TYNESIDE",
-            "country": "ENGLAND",
-            "line1": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-            "city": "NEWCASTLE UPON TYNE",
-            "postCode": "NE4 7YH"
-          }
-        }
-      ],
+      "storageFacility": {
+        "name": "name",
+        "address": {
+          "building_number": "",
+          "sub_building_name": "MMO SUB",
+          "building_name": "LANCASTER HOUSE",
+          "street_name": "HAMPSHIRE COURT",
+          "county": "TYNESIDE",
+          "country": "ENGLAND",
+          "line1": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+          "city": "NEWCASTLE UPON TYNE",
+          "postCode": "NE4 7YH"
+        },
+        "dateOfUnloading": "2023-09-05",
+      },
       "transportation": {
         "modeofTransport": "truck",
         "hasRoadTransportDocument": true,
         "exportDate": "2023-09-05"
+      },
+      "arrivalTransportation": {
+        "modeofTransport": "truck",
+        "hasRoadTransportDocument": false,
+        "nationality": "Ukraine",
+        "registration": "BD51SMR",
+        "freightbillNumber": "BD51SMR",
+        "countryofDeparture": "Burundi",
+        "whereDepartsFrom": "Calais-Dunkerque airport",
+        "departureDate": "17/10/2025",
+        "placeOfUnloading": "Dover"
       },
       "authority": {
         "name": "Illegal Unreported and Unregulated (IUU) Fishing Team",
@@ -4075,20 +4111,16 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             }
           }
         ],
-        "storageFacilities": [
-          {
-            "facilityName": "name",
-            "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-            "facilityTownCity": "NEWCASTLE UPON TYNE",
-            "facilityPostcode": "NE4 7YH",
-            "facilitySubBuildingName": "MMO SUB",
-            "facilityBuildingNumber": "",
-            "facilityBuildingName": "LANCASTER HOUSE",
-            "facilityStreetName": "HAMPSHIRE COURT",
-            "facilityCounty": "TYNESIDE",
-            "facilityCountry": "ENGLAND"
-          }
-        ],
+        "facilityName": "name",
+        "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+        "facilityTownCity": "NEWCASTLE UPON TYNE",
+        "facilityPostcode": "NE4 7YH",
+        "facilitySubBuildingName": "MMO SUB",
+        "facilityBuildingNumber": "",
+        "facilityBuildingName": "LANCASTER HOUSE",
+        "facilityStreetName": "HAMPSHIRE COURT",
+        "facilityCounty": "TYNESIDE",
+        "facilityCountry": "ENGLAND",
         "exporterDetails": {
           "addressOne": "NATURAL ENGLAND, LANCASTER HOUSE, HAMPSHIRE COURT",
           "buildingNumber": null,

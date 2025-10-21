@@ -981,19 +981,16 @@ describe("Report Void", () => {
           "product": "Atlantic herring (HER)",
           "commodityCode": "0345603",
           "productWeight": "12",
-          "dateOfUnloading": "12/06/2020",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078",
           "certificateNumber": "GBR-3453-3453-3443",
           "weightOnCC": "12"
         }],
-        "storageFacilities": [{
+        "storageFacility": {
           "facilityName": "Exporter Person",
           "facilityAddressOne": "Building Name",
           "facilityAddressTwo": "Building Street",
           "facilityTownCity": "Town",
           "facilityPostcode": "XX12 X34"
-        }],
+        },
         "transportation": {
           "vehicle": "containerVessel",
           "vesselName": "WIRON 5",
@@ -1001,6 +998,16 @@ describe("Report Void", () => {
           "containerNumber": "1234",
           "departurePlace": "Telford",
           "exportDate": "03/03/2020"
+        },
+        "arrivalTransportation": {
+          "vehicle": "truck",
+          "nationalityOfVehicle": "Ukraine",
+          "registrationNumber": "BD51SMR",
+          "freightBillNumber": "BD51SMR",
+          "departureCountry": "Burundi",
+          "departurePort": "Calais-Dunkerque airport",
+          "departureDate": "17/10/2025",
+          "placeOfUnloading": "Place of unloading"
         }
       },
       "createdByEmail": "foo@foo.com",

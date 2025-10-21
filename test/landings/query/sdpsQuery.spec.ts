@@ -27,20 +27,18 @@ describe('low level transformations', () => {
     const document = createDocument('12345',
       'storageDocument',
       [
-        { certificateNumber: 'FCC051', certificateType: 'uk', product: 'cats', scientificName: "some scientific name 1", weightOnCC: 500.51, productWeight: 500.51, dateOfUnloading: "15/06/2020", placeOfUnloading: "Dover", transportUnloadedFrom: "BA078" },
-        { certificateNumber: 'FCC051', certificateType: 'non_uk', product: 'dogs', scientificName: "some scientific name 2", weightOnCC: 500.51, productWeight: 200.29, dateOfUnloading: "15/06/2020", placeOfUnloading: "Hull", transportUnloadedFrom: "EF078", supportingDocuments: ['PS','CC'] }
+        { certificateNumber: 'FCC051', certificateType: 'uk', product: 'cats', scientificName: "some scientific name 1", weightOnCC: 500.51, productWeight: 500.51 },
+        { certificateNumber: 'FCC051', certificateType: 'non_uk', product: 'dogs', scientificName: "some scientific name 2", weightOnCC: 500.51, productWeight: 200.29, supportingDocuments: ['PS','CC'] }
       ]
     )
 
     const expected = [
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'storageDocument',
         extended: { url: 'http://www.bob.com' },
-        certificateNumber: 'FCC051', certificateType: 'uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", weight: 500.51, weightOnCC: 500.51,
-        dateOfUnloading: "15/06/2020", placeOfUnloading: "Dover", transportUnloadedFrom: "BA078" },
+        certificateNumber: 'FCC051', certificateType: 'uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", weight: 500.51, weightOnCC: 500.51 },
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'storageDocument',
         extended: { url: 'http://www.bob.com' },
-        certificateNumber: 'FCC051', certificateType: 'non_uk', da: 'England', species: 'dogs', scientificName: "some scientific name 2", weight: 200.29, weightOnCC: 500.51,
-        dateOfUnloading: "15/06/2020", placeOfUnloading: "Hull", transportUnloadedFrom: "EF078", supportingDocuments: "PS,CC" }
+        certificateNumber: 'FCC051', certificateType: 'non_uk', da: 'England', species: 'dogs', scientificName: "some scientific name 2", weight: 200.29, weightOnCC: 500.51, supportingDocuments: "PS,CC" }
     ]
 
     const res = Query.unwindAndMapCatches(document, identity)
@@ -229,9 +227,6 @@ describe('low level transformations', () => {
             "scientificName": "some scientific name 1",
             "commodityCode":"423523432",
             "productWeight":"300",
-            "dateOfUnloading":"01/10/2019",
-            "placeOfUnloading":"351",
-            "transportUnloadedFrom":"234",
             "certificateNumber":"fasdfnasdfjasdfjaisdf8asdf8as",
             "weightOnCC":"1000"
           },
@@ -240,29 +235,15 @@ describe('low level transformations', () => {
             "scientificName": "some scientific name 2",
             "commodityCode":"23408230498234",
             "productWeight":"200.11",
-            "dateOfUnloading":"09/07/2019",
-            "placeOfUnloading":"DOVER",
-            "transportUnloadedFrom":"234",
             "certificateNumber":"2",
             "weightOnCC":"20000.55"
           }
         ],
-        "storageFacilities":[
-          {
-            "facilityName":"11",
-            "facilityAddressOne":"11 Dessert Way",
-            "facilityAddressTwo":"Enyt-No-Nodyalb",
-            "facilityTownCity":"Gateshead",
-            "facilityPostcode":"N32 5PJ"
-          },
-          {
-            "facilityName":"11 THE SECOND",
-            "facilityAddressOne":"11 Dessert Way without water",
-            "facilityAddressTwo":"Enyt-No-Nodyalb",
-            "facilityTownCity":"Gateshead",
-            "facilityPostcode":"N32 5PJ"
-          }
-        ],
+        "facilityName":"11",
+        "facilityAddressOne":"11 Dessert Way",
+        "facilityAddressTwo":"Enyt-No-Nodyalb",
+        "facilityTownCity":"Gateshead",
+        "facilityPostcode":"N32 5PJ",
         "validationErrors":[
           {
 
@@ -307,14 +288,12 @@ describe('low level transformations', () => {
           certificateNumber: 'FASDFNASDFJASDFJAISDF8ASDF8AS', da: 'LE17 5QZ', species: 'Atlantic herring (HER)',
           scientificName: "some scientific name 1", commodityCode: '423523432', weight: 300, weightOnCC: 1000, extended: {
             exporterCompanyName: "BONZO"
-          }, dateOfUnloading:"01/10/2019", placeOfUnloading:"351", transportUnloadedFrom:"234"
-         },
+          }},
         { documentNumber: 'GBR-2019-SD-DED9F3FE6', status: 'DRAFT', documentType: 'storageDocument',
           certificateNumber: '2', da: 'LE17 5QZ', species: 'Argentine anchovy (ANA)',
           scientificName: "some scientific name 2", commodityCode: '23408230498234', weight: 200.11, weightOnCC: 20000.55, extended: {
             exporterCompanyName: "BONZO"
-          }, dateOfUnloading: "09/07/2019", placeOfUnloading: "DOVER", transportUnloadedFrom:"234",
-        },
+          }},
       ];
 
       const res = Query.unwindAndMapCatches(document, identity);
@@ -823,10 +802,7 @@ describe('When setting isOverAllocated', () => {
              product: 'cats',
              scientificName: 'some scientific name',
              weightOnCC: weightOnCC,
-             productWeight: 0,
-             dateOfUnloading: "15/06/2020",
-             placeOfUnloading: "Dover",
-             transportUnloadedFrom: "BA078"
+             productWeight: 0
            }
          ]
         )
@@ -965,10 +941,7 @@ describe('When setting over used info array', () => {
             product: 'cats',
             scientificName: 'some scientific name',
             weightOnCC: weightOnCC,
-            productWeight: 0,
-            dateOfUnloading: "15/06/2020",
-            placeOfUnloading: "Dover",
-            transportUnloadedFrom: "BA078"
+            productWeight: 0
           }
         ]
       ),
@@ -980,20 +953,14 @@ describe('When setting over used info array', () => {
             product: 'cats',
             scientificName: 'some scientific name',
             weightOnCC: weightOnCC,
-            productWeight: 0,
-            dateOfUnloading: "15/06/2020",
-            placeOfUnloading: "Dover",
-            transportUnloadedFrom: "BA078"
+            productWeight: 0
           },
           {
             certificateNumber: 'FCC051',
             product: 'cats',
             scientificName: 'some scientific name',
             weightOnCC: weightOnCC,
-            productWeight: 0,
-            dateOfUnloading: "15/06/2020",
-            placeOfUnloading: "Dover",
-            transportUnloadedFrom: "BA078"
+            productWeight: 0
           }
         ]
       )]

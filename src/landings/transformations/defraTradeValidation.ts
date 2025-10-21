@@ -198,9 +198,6 @@ export function toDefraTradeSdProduct(validatedSdProducts: ISdPsQueryResult): ID
       overuseInfo: validatedSdProducts.overUsedInfo.some(_ => _ !== validatedSdProducts.documentNumber)
         ? validatedSdProducts.overUsedInfo.filter(_ => _ !== validatedSdProducts.documentNumber) : undefined
     },
-    dateOfUnloading: moment(validatedSdProducts.dateOfUnloading, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-    placeOfUnloading: validatedSdProducts.placeOfUnloading,
-    transportUnloadedFrom: validatedSdProducts.transportUnloadedFrom,
     supportingDocuments: validatedSdProducts.supportingDocuments,
     productDescription: validatedSdProducts.productDescription,
     netWeightProductArrival: validatedSdProducts.netWeightProductArrival,
@@ -223,7 +220,7 @@ export const toDefraTradeSd = (document: IDocument, documentCase: IDynamicsStora
   return {
     ...documentCase,
     products: Array.isArray(sdQueryResults) ? sdQueryResults.map((_: ISdPsQueryResult) => toDefraTradeProduct(_)) : null,
-    storageFacilities: document.exportData.storageFacilities.map((_) => toDefraSdStorageFacility(_)),
+    storageFacility: toDefraSdStorageFacility(document.exportData),
     exportedTo: document.exportData?.exportedTo,
     transportation,
     arrivalTransportation,

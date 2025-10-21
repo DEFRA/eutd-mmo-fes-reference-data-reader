@@ -56,6 +56,7 @@
           "foreignCatchCertificateNumber": "FR-PS-234234-23423-234234",
           "species": "HER",
           "cnCode": "324234324432234",
+          "productDescription": "Battered Cod",
           "scientificName": "scientific name",
           "importedWeight": 500,
           "usedWeightAgainstCertificate": 700,
@@ -72,6 +73,7 @@
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
           "species": "SAL",
           "cnCode": "523842358",
+          "productDescription": "Filleted Haddock",
           "scientificName": "scientific name",
           "importedWeight": 200,
           "usedWeightAgainstCertificate": 100,
@@ -229,6 +231,9 @@
           "type": "string"
         },
         "cnCode": {
+          "type": "string"
+        },
+        "productDescription": {
           "type": "string"
         },
         "scientificName": {

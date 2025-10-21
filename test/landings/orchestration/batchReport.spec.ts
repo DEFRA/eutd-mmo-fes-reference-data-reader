@@ -1050,22 +1050,18 @@ describe('all reporting functions', () => {
                 "product" : "Atlantic herring (HER)",
                 "commodityCode" : "1",
                 "productWeight" : "1000",
-                "dateOfUnloading" : "15/07/2019",
-                "placeOfUnloading" : "Dover",
-                "transportUnloadedFrom" : "235",
                 "certificateNumber" : "juanito_juanito_junior",
                 "weightOnCC" : "2000"
               }
             ],
-            "storageFacilities" : [
-              {
-                "facilityName" : "FACILITY",
-                "facilityAddressOne" : "Bruntingthorpe Industrial Estate Unit 6 Upper Bruntingthorpe",
-                "facilityTownCity" : "Lutterworth",
-                "facilityPostcode" : "LE17 5QZ",
-                "storedAs" : "chilled"
-              }
-            ],
+            "storageFacility" : {
+              "facilityName" : "FACILITY",
+              "facilityAddressOne" : "Bruntingthorpe Industrial Estate Unit 6 Upper Bruntingthorpe",
+              "facilityTownCity" : "Lutterworth",
+              "facilityPostcode" : "LE17 5QZ",
+              "facilityArrivalDate" : "15/07/2019",
+              "facilityStorage" : "Chilled"
+            },
             "exporterDetails" : {
               "exporterCompanyName" : "Mr",
               "addressOne" : "11, Woodlands Way",
@@ -1075,6 +1071,10 @@ describe('all reporting functions', () => {
             },
             "transportation" : {
               "vehicle" : "truck"
+            },
+            "arrivalTransportation" : {
+              "vehicle" : "truck",
+              "placeOfUnloading" : "Dover",
             }
           },
           "audit" : [],
@@ -1107,22 +1107,16 @@ describe('all reporting functions', () => {
                 "product" : "Atlantic herring (HER)",
                 "commodityCode" : "1",
                 "productWeight" : "1000",
-                "dateOfUnloading" : "15/07/2019",
-                "placeOfUnloading" : "Dover",
-                "transportUnloadedFrom" : "235",
                 "certificateNumber" : "juanito_juanito_junior",
                 "weightOnCC" : "2000"
               }
             ],
-            "storageFacilities" : [
-              {
-                "facilityName" : "FACILITY",
-                "facilityAddressOne" : "Bruntingthorpe Industrial Estate Unit 6 Upper Bruntingthorpe",
-                "facilityTownCity" : "Lutterworth",
-                "facilityPostcode" : "LE17 5QZ",
-                "storedAs" : "chilled"
-              }
-            ],
+            "facilityName" : "FACILITY",
+            "facilityAddressOne" : "Bruntingthorpe Industrial Estate Unit 6 Upper Bruntingthorpe",
+            "facilityTownCity" : "Lutterworth",
+            "facilityPostcode" : "LE17 5QZ",
+            "facilityArrivalDate": "15/07/2019",
+            "facilityStorage" : "Chilled",
             "exporterDetails" : {
               "exporterCompanyName" : "Mr",
               "addressOne" : "11, Woodlands Way",
@@ -1132,6 +1126,10 @@ describe('all reporting functions', () => {
             },
             "transportation" : {
               "vehicle" : "truck"
+            },
+            "arrivalTransportation" : {
+              "vehicle" : "truck",
+              "placeOfUnloading" : "Dover",
             }
           },
           "audit" : [],

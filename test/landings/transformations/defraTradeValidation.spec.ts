@@ -1435,28 +1435,22 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
           "commodityCode": "03089090",
           "certificateNumber": "GBR-2023-CC-0123456789",
           "productWeight": "100",
-          "dateOfUnloading": "05/09/2023",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078",
           "weightOnCC": "100",
           "scientificName": "Gadus morhua",
           "certificateType": "non_uk",
         }
       ],
-      "storageFacilities": [
-        {
-          "facilityName": "name",
-          "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-          "facilityTownCity": "NEWCASTLE UPON TYNE",
-          "facilityPostcode": "NE4 7YH",
-          "facilitySubBuildingName": "MMO SUB",
-          "facilityBuildingNumber": "",
-          "facilityBuildingName": "LANCASTER HOUSE",
-          "facilityStreetName": "HAMPSHIRE COURT",
-          "facilityCounty": "TYNESIDE",
-          "facilityCountry": "ENGLAND"
-        }
-      ],
+      "facilityName": "name",
+      "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+      "facilityTownCity": "NEWCASTLE UPON TYNE",
+      "facilityPostcode": "NE4 7YH",
+      "facilitySubBuildingName": "MMO SUB",
+      "facilityBuildingNumber": "",
+      "facilityBuildingName": "LANCASTER HOUSE",
+      "facilityStreetName": "HAMPSHIRE COURT",
+      "facilityCounty": "TYNESIDE",
+      "facilityCountry": "ENGLAND",
+      "facilityArrivalDate": "20/10/2020",
       "exporterDetails": {
         "contactId": "4704bf69-18f9-ec11-bb3d-000d3a2f806d",
         "accountId": "8504bf69-18f9-ec11-bb3d-000d3a2f806d",
@@ -1546,9 +1540,6 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     overAllocatedByWeight: 100,
     overUsedInfo: ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"],
     isMismatch: false,
-    dateOfUnloading: "25/08/2023",
-    placeOfUnloading: "Dover",
-    transportUnloadedFrom: "BA078",
     catchCertificateNumber: 'GBR-2023-CC-0123456789',
     scientificName: 'Gadus morhua'
   }];
@@ -1652,29 +1643,28 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     expect(result.transportation).toStrictEqual(expected);
   });
 
-  it('will return a storageFacilities within the IDefraTradeStorageDocument payload', () => {
+  it('will return a storageFacility within the IDefraTradeStorageDocument payload', () => {
     const result: IDefraTradeStorageDocument = SUT.toDefraTradeSd(exampleSd, exampleSdDynamicsCase, exampleSdQueryResult);
-    const expected = [
-      {
-        "name": "name",
-        "address": {
-          "line1": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-          "sub_building_name": "MMO SUB",
-          "building_number": "",
-          "building_name": "LANCASTER HOUSE",
-          "street_name": "HAMPSHIRE COURT",
-          "city": "NEWCASTLE UPON TYNE",
-          "postCode": "NE4 7YH",
-          "county": "TYNESIDE",
-          "country": "ENGLAND"
-        },
-        "approvalNumber": undefined,
-        "arrivalDate": undefined,
-        "productHandling": undefined,
-      }
-    ];
+    const expected =
+    {
+      "name": "name",
+      "address": {
+        "line1": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+        "sub_building_name": "MMO SUB",
+        "building_number": "",
+        "building_name": "LANCASTER HOUSE",
+        "street_name": "HAMPSHIRE COURT",
+        "city": "NEWCASTLE UPON TYNE",
+        "postCode": "NE4 7YH",
+        "county": "TYNESIDE",
+        "country": "ENGLAND"
+      },
+      "approvalNumber": undefined,
+      "productHandling": undefined,
+      "dateOfUnloading": "2020-10-20"
+    };
 
-    expect(result.storageFacilities).toStrictEqual(expected);
+    expect(result.storageFacility).toStrictEqual(expected);
   });
 
   it('will return a products within the IDefraTradeStorageDocument payload', () => {
@@ -1687,9 +1677,6 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
       "scientificName": "Gadus morhua",
       "importedWeight": 100,
       "exportedWeight": 100,
-      "dateOfUnloading": "2023-08-25",
-      "placeOfUnloading": "Dover",
-      "transportUnloadedFrom": "BA078",
       "validation": {
         "status": SdPsStatus.Success,
         "totalWeightExported": 100,

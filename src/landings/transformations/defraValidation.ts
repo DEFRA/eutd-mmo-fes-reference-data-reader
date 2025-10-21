@@ -246,8 +246,8 @@ function populateExportData(result: IDefraValidationStorageDocument, storageDocu
       result.products = exportData.catches.map(toDefraSdProduct);
    }
 
-   if (exportData.storageFacilities && exportData.storageFacilities.length > 0) {
-      result.storageFacilities = exportData.storageFacilities.map(toDefraSdStorageFacility);
+   if (exportData) {
+    result.storageFacility = toDefraSdStorageFacility(exportData);
    }
 
    if (exportData.transportation) {
@@ -329,9 +329,6 @@ export function toDefraSdProduct(sdCatch): StorageDocumentReportCatch {
       species: sdCatch.product,
       scientificName: sdCatch.scientificName,
       productWeight: parseInt(sdCatch.productWeight, 10),
-      dateOfUnloading: sdCatch.dateOfUnloading,
-      placeOfUnloading: sdCatch.placeOfUnloading,
-      transportUnloadedFrom: sdCatch.transportUnloadedFrom,
       certificateNumber: sdCatch.certificateNumber,
       weightOnCertificate: parseInt(sdCatch.weightOnCC, 10),
       cnCode: sdCatch.commodityCode,
@@ -353,7 +350,7 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
          city: sdStorageFacility.facilityTownCity,
          postCode: sdStorageFacility.facilityPostcode
       },
-      arrivalDate: sdStorageFacility.facilityArrivalDate,
+      dateOfUnloading: moment(sdStorageFacility.facilityArrivalDate, 'DD/MM/YYYY').format('YYYY-MM-DD'),
       approvalNumber: !isEmpty(sdStorageFacility.facilityApprovalNumber) ? sdStorageFacility.facilityApprovalNumber : undefined,
       productHandling: !isEmpty(sdStorageFacility.facilityStorage) ? sdStorageFacility.facilityStorage : undefined,
    } : undefined;
@@ -377,7 +374,8 @@ export function toTransportation(transportation): CertificateTransport {
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
-            departureDate: transportation.departureDate
+            departureDate: transportation.departureDate,
+            placeOfUnloading: transportation.placeOfUnloading
          }
       case TRANSPORT_VEHICLE_TRAIN:
          return {
@@ -388,7 +386,8 @@ export function toTransportation(transportation): CertificateTransport {
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
-            departureDate: transportation.departureDate
+            departureDate: transportation.departureDate,
+            placeOfUnloading: transportation.placeOfUnloading
          }
       case TRANSPORT_VEHICLE_PLANE:
          return {
@@ -401,7 +400,8 @@ export function toTransportation(transportation): CertificateTransport {
             airwaybillNumber: handleEmptyValue(transportation.airwayBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
-            departureDate: transportation.departureDate
+            departureDate: transportation.departureDate,
+            placeOfUnloading: transportation.placeOfUnloading
          }
       case TRANSPORT_VEHICLE_CONTAINER_VESSEL:
          return {
@@ -414,7 +414,8 @@ export function toTransportation(transportation): CertificateTransport {
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
-            departureDate: transportation.departureDate
+            departureDate: transportation.departureDate,
+            placeOfUnloading: transportation.placeOfUnloading
          }
       default:
          return {
@@ -424,7 +425,8 @@ export function toTransportation(transportation): CertificateTransport {
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.countryofDeparture,
             whereDepartsFrom: transportation.departurePort,
-            departureDate: transportation.departureDate
+            departureDate: transportation.departureDate,
+            placeOfUnloading: transportation.placeOfUnloading,
          }
    }
 }
@@ -540,9 +542,6 @@ export function toProducts(queryRes: ISdPsQueryResult[]): StorageDocumentReportC
          species: row.species,
          scientificName: row.scientificName,
          productWeight: row.weightOnDoc,
-         dateOfUnloading: row.dateOfUnloading,
-         placeOfUnloading: row.placeOfUnloading,
-         transportUnloadedFrom: row.transportUnloadedFrom,
          certificateNumber: row.catchCertificateNumber,
          weightOnCertificate: row.weightOnFCC,
          cnCode: row.commodityCode,

@@ -75,9 +75,6 @@ export interface StorageDocumentReportCatch {
     species: string;
     scientificName?: string;
     productWeight: number;
-    dateOfUnloading: string;
-    placeOfUnloading: string;
-    transportUnloadedFrom: string;
     certificateNumber: string;
     weightOnCertificate: number;
     cnCode?: string;
@@ -113,13 +110,14 @@ export interface CertificatePlant {
 export interface CertificateStorageFacility {
     name?: string;
     address: CertificateAddress;
-    arrivalDate?: string,
+    dateOfUnloading?: string,
     approvalNumber?: string,
     productHandling?: string
 }
 
 interface ModeOfTransport {
     modeofTransport: string;
+    placeOfUnloading?: string,
     exportLocation?: string;
     exportDate?: string;
     freightbillNumber?: string;
@@ -135,17 +133,17 @@ export interface Truck extends ModeOfTransport {
 }
 
 export interface Train extends ModeOfTransport {
-    billNumber: string;
+    billNumber?: string;
 }
 
 export interface Plane extends ModeOfTransport {
-    flightNumber: string;
+    flightNumber?: string;
     containerId: string;
     airwaybillNumber?: string;
 }
 
 export interface Vessel extends ModeOfTransport {
-    name: string;
+    name?: string;
     flag: string;
     containerId: string;
 }
@@ -213,6 +211,7 @@ export interface IDefraValidationStorageDocument {
     exporterDetails?:       CertificateCompany;
     products?:              StorageDocumentReportCatch[];
     storageFacilities?:     CertificateStorageFacility[];
+    storageFacility?:       CertificateStorageFacility;
     transportation?:        CertificateTransport;
     arrivalTransportation?: CertificateTransport;
     documentUri?:           string;
@@ -274,7 +273,8 @@ export const DefraValidationStorageDocumentSchema = new Schema ({
     audits:                     { type: [Schema.Types.Mixed],  required: false },
     exporterDetails:            { type: Object,  required: false },
     products:                   { type: [Schema.Types.Mixed],  required: false },
-    storageFacilities:          { type: [Schema.Types.Mixed],  required: false },
+    storageFacilities:          { type: [Schema.Types.Mixed],  required: false, default: undefined },
+    storageFacility:            { type: Object,  required: false },
     transportation:             { type: Schema.Types.Mixed,    required: false },
     arrivalTransportation:      { type: Schema.Types.Mixed,    required: false },
     documentUri:                { type: String,  required: false },

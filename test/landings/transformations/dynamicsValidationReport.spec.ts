@@ -8665,20 +8665,15 @@ describe('Dynamics Validation', () => {
           "product": "Atlantic herring (HER)",
           "commodityCode": "0345603",
           "productWeight": "1000",
-          "dateOfUnloading": "12/06/2020",
-          "placeOfUnloading": "Dover",
-          "transportUnloadedFrom": "BA078",
           "certificateNumber": "GBR-3453-3453-3443",
           "weightOnCC": "1000",
           "scientificName": "Gadus morhua"
         }],
-        "storageFacilities": [{
-          "facilityName": "Exporter Person",
-          "facilityAddressOne": "Building Name",
-          "facilityAddressTwo": "Building Street",
-          "facilityTownCity": "Town",
-          "facilityPostcode": "XX12 X34"
-        }],
+        "facilityName": "Exporter Person",
+        "facilityAddressOne": "Building Name",
+        "facilityAddressTwo": "Building Street",
+        "facilityTownCity": "Town",
+        "facilityPostcode": "XX12 X34",
         "exportedTo": {
           "officialCountryName": "Nigeria",
           "isoCodeAlpha2": "NG",

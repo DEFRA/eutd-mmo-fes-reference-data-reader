@@ -837,9 +837,6 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "id": 'fasdfnasdfjasdfjaisdf8asdf8as-1610018839',
           "commodityCode": "423523432",
           "productWeight": "300",
-          "dateOfUnloading": "01/10/2019",
-          "placeOfUnloading": "351",
-          "transportUnloadedFrom": "234",
           "certificateNumber": "fasdfnasdfjasdfjaisdf8asdf8as",
           "certificateType": "uk",
           "weightOnCC": "1000",
@@ -856,9 +853,6 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "id": '2-1610018839',
           "commodityCode": "23408230498234",
           "productWeight": "200",
-          "dateOfUnloading": "09/07/2019",
-          "placeOfUnloading": "DOVER",
-          "transportUnloadedFrom": "234",
           "certificateNumber": "2",
           "certificateType": "uk",
           "weightOnCC": "20000",
@@ -870,22 +864,11 @@ describe('when mapping from a mongo storage document to domain SD', () => {
           "supportingDocuments": undefined,
         }
       ],
-      "storageFacilities": [
-        {
-          "facilityName": "11",
-          "facilityAddressOne": "11 Dessert Way",
-          "facilityAddressTwo": "Enyt-No-Nodyalb",
-          "facilityTownCity": "Gateshead",
-          "facilityPostcode": "N32 5PJ"
-        },
-        {
-          "facilityName": "11 THE SECOND",
-          "facilityAddressOne": "11 Dessert Way without water",
-          "facilityAddressTwo": "Enyt-No-Nodyalb",
-          "facilityTownCity": "Gateshead",
-          "facilityPostcode": "N32 5PJ"
-        }
-      ],
+      "facilityName": "11",
+      "facilityAddressOne": "11 Dessert Way",
+      "facilityAddressTwo": "Enyt-No-Nodyalb",
+      "facilityTownCity": "Gateshead",
+      "facilityPostcode": "N32 5PJ",
       "validationErrors": [
         {
 
@@ -900,8 +883,7 @@ describe('when mapping from a mongo storage document to domain SD', () => {
         "user_id": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
         "cmr": "true"
       },
-      "arrivalTransportation": [{
-        "id": '0',
+      "arrivalTransportation": {
         "vehicle": "truck",
         "departurePlace": "Hull",
         "nationalityOfVehicle": "Uk",
@@ -910,47 +892,7 @@ describe('when mapping from a mongo storage document to domain SD', () => {
         "departureCountry": "United Kingdom",
         "departurePort": "Hull",
         "exportDate": "2023-08-31"
-      }, {
-        "id": '0',
-        "vehicle": "plane",
-        "departurePlace": "Hull",
-        "flightNumber": "SK123",
-        "containerNumber": "CON121",
-        "freightBillNumber": "ABC123",
-        "departureCountry": "United Kingdom",
-        "departurePort": "Hull",
-        "exportDate": "2023-08-31",
-      }, {
-        "id": '0',
-        "vehicle": "train",
-        "railwayBillNumber": "ABC123",
-        "freightBillNumber": "ABC123",
-        "departureCountry": "United Kingdom",
-        "departurePort": "Hull",
-        "exportDate": "2023-08-31",
-      }, {
-        "id": '0',
-        "vehicle": "containerVessel",
-        "departurePlace": "Hull",
-        "vesselName": "",
-        "flagState": "",
-        "containerNumber": "CON121",
-        "freightBillNumber": "ABC123",
-        "departureCountry": "United Kingdom",
-        "departurePort": "Hull",
-        "exportDate": "2023-08-31",
-      }, {
-        "id": '0',
-        "vehicle": "unknown",
-        "departurePlace": "Hull",
-        "nationalityOfVehicle": "",
-        "registrationNumber": "",
-        "freightBillNumber": "",
-        "departureCountry": "United Kingdom",
-        "departurePort": "Hull",
-        "exportDate": "2023-08-31",
-      }
-      ],
+      },
       "exporter": {
         "exporterCompanyName": "BONZO",
         "preLoadedCompanyName": true,
@@ -985,9 +927,6 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             productWeight: "300",
             weightOnCC: "1000",
             commodityCode: "423523432",
-            dateOfUnloading: "01/10/2019",
-            placeOfUnloading: "351",
-            transportUnloadedFrom: "234",
             scientificName: "Gadus morhua",
             netWeightProductArrival: 9999999.99,
             netWeightFisheryProductArrival: 9999999.99,
@@ -1004,9 +943,6 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             productWeight: "200",
             weightOnCC: "20000",
             commodityCode: "23408230498234",
-            dateOfUnloading: "09/07/2019",
-            placeOfUnloading: "DOVER",
-            transportUnloadedFrom: "234",
             scientificName: "Argentine anchovy",
             netWeightProductArrival: 9999999.99,
             netWeightFisheryProductArrival: 9999999.99,

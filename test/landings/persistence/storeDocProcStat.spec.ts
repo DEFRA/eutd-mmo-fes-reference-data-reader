@@ -43,22 +43,15 @@ describe('that we can read documents from mongo', () => {
             "product" : "Atlantic cod (COD)",
             "commodityCode" : "1234",
             "productWeight" : "100",
-            "dateOfUnloading" : "24/09/2019",
-            "placeOfUnloading" : "Dover",
-            "transportUnloadedFrom" : "BIKE",
             "certificateNumber" : "11234",
             "weightOnCC" : "100"
           }
         ],
-        "storageFacilities" : [
-          {
-            "facilityName" : "BOB",
-            "facilityAddressOne" : "421 Salters Road",
-            "facilityTownCity" : "Newcastle",
-            "facilityPostcode" : "NE34XJ",
-            "storedAs" : "chilled"
-          }
-        ],
+        "facilityName" : "BOB",
+        "facilityAddressOne" : "421 Salters Road",
+        "facilityTownCity" : "Newcastle",
+        "facilityPostcode" : "NE34XJ",
+        "storedAs" : "chilled",
         "exporterDetails" : {
             "exporterCompanyName" : "Geraint Williams",
             "addressOne" : "421 Salters Road",

@@ -61,9 +61,6 @@ export interface IDefraTradeStorageDocumentProduct {
   importedWeight: number;
   exportedWeight: number;
   validation: IDefraTradeStorageDocumentValidation;
-  dateOfUnloading: string,
-  placeOfUnloading: string,
-  transportUnloadedFrom: string,
   supportingDocuments?: string,
   productDescription?: string,
   netWeightProductArrival?: string,
@@ -88,7 +85,8 @@ export interface IDefraTradeStorageDocument {
   requestedByAdmin: boolean;
   transportation: CertificateTransport;
   arrivalTransportation?: CertificateTransport;
-  storageFacilities: CertificateStorageFacility[];
+  storageFacilities?: CertificateStorageFacility[];
+  storageFacility: CertificateStorageFacility;
   authority: CertificateAuthority;
 }
 

@@ -99,7 +99,7 @@
         "exportLocation": "UK",
         "exportDate": "2023-01-10"
       },
-      "storageFacilities" : [{
+      "storageFacility" : {
         "name": "Fish Food LTD.",
         "address": {
             "line1": "Fake Street",
@@ -110,15 +110,12 @@
         "arrivalDate": "2025-08-12",
         "approvalNumber": "UK/ABC",
         "productHandling": "chilled"
-      }],
+      },
       "products" : [{
         "species" : "Atlantic Herring (HER)",
         "scientificName": "some scientific name",
         "commodityCode" : "324234235235",
         "productWeight" : 1000,
-        "dateOfUnloading" :"2019-01-01 05:05:05",
-        "placeOfUnloading" : "Devon",
-        "transportUnloadedFrom" : "234235235235",
         "certificateNumber" : "IT-2342329-23523-235",
         "weightOnCertificate" : 500,
         "isOverUse" : true,
@@ -247,9 +244,6 @@
                 "species" : {"type" : "string"},
                 "scientificName": {"type": "string"},
                 "productWeight" : {"type" : "number"},
-                "dateOfUnloading" : {"type" : "string"},
-                "placeOfUnloading" : {"type" : "string"},
-                "transportUnloadedFrom" : {"type" : "string"},
                 "netWeightProductArrival": { "type": "string" },
                 "netWeightFisheryProductArrival": { "type": "string" },
                 "netWeightProductDeparture": { "type": "string" },
@@ -267,8 +261,7 @@
                   "description": "Flag to identify whether the certificate was issued in the UK"
                 }
             },
-            "required" : ["species","productWeight","dateOfUnloading","placeOfUnloading",
-                "transportUnloadedFrom","certificateNumber","weightOnCertificate"]
+            "required" : ["species","productWeight","certificateNumber","weightOnCertificate"]
         }
     },
     "properties": {
@@ -367,12 +360,10 @@
                 "$ref": "#/definitions/product"
             }
         },
-        "storageFacilities": {
-            "type": "array",
+        "storageFacility": {
+            "type": "object",
             "additionalItems" : false,
-            "items" : {
-                "$ref" : "#/definitions/storageFacility"
-            }
+            "$ref" : "#/definitions/storageFacility"
         },
         "transportation": {
             "type": "object",
@@ -508,6 +499,12 @@
               "type": "string"
             },
             "departureDate": {
+              "type": "string"
+            },
+            "placeOfUnloading": {
+              "type": "string"
+            },
+            "transportUnloadedFrom": {
               "type": "string"
             }
           }
