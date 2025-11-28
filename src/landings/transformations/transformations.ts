@@ -439,12 +439,15 @@ export function mapProcessingStatementToPS(redisPS) {
     redisPS.catches.map(_ => ({
       catchCertificateNumber: _.catchCertificateNumber.toUpperCase(),
       catchCertificateType: _.catchCertificateType,
+      issuingCountry: _.issuingCountry,
       species: _.species,
       scientificName: _.scientificName,
       id: _.id,
       totalWeightLanded: _.totalWeightLanded,
       exportWeightBeforeProcessing: _.exportWeightBeforeProcessing,
-      exportWeightAfterProcessing: _.exportWeightAfterProcessing
+      exportWeightAfterProcessing: _.exportWeightAfterProcessing,
+      productDescription: _.productDescription,
+      productCommodityCode: _.productCommodityCode
     })));
 }
 
@@ -453,6 +456,7 @@ export function mapStorageDocumentToSD(redisSD) {
     redisSD.catches.map(_ => ({
       certificateNumber: _.certificateNumber.toUpperCase(),
       certificateType: _.certificateType,
+      issuingCountry: _.issuingCountry,
       id: _.id,
       product: _.product,
       productWeight: _.productWeight,

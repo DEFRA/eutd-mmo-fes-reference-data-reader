@@ -37,7 +37,7 @@ describe('tests on the report output', () => {
     };
 
     const expected = [
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '12345', documentStatus: 'COMPLETE',
         documentType: 'PS', exporter: 'the company',
         speciesCode: 'cats', speciesName: 'cats',
@@ -74,7 +74,7 @@ describe('tests on the report output', () => {
    };
 
    const expected = [
-     { productCommodityCode: 'N/A',
+     { productCommodityCode: undefined,
        documentNumber: '12345', documentStatus: 'COMPLETE',
        documentType: 'PS', exporter: 'the company',
        speciesCode: 'cats', speciesName: 'cats',
@@ -131,7 +131,7 @@ describe('tests on the report output', () => {
     ]
 
     const expected = [
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '12345', documentStatus: 'COMPLETE',
         documentType: 'PS', exporter: 'the company',
         speciesCode: 'cats', speciesName: 'cats',
@@ -182,31 +182,31 @@ describe('tests on the report output', () => {
     ];
 
     const expected = [
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '12345', documentStatus: 'COMPLETE',
         documentType: 'PS',
         speciesName: 'cats', speciesCode: 'cats', weight: 100, exportWeightExceeded: 100, inputWeightMismatch: undefined, timestamp: '2019-01-01T00:00:00.000Z',
         documentUrl: 'http://www.bob.com',
         authority: 'England' },
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '12345', documentStatus: 'COMPLETE',
         documentType: 'PS',
         speciesName: 'dogs', speciesCode: 'dogs', weight: 100, exportWeightExceeded: 0, inputWeightMismatch: undefined, timestamp: '2019-01-01T00:00:00.000Z',
         documentUrl: 'http://www.bob.com',
         authority: 'England' },
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '12345', documentStatus: 'COMPLETE',
         documentType: 'PS',
         speciesName: 'cats', speciesCode: 'cats', weight: 100, exportWeightExceeded: 0, inputWeightMismatch: undefined, timestamp: '2019-01-01T00:00:00.000Z',
         documentUrl: 'http://www.bob.com',
         authority: 'England' },
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '22345', documentStatus: 'COMPLETE',
         documentType: 'PS',
         speciesName: 'cats', speciesCode: 'cats', weight: 500, exportWeightExceeded: 100, inputWeightMismatch: undefined, timestamp: '2019-01-01T10:00:00.000Z',
         documentUrl: 'http://www.bob.com',
         authority: 'England' },
-      { productCommodityCode: 'N/A',
+      { productCommodityCode: undefined,
         documentNumber: '22345', documentStatus: 'COMPLETE',
         documentType: 'PS',
         speciesName: 'cats', speciesCode: 'cats', weight: 100, exportWeightExceeded: 0, inputWeightMismatch: undefined, timestamp: '2019-01-01T10:00:00.000Z',

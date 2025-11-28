@@ -70,6 +70,7 @@
           "id": "GBR-PS-234234-234-234-1234567890",
           "species": "HER",
           "cnCode": "324234324432234",
+          "productDescription": "Battered Cod",
           "scientificName": "scientific name",
           "importedWeight": 500,
           "usedWeightAgainstCertificate": 700,
@@ -81,13 +82,15 @@
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "Nigeria"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
           "id": "GBR-PS-234234-234-234-1234567890",
           "species": "SAL",
           "cnCode": "523842358",
+          "productDescription": "Battered Cod",
           "scientificName": "scientific name",
           "importedWeight": 200,
           "usedWeightAgainstCertificate": 100,
@@ -95,7 +98,8 @@
           "validation": {
             "status": "Validation Success",
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "Nigeria"
         }
       ],
       "healthCertificateNumber": "20/2/123456",
@@ -409,6 +413,9 @@
         "cnCode": {
           "type": "string"
         },
+        "productDescription": {
+          "type": "string"
+        },
         "scientificName": {
           "type": "string"
         },
@@ -428,6 +435,10 @@
           "items": {
             "$ref": "#/definitions/catchValidation"
           }
+        },
+        "issuingCountry": {
+          "type": "string",
+          "description": "Name of the country issuing the catch certificate"
         }
       },
       "required": [
@@ -438,7 +449,8 @@
         "importedWeight",
         "usedWeightAgainstCertificate",
         "processedWeight",
-        "validation"
+        "validation",
+        "issuingCountry"
       ],
       "additionalProperties": false
     },
@@ -476,8 +488,9 @@
     }
   },
   "properties": {
-    "version" : {
-      "type":"string", "const":"2"
+    "version": {
+      "type": "string",
+      "const": "2"
     },
     "exporter": {
       "type": "object",
@@ -564,10 +577,16 @@
           "type": "string"
         },
         "isoCodeAlpha3": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "isoNumericCode": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     },
@@ -576,7 +595,10 @@
       "definition": "description and commodity code"
     },
     "catches": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "$ref": "#/definitions/catch"
       }

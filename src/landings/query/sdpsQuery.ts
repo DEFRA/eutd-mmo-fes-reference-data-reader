@@ -1,4 +1,4 @@
-import { postCodeDaLookup } from 'mmo-shared-reference-data';
+import { ICountry, postCodeDaLookup } from 'mmo-shared-reference-data';
 import { ISdPsQueryResult } from "../types/query";
 import { AuditEventTypes } from "../types/auditEvent";
 import { getLastAuditEvent } from "../transformations/transformations"
@@ -12,6 +12,8 @@ interface IFlattenedCatch {
   documentType: string;
   certificateNumber: string;
   certificateType: string;
+  productDescription: string;
+  issuingCountry: ICountry;
   status: string;
   createdAt: string;
   da: string;
@@ -72,6 +74,7 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
       r.scientificName = item.scientificName
       r.catchCertificateNumber = item.certificateNumber
       r.catchCertificateType = item.certificateType
+      r.issuingCountry = item.issuingCountry
       r.commodityCode = item.commodityCode
       r.weightOnDoc = item.weight
       r.extended = item.extended
@@ -129,6 +132,7 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         documentType: 'storageDocument',
         certificateNumber: cat.certificateNumber,
         certificateType: cat.certificateType,
+        issuingCountry: cat.issuingCountry,
         species: cat.product,
         commodityCode: cat.commodityCode,
         weight: parseFloat(cat.productWeight),
@@ -147,9 +151,11 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         documentType: 'processingStatement',
         certificateNumber: cat.catchCertificateNumber,
         certificateType: cat.catchCertificateType,
+        issuingCountry: cat.issuingCountry,
+        productDescription: cat.productDescription,
         species: cat.species,
         scientificName: cat.scientificName,
-        commodityCode: 'N/A',
+        commodityCode: cat.productCommodityCode,
         weight: parseFloat(cat.exportWeightBeforeProcessing),
         weightOnCC: parseFloat(cat.totalWeightLanded),
         weightAfterProcessing: getWeightAfterProcess(cat.exportWeightAfterProcessing),

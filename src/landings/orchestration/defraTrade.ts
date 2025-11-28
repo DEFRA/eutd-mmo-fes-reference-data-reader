@@ -186,6 +186,7 @@ export const reportSdToTrade = async (storageDocument: IDocument, caselabel: Mes
 
   delete storageDocumentCase.clonedFrom;
   delete storageDocumentCase.parentDocumentVoid;
+  delete storageDocumentCase.placeOfUnloading;
 
   if (!config.azureTradeQueueEnabled) {
     logger.info(`[DEFRA-TRADE-SD][DOCUMENT-NUMBER][${storageDocument.documentNumber}][CHIP-DISABLED]`);

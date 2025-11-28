@@ -27,11 +27,10 @@ const toAuthority: () => CertificateAuthority = () => ({
   name: "Illegal Unreported and Unregulated (IUU) Fishing Team",
   companyName: "Marine Management Organisation",
   address: {
-    line1: "Lancaster House, Hampshire Court",
-    building_name: "Lancaster House",
-    street_name: "Hampshire Court",
+    line1: "Tyneside House",
+    street_name: "Skinnerburn Rd",
     city: "Newcastle upon Tyne",
-    postCode: "NE4 7YJ",
+    postCode: "NE4 7AR",
     country: "United Kingdom"
   },
   tel: "0300 123 1032",
@@ -143,7 +142,9 @@ export function toDefraTradePsCatch(validatedPsCatches: ISdPsQueryResult): IDefr
       weightExceededAmount: validatedPsCatches.overAllocatedByWeight,
       overuseInfo: validatedPsCatches.overUsedInfo.some(_ => _ !== validatedPsCatches.documentNumber)
         ? validatedPsCatches.overUsedInfo.filter(_ => _ !== validatedPsCatches.documentNumber) : undefined
-    }
+    },
+    issuingCountry: validatedPsCatches.catchCertificateType === 'uk' ? 'United Kingdom' : validatedPsCatches.issuingCountry?.officialCountryName,
+    productDescription: validatedPsCatches.productDescription
   }
 }
 
@@ -198,6 +199,7 @@ export function toDefraTradeSdProduct(validatedSdProducts: ISdPsQueryResult): ID
       overuseInfo: validatedSdProducts.overUsedInfo.some(_ => _ !== validatedSdProducts.documentNumber)
         ? validatedSdProducts.overUsedInfo.filter(_ => _ !== validatedSdProducts.documentNumber) : undefined
     },
+    issuingCountry: validatedSdProducts.catchCertificateType === 'uk' ? 'United Kingdom' : validatedSdProducts.issuingCountry?.officialCountryName,
     supportingDocuments: validatedSdProducts.supportingDocuments,
     productDescription: validatedSdProducts.productDescription,
     netWeightProductArrival: validatedSdProducts.netWeightProductArrival,

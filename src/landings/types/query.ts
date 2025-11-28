@@ -1,5 +1,5 @@
 import { model, Schema, Document } from 'mongoose';
-import { ICcQueryResult } from 'mmo-shared-reference-data';
+import { ICcQueryResult, ICountry } from 'mmo-shared-reference-data';
 
 
 const EmptySchema = new Schema({},{strict:false });
@@ -14,6 +14,7 @@ export interface ISdPsQueryResult {
   documentNumber: string;
   catchCertificateNumber?: string;
   catchCertificateType?: string;
+  issuingCountry?: ICountry;
   status: string;
   documentType: string;
   createdAt: string;

@@ -31,6 +31,8 @@ export interface IDynamicsProcessingStatementCatch {
     usedWeightAgainstCertificate: number;
     processedWeight: number;
     validation: IDynamicsProcessingStatementValidation;
+    issuingCountry: string;
+    productDescription: string;
 }
 
 export interface IDynamicsProcessingStatementValidation {
@@ -56,6 +58,7 @@ export interface IDynamicsStorageDocumentCase {
     requestedByAdmin: boolean;
     clonedFrom?: string;
     parentDocumentVoid?: boolean;
+    placeOfUnloading?: string;
 }
 
 export interface IDynamicsStorageDocumentProduct {
@@ -74,6 +77,7 @@ export interface IDynamicsStorageDocumentProduct {
     netWeightProductDeparture?: number,
     netWeightFisheryProductDeparture?: number,
     validation: IDynamicsStorageDocumentValidation;
+    issuingCountry: string;
 }
 
 export interface IDynamicsStorageDocumentValidation {

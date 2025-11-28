@@ -753,7 +753,9 @@ describe('when mapping from a mongo processing statement to domain PS', () => {
           "id": '323223323242315-1610018839',
           "totalWeightLanded": "2",
           "exportWeightBeforeProcessing": "2",
-          "exportWeightAfterProcessing": "2"
+          "exportWeightAfterProcessing": "2",
+          "productDescription": "Battered Cod",
+          "productCommodityCode": "03301661"
         },
         {
           "species": "Allardice's moray (AMA)",
@@ -763,7 +765,9 @@ describe('when mapping from a mongo processing statement to domain PS', () => {
           "id": '343243242321-1610018839',
           "totalWeightLanded": "5",
           "exportWeightBeforeProcessing": "5",
-          "exportWeightAfterProcessing": "5"
+          "exportWeightAfterProcessing": "5",
+          "productDescription": "Battered Cod",
+          "productCommodityCode": "03301661"
         }
       ],
       "validationErrors": [
@@ -810,8 +814,32 @@ describe('when mapping from a mongo processing statement to domain PS', () => {
       __t: "processingStatement",
       exportData: {
         catches: [
-          { catchCertificateNumber: '323223323242315', catchCertificateType: 'uk', species: 'Atlantic herring (HER)', scientificName: "Pseudophycis bachus", id: '323223323242315-1610018839', totalWeightLanded: "2", exportWeightBeforeProcessing: "2", exportWeightAfterProcessing: "2" },
-          { catchCertificateNumber: '343243242321', catchCertificateType: 'uk', species: 'Allardice\'s moray (AMA)', scientificName: "Allardice's moray", id: '343243242321-1610018839', totalWeightLanded: "5", exportWeightBeforeProcessing: "5", exportWeightAfterProcessing: "5" }
+          {
+            catchCertificateNumber: '323223323242315',
+            catchCertificateType: 'uk',
+            species: 'Atlantic herring (HER)',
+            scientificName: "Pseudophycis bachus",
+            id: '323223323242315-1610018839',
+            totalWeightLanded: "2",
+            exportWeightBeforeProcessing: "2",
+            exportWeightAfterProcessing: "2",
+            issuingCountry: undefined,
+            productDescription: "Battered Cod",
+            productCommodityCode: "03301661"
+          },
+          {
+            catchCertificateNumber: '343243242321',
+            catchCertificateType: 'uk',
+            species: 'Allardice\'s moray (AMA)',
+            scientificName: "Allardice's moray",
+            id: '343243242321-1610018839',
+            totalWeightLanded: "5",
+            exportWeightBeforeProcessing: "5",
+            exportWeightAfterProcessing: "5",
+            issuingCountry: undefined,
+            productDescription: "Battered Cod",
+            productCommodityCode: "03301661"
+          }
         ],
         exporterDetails: {
           postcode: "LE17 5QZ",
@@ -934,6 +962,7 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             netWeightFisheryProductDeparture: 999999.99,
             productDescription: "Sample product description",
             supportingDocuments: "sample document1, sample document2",
+            issuingCountry: undefined
           },
           {
             certificateNumber: '2',
@@ -950,6 +979,7 @@ describe('when mapping from a mongo storage document to domain SD', () => {
             netWeightFisheryProductDeparture: 999999.99,
             productDescription: undefined,
             supportingDocuments: undefined,
+            issuingCountry: undefined
           }
         ],
         exporterDetails: {

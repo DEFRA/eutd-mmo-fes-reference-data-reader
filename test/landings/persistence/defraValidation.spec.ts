@@ -148,6 +148,8 @@ describe('insertPsDefraValidationReport', () => {
     };
 
     await insertPsDefraValidationReport(report1);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    
     await insertPsDefraValidationReport(report2);
 
     const result: any = await DefraValidationReportData.find().lean();
@@ -226,6 +228,10 @@ describe('insertSdDefraValidationReport', () => {
     };
 
     await insertSdDefraValidationReport(report1);
+    
+    // Add a small delay to ensure different timestamps
+    await new Promise(resolve => setTimeout(resolve, 10));
+    
     await insertSdDefraValidationReport(report2);
 
     const result: any = await DefraValidationReportData.find().lean();
@@ -304,6 +310,10 @@ describe('insertCcDefraValidationReport', () => {
     };
 
     await insertCcDefraValidationReport(report1);
+    
+    // Add a small delay to ensure different timestamps
+    await new Promise(resolve => setTimeout(resolve, 10));
+    
     await insertCcDefraValidationReport(report2);
 
     const result: any = await DefraValidationReportData.find().lean();

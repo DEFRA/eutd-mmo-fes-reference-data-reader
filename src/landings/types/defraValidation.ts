@@ -63,6 +63,7 @@ export interface ProcessingStatementReportCatch {
     scientificName?: string;
     catchCertificateNumber: string;
     isDocumentIssuedInUK?: boolean;
+    issuingCountry?: string;
     totalWeightLanded: number;
     exportWeightBeforeProcessing: number;
     exportWeightAfterProcessing: number;

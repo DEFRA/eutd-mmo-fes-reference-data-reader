@@ -466,10 +466,12 @@ export function toPsCatch(validatedPsCatches: ISdPsQueryResult): IDynamicsProces
   }
 
   return {
+    id: validatedPsCatches.extended.id,
     foreignCatchCertificateNumber: validatedPsCatches.catchCertificateNumber,
     isDocumentIssuedInUK: validatedPsCatches.catchCertificateType === 'uk',
+    issuingCountry: validatedPsCatches.catchCertificateType === 'uk' ? 'United Kingdom' : validatedPsCatches.issuingCountry?.officialCountryName,
     species: toSpeciesCode(validatedPsCatches.species),
-    id: validatedPsCatches.extended.id,
+    productDescription: validatedPsCatches.productDescription,
     cnCode: validatedPsCatches.commodityCode,
     scientificName: validatedPsCatches.scientificName,
     importedWeight: validatedPsCatches.weightOnFCC,
@@ -574,7 +576,8 @@ export function toSdProduct(validatedSdProducts: ISdPsQueryResult): IDynamicsSto
       weightExceededAmount: validatedSdProducts.overAllocatedByWeight,
       overuseInfo: validatedSdProducts.overUsedInfo.some(_ => _ !== validatedSdProducts.documentNumber)
         ? validatedSdProducts.overUsedInfo.filter(_ => _ !== validatedSdProducts.documentNumber) : undefined
-    }
+    },
+    issuingCountry: validatedSdProducts.catchCertificateType === 'uk' ? 'United Kingdom' : validatedSdProducts.issuingCountry?.officialCountryName
   }
 }
 
@@ -601,7 +604,8 @@ export function toDynamicsSd(
     da: daLookUp(storageDocument.exportData.exporterDetails.postcode),
     _correlationId: correlationId,
     requestedByAdmin: storageDocument.requestByAdmin,
-    exportedTo: toExportedToPsSd(storageDocument)
+    exportedTo: storageDocument.exportData?.exportedTo ? toExportedToPsSd(storageDocument) : undefined,
+    placeOfUnloading: storageDocument.exportData?.arrivalTransportation?.placeOfUnloading
   };
 }
 
