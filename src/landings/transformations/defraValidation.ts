@@ -92,89 +92,89 @@ export function toPsPlant(processingStatement: IDocument): CertificatePlant {
 }
 
 export function toPsDefraReport(
-  documentNumber: string,
-  correlationId: string,
-  status: string,
-  requestByAdmin: boolean,
-  processingStatement?: IDocument
+   documentNumber: string,
+   correlationId: string,
+   status: string,
+   requestByAdmin: boolean,
+   processingStatement?: IDocument
 ): IDefraValidationProcessingStatement {
-  const result: IDefraValidationProcessingStatement = providePsResult(documentNumber, correlationId, status, requestByAdmin);
+   const result: IDefraValidationProcessingStatement = providePsResult(documentNumber, correlationId, status, requestByAdmin);
 
-  if (processingStatement) {
-    addAuditsToResult(result, processingStatement);
-    addCatchesToResult(result, processingStatement);
-    addPlantDetailsToResult(result, processingStatement);
-    addHealthCertificateToResult(result, processingStatement);
-    addConsignmentDetailsToResult(result, processingStatement);
-    addExporterDetailsToResult(result, processingStatement);
-    addAdditionalDetailsToResult(result, processingStatement);
-  }
+   if (processingStatement) {
+      addAuditsToResult(result, processingStatement);
+      addCatchesToResult(result, processingStatement);
+      addPlantDetailsToResult(result, processingStatement);
+      addHealthCertificateToResult(result, processingStatement);
+      addConsignmentDetailsToResult(result, processingStatement);
+      addExporterDetailsToResult(result, processingStatement);
+      addAdditionalDetailsToResult(result, processingStatement);
+   }
 
-  return result;
+   return result;
 }
 
 function addAuditsToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  if (processingStatement.audit && processingStatement.audit.length > 0) {
-    result.audits = processingStatement.audit.map(toDefraAudit);
-  }
+   if (processingStatement.audit && processingStatement.audit.length > 0) {
+      result.audits = processingStatement.audit.map(toDefraAudit);
+   }
 }
 
 function addCatchesToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  if (processingStatement.exportData.catches && processingStatement.exportData.catches.length > 0) {
-    result.catches = processingStatement.exportData.catches.map(toDefraPsCatch);
-  }
+   if (processingStatement.exportData.catches && processingStatement.exportData.catches.length > 0) {
+      result.catches = processingStatement.exportData.catches.map(toDefraPsCatch);
+   }
 }
 
 function addPlantDetailsToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  result.plant = toPsPlant(processingStatement);
+   result.plant = toPsPlant(processingStatement);
 }
 
 function addHealthCertificateToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  result.healthCertificate = {
-    number: processingStatement.exportData.healthCertificateNumber,
-    date: processingStatement.exportData.healthCertificateDate,
-  };
+   result.healthCertificate = {
+      number: processingStatement.exportData.healthCertificateNumber,
+      date: processingStatement.exportData.healthCertificateDate,
+   };
 }
 
 function addConsignmentDetailsToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  result.consignment = {
-    description: processingStatement.exportData.consignmentDescription,
-    personResponsible: processingStatement.exportData.personResponsibleForConsignment,
-  };
+   result.consignment = {
+      description: processingStatement.exportData.consignmentDescription,
+      personResponsible: processingStatement.exportData.personResponsibleForConsignment,
+   };
 }
 
 function addExporterDetailsToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  if (processingStatement.exportData.exporterDetails) {
-    result.exporterDetails = providePsExportDetails(processingStatement);
-    result.devolvedAuthority = daLookUp(processingStatement.exportData.exporterDetails.postcode);
+   if (processingStatement.exportData.exporterDetails) {
+      result.exporterDetails = providePsExportDetails(processingStatement);
+      result.devolvedAuthority = daLookUp(processingStatement.exportData.exporterDetails.postcode);
 
-    const userDetails = processingStatement.exportData.exporterDetails._dynamicsUser ?? {};
-    const { firstName, lastName } = userDetails;
+      const userDetails = processingStatement.exportData.exporterDetails._dynamicsUser ?? {};
+      const { firstName, lastName } = userDetails;
 
-    result.created = {
-      id: processingStatement.createdBy,
-      email: processingStatement.createdByEmail,
-      firstName,
-      lastName,
-    };
-  }
+      result.created = {
+         id: processingStatement.createdBy,
+         email: processingStatement.createdByEmail,
+         firstName,
+         lastName,
+      };
+   }
 }
 
 function addAdditionalDetailsToResult(result: IDefraValidationProcessingStatement, processingStatement: IDocument): void {
-  result.failedSubmissions = processingStatement.numberOfFailedAttempts || 0;
+   result.failedSubmissions = processingStatement.numberOfFailedAttempts || 0;
 
-  if (processingStatement.documentUri) {
-    result.documentUri = `${ApplicationConfig.prototype.externalAppUrl}/qr/export-certificates/${processingStatement.documentUri}`;
-  }
+   if (processingStatement.documentUri) {
+      result.documentUri = `${ApplicationConfig.prototype.externalAppUrl}/qr/export-certificates/${processingStatement.documentUri}`;
+   }
 
-  if (processingStatement.exportData) {
-    result.exportedTo = processingStatement.exportData.exportedTo;
-  }
+   if (processingStatement.exportData) {
+      result.exportedTo = processingStatement.exportData.exportedTo;
+   }
 
-  result.userReference = processingStatement.userReference;
-  result.dateCreated = processingStatement.createdAt;
-  result.clonedFrom = processingStatement.clonedFrom;
-  result.parentDocumentVoid = processingStatement.parentDocumentVoid;
+   result.userReference = processingStatement.userReference;
+   result.dateCreated = processingStatement.createdAt;
+   result.clonedFrom = processingStatement.clonedFrom;
+   result.parentDocumentVoid = processingStatement.parentDocumentVoid;
 }
 
 export function providePsResult(documentNumber, correlationId, status, requestByAdmin): IDefraValidationProcessingStatement {
@@ -247,7 +247,7 @@ function populateExportData(result: IDefraValidationStorageDocument, storageDocu
    }
 
    if (exportData) {
-    result.storageFacility = toDefraSdStorageFacility(exportData);
+      result.storageFacility = toDefraSdStorageFacility(exportData);
    }
 
    if (exportData.transportation) {
@@ -320,6 +320,7 @@ export function toDefraAudit(systemAudit: IAuditEvent): CertificateAudit {
 
 export function toDefraPsCatch(psCatch): ProcessingStatementReportCatch {
    psCatch.isDocumentIssuedInUK = (psCatch.catchCertificateType === "uk");
+   psCatch.issuingCountry = psCatch.catchCertificateType === "uk" ? "United Kingdom" : psCatch.issuingCountry?.officialCountryName;
    delete psCatch.catchCertificateType;
    return psCatch;
 }
@@ -531,8 +532,11 @@ export function toCatches(queryRes: ISdPsQueryResult[]): ProcessingStatementRepo
          hasWeightMismatch: row.isMismatch,
          importWeightExceededAmount: row.overAllocatedByWeight,
          cnCode: row.commodityCode,
-         isDocumentIssuedInUK: row.catchCertificateType === 'uk'
-      }
+         isDocumentIssuedInUK: row.catchCertificateType === 'uk',
+         issuingCountry: row.catchCertificateType === 'uk' 
+            ? 'United Kingdom' 
+            : row.issuingCountry?.officialCountryName
+      };
    });
 }
 

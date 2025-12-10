@@ -7741,10 +7741,24 @@ describe('Dynamics Validation', () => {
       expect(result.foreignCatchCertificateNumber).toEqual("PS2");
     });
 
-    it('will map the catchCertificateType', () => {
+    it('will map the catchCertificateType when issued in uk', () => {
       const result = toPsCatch(input);
 
       expect(result.isDocumentIssuedInUK).toBe(true);
+    });
+
+    it('will map the catchCertificateType when not issued in uk', () => {
+      input.catchCertificateType = "non_uk";
+      input.issuingCountry = {
+        officialCountryName: "Norway",
+        isoCodeAlpha2: "NO",
+        isoCodeAlpha3: "NOR",
+        isoNumericCode: "578"
+      }
+      const result = toPsCatch(input);
+
+      expect(result.isDocumentIssuedInUK).toBe(false);
+      expect(result.issuingCountry).toBe("Norway");
     });
 
     it('will map the species code', () => {
@@ -8365,10 +8379,24 @@ describe('Dynamics Validation', () => {
       expect(result.foreignCatchCertificateNumber).toEqual("SD2");
     });
 
-    it('will map the certificateType', () => {
+    it('will map the certificateType when issued in uk', () => {
       const result = toSdProduct(input);
 
       expect(result.isDocumentIssuedInUK).toEqual(true);
+    });
+
+    it('will map the catchCertificateType when not issued in uk', () => {
+      input.catchCertificateType = "non_uk";
+      input.issuingCountry = {
+        officialCountryName: "Norway",
+        isoCodeAlpha2: "NO",
+        isoCodeAlpha3: "NOR",
+        isoNumericCode: "578"
+      }
+      const result = toPsCatch(input);
+
+      expect(result.isDocumentIssuedInUK).toBe(false);
+      expect(result.issuingCountry).toBe("Norway");
     });
 
     it('will map the species code', () => {
@@ -8683,6 +8711,11 @@ describe('Dynamics Validation', () => {
         "transportation": {
           "vehicle": "truck",
           "cmr": true
+        },
+        "arrivalTransportation": {
+          "vehicle": "truck",
+          "placeOfUnloading": "Lagos",
+          "cmr": false
         }
       },
       "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf",
@@ -8831,6 +8864,12 @@ describe('Dynamics Validation', () => {
         isoCodeAlpha3: "NGA"
       });
     });
+
+    it('will include a place of unloading', () => {
+      const result = toDynamicsSd([input], exampleSd, correlationId);
+
+      expect(result.placeOfUnloading).toBe('Lagos');
+    })
 
   });
 

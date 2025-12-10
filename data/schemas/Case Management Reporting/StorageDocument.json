@@ -71,7 +71,8 @@
             "overuseInfo": [
               "GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "Nigeria"
         },
         {
           "foreignCatchCertificateNumber": "IRL-SD-4324-423423-234234",
@@ -89,9 +90,11 @@
           "validation": {
             "status": "Validation Success",
             "totalWeightExported": 300
-          }
+          },
+          "issuingCountry": "Nigeria"
         }
       ],
+      "placeOfUnloading": "Some Port in Nigeria",
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
       "requestedByAdmin": false
@@ -375,6 +378,10 @@
           "items": {
             "$ref": "#/definitions/productValidation"
           }
+        },
+        "issuingCountry": {
+          "type": "string",
+          "description": "Name of the country issuing the catch certificate"
         }
       },
       "required": [
@@ -485,6 +492,10 @@
           "type": "string"
         }
       }
+    },
+    "placeOfUnloading": {
+      "description": "Where the consignment was unloaded from when arriving in the UK",
+      "type": "string"
     },
     "da": {
       "type": "string"

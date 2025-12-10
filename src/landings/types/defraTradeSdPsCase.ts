@@ -19,6 +19,8 @@ export interface IDefraTradeProcessingStatementCatch {
   usedWeightAgainstCertificate: number;
   processedWeight: number;
   validation: IDefraTradeProcessingStatementValidation;
+  issuingCountry: string;
+  productDescription: string;
 }
 
 export interface IDefraTradeProcessingStatement {
@@ -61,6 +63,7 @@ export interface IDefraTradeStorageDocumentProduct {
   importedWeight: number;
   exportedWeight: number;
   validation: IDefraTradeStorageDocumentValidation;
+  issuingCountry: string;
   supportingDocuments?: string,
   productDescription?: string,
   netWeightProductArrival?: string,

@@ -59,6 +59,8 @@ export class ApplicationConfig {
 
   // sets eod default rules when going live for the first time
   public eodRulesMigration: boolean;
+  //EEZ max codes
+  public euCatchMaxEEZ: number;
 
   public static loadEnv(env: any): void {
     ApplicationConfig.prototype.basicAuthUser = env.REF_SERVICE_BASIC_AUTH_USER;
@@ -117,6 +119,7 @@ export class ApplicationConfig {
 
     // sets eod default rules when going live for the first time
     ApplicationConfig.prototype.eodRulesMigration = env.EOD_RULES_MIGRATION === 'true';
+    ApplicationConfig.prototype.euCatchMaxEEZ = parseInt(env.EU_CATCH_MAX_EEZ, 10) || 5;
   }
 
 }

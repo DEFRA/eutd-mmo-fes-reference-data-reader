@@ -4,9 +4,10 @@ import * as VesselController from '../../src/controllers/vessel';
 import * as DataCache from '../../src/data/cache';
 import { faoAreas } from '../../src/data/faoAreas';
 import moment from 'moment';
+import { ApplicationConfig } from '../../src/config';
 
 describe('uploadValidation.service', () => {
-
+  ApplicationConfig.loadEnv({ EU_CATCH_MAX_EEZ: '5' });
   const gearRecords = [
     {"Gear category":"Surrounding nets","Gear name":"Purse seines","Gear code":"PS"},
     {"Gear category":"Surrounding nets","Gear name":"Surrounding nets without purse lines","Gear code":"LA"},
@@ -324,6 +325,30 @@ describe('uploadValidation.service', () => {
 
     const landingLimitDaysInFuture = 7;
 
+    it('should return an error if the startDate is missing', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: undefined,
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual(['error.startDate.date.missing']);
+    });
+
+    it('should return an error if the startDate is empty', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '',
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual(['error.startDate.date.missing']);
+    });
+
     it('should return an error if the landingDate is missing', () => {
 
       const result = SUT.validateDateForLanding(
@@ -429,59 +454,110 @@ describe('uploadValidation.service', () => {
 
     });
 
-    it('should return  errors when landing dates are missing', () => {
-      const result = SUT.validateDateForLanding(
-        {
-          ...uploadedLanding,
-          startDate: '',
-          landingDate: '',
-        },
-        landingLimitDaysInFuture
-      );
+    describe('should return errors when landing dates are missing', () => {
+      it('should return error for missing landing date', () => {
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: '24/12/2020',
+            landingDate: undefined,
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
 
-      expect(result.errors).toStrictEqual([
-        'error.dateLanded.date.missing'
-      ]);
-    })
+        expect(result.errors).toStrictEqual([
+          'error.dateLanded.date.missing'
+        ]);
+      });
+      it('should return error for missing start date', () => {
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: undefined,
+            landingDate: '25/12/2020',
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
 
-    it('should return aggregated errors when dates are invalid', () => {
-      const result = SUT.validateDateForLanding(
-        {
-          ...uploadedLanding,
-          startDate: 'x',
-          landingDate: 'x',
-        },
-        landingLimitDaysInFuture
-      );
-
-      expect(result.errors).toStrictEqual([
-        'error.startDate.date.base',
-        'error.dateLanded.date.base'
-      ]);
-    })
-
-    it('should only validate landing date separate to start date optional', () => {
-      const result = SUT.validateDateForLanding(
-        {
-          ...uploadedLanding,
-          startDate: undefined,
-          landingDate: moment()
-            .add(landingLimitDaysInFuture + 1, 'days')
-            .format('DD/MM/YYYY'),
-        },
-        landingLimitDaysInFuture
-      );
-
-      expect(result.errors).toStrictEqual([
-        {
-          key: 'error.dateLanded.date.max',
-          params: [
-            landingLimitDaysInFuture
-          ]
-        }
-      ]);
-
+        expect(result.errors).toStrictEqual([
+          'error.startDate.date.missing'
+        ]);
+      });
     });
+
+    describe('should only validate landing date separate to start date', () => {
+      it('should validate future landing date when start date is provided', () => {
+        const futureDate = moment.utc().add(14, 'days').format('DD/MM/YYYY');
+        
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: '24/12/2020',
+            landingDate: futureDate,
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
+
+        expect(result.errors).toStrictEqual([
+          {
+            key: 'error.dateLanded.date.max',
+            params: [7],
+          }
+        ]);
+      });
+    });
+
+    it('should not return error when landing date is within future limit', () => {
+      const validFutureDate = moment.utc().add(landingLimitDaysInFuture - 1, 'days').format('DD/MM/YYYY');
+      
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: moment.utc().format('DD/MM/YYYY'),
+          landingDate: validFutureDate,
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should not return error when landing date is exactly at future limit', () => {
+      const limitDate = moment.utc().add(landingLimitDaysInFuture, 'days').format('DD/MM/YYYY');
+      
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: moment.utc().format('DD/MM/YYYY'),
+          landingDate: limitDate,
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should not return error when landing date is today', () => {
+      const today = moment.utc().format('DD/MM/YYYY');
+      
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: moment.utc().subtract(1, 'day').format('DD/MM/YYYY'),
+          landingDate: today,
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([]);
+    });
+
   });
 
   describe('validateExportWeightForLanding', () => {
@@ -715,6 +791,27 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toStrictEqual([]);
 
     });
+
+
+    it('should return error when vessel exists but license search fails', () => {
+    mockGetVesselData.mockReturnValue([
+      { registrationNumber: 'PD110', fishingVesselName: 'TEST' }
+    ]);
+    
+    mockVesselSearch.mockReturnValue([
+      { pln: 'DIFFERENT_PLN', vesselLength: 10 }
+    ]);
+
+    const result = SUT.validateVesselForLanding({
+      ...uploadedLanding,
+      vesselPln: 'PD110',
+      landingDate: '01/01/2020',
+      errors: []
+    });
+
+    expect(result.vessel).toBeUndefined();
+    expect(result.errors).toStrictEqual(['error.vesselPln.any.invalid']); 
+  });
 
     it('should populate the vessel information if validation is successful', () => {
 
@@ -965,6 +1062,13 @@ describe('uploadValidation.service', () => {
   });
 
   describe('validateGearCodeForLanding', () => {
+    it('should return an error when gear code is missing', () => {
+      const result = SUT.validateGearCodeForLanding({ errors: [], gearCode: undefined }, gearRecords);
+
+      expect(result.gearCategory).toBeUndefined();
+      expect(result.gearName).toBeUndefined();
+      expect(result.errors).toStrictEqual(['error.gearCode.any.missing']);
+    });
 
     it('should enrich the landing with gear details when gear code exists', () => {
       const result = SUT.validateGearCodeForLanding({ errors: [], gearCode: 'PS' }, gearRecords);
@@ -974,12 +1078,12 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toStrictEqual([]);
     });
 
-    it('should not enrich or return an error when gear code is not passed', () => {
+    it('should return an error when gear code is not passed', () => {
       const result = SUT.validateGearCodeForLanding({ errors: [] }, gearRecords);
 
       expect(result.gearCategory).toBeUndefined()
       expect(result.gearName).toBeUndefined();
-      expect(result.errors).toStrictEqual([]);
+      expect(result.errors).toStrictEqual(['error.gearCode.any.missing']);
     });
 
     it('should return an error when gear code is not valid', () => {
@@ -1001,6 +1105,8 @@ describe('uploadValidation.service', () => {
 
   describe('validateRfmoCodeForLanding', () => {
 
+    let mockGetRfmoRecords: jest.SpyInstance;
+
     beforeEach(() => {
       mockGetRfmoRecords = jest.spyOn(DataCache, 'getRfmos');
       mockGetRfmoRecords.mockReturnValue(rfmoRecords);
@@ -1017,19 +1123,53 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toStrictEqual([]);
     });
 
-    it('should not enrich or return an error when RFMO code is not passed', () => {
-      const result = SUT.validateRfmoCodeForLanding({ errors: [] });
-
-      expect(result.rfmoName).toBeUndefined()
-      expect(result.errors).toStrictEqual([]);
-    });
-
     it('should return an error when RFMO code does not exist', () => {
       const result = SUT.validateRfmoCodeForLanding({ errors: [], rfmoCode: 'ABC' });
 
       expect(result.rfmoName).toBeUndefined();
       expect(result.errors).toStrictEqual(['validation.rfmoCode.string.unknown']);
     });
+
+    it('should enrich landing with RFMO full text when valid code provided', () => {
+      const result = SUT.validateRfmoCodeForLanding({ 
+        errors: [], 
+        rfmoCode: 'NEAFC' 
+      });
+
+      expect(result.rfmoName).toEqual('North East Atlantic Fisheries Commission (NEAFC)');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should enrich landing with RFMO name when code is lowercase', () => {
+      const result = SUT.validateRfmoCodeForLanding({ 
+        errors: [], 
+        rfmoCode: 'gfcm' 
+      });
+
+      expect(result.rfmoName).toEqual('General Fisheries Commission for the Mediterranean (GFCM)');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should enrich landing with CCAMLR when code is valid', () => {
+      const result = SUT.validateRfmoCodeForLanding({ 
+        errors: [], 
+        rfmoCode: 'CCAMLR' 
+      });
+
+      expect(result.rfmoName).toEqual('Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)');
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should handle mixed case RFMO codes', () => {
+      const result = SUT.validateRfmoCodeForLanding({ 
+        errors: [], 
+        rfmoCode: 'NeAfC' 
+      });
+
+      expect(result.rfmoName).toEqual('North East Atlantic Fisheries Commission (NEAFC)');
+      expect(result.errors).toStrictEqual([]);
+    });
+
   });
 
   describe('validateEezCodeForLanding', () => {
@@ -1042,6 +1182,13 @@ describe('uploadValidation.service', () => {
     afterEach(() => {
       jest.restoreAllMocks();
     })
+
+    it('should return an error when EEZ code is missing when high seas is "no"', () => {
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: undefined, highSeasArea: 'no' });
+
+      expect(result.eezData).toBeUndefined();
+      expect(result.errors).toStrictEqual(['error.eezCode.any.missing']);
+    });
 
     it('should enrich the landing with the country name when EEZ code exists', () => {
       const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA' });
@@ -1104,11 +1251,11 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toStrictEqual([]);
     });
 
-    it('should not enrich or return an error when EEZ code is not passed', () => {
-      const result = SUT.validateEezCodeForLanding({ errors: [] });
+    it('should return an error when EEZ code is not passed when high seas is "no"', () => {
+      const result = SUT.validateEezCodeForLanding({ errors: [], highSeasArea: 'no' });
 
-      expect(result.eezName).toBeUndefined()
-      expect(result.errors).toStrictEqual([]);
+      expect(result.eezData).toBeUndefined();
+      expect(result.errors).toStrictEqual(['error.eezCode.any.missing']);
     });
 
     it('should return an error when EEZ code is not valid', () => {
@@ -1190,6 +1337,48 @@ describe('uploadValidation.service', () => {
         expect(result).toBe(true);
       });
 
+
+      it('should return an error when more than 5 EEZ codes are provided', () => {
+        const landing = {
+          eezCode: 'GB;FR;DE;IT;ES;PT',
+          errors: []
+        };
+
+        const result = SUT.validateEezCodeForLanding(landing);
+
+        expect(result.errors).toContain('validation.eezCode.string.max');
+      });
+
+  
+      it('zero (edge case for num >= 0)', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(0);
+        expect(result).toBe(true);
+      });
+
+      it('a very small positive number', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(0.01);
+        expect(result).toBe(true);
+      });
+
+      it('a large positive integer', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(999999);
+        expect(result).toBe(true);
+      });
+
+      it('a positive float with one decimal place', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(5.5);
+        expect(result).toBe(true);
+      });
+
+      it('a positive float with exactly two decimal places', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(10.99);
+        expect(result).toBe(true);
+      });
+
+      it('a positive float with trailing zeros (2.50)', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(2.50);
+        expect(result).toBe(true);
+      });
     });
 
     describe('returns false when given', () => {
@@ -1206,6 +1395,27 @@ describe('uploadValidation.service', () => {
 
       it('a float with more than two dp', () => {
         const result = SUT.isPositiveNumberWithTwoDecimals(1.111);
+        expect(result).toBe(false);
+      });
+
+      it('negative zero (JavaScript quirk)', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(-0);
+        // -0 is technically >= 0 in JavaScript, so should return true
+        expect(result).toBe(true);
+      });
+
+      it('a very small negative number (-0.01)', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(-0.01);
+        expect(result).toBe(false);
+      });
+
+      it('a large negative number', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(-999999);
+        expect(result).toBe(false);
+      });
+
+      it('a negative number with two valid decimals (-5.99)', () => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(-5.99);
         expect(result).toBe(false);
       });
 
@@ -1228,6 +1438,18 @@ describe('uploadValidation.service', () => {
       exportWeight: undefined,
       errors : []
     }
+
+    it('should return an error if the high seas area is missing', () => {
+      const result = SUT.validateHighSeasAreaForLanding(
+        {
+          ...uploadedLanding,
+          highSeasArea: undefined,
+          errors: []
+        }
+      );
+
+      expect(result.errors).toStrictEqual(['error.highSeasArea.any.missing']);
+    });
 
     it('should return an error if the high seas area is invalid', () => {
 
@@ -1266,7 +1488,7 @@ describe('uploadValidation.service', () => {
         }
       );
 
-      expect(result.errors).toStrictEqual([]);
+      expect(result.errors).toStrictEqual(['error.highSeasArea.any.missing']);
 
     });
   });

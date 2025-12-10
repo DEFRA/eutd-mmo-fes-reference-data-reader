@@ -2200,7 +2200,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
@@ -2215,7 +2217,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "validation": {
             "status": SdPsStatus.Overuse,
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
       "da": "Northern Ireland",
@@ -2276,12 +2280,19 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           {
             "catchCertificateNumber": "GBR-2023-CC-1975CB0F9",
             "catchCertificateType": "non_uk",
+            "issuingCountry": {
+              "officialCountryName": "France",
+              "isoCodeAlpha2": "FR",
+              "isoCodeAlpha3": "FRA",
+              "isoNumericCode": "250"
+            },
             "species": "Northern shortfin squid (SQI)",
             "speciesCode": "SQI",
             "id": "GBR-2023-CC-1975CB0F9-1692962600",
             "totalWeightLanded": "80",
             "exportWeightBeforeProcessing": "80",
             "exportWeightAfterProcessing": "80",
+            "productDescription": "Cod Fillets",
             "scientificName": "Illex illecebrosus",
             "_id": {
               "$oid": "64e88f2814ee5ab32f4a9278"
@@ -2424,7 +2435,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
@@ -2439,7 +2452,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "validation": {
             "status": SdPsStatus.Overuse,
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
       "da": "Northern Ireland",
@@ -2510,7 +2525,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalUsedWeightAgainstCertificate": 150,
             "weightExceededAmount": 0,
             "overuseInfo": undefined,
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
       "da": "Northern Ireland",
@@ -2534,11 +2551,10 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         "name": "Illegal Unreported and Unregulated (IUU) Fishing Team",
         "companyName": "Marine Management Organisation",
         "address": {
-          "line1": "Lancaster House, Hampshire Court",
-          "building_name": "Lancaster House",
-          "street_name": "Hampshire Court",
+          "line1": "Tyneside House",
+          "street_name": "Skinnerburn Rd",
           "city": "Newcastle upon Tyne",
-          "postCode": "NE4 7YJ",
+          "postCode": "NE4 7AR",
           "country": "United Kingdom"
         },
         "tel": "0300 123 1032",
@@ -2551,6 +2567,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       documentNumber: "GBR-2023-PS-6D2C91A0A",
       catchCertificateNumber: "PS2",
       catchCertificateType: "non_uk",
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       documentType: "PS",
       createdAt: "2020-01-01",
       status: "COMPLETE",
@@ -2561,6 +2583,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       weightOnAllDocs: 150,
       weightOnFCC: 200,
       weightAfterProcessing: 80,
+      productDescription: "Cod Fillets",
       isOverAllocated: false,
       overUsedInfo: [],
       isMismatch: false,
@@ -2593,6 +2616,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       documentNumber: "GBR-2023-PS-6D2C91A0A",
       catchCertificateNumber: "PS2",
       catchCertificateType: "non_uk",
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       documentType: "PS",
       createdAt: "2020-01-01",
       status: "BLOCKED",
@@ -2603,6 +2632,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       weightOnAllDocs: 150,
       weightOnFCC: 200,
       weightAfterProcessing: 80,
+      productDescription: "Cod Fillets",
       isOverAllocated: false,
       overUsedInfo: [],
       isMismatch: false,
@@ -2806,7 +2836,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
@@ -2821,7 +2853,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "validation": {
             "status": SdPsStatus.Overuse,
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
       "da": "Northern Ireland",
@@ -2892,7 +2926,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalUsedWeightAgainstCertificate": 150,
             "weightExceededAmount": 0,
             "overuseInfo": undefined,
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
       "da": "Northern Ireland",
@@ -2916,11 +2952,10 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         "name": "Illegal Unreported and Unregulated (IUU) Fishing Team",
         "companyName": "Marine Management Organisation",
         "address": {
-          "line1": "Lancaster House, Hampshire Court",
-          "building_name": "Lancaster House",
-          "street_name": "Hampshire Court",
+          "line1": "Tyneside House",
+          "street_name": "Skinnerburn Rd",
           "city": "Newcastle upon Tyne",
-          "postCode": "NE4 7YJ",
+          "postCode": "NE4 7AR",
           "country": "United Kingdom"
         },
         "tel": "0300 123 1032",
@@ -2933,6 +2968,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       documentNumber: "GBR-2023-PS-6D2C91A0A",
       catchCertificateNumber: "PS2",
       catchCertificateType: "non_uk",
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       documentType: "PS",
       createdAt: "2020-01-01",
       status: "COMPLETE",
@@ -2943,6 +2984,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       weightOnAllDocs: 150,
       weightOnFCC: 200,
       weightAfterProcessing: 80,
+      productDescription: "Cod Fillets",
       isOverAllocated: false,
       overUsedInfo: [],
       isMismatch: false,
@@ -2975,6 +3017,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       documentNumber: "GBR-2023-PS-6D2C91A0A",
       catchCertificateNumber: "PS2",
       catchCertificateType: "non_uk",
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       documentType: "PS",
       createdAt: "2020-01-01",
       status: "BLOCKED",
@@ -2985,6 +3033,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       weightOnAllDocs: 150,
       weightOnFCC: 200,
       weightAfterProcessing: 80,
+      productDescription: "Cod Fillets",
       isOverAllocated: false,
       overUsedInfo: [],
       isMismatch: false,
@@ -3150,7 +3199,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
@@ -3165,7 +3216,9 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "validation": {
             "status": SdPsStatus.Overuse,
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
       "da": "Northern Ireland",
@@ -3260,12 +3313,14 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 700,
             "weightExceededAmount": 200,
             "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
-      "requestedByAdmin": false
+      "requestedByAdmin": false,
+      "placeOfUnloading": "Dover"
     };
     const mapped: any = { _correlationId: 'some-uuid-correlation-id' };
 
@@ -3309,17 +3364,17 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           }
         ],
         "storageFacility": {
-            "facilityName": "name",
-            "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-            "facilityTownCity": "NEWCASTLE UPON TYNE",
-            "facilityPostcode": "NE4 7YH",
-            "facilitySubBuildingName": "MMO SUB",
-            "facilityBuildingNumber": "",
-            "facilityBuildingName": "LANCASTER HOUSE",
-            "facilityStreetName": "HAMPSHIRE COURT",
-            "facilityCounty": "TYNESIDE",
-            "facilityCountry": "ENGLAND",
-            "facilityArrivalDate": "05/09/2023"
+          "facilityName": "name",
+          "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
+          "facilityTownCity": "NEWCASTLE UPON TYNE",
+          "facilityPostcode": "NE4 7YH",
+          "facilitySubBuildingName": "MMO SUB",
+          "facilityBuildingNumber": "",
+          "facilityBuildingName": "LANCASTER HOUSE",
+          "facilityStreetName": "HAMPSHIRE COURT",
+          "facilityCounty": "TYNESIDE",
+          "facilityCountry": "ENGLAND",
+          "facilityArrivalDate": "05/09/2023"
         },
         "facilityName": "name",
         "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
@@ -3460,12 +3515,14 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 700,
             "weightExceededAmount": 200,
             "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
-      "requestedByAdmin": false
+      "requestedByAdmin": false,
+      "placeOfUnloading": "Dover"
     };
 
     const results: ISdPsQueryResult[] = [{
@@ -3477,6 +3534,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       species: 'Atlantic cod (COD)',
       scientificName: 'Gadus morhua',
       catchCertificateNumber: 'GBR-2023-CC-0123456789',
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       commodityCode: '03089090',
       weightOnDoc: 100,
       extended: {
@@ -3504,6 +3567,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       species: 'Atlantic cod (COD)',
       scientificName: 'Gadus morhua',
       catchCertificateNumber: 'GBR-2023-CC-0123456789',
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       commodityCode: '03089090',
       weightOnDoc: 100,
       extended: {
@@ -3579,7 +3648,8 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 400,
             "status": IDefraTradeSdPsStatus.Overuse,
             "weightExceededAmount": 300
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
@@ -3620,11 +3690,10 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         "name": "Illegal Unreported and Unregulated (IUU) Fishing Team",
         "companyName": "Marine Management Organisation",
         "address": {
-          "line1": "Lancaster House, Hampshire Court",
-          "building_name": "Lancaster House",
-          "street_name": "Hampshire Court",
+          "line1": "Tyneside House",
+          "street_name": "Skinnerburn Rd",
           "city": "Newcastle upon Tyne",
-          "postCode": "NE4 7YJ",
+          "postCode": "NE4 7AR",
           "country": "United Kingdom"
         },
         "tel": "0300 123 1032",
@@ -3785,18 +3854,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
           "departureDate": "17/10/2025",
           "placeOfUnloading": "Dover",
           "hasRoadTransportDocument": false
-        },
-        "facilityName": "name",
-        "facilityAddressOne": "MMO SUB, LANCASTER HOUSE, HAMPSHIRE COURT",
-        "facilityTownCity": "NEWCASTLE UPON TYNE",
-        "facilityPostcode": "NE4 7YH",
-        "facilitySubBuildingName": "MMO SUB",
-        "facilityBuildingNumber": "",
-        "facilityBuildingName": "LANCASTER HOUSE",
-        "facilityStreetName": "HAMPSHIRE COURT",
-        "facilityCounty": "TYNESIDE",
-        "facilityCountry": "ENGLAND",
-        "facilityArrivalDate": "05/09/2023"
+        }
       },
       "userReference": "some-reference",
       "documentUri": "_ab830758-1c18-4dad-b756-e3dc10fe7efa.pdf"
@@ -3859,12 +3917,14 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 700,
             "weightExceededAmount": 200,
             "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
-      "requestedByAdmin": false
+      "requestedByAdmin": false,
+      "placeOfUnloading": "Dover"
     };
 
     const results: ISdPsQueryResult[] = [{
@@ -3876,6 +3936,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       species: 'Atlantic cod (COD)',
       scientificName: 'Gadus morhua',
       catchCertificateNumber: 'GBR-2023-CC-0123456789',
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       commodityCode: '03089090',
       weightOnDoc: 100,
       extended: {
@@ -3903,6 +3969,12 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       species: 'Atlantic cod (COD)',
       scientificName: 'Gadus morhua',
       catchCertificateNumber: 'GBR-2023-CC-0123456789',
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      },
       commodityCode: '03089090',
       weightOnDoc: 100,
       extended: {
@@ -3978,7 +4050,8 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 400,
             "status": IDefraTradeSdPsStatus.Overuse,
             "weightExceededAmount": 300
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
@@ -4019,11 +4092,10 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         "name": "Illegal Unreported and Unregulated (IUU) Fishing Team",
         "companyName": "Marine Management Organisation",
         "address": {
-          "line1": "Lancaster House, Hampshire Court",
-          "building_name": "Lancaster House",
-          "street_name": "Hampshire Court",
+          "line1": "Tyneside House",
+          "street_name": "Skinnerburn Rd",
           "city": "Newcastle upon Tyne",
-          "postCode": "NE4 7YJ",
+          "postCode": "NE4 7AR",
           "country": "United Kingdom"
         },
         "tel": "0300 123 1032",
@@ -4197,12 +4269,14 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
             "totalWeightExported": 700,
             "weightExceededAmount": 200,
             "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
-      "requestedByAdmin": false
+      "requestedByAdmin": false,
+      "placeOfUnloading": "Dover"
     };
 
     const expected: ServiceBusMessage = {
@@ -4936,7 +5010,9 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
@@ -4951,7 +5027,9 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
           "validation": {
             "status": SdPsStatus.Overuse,
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
 
@@ -5022,7 +5100,9 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
             "overuseInfo": [
               "GBR-PS-123234-123-234”,”GBR-PS-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         },
         {
           "foreignCatchCertificateNumber": "IRL-PS-4324-423423-234234",
@@ -5036,7 +5116,9 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
           "validation": {
             "status": SdPsStatus.Overuse,
             "totalUsedWeightAgainstCertificate": 200
-          }
+          },
+          "issuingCountry": "France",
+          "productDescription": "Cod Fillets"
         }
       ],
 
@@ -5146,12 +5228,14 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
             "totalWeightExported": 700,
             "weightExceededAmount": 200,
             "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
-      "requestedByAdmin": false
+      "requestedByAdmin": false,
+      "placeOfUnloading": "Dover"
     };
 
     const sdCaseExpected: IDynamicsStorageDocumentCase = {
@@ -5211,7 +5295,8 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
             "totalWeightExported": 700,
             "weightExceededAmount": 200,
             "overuseInfo": ["GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"]
-          }
+          },
+          "issuingCountry": "France"
         }
       ],
       "da": "Northern Ireland",
@@ -5233,6 +5318,7 @@ describe('azureTradeQueueEnabled feature flag turned off', () => {
       weightOnAllDocs: 150,
       weightOnFCC: 200,
       weightAfterProcessing: 80,
+      productDescription: "Cod Fillets",
       isOverAllocated: false,
       overUsedInfo: [],
       isMismatch: false,

@@ -71,7 +71,8 @@
             "overuseInfo": [
               "GBR-SD-123234-123-234”,”GBR-SD-123234-123-234"
             ]
-          }
+          },
+          "issuingCountry": "Nigeria"
         },
         {
           "id": "some-product-id-2",
@@ -483,10 +484,11 @@
           "description": "Description of the product added to the consignment"
         },
         "validation": {
-          "type": "object",
-          "items": {
-            "$ref": "#/definitions/productValidation"
-          }
+          "$ref": "#/definitions/productValidation"
+        },
+        "issuingCountry": {
+          "type": "string",
+          "description": "Name of the country issuing the catch certificate"
         }
       },
       "required": [
@@ -496,7 +498,8 @@
         "cnCode",
         "importedWeight",
         "exportedWeight",
-        "validation"
+        "validation",
+        "issuingCountry"
       ],
       "additionalProperties": false
     },
@@ -659,6 +662,12 @@
           "type": "string"
         },
         "airwaybillNumber": {
+          "type": "string"
+        },
+        "billNumber": {
+          "type": "string"
+        },
+        "flightNumber": {
           "type": "string"
         },
         "countryofDeparture": {

@@ -15,7 +15,8 @@ import { IVessel } from "../interfaces/vessels.interfaces";
 import { pipe } from "../utils/functions";
 import { GearRecord } from "../interfaces/gearTypes.interface";
 import { equalsIgnoreCase } from "../utils/string";
-
+import { ICountry } from "mmo-shared-reference-data";
+import ApplicationConfig from "../config";
 const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
 const isoCountryCodeRegex = /^[A-Z]{2,3}$/;
 
@@ -53,34 +54,61 @@ export const initialiseErrorsForLanding = (landing: IUploadedLanding): IUploaded
   return landing;
 }
 
-export const validateDateForLanding = (landing: IUploadedLanding, landingLimitDaysInFuture: number): IUploadedLanding => {
-  const { errors } = landing;
-  const startDate = landing.startDate ? moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true) : null;
-  const landingDate = landing.landingDate ? moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true) : null;
-
-   // only validate the start date if set
-   if (startDate && !startDate.isValid()) {
-    errors.push('error.startDate.date.base');
+/**
+ * Validates landing and start dates against business rules
+ * @param landing - Uploaded landing data
+ * @param landingLimitDaysInFuture - Max days in future for landing date
+ * @returns Landing object with validation errors
+ */
+export const validateDateForLanding = (
+  landing: IUploadedLanding,
+  landingLimitDaysInFuture: number
+): IUploadedLanding => {
+  // Validate start date exists
+  if (!landing.startDate) {
+    landing.errors.push('error.startDate.date.missing');
+    return landing;
   }
 
-  if (!landingDate) {
-    errors.push('error.dateLanded.date.missing');
-  } else if (!landingDate.isValid()) {
-    errors.push('error.dateLanded.date.base');
-  } else if (startDate?.isValid() && landingDate.isBefore(startDate, 'day')) {
-    errors.push('error.startDate.date.max');
-  } else {
-    const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
-    if (landingDate.utc() > maxValidDate) {
-      errors.push({
-        key: 'error.dateLanded.date.max',
-        params: [landingLimitDaysInFuture],
-      })
-    }
+  const startDate = moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
+
+  // Validate start date format
+  if (!startDate.isValid()) {
+    landing.errors.push('error.startDate.date.base');
+    return landing;
+  }
+
+  // Validate landing date exists
+  if (!landing.landingDate) {
+    landing.errors.push('error.dateLanded.date.missing');
+    return landing;
+  }
+
+  const landingDate = moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
+
+  // Validate landing date format
+  if (!landingDate.isValid()) {
+    landing.errors.push('error.dateLanded.date.base');
+    return landing;
+  }
+
+  // Validate landing date is not before start date
+  if (landingDate.isBefore(startDate, 'day')) {
+    landing.errors.push('error.startDate.date.max');
+    return landing;
+  }
+
+  // Validate landing date is not too far in future
+  const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
+  if (landingDate.utc().isAfter(maxValidDate)) {
+    landing.errors.push({
+      key: 'error.dateLanded.date.max',
+      params: [landingLimitDaysInFuture],
+    });
   }
 
   return landing;
-}
+};
 
 export const validateExportWeightForLanding = (landing: IUploadedLanding): IUploadedLanding => {
   if (!landing.exportWeight) {
@@ -107,7 +135,6 @@ export const validateFaoAreaForLanding = (landing: IUploadedLanding): IUploadedL
 }
 
 export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLanding => {
-
   if (!landing.vesselPln) {
     landing.errors.push('error.vesselPln.any.missing');
     return landing;
@@ -134,11 +161,9 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
   }
 
   return landing;
-
 }
 
 export const validateProductForLanding = (landing: IUploadedLanding, products: IProduct[], seasonalRestrictions: ISeasonalFishPeriod[]): IUploadedLanding => {
-
   if (!landing.productId) {
     landing.errors.push("error.product.any.missing");
     return landing;
@@ -196,12 +221,14 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
   }
 
   return landing;
-
 }
 
 export const validateGearCodeForLanding = (landing: IUploadedLanding, gearRecords: GearRecord[]): IUploadedLanding => {
-  if (!landing.gearCode) return landing;
-
+  // Gear code is now required
+  if (!landing.gearCode) {
+    landing.errors.push('error.gearCode.any.missing');
+    return landing;
+  }
   if (!gearCodeRegex.test(landing.gearCode)) {
     landing.errors.push('validation.gearCode.string.invalid');
   } else {
@@ -218,18 +245,23 @@ export const validateGearCodeForLanding = (landing: IUploadedLanding, gearRecord
 }
 
 export const validateHighSeasAreaForLanding = (landing: IUploadedLanding): IUploadedLanding => {
-  if (landing.highSeasArea && ["yes", "no"].indexOf(landing.highSeasArea.toLowerCase()) === -1) {
+  if (!landing.highSeasArea) {
+    landing.errors.push('error.highSeasArea.any.missing');
+    return landing;
+  }
+
+  const normalizedValue = landing.highSeasArea.toLowerCase();
+  
+  if (!["yes", "no"].includes(normalizedValue)) {
     landing.errors.push('error.highSeasArea.any.invalid');
   }
 
-  landing.highSeasArea = landing.highSeasArea?.toLowerCase();
-
+  landing.highSeasArea = normalizedValue;
   return landing;
-}
+};
 
 export const validateRfmoCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {
   if (!landing.rfmoCode) return landing;
-
   const rfmoRecord = getRfmos()?.find(r => equalsIgnoreCase(landing.rfmoCode, r['Abbreviation']));
   if (!rfmoRecord) {
     landing.errors.push('validation.rfmoCode.string.unknown');
@@ -240,38 +272,124 @@ export const validateRfmoCodeForLanding = (landing: IUploadedLanding): IUploaded
   return landing;
 }
 
-export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {
-  if (!landing.eezCode) return landing;
+// ========================================
+// EEZ Validation Helper Functions
+// (Cognitive complexity reduction - each ≤3)
+// ========================================
 
-  const codes = landing.eezCode.split(';')
+/**
+ * Parses semicolon-separated EEZ codes into normalized array
+ * @param eezCode - Raw EEZ code string (e.g., "FR;GB;NLD")
+ * @returns Array of uppercase, trimmed codes
+ */
+const parseEezCodes = (eezCode: string): string[] => {
+  return eezCode
+    .split(';')
     .map(c => c.trim().toUpperCase())
     .filter(c => c);
-  const validCodes = [...new Set(codes.filter(c => isoCountryCodeRegex.test(c)))];
+};
 
-  if (!validCodes.length || validCodes.length !== codes.length) {
-    landing.errors.push('validation.eezCode.string.invalid');
-  } else {
-    const getEezNameByCode = (code: string) => getCountries()?.
-      find(c => equalsIgnoreCase(code, c.isoCodeAlpha3) || equalsIgnoreCase(code, c.isoCodeAlpha2));
-    const eezDataArr = validCodes.map(getEezNameByCode);
-    const eezNames = eezDataArr.map((eezData) => eezData?.officialCountryName).filter((eez) => eez);
-    if (new Set(eezNames).size !== eezNames.length) {
-      // detect duplicate codes e.g. FR;FRA
-      landing.errors.push('validation.eezCode.string.invalid');
-    } else if (validCodes.length !== eezNames.length) {
-      landing.errors.push('validation.eezCode.string.unknown');
-    } else {
-      landing.eezData = eezDataArr;
-    }
+/**
+ * Validates all codes match ISO format and are unique
+ * @param codes - Array of EEZ codes
+ * @returns Array of unique valid codes
+ */
+const validateEezCodeFormat = (codes: string[]): string[] => {
+  const validCodes = codes.filter(c => isoCountryCodeRegex.test(c));
+  return [...new Set(validCodes)];
+};
+
+/**
+ * Finds country by 2-char or 3-char ISO code
+ * @param code - ISO country code (e.g., "FR" or "FRA")
+ * @returns Country object or undefined
+ */
+const findCountryByCode = (code: string): ICountry | undefined => {
+  return getCountries()?.find(
+    c => equalsIgnoreCase(code, c.isoCodeAlpha3) || equalsIgnoreCase(code, c.isoCodeAlpha2)
+  );
+};
+
+/**
+ * Checks for duplicate countries referenced by different ISO codes
+ * @param eezDataArr - Array of country objects (may contain undefined)
+ * @returns true if duplicates found (e.g., "FR" and "FRA" both present)
+ */
+const hasDuplicateCountries = (eezDataArr: Array<ICountry | undefined>): boolean => {
+  const countryNames = eezDataArr
+    .map(eezData => eezData?.officialCountryName)
+    .filter((name): name is string => name !== undefined);
+  
+  return new Set(countryNames).size !== countryNames.length;
+};
+
+/**
+ * Validates EEZ code field with format and existence checks
+ * Required field as of business rule update
+ * @param landing - Uploaded landing data
+ * @returns Landing with enriched eezData or validation errors
+ */
+export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {  
+  // EEZ code is now required only if high seas is "no"
+  if(!landing.eezCode && landing.highSeasArea === 'yes') return landing;
+  if ((!landing.eezCode || landing.eezCode.trim() === '') && landing.highSeasArea === 'no') {
+    landing.errors.push('error.eezCode.any.missing');
+    return landing;
   }
 
-  return landing;
-}
+  const codes = parseEezCodes(landing.eezCode);
+  const validCodes = validateEezCodeFormat(codes);
+  if (codes.length > ApplicationConfig.euCatchMaxEEZ) {
+     landing.errors.push('validation.eezCode.string.max');
+  }
+  // Validate code format (must be valid ISO codes)
+  if (!validCodes.length || validCodes.length !== codes.length) {
+    landing.errors.push('validation.eezCode.string.invalid');
+    return landing;
+  }
 
-export const isPositiveNumberWithTwoDecimals = (num: number) => {
-  const regex = /^(\d+(\.\d{0,2})?|\.?\d{1,2})$/;
-  return !isNaN(+num) && +num >= 0 && regex.test(''+num);
-}
+  // Find countries by codes
+  const eezDataArr = validCodes.map(findCountryByCode);
+
+  // Check for duplicate countries (e.g., FR and FRA both used)
+  if (hasDuplicateCountries(eezDataArr)) {
+    landing.errors.push('validation.eezCode.string.invalid');
+    return landing;
+  }
+
+  // Check all codes resolve to valid countries
+  const eezNames = eezDataArr.filter((data): data is ICountry => data !== undefined);
+  
+  if (validCodes.length !== eezNames.length) {
+    landing.errors.push('validation.eezCode.string.unknown');
+    return landing;
+  }
+
+  // All validations passed - enrich landing with EEZ data
+  landing.eezData = eezNames;
+
+  return landing;
+};
+
+// ========================================
+// Utility Functions
+// ========================================
+
+export const isPositiveNumberWithTwoDecimals = (num: number): boolean => {
+  if (isNaN(num) || num < 0) {
+    return false;
+  }
+  
+  // Safer: Check decimal places by converting to string
+  const numStr = num.toString();
+  const decimalIndex = numStr.indexOf('.');
+  
+  if (decimalIndex === -1) {
+    return true; // No decimals
+  }
+  
+  return numStr.length - decimalIndex - 1 <= 2; // Max 2 decimal places
+};
 
 const isFavouriteValid = (favouriteProduct: IProduct, commodityCodes: ICommodityCode[]): boolean =>
   commodityCodes.some(

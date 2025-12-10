@@ -91,7 +91,8 @@
           "isOverUse": true,
           "hasWeightMismatch": true,
           "importWeightExceededAmount": 50,
-          "isDocumentIssuedInUK": true
+          "isDocumentIssuedInUK": true,
+          "issuingCountry": "United Kingdom"
         }
       ],
       "consignment": {
@@ -129,7 +130,20 @@
       "lastUpdated": "2019-01-01 05:05:05",
       "status": "DRAFT",
       "_correlationId": "c03483ba-86ed-49be-ba9d-695ea27b3951",
-      "requestedByAdmin": false
+      "catches": [
+        {
+          "species": "Atlantic Salmon (SAL)",
+          "scientificName": "Salmo salar",
+          "catchCertificateNumber": "IRL-PS-4324-423423-234234",
+          "totalWeightLanded": 500,
+          "exportWeightBeforeProcessing": 450,
+          "exportWeightAfterProcessing": 400,
+          "isOverUse": false,
+          "hasWeightMismatch": false,
+          "isDocumentIssuedInUK": false,
+          "issuingCountry": "France"
+        }
+      ]
     }
   ],
   "required": [
@@ -147,7 +161,11 @@
       "properties": {
         "auditOperation": {
           "type": "string",
-          "enum": ["INVESTIGATED", "VOIDED", "PREAPPROVED"]
+          "enum": [
+            "INVESTIGATED",
+            "VOIDED",
+            "PREAPPROVED"
+          ]
         },
         "investigationStatus": {
           "type": "string",
@@ -168,7 +186,11 @@
           "type": "string"
         }
       },
-      "required": ["auditOperation", "user", "auditAt"]
+      "required": [
+        "auditOperation",
+        "user",
+        "auditAt"
+      ]
     },
     "address": {
       "type": "object",
@@ -177,22 +199,40 @@
           "type": "string"
         },
         "sub_building_name": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "building_number": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "building_name": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "street_name": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "county": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "country": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "city": {
           "type": "string"
@@ -201,7 +241,11 @@
           "type": "string"
         }
       },
-      "required": ["line1", "city", "postCode"]
+      "required": [
+        "line1",
+        "city",
+        "postCode"
+      ]
     },
     "dynamicsAddress": {
       "type": "object",
@@ -210,13 +254,19 @@
           "type": "string"
         },
         "defra_buildingname": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_county": {
           "type": "string"
         },
         "defra_dependentlocality": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_fromcompanieshouse": {
           "type": "boolean"
@@ -225,10 +275,16 @@
           "type": "string"
         },
         "defra_internationalpostalcode": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_locality": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_postcode": {
           "type": "string"
@@ -240,13 +296,19 @@
           "type": "string"
         },
         "defra_subbuildingname": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "defra_towntext": {
           "type": "string"
         },
         "defra_uprn": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "_defra_country_value": {
           "type": "string"
@@ -306,6 +368,10 @@
         "isDocumentIssuedInUK": {
           "type": "boolean",
           "description": "Flag to identify whether the certificate was issued in the UK"
+        },
+        "issuingCountry": {
+          "type": "string",
+          "description": "The country that issued the catch certificate. Set to 'United Kingdom' when isDocumentIssuedInUK is true, otherwise populated from user input"
         }
       },
       "required": [
@@ -336,7 +402,10 @@
     },
     "created": {
       "type": "object",
-      "required": ["id", "email"],
+      "required": [
+        "id",
+        "email"
+      ],
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -355,7 +424,13 @@
     },
     "status": {
       "type": "string",
-      "enum": ["DRAFT", "VOID", "COMPLETE", "BLOCKED", "DELETED"]
+      "enum": [
+        "DRAFT",
+        "VOID",
+        "COMPLETE",
+        "BLOCKED",
+        "DELETED"
+      ]
     },
     "userReference": {
       "type": "string"
@@ -420,7 +495,10 @@
     },
     "consignment": {
       "type": "object",
-      "required": ["description", "personResponsible"],
+      "required": [
+        "description",
+        "personResponsible"
+      ],
       "additionalProperties": false,
       "properties": {
         "description": {
@@ -433,7 +511,10 @@
     },
     "healthCertificate": {
       "type": "object",
-      "required": ["number", "date"],
+      "required": [
+        "number",
+        "date"
+      ],
       "additionalProperties": false,
       "properties": {
         "number": {
@@ -446,7 +527,12 @@
     },
     "plant": {
       "type": "object",
-      "required": ["approvalNumber", "name", "address", "dateOfAcceptance"],
+      "required": [
+        "approvalNumber",
+        "name",
+        "address",
+        "dateOfAcceptance"
+      ],
       "additionalProperties": false,
       "properties": {
         "approvalNumber": {

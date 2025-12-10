@@ -346,22 +346,10 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "licenceHolder": "C & J SHELLFISH LTD",
         "speciesAlias": "N",
         "weight": 89,
+        "gearType": "Type 1",
         "highSeasArea": "Yes",
         "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-        "exclusiveEconomicZones": [
-          {
-            "officialCountryName": "Nigeria",
-            "isoCodeAlpha2": "NG",
-            "isoCodeAlpha3": "NGA",
-            "isoNumericCode": "566"
-          },
-          {
-            "officialCountryName": "France",
-            "isoCodeAlpha2": "FR",
-            "isoCodeAlpha3": "FRA",
-            "isoNumericCode": "250"
-          }
-        ],
+        "exclusiveEconomicZones": "Nigeria,France",
         "numberOfTotalSubmissions": 1,
         "vesselOverriddenByAdmin": false,
         "speciesOverriddenByAdmin": false,
@@ -1617,11 +1605,10 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
       name: "Illegal Unreported and Unregulated (IUU) Fishing Team",
       companyName: "Marine Management Organisation",
       address: {
-        line1: "Lancaster House, Hampshire Court",
-        building_name: "Lancaster House",
-        street_name: "Hampshire Court",
+        line1: "Tyneside House",
+        street_name: "Skinnerburn Rd",
         city: "Newcastle upon Tyne",
-        postCode: "NE4 7YJ",
+        postCode: "NE4 7AR",
         country: "United Kingdom"
       },
       tel: "0300 123 1032",
@@ -1688,7 +1675,8 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
       "netWeightProductDeparture": undefined,
       "netWeightFisheryProductDeparture": undefined,
       "productDescription": undefined,
-      "supportingDocuments": undefined
+      "supportingDocuments": undefined,
+      "issuingCountry": undefined,
     };
 
     expect(result.products?.[0]).toStrictEqual(expected);

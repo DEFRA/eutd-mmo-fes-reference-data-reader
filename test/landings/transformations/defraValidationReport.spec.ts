@@ -157,6 +157,8 @@ describe('For processing statements', () => {
         species: "Atlantic herring (HER)",
         scientificName: "Clupea harengus",
         catchCertificateNumber: "IT-23423-423-42342",
+        catchCertificateType: "foreign",
+        issuingCountry: { officialCountryName: "France" },
         totalWeightLanded: 10,
         exportWeightBeforeProcessing: 20,
         exportWeightAfterProcessing: 30
@@ -167,6 +169,7 @@ describe('For processing statements', () => {
         scientificName: "Clupea harengus",
         catchCertificateNumber: "IT-23423-423-42342",
         isDocumentIssuedInUK: false,
+        issuingCountry: "France" ,
         totalWeightLanded: 10,
         exportWeightBeforeProcessing: 20,
         exportWeightAfterProcessing: 30,
@@ -194,6 +197,7 @@ describe('For processing statements', () => {
         scientificName: "Clupea harengus",
         catchCertificateNumber: "IT-23423-423-42342",
         isDocumentIssuedInUK: true,
+        issuingCountry: "United Kingdom",
         totalWeightLanded: 10,
         exportWeightBeforeProcessing: 20,
         exportWeightAfterProcessing: 30,
@@ -2191,6 +2195,107 @@ describe('toCatches', () => {
       importWeightExceededAmount: 0,
       cnCode: "FRESHCOD",
       isDocumentIssuedInUK: false
+    }]);
+
+  });
+
+  it('should map ISdpsQueryResult with issuingCountry as non-uk', () => {
+
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "PS2",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 80,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SDHSADJHSDHASDSD-1610018839',
+      },
+      issuingCountry: {
+        officialCountryName: "France",
+        isoCodeAlpha2: "FR",
+        isoCodeAlpha3: "FRA",
+        isoNumericCode: "250"
+      }
+    };
+
+    const result = toCatches([input]);
+
+    expect(result).toEqual([{
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      catchCertificateNumber: "PS2",
+      totalWeightLanded: 200,
+      exportWeightBeforeProcessing: 100,
+      exportWeightAfterProcessing: 80,
+      isOverUse: false,
+      hasWeightMismatch: false,
+      importWeightExceededAmount: 0,
+      cnCode: "FRESHCOD",
+      isDocumentIssuedInUK: false,
+      issuingCountry: "France"
+    }]);
+
+  });
+
+  it('should map ISdpsQueryResult with issuingCountry as UK', () => {
+
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "PS2",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 80,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SDHSADJHSDHASDSD-1610018839',
+      },
+      catchCertificateType: 'uk',
+      issuingCountry: {
+        officialCountryName: "United Kingdom",
+        isoCodeAlpha2: "GB",
+        isoCodeAlpha3: "GBR",
+        isoNumericCode: "826"
+      }
+    };
+
+    const result = toCatches([input]);
+
+    expect(result).toEqual([{
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      catchCertificateNumber: "PS2",
+      totalWeightLanded: 200,
+      exportWeightBeforeProcessing: 100,
+      exportWeightAfterProcessing: 80,
+      isOverUse: false,
+      hasWeightMismatch: false,
+      importWeightExceededAmount: 0,
+      cnCode: "FRESHCOD",
+      isDocumentIssuedInUK: true,
+      issuingCountry: "United Kingdom"
     }]);
 
   });

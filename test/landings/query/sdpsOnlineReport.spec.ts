@@ -42,7 +42,7 @@ describe('tests on the foreign catch certificate online report output', () => {
       ],
       rawData: [{
         catchCertificateNumber: "FCC051",
-        commodityCode: "N/A",
+        commodityCode: undefined,
         createdAt: "2019-01-01T00:00:00.000Z",
         da: "England",
         documentNumber: "12345",
@@ -202,7 +202,7 @@ describe('tests on the foreign catch certificate online report output', () => {
             ],
             rawData: [{
               catchCertificateNumber: "FCC051",
-              commodityCode: "N/A",
+              commodityCode: undefined,
               createdAt: "2019-01-01T00:00:00.000Z",
               da: "England",
               documentNumber: "12345",
@@ -229,7 +229,7 @@ describe('tests on the foreign catch certificate online report output', () => {
             },
             {
               catchCertificateNumber: "FCC052",
-              commodityCode: "N/A",
+              commodityCode: undefined,
               createdAt: "2019-01-01T00:00:00.000Z",
               da: "England",
               documentNumber: "12345",
@@ -302,7 +302,8 @@ describe('tests on the foreign catch certificate online report output', () => {
         rawData: [{
           catchCertificateNumber: "FCC051",
           catchCertificateType: 'uk',
-          commodityCode: "N/A",
+          issuingCountry: undefined,
+          commodityCode: undefined,
           createdAt: "2019-01-01T00:00:00.000Z",
           da: "England",
           documentNumber: "12345",
@@ -329,7 +330,8 @@ describe('tests on the foreign catch certificate online report output', () => {
         {
           catchCertificateNumber: "FCC051",
           catchCertificateType: 'uk',
-          commodityCode: "N/A",
+          issuingCountry: undefined,
+          commodityCode: undefined,
           createdAt: "2019-01-01T00:00:00.000Z",
           da: "England",
           documentNumber: "12345",
@@ -356,7 +358,8 @@ describe('tests on the foreign catch certificate online report output', () => {
         {
           catchCertificateNumber: "FCC052",
           catchCertificateType: 'uk',
-          commodityCode: "N/A",
+          issuingCountry: undefined,
+          commodityCode: undefined,
           createdAt: "2019-01-01T00:00:00.000Z",
           da: "England",
           documentNumber: "12345",
@@ -383,7 +386,8 @@ describe('tests on the foreign catch certificate online report output', () => {
         {
           catchCertificateNumber: "FCC051",
           catchCertificateType: 'uk',
-          commodityCode: "N/A",
+          issuingCountry: undefined,
+          commodityCode: undefined,
           createdAt: "2019-01-01T10:00:00.000Z",
           da: "England",
           documentNumber: "12345",
@@ -410,7 +414,8 @@ describe('tests on the foreign catch certificate online report output', () => {
         {
           catchCertificateNumber: "FCC053",
           catchCertificateType: 'uk',
-          commodityCode: "N/A",
+          issuingCountry: undefined,
+          commodityCode: undefined,
           createdAt: "2019-01-01T10:00:00.000Z",
           da: "England",
           documentNumber: "12345",
@@ -437,6 +442,7 @@ describe('tests on the foreign catch certificate online report output', () => {
         {
           catchCertificateNumber: "FCC051",
           catchCertificateType: 'uk',
+          issuingCountry: undefined,
           commodityCode: "CC",
           createdAt: "2019-01-01T12:00:00.000Z",
           da: "England",
@@ -526,7 +532,8 @@ describe('tests on the foreign catch certificate online report output', () => {
           rawData: [{
             catchCertificateNumber: "FCC051",
             catchCertificateType: 'uk',
-            commodityCode: "N/A",
+            issuingCountry: undefined,
+            commodityCode: undefined,
             createdAt: "2019-01-01T00:00:00.000Z",
             da: "England",
             documentNumber: "12345",
@@ -553,7 +560,8 @@ describe('tests on the foreign catch certificate online report output', () => {
           {
             catchCertificateNumber: "FCC051",
             catchCertificateType: 'uk',
-            commodityCode: "N/A",
+            issuingCountry: undefined,
+            commodityCode: undefined,
             createdAt: "2019-01-01T00:00:00.000Z",
             da: "England",
             documentNumber: "12345",
@@ -580,7 +588,8 @@ describe('tests on the foreign catch certificate online report output', () => {
           {
             catchCertificateNumber: "FCC052",
             catchCertificateType: 'uk',
-            commodityCode: "N/A",
+            issuingCountry: undefined,
+            commodityCode: undefined,
             createdAt: "2019-01-01T00:00:00.000Z",
             da: "England",
             documentNumber: "12345",

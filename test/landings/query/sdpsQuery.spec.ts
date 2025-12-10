@@ -66,13 +66,13 @@ describe('low level transformations', () => {
     const expected = [
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement',
         extended: { url: 'http://www.bob.com' },
-        certificateNumber: 'FCC051', certificateType: 'uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", commodityCode: 'N/A', weight: 100.11, weightOnCC: 500.11, weightAfterProcessing: 90.11 },
+        certificateNumber: 'FCC051', certificateType: 'uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", commodityCode: undefined, weight: 100.11, weightOnCC: 500.11, weightAfterProcessing: 90.11 },
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement',
         extended: { url: 'http://www.bob.com' },
-        certificateNumber: 'FCC051', certificateType: 'non_uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", commodityCode: 'N/A', weight: 200.11, weightOnCC: 400.11, weightAfterProcessing: 190.11 },
+        certificateNumber: 'FCC051', certificateType: 'non_uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", commodityCode: undefined, weight: 200.11, weightOnCC: 400.11, weightAfterProcessing: 190.11 },
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement',
         extended: { url: 'http://www.bob.com' },
-        certificateNumber: 'FCC051', certificateType: 'uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", commodityCode: 'N/A', weight: 300.11, weightOnCC: 300.11, weightAfterProcessing: 290.11 },
+        certificateNumber: 'FCC051', certificateType: 'uk', da: 'England', species: 'cats', scientificName: "some scientific name 1", commodityCode: undefined, weight: 300.11, weightOnCC: 300.11, weightAfterProcessing: 290.11 },
     ]
 
     const res = Query.unwindAndMapCatches(document, identity)
@@ -197,12 +197,12 @@ describe('low level transformations', () => {
       const expected = [
         { documentNumber: 'GBR-2019-PS-B3905EB18', status: 'DRAFT', documentType: 'processingStatement',
           certificateNumber: '323223323242315', da: 'LE17 5QZ', species: 'Atlantic herring (HER)', scientificName: "some scientific name 1",
-          commodityCode: 'N/A', weight: 2.11, weightOnCC: 2.11, weightAfterProcessing: 2.11, extended: {
+          commodityCode: undefined, weight: 2.11, weightOnCC: 2.11, weightAfterProcessing: 2.11, extended: {
             exporterCompanyName: "BONZO"
           } },
         { documentNumber: 'GBR-2019-PS-B3905EB18', status: 'DRAFT', documentType: 'processingStatement',
           certificateNumber: '343243242321', da: 'LE17 5QZ',
-          species: 'Allardice\'s moray (AMA)', scientificName: "some scientific name 2", commodityCode: 'N/A', weight: 5.22, weightAfterProcessing: 5.22, weightOnCC: 5.22, extended: {
+          species: 'Allardice\'s moray (AMA)', scientificName: "some scientific name 2", commodityCode: undefined, weight: 5.22, weightAfterProcessing: 5.22, weightOnCC: 5.22, extended: {
             exporterCompanyName: "BONZO"
           }  },
       ];
@@ -325,7 +325,7 @@ describe('low level transformations', () => {
     const expected = [
       { documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement',
         extended: { url: 'http://www.bob.com' },
-        certificateNumber: 'FCC051', da: 'SUPERCOOL', species: 'cats', commodityCode: 'N/A', weight: 100, weightOnCC: 500 }
+        certificateNumber: 'FCC051', da: 'SUPERCOOL', species: 'cats', commodityCode: undefined, weight: 100, weightOnCC: 500 }
     ]
 
     const res = Query.unwindAndMapCatches(document, identity)
@@ -433,7 +433,7 @@ describe('tests at the query level', () => {
 
     const expected = [
       { catchCertificateNumber: "FCC051", catchCertificateType: 'uk', documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement', da: 'England', createdAt: '2019-01-01T00:00:00.000Z',
-        species: 'cats', scientificName: 'some scientific name', commodityCode: 'N/A',
+        species: 'cats', scientificName: 'some scientific name', commodityCode: undefined,
         weightOnDoc: 100, weightOnAllDocs: 100, weightOnFCC: 500,
         isOverAllocated: false, overAllocatedByWeight: 0,
         overUsedInfo: [],
@@ -471,14 +471,14 @@ describe('tests at the query level', () => {
 
     const expected = [
       { catchCertificateNumber: "FCC051", catchCertificateType: 'uk', documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement', da: 'England', createdAt: '2019-01-01T00:00:00.000Z',
-        species: 'cats', scientificName: 'some scientific name', commodityCode: 'N/A',
+        species: 'cats', scientificName: 'some scientific name', commodityCode: undefined,
         weightOnDoc: 100, weightOnAllDocs: 1100, weightOnFCC: 500,
         isOverAllocated: true, overAllocatedByWeight: 600,
         overUsedInfo: [],
         isMismatch: false
       },
       { catchCertificateNumber: "FCC051", catchCertificateType: 'non_uk', documentNumber: '22345', status: 'COMPLETE', documentType: 'processingStatement', da: 'England', createdAt: '2019-01-01T10:00:00.000Z',
-        species: 'cats', scientificName: 'some scientific name', commodityCode: 'N/A',
+        species: 'cats', scientificName: 'some scientific name', commodityCode: undefined,
         weightOnDoc: 1000, weightOnAllDocs: 1100, weightOnFCC: 500,
         isOverAllocated: true, overAllocatedByWeight: 600,
         overUsedInfo: ["12345"],
@@ -511,7 +511,7 @@ describe('tests at the query level', () => {
     const res: any[] = Array.from(Query.sdpsQuery(documents))
 
     expect(res.map(_ => [_.documentNumber, _.commodityCode]))
-      .toEqual([ ['12345', 'COMMODITYCODE123'], ['52345', 'N/A'] ])
+      .toEqual([ ['12345', 'COMMODITYCODE123'], ['52345', undefined] ])
 
   })
 
@@ -535,14 +535,14 @@ describe('tests at the query level', () => {
 
     const expected = [
       { catchCertificateNumber: 'FCC051', catchCertificateType: 'uk', documentNumber: '12345', status: 'COMPLETE', documentType: 'processingStatement', da: 'England', createdAt: '2019-01-01T00:00:00.000Z',
-        species: 'cats', scientificName: 'some scientific name', commodityCode: 'N/A',
+        species: 'cats', scientificName: 'some scientific name', commodityCode: undefined,
         weightOnDoc: 100, weightOnAllDocs: 500, weightOnFCC: 500,
         isOverAllocated: false, overAllocatedByWeight: 0,
         overUsedInfo: [],
         isMismatch: false
       },
       { catchCertificateNumber: 'FCC051', catchCertificateType: 'non_uk', documentNumber: '22345', status: 'COMPLETE', documentType: 'processingStatement', da: 'England', createdAt: '2019-01-01T10:00:00.000Z',
-        species: 'cats', scientificName: 'some scientific name', commodityCode: 'N/A',
+        species: 'cats', scientificName: 'some scientific name', commodityCode: undefined,
         weightOnDoc: 400, weightOnAllDocs: 500, weightOnFCC: 500,
         isOverAllocated: false, overAllocatedByWeight: 0,
         overUsedInfo: [],

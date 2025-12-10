@@ -11,3 +11,4 @@ githash
 junit.xml
 service_bus
 /.env
+/.vscode
