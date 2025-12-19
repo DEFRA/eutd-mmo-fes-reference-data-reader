@@ -1,5 +1,4 @@
 import appInsights from './app-insights';
-import { updateIgnoreFlagName } from './landings/updateIgnoreFlagName';
 import { Boom } from '@hapi/boom';
 
 import * as fs from 'fs';
@@ -60,7 +59,6 @@ export class Server {
       await cleanUpEodRules();
 
       await Promise.all([
-        updateIgnoreFlagName(),
         loadFishCountriesAndSpecies(),
         loadVessels(),
         loadExporterBehaviour(),
