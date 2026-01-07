@@ -7,9 +7,11 @@ import * as CatchCertPersistence from '../../src/landings/persistence/catchCert'
 import * as DataHub from '../../src/controllers/dataHub';
 import CatchCertificateTransformerService from '../../src/services/catch-certificate-transformer.service';
 import ProcessingStatementTransformerService from '../../src/services/processing-statement-transformer.service';
+import { DocumentModel } from '../../src/landings/types/document';
 
 jest.mock('mmo-shared-reference-data');
 jest.mock('../../src/landings/persistence/catchCert');
+jest.mock('../../src/landings/types/document');
 jest.mock('../../src/controllers/dataHub');
 jest.mock('../../src/services/catch-certificate-transformer.service');
 jest.mock('../../src/services/processing-statement-transformer.service');
@@ -56,8 +58,9 @@ describe('CATCH Submission Handler (FI0-10312)', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue({ CreateCatchCertificateRequest: {} });
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue({
@@ -77,8 +80,9 @@ describe('CATCH Submission Handler (FI0-10312)', () => {
 
     it('should return 500 when CATCH API submission fails', async () => {
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockRejectedValue(new Error('CATCH API error: 500 - Internal Server Error'));
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockRejectedValue(new Error('CATCH API error: 500 - Internal Server Error'))
+      });
       (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
 
       const response = await server.inject({
@@ -131,8 +135,9 @@ describe('CATCH Submission Handler (FI0-10312)', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue({ CreateCatchCertificateRequest: {} });
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue({
@@ -165,8 +170,9 @@ describe('CATCH Submission Handler (FI0-10312)', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue({ CreateCatchCertificateRequest: {} });
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue({
@@ -193,8 +199,9 @@ describe('CATCH Submission Handler (FI0-10312)', () => {
       const errorWithEmptyMessage = new Error('');
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockRejectedValue(errorWithEmptyMessage);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockRejectedValue(errorWithEmptyMessage)
+      });
       (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
 
       const response = await server.inject({
@@ -267,8 +274,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -281,8 +289,11 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       });
 
       expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-CC-TEST001');
-      expect(CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts)
-        .toHaveBeenCalledWith('GBR-2025-CC-TEST001', 'catchCert');
+      expect(DocumentModel.findOne).toHaveBeenCalledWith({
+        __t: "catchCert",
+        documentNumber: 'GBR-2025-CC-TEST001',
+        status: { $in: ['COMPLETE', 'VOID'] }
+      });
       expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalled();
       expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
         mockTransformedPayload,
@@ -313,8 +324,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateVoidCatchPayload as jest.Mock)
         .mockReturnValue(mockVoidPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -340,8 +352,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       const mockBoomiResponse = {}; // No CatchCertificateResponse
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -367,8 +380,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(null);
@@ -394,8 +408,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(undefined);
@@ -443,8 +458,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockDocumentNoCaughtBy);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockDocumentNoCaughtBy)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -485,8 +501,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockDocumentNoProducts);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockDocumentNoProducts)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -545,8 +562,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocument)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -559,8 +577,11 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       });
 
       expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-PS-TEST001');
-      expect(CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts)
-        .toHaveBeenCalledWith('GBR-2025-PS-TEST001', 'processingStatement');
+      expect(DocumentModel.findOne).toHaveBeenCalledWith({
+        __t: "processingStatement",
+        documentNumber: 'GBR-2025-PS-TEST001',
+        status: { $in: ['COMPLETE', 'VOID'] }
+      });
       expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalled();
       expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
         mockTransformedPayload,
@@ -586,8 +607,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocument)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -612,8 +634,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       const mockBoomiResponse = {}; // No ProcessingStatementResponse
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocument)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -644,8 +667,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocument)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(null);
@@ -676,8 +700,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocument)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(undefined);
@@ -722,8 +747,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocumentNullProducts);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocumentNullProducts)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -763,8 +789,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocumentNullCatches);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocumentNullCatches)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue(mockTransformedPayload);
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
@@ -788,8 +815,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
   describe('Error Handling', () => {
     it('should throw error when document is not found', async () => {
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(null);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(null)
+      });
 
       await expect(
         Controller.submitDocumentToBoomi({
@@ -807,8 +835,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       };
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockDocumentNoExportData);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockDocumentNoExportData)
+      });
 
       await expect(
         Controller.submitDocumentToBoomi({
@@ -822,8 +851,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       const fetchError = new Error('Database connection failed');
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockRejectedValue(fetchError);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockRejectedValue(fetchError)
+      });
       (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
 
       await expect(
@@ -857,8 +887,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       const boomiError = new Error('Boomi service unavailable');
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockReturnValue({ CreateCatchCertificateRequest: {} });
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockRejectedValue(boomiError);
@@ -895,8 +926,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       const transformerError = new Error('Transformation failed');
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockCatchCertDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+      });
       (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
         .mockImplementation(() => {
           throw transformerError;
@@ -935,8 +967,9 @@ describe('submitDocumentToBoomi Controller Tests', () => {
       const boomiError = new Error('PS Boomi error');
 
       (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (CatchCertPersistence.getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock)
-        .mockResolvedValue(mockPsDocument);
+      (DocumentModel.findOne as jest.Mock).mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockPsDocument)
+      });
       (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
         .mockReturnValue({ CreateCatchProcessingStatementRequest: {} });
       (BoomiService.sendDocumentToBoomi as jest.Mock).mockRejectedValue(boomiError);
