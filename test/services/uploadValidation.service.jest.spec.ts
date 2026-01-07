@@ -330,11 +330,12 @@ describe('uploadValidation.service', () => {
         {
           ...uploadedLanding,
           startDate: undefined,
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.startDate.date.missing']);
+      expect(result.errors).toContain('error.startDate.date.missing');
     });
 
     it('should return an error if the startDate is empty', () => {
@@ -342,116 +343,170 @@ describe('uploadValidation.service', () => {
         {
           ...uploadedLanding,
           startDate: '',
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.startDate.date.missing']);
+      expect(result.errors).toContain('error.startDate.date.missing');
+    });
+
+    it('should return an error if the startDate is invalid format', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: 'invalid-date',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.startDate.date.base');
     });
 
     it('should return an error if the landingDate is missing', () => {
-
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
           landingDate: undefined,
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.dateLanded.date.missing']);
-
+      expect(result.errors).toContain('error.dateLanded.date.missing');
     });
 
     it('should return an error if the landingDate is empty', () => {
-
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
           landingDate: '',
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.dateLanded.date.missing']);
-
+      expect(result.errors).toContain('error.dateLanded.date.missing');
     });
 
-    it('should return an error if the landingDate is invalid', () => {
-
+    it('should return an error if the landingDate is invalid format', () => {
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
-          landingDate: 'x',
+          landingDate: 'invalid-date',
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.dateLanded.date.base']);
-
+      expect(result.errors).toContain('error.dateLanded.date.base');
     });
 
-    it('should return an error if the startDate is invalid', () => {
-
+    it('should not check date relationships if basic validation fails', () => {
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
-          startDate: 'x',
+          startDate: 'invalid',
+          landingDate: 'also-invalid',
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.startDate.date.base']);
-
+      expect(result.errors).toContain('error.startDate.date.base');
+      expect(result.errors).toContain('error.dateLanded.date.base');
+      expect(result.errors).not.toContain('error.startDate.date.max');
     });
 
     it('should return an error if the startDate is after the landingDate', () => {
-
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
           startDate: '26/12/2020',
           landingDate: '25/12/2020',
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual(['error.startDate.date.max']);
-
+      expect(result.errors).toContain('error.startDate.date.max');
     });
 
     it('should return an error if the landingDate is too far in the future', () => {
+      const futureLandingDate = moment()
+        .add(landingLimitDaysInFuture + 1, 'days')
+        .format('DD/MM/YYYY');
 
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
-          landingDate: moment()
-            .add(landingLimitDaysInFuture + 1, 'days')
-            .format('DD/MM/YYYY'),
+          landingDate: futureLandingDate,
+          errors: []
         },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual([
-        {
-          key: 'error.dateLanded.date.max',
-          params: [
-            landingLimitDaysInFuture
-          ]
-        }
-      ]);
-
+      expect(result.errors).toContainEqual({
+        key: 'error.dateLanded.date.max',
+        params: [landingLimitDaysInFuture]
+      });
     });
 
-    it('should return no errors if the landingDate and startDate is valid', () => {
-
+    it('should support DD/MM/YYYY date format', () => {
       const result = SUT.validateDateForLanding(
-        uploadedLanding,
+        {
+          ...uploadedLanding,
+          startDate: '01/12/2020',
+          landingDate: '15/12/2020',
+          errors: []
+        },
         landingLimitDaysInFuture
       );
 
-      expect(result.errors).toStrictEqual([]);
+      expect(result.errors).toHaveLength(0);
+    });
 
+    it('should support D/M/YYYY date format', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '1/12/2020',
+          landingDate: '15/12/2020',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('should return no errors if the landingDate and startDate are valid', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '24/12/2020',
+          landingDate: '25/12/2020',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('should return no errors if the landingDate equals the startDate', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '25/12/2020',
+          landingDate: '25/12/2020',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toHaveLength(0);
     });
 
     describe('should return errors when landing dates are missing', () => {
@@ -556,6 +611,97 @@ describe('uploadValidation.service', () => {
       );
 
       expect(result.errors).toStrictEqual([]);
+    });
+
+    describe('should return errors when both dates have issues', () => {
+      it('should return both missing errors when both startDate and landingDate are missing', () => {
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: undefined,
+            landingDate: undefined,
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
+
+        expect(result.errors).toStrictEqual([
+          'error.startDate.date.missing',
+          'error.dateLanded.date.missing'
+        ]);
+      });
+
+      it('should return both format errors when both startDate and landingDate have invalid format', () => {
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: 'invalid-date',
+            landingDate: 'invalid-date',
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
+
+        expect(result.errors).toStrictEqual([
+          'error.startDate.date.base',
+          'error.dateLanded.date.base'
+        ]);
+      });
+
+      it('should return missing startDate and invalid format dateLanded errors', () => {
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: undefined,
+            landingDate: 'invalid-date',
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
+
+        expect(result.errors).toStrictEqual([
+          'error.startDate.date.missing',
+          'error.dateLanded.date.base'
+        ]);
+      });
+
+      it('should return invalid startDate and missing dateLanded errors', () => {
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: 'invalid-date',
+            landingDate: undefined,
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
+
+        expect(result.errors).toStrictEqual([
+          'error.startDate.date.base',
+          'error.dateLanded.date.missing'
+        ]);
+      });
+
+      it('should return dateLanded error when startDate is valid but dateLanded is too far in future', () => {
+        const futureDate = moment.utc().add(landingLimitDaysInFuture + 1, 'days').format('DD/MM/YYYY');
+        
+        const result = SUT.validateDateForLanding(
+          {
+            ...uploadedLanding,
+            startDate: '24/12/2020',
+            landingDate: futureDate,
+            errors: []
+          },
+          landingLimitDaysInFuture
+        );
+
+        expect(result.errors).toStrictEqual([
+          {
+            key: 'error.dateLanded.date.max',
+            params: [landingLimitDaysInFuture]
+          }
+        ]);
+      });
     });
 
   });

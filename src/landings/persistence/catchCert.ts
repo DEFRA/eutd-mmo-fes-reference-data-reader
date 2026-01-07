@@ -1,7 +1,8 @@
 import moment from 'moment'
-import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry } from 'mmo-shared-reference-data';
+import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry, IEuUpgradeResponse } from 'mmo-shared-reference-data';
 import { DocumentModel, DocumentStatuses, IDocument } from '../types/document';
 import logger from '../../logger';
+import { toBackEndCatchSubmission } from '../../controllers/euUpgrade';
 
 export const getCertificateByPdfReference = async (documentNumber: string) => {
   return await DocumentModel.findOne({ documentUri: `${documentNumber}.pdf` }).lean()
@@ -51,9 +52,9 @@ export const upsertProductsByIgnore = async (products: any, documentNumber: stri
 export const upsertExportPayload = async (documentNumber: string, products: Product[]) => {
   const query : any = {status: 'DRAFT', documentNumber: documentNumber};
 
-  const certificate = DocumentModel.findOne(
+  const certificate = await DocumentModel.findOne(
     query,
-    ['userReference', 'exportData'],
+    { userReference: 1, 'exportData': 1 },
     { lean: true }
   );
 
@@ -63,6 +64,36 @@ export const upsertExportPayload = async (documentNumber: string, products: Prod
   const update = {'$set': { 'exportData.products': products } }
 
   await DocumentModel.findOneAndUpdate(query, update, options);
+}
+
+/**
+ * Update EU CATCH status for a certificate
+ * Used by FI0-10355 EU upgrade callback
+ */
+export const updateCertificateEuCatchStatus = async (documentNumber: string, statusData: IEuUpgradeResponse): Promise<void> => {
+  const query = { documentNumber: documentNumber };
+
+  // Build the update object with catchStatus fields
+  const update: Object = { '$set': { 'catchSubmission': toBackEndCatchSubmission(statusData) } }
+
+   const options = {
+    upsert: true,
+    omitUndefined: true,
+    new: true
+  };
+
+  logger.info(
+    `[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][UPDATE][${JSON.stringify(
+      update
+    )}]`);
+
+  const result = await DocumentModel.findOneAndUpdate(query, update, options);
+
+  if (!result) {
+    throw new Error(`Certificate not found: ${documentNumber}`);
+  }
+
+  logger.info(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][SUCCESS][${documentNumber}]`);
 }
 
 export interface Catch {

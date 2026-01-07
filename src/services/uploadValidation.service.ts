@@ -67,46 +67,34 @@ export const validateDateForLanding = (
   // Validate start date exists
   if (!landing.startDate) {
     landing.errors.push('error.startDate.date.missing');
-    return landing;
-  }
-
-  const startDate = moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
-
-  // Validate start date format
-  if (!startDate.isValid()) {
+  } else if (!moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).isValid()) {
     landing.errors.push('error.startDate.date.base');
-    return landing;
   }
 
   // Validate landing date exists
   if (!landing.landingDate) {
     landing.errors.push('error.dateLanded.date.missing');
-    return landing;
-  }
-
-  const landingDate = moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
-
-  // Validate landing date format
-  if (!landingDate.isValid()) {
+  } else if (!moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).isValid()) {
     landing.errors.push('error.dateLanded.date.base');
-    return landing;
   }
 
   // Validate landing date is not before start date
-  if (landingDate.isBefore(startDate, 'day')) {
-    landing.errors.push('error.startDate.date.max');
-    return landing;
-  }
+  if (landing.errors.length <= 0) {
+    const landingDate = moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
+    const startDate = moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
 
-  // Validate landing date is not too far in future
-  const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
-  if (landingDate.utc().isAfter(maxValidDate)) {
-    landing.errors.push({
-      key: 'error.dateLanded.date.max',
-      params: [landingLimitDaysInFuture],
-    });
+    if (landingDate.isBefore(startDate, 'day')) {
+      landing.errors.push('error.startDate.date.max');
+    }
+    // Validate landing date is not too far in future
+    const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
+    if (landingDate.utc().isAfter(maxValidDate)) {
+      landing.errors.push({
+        key: 'error.dateLanded.date.max',
+        params: [landingLimitDaysInFuture],
+      });
+    }
   }
-
   return landing;
 };
 

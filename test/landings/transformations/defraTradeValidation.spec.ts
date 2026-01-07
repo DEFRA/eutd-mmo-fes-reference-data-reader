@@ -179,7 +179,8 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "freightBillNumber": "ABC123",
         "departureCountry": "United Kingdom",
         "departurePort": "Hull",
-        "exportDate": "2023-08-31"
+        "exportDate": "2023-08-31",
+        "placeOfUnloading": "Dover Port",
       }, {
         "id": '0',
         "vehicle": "plane",
@@ -190,6 +191,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "departureCountry": "United Kingdom",
         "departurePort": "Hull",
         "exportDate": "2023-08-31",
+        "placeOfUnloading": "Dover Port",
       }, {
         "id": '0',
         "vehicle": "train",
@@ -198,6 +200,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "departureCountry": "United Kingdom",
         "departurePort": "Hull",
         "exportDate": "2023-08-31",
+        "placeOfUnloading": "Dover Port",
       }, {
         "id": '0',
         "vehicle": "containerVessel",
@@ -209,6 +212,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "departureCountry": "United Kingdom",
         "departurePort": "Hull",
         "exportDate": "2023-08-31",
+        "placeOfUnloading": "Dover Port",
       }, {
         "id": '0',
         "vehicle": "unknown",
@@ -219,6 +223,7 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "departureCountry": "United Kingdom",
         "departurePort": "Hull",
         "exportDate": "2023-08-31",
+        "placeOfUnloading": "Dover Port",
       }
       ],
       "conservation": {
@@ -346,10 +351,22 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
         "licenceHolder": "C & J SHELLFISH LTD",
         "speciesAlias": "N",
         "weight": 89,
-        "gearType": "Type 1",
         "highSeasArea": "Yes",
         "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
-        "exclusiveEconomicZones": "Nigeria,France",
+        "exclusiveEconomicZones": [
+          {
+            "officialCountryName": "Nigeria",
+            "isoCodeAlpha2": "NG",
+            "isoCodeAlpha3": "NGA",
+            "isoNumericCode": "566"
+          },
+          {
+            "officialCountryName": "France",
+            "isoCodeAlpha2": "FR",
+            "isoCodeAlpha3": "FRA",
+            "isoNumericCode": "250"
+          }
+        ],
         "numberOfTotalSubmissions": 1,
         "vesselOverriddenByAdmin": false,
         "speciesOverriddenByAdmin": false,
@@ -638,6 +655,19 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
     expect(result).toStrictEqual(expected);
   });
 
+  it('will include pointOfDestination from document.exportData for Catch Certificate', () => {
+    const ccWithPod: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        pointOfDestination: 'Port of Lagos'
+      }
+    } as IDocument;
+
+    const result: any = SUT.toDefraTradeCc(ccWithPod, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.pointOfDestination).toEqual('Port of Lagos');
+  });
+
   it('will return a IDefraTradeCatchCertificate payload with direct landing', () => {
     const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc({
       ...exampleCc, exportData: {
@@ -788,6 +818,24 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
     };
 
     expect(result).toStrictEqual(expected);
+  });
+
+  it('will fallback to transportation.pointOfDestination for Catch Certificate when exportData.pointOfDestination is missing', () => {
+    const ccWithTransportPod: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        pointOfDestination: undefined,
+        transportation: {
+          exportedTo: exampleCc.exportData.exportedTo,
+          vehicle: 'truck',
+          pointOfDestination: 'Transport Port'
+        }
+      }
+    } as IDocument;
+
+    const result: any = SUT.toDefraTradeCc(ccWithTransportPod, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.pointOfDestination).toEqual('Transport Port');
   });
 
   it('will return a IDefraTradeCatchCertificate payload containing true for multischedule for a submission with multiple vessels', () => {
@@ -1325,6 +1373,105 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
     expect(result).toStrictEqual(expected);
   });
 
+  it('will handle missing products (empty or undefined) and not throw when computing multiVesselSchedule', () => {
+    const ccNoProducts: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        products: undefined
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccNoProducts, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.multiVesselSchedule).toBe(false);
+  });
+
+  it('will handle empty products array and not mark multiVesselSchedule', () => {
+    const ccEmptyProducts: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        products: []
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccEmptyProducts, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.multiVesselSchedule).toBe(false);
+  });
+
+  it('will handle transportList not being an array when raw transportation exists', () => {
+    const ccWithRawTransport: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportations: undefined,
+        transportation: {
+          exportedFrom: "United Kingdom",
+          exportedTo: {
+            officialCountryName: "Spain",
+            isoCodeAlpha2: "ES",
+            isoCodeAlpha3: "ESP",
+            isoNumericCode: "724"
+          },
+          vehicle: "truck",
+          departurePlace: "Portsmouth"
+        }
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccWithRawTransport, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.transportation).toBeDefined();
+    expect(result.exportedTo).toBeDefined();
+    expect(result.exportedTo.isoCodeAlpha2).toEqual('ES');
+  });
+
+  it('will prefer exportData.transportation over transportations list when both exist', () => {
+    const ccWithBothTransports: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportations: [{
+          vehicle: 'truck',
+          departurePlace: 'OldPort',
+          exportedTo: { isoCodeAlpha2: 'ZZ', officialCountryName: 'Zed' }
+        }],
+        transportation: {
+          exportedFrom: "United Kingdom",
+          exportedTo: {
+            officialCountryName: "Italy",
+            isoCodeAlpha2: "IT",
+            isoCodeAlpha3: "ITA",
+            isoNumericCode: "380"
+          },
+          vehicle: "truck",
+          departurePlace: "Portsmouth"
+        }
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccWithBothTransports, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.exportedTo).toBeDefined();
+    expect(result.exportedTo.isoCodeAlpha2).toEqual('IT');
+  });
+
+  it('will not include pointOfDestination when neither exportData.pointOfDestination nor transportation.pointOfDestination exist', () => {
+    const ccNoPOD: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        pointOfDestination: undefined,
+        transportation: {
+          exportedTo: exampleCc.exportData.exportedTo,
+          vehicle: 'truck',
+          pointOfDestination: undefined
+        }
+      }
+    } as IDocument;
+
+    const result: any = SUT.toDefraTradeCc(ccNoPOD, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(Object.prototype.hasOwnProperty.call(result, 'pointOfDestination')).toBe(false);
+  });
+
   it('will return a IDefraTradeCatchCertificate payload for a VOID event by an admin', () => {
     const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(exampleCc, { ...dynamicsCatchCertificateCase, caseType2: CaseTwoType.VoidByAdmin }, null);
     const expected: IDefraTradeCatchCertificate = {
@@ -1398,6 +1545,56 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
     };
 
     expect(result).toStrictEqual(expected);
+  });
+
+  it('will mark certificate as BLOCKED when any ccQueryResults status is BLOCKED', () => {
+    const blockedResults = [{ ...ccQueryResults[0], status: 'BLOCKED' } as any];
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(exampleCc, dynamicsCatchCertificateCase, blockedResults as any);
+    expect(result.certStatus).toEqual(CertificateStatus.BLOCKED);
+  });
+
+  it('will mark certificate as COMPLETE when no ccQueryResults status is BLOCKED', () => {
+    const completeResults = [{ ...ccQueryResults[0], status: 'COMPLETE' } as any];
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(exampleCc, dynamicsCatchCertificateCase, completeResults as any);
+    expect(result.certStatus).toEqual(CertificateStatus.COMPLETE);
+  });
+
+  it('will prefer document.exportData.exportedTo when transportation.exportedTo is missing', () => {
+    const ccWithExportedToOnly: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        exportedTo: {
+          officialCountryName: 'Wonderland',
+          isoCodeAlpha2: 'WL',
+          isoCodeAlpha3: 'WLD'
+        },
+        transportation: {
+          vehicle: 'truck'
+        }
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccWithExportedToOnly, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.exportedTo).toBeDefined();
+    expect(result.exportedTo?.officialCountryName).toEqual('Wonderland');
+  });
+
+  it('will prefer document.exportData.pointOfDestination over transportation.pointOfDestination', () => {
+    const ccWithBothPods: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        pointOfDestination: 'Doc Port',
+        transportation: {
+          vehicle: 'truck',
+          pointOfDestination: 'Transport Port'
+        }
+      }
+    } as IDocument;
+
+    const result: any = SUT.toDefraTradeCc(ccWithBothPods, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.pointOfDestination).toEqual('Doc Port');
   });
 });
 
@@ -1503,7 +1700,8 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
         },
         "vehicle": "truck",
         "cmr": true,
-        "exportDate": "05/09/2023"
+        "exportDate": "05/09/2023",
+        "placeOfUnloading": "Dover Port"
       }
     },
     "userReference": "some-reference",
@@ -1630,6 +1828,24 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     expect(result.transportation).toStrictEqual(expected);
   });
 
+  it('will fallback transportation.exportDate to utc when input exportDate is invalid', () => {
+    const sdInvalidDate: IDocument = {
+      ...exampleSd,
+      exportData: {
+        ...exampleSd.exportData,
+        transportation: {
+          exportedTo: exampleSd.exportData.exportedTo,
+          vehicle: 'truck',
+          cmr: true,
+          exportDate: 'invalid-date'
+        }
+      }
+    } as IDocument;
+
+    const result: IDefraTradeStorageDocument = SUT.toDefraTradeSd(sdInvalidDate, exampleSdDynamicsCase, exampleSdQueryResult);
+    expect(result.transportation.exportDate).toEqual(moment.utc().format('YYYY-MM-DD'));
+  });
+
   it('will return a storageFacility within the IDefraTradeStorageDocument payload', () => {
     const result: IDefraTradeStorageDocument = SUT.toDefraTradeSd(exampleSd, exampleSdDynamicsCase, exampleSdQueryResult);
     const expected =
@@ -1681,6 +1897,18 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
 
     expect(result.products?.[0]).toStrictEqual(expected);
   });
+it('will handle missing arrivalTransportation without throwing', () => {
+    const sdNoArrival: IDocument = {
+      ...exampleSd,
+      exportData: {
+        ...exampleSd.exportData,
+        arrivalTransportation: undefined
+      }
+    } as IDocument;
+
+    const result: any = SUT.toDefraTradeSd(sdNoArrival, exampleSdDynamicsCase, exampleSdQueryResult);
+    expect(result.arrivalTransportation).toBeUndefined();
+  });
 
 });
 
@@ -1713,6 +1941,104 @@ describe('When mapping from an ISdPsQueryResult to a IDefraTradeProcessingStatem
     const result = SUT.toDefraTradePsCatch(input);
 
     expect(result.foreignCatchCertificateNumber).toEqual("PS2");
+  });
+
+  it('will include pointOfDestination from document.exportData for Processing Statement', () => {
+    const psDocument: IDocument = {
+      createdAt: new Date(),
+      __t: 'processingStatement',
+      documentNumber: 'GBR-PS-123',
+      status: 'COMPLETE',
+      createdBy: 'tester',
+      documentUri: 'uri.pdf',
+      exportData: {
+        pointOfDestination: 'Port X',
+        plantAddressOne: 'x',
+        plantBuildingName: '',
+        plantBuildingNumber: '',
+        plantSubBuildingName: '',
+        plantStreetName: '',
+        plantCountry: 'England',
+        plantCounty: '',
+        plantTownCity: '',
+        plantPostcode: '',
+        plantApprovalNumber: '',
+        dateOfAcceptance: '01/01/2020',
+        healthCertificateNumber: '',
+        healthCertificateDate: '01/01/2020'
+      }
+    } as IDocument;
+
+    const psCase = {} as any;
+    const result: any = SUT.toDefraTradePs(psDocument, psCase, null);
+    expect(result.pointOfDestination).toEqual('Port X');
+  });
+
+  it('will map exportedTo from document.exportData for Processing Statement', () => {
+    const psDocument: IDocument = {
+      createdAt: new Date(),
+      __t: 'processingStatement',
+      documentNumber: 'GBR-PS-124',
+      status: 'COMPLETE',
+      createdBy: 'tester',
+      documentUri: 'uri.pdf',
+      exportData: {
+        exportedTo: {
+          officialCountryName: 'Fantasia',
+          isoCodeAlpha2: 'FA',
+          isoCodeAlpha3: 'FAN'
+        },
+        plantAddressOne: 'x',
+        plantBuildingName: '',
+        plantBuildingNumber: '',
+        plantSubBuildingName: '',
+        plantStreetName: '',
+        plantCountry: 'England',
+        plantCounty: '',
+        plantTownCity: '',
+        plantPostcode: '',
+        plantApprovalNumber: '',
+        dateOfAcceptance: '01/01/2020',
+        healthCertificateNumber: '',
+        healthCertificateDate: '01/01/2020'
+      }
+    } as IDocument;
+
+    const psCase = {} as any;
+    const result: any = SUT.toDefraTradePs(psDocument, psCase, null);
+    expect(result.exportedTo).toBeDefined();
+    expect(result.exportedTo.officialCountryName).toEqual('Fantasia');
+  });
+
+  it('will include pointOfDestination from document.exportData when present (spread)', () => {
+    const psDocument: IDocument = {
+      createdAt: new Date(),
+      __t: 'processingStatement',
+      documentNumber: 'GBR-PS-125',
+      status: 'COMPLETE',
+      createdBy: 'tester',
+      documentUri: 'uri.pdf',
+      exportData: {
+        pointOfDestination: 'Plant Port',
+        plantAddressOne: 'x',
+        plantBuildingName: '',
+        plantBuildingNumber: '',
+        plantSubBuildingName: '',
+        plantStreetName: '',
+        plantCountry: 'England',
+        plantCounty: '',
+        plantTownCity: '',
+        plantPostcode: '',
+        plantApprovalNumber: '',
+        dateOfAcceptance: '01/01/2020',
+        healthCertificateNumber: '',
+        healthCertificateDate: '01/01/2020'
+      }
+    } as IDocument;
+
+    const psCase = {} as any;
+    const result: any = SUT.toDefraTradePs(psDocument, psCase, null);
+    expect(result.pointOfDestination).toEqual('Plant Port');
   });
 
   it('will map the species code', () => {

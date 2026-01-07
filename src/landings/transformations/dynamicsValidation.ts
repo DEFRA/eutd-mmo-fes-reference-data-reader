@@ -409,7 +409,8 @@ export function toDynamicsCcCase(
     vesselOverriddenByAdmin: validatedLandings ? validatedLandings.some((landing: ICcQueryResult) => landing.extended.vesselOverriddenByAdmin) : undefined,
     speciesOverriddenByAdmin: validatedLandings ? validatedLandings.some((landing: ICcQueryResult) => landing.extended.speciesOverriddenByAdmin) : undefined,
     failureIrrespectiveOfRisk: landings ? toFailureIrrespectiveOfRisk(landings) : false,
-    exportedTo: toExportedTo(catchCertificate)
+    exportedTo: toExportedTo(catchCertificate),
+    pointOfDestination: catchCertificate.exportData?.pointOfDestination
   };
 
   return dynamicsCase;
@@ -539,7 +540,8 @@ export function toDynamicsPs(
     requestedByAdmin: processingStatement.requestByAdmin,
     exportedTo: toExportedToPsSd(processingStatement),
     clonedFrom: processingStatement.clonedFrom,
-    parentDocumentVoid: processingStatement.parentDocumentVoid
+    parentDocumentVoid: processingStatement.parentDocumentVoid,
+    pointOfDestination: processingStatement.exportData?.pointOfDestination
   };
 }
 
@@ -605,7 +607,8 @@ export function toDynamicsSd(
     _correlationId: correlationId,
     requestedByAdmin: storageDocument.requestByAdmin,
     exportedTo: storageDocument.exportData?.exportedTo ? toExportedToPsSd(storageDocument) : undefined,
-    placeOfUnloading: storageDocument.exportData?.arrivalTransportation?.placeOfUnloading
+    placeOfUnloading: storageDocument.exportData?.arrivalTransportation?.placeOfUnloading,
+    pointOfDestination: storageDocument.exportData?.transportation?.pointOfDestination
   };
 }
 

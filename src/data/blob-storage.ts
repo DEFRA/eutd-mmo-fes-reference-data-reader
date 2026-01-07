@@ -7,6 +7,7 @@ import { type IConversionFactor } from 'mmo-shared-reference-data';
 import { IExporterBehaviour } from '../landings/types/appConfig/exporterBehaviour';
 import { IAllSpecies } from '../landings/types/appConfig/allSpecies';
 import { IVessel } from '../landings/types/appConfig/vessels';
+import { GearRecord } from "../interfaces/gearTypes.interface";
 
 const CATCH_CERT_DATA_CONTAINER_NAME        = 'catchcertdata';
 const NOTIFICATIONS_FILE_NAME               = 'Notification.json';
@@ -26,6 +27,8 @@ const GEAR_TYPES_DATA_CONTAINER_NAME        = 'geartype';
 const GEAR_TYPES_DATA_FILE_NAME             = 'geartypes.csv';
 const RFMO_DATA_CONTAINER_NAME              = 'catcharea';
 const RFMO_DATA_FILE_NAME                   = 'RFMOList.csv';
+const EU_MEMBER_STATES_CONTAINER_NAME       = 'eumemberstates';
+const EU_MEMBER_STATES_FILE_NAME            = 'eumemberstates.csv';
 
 export const readToText = async (blobClient) => {
   const downloadBlockBlobResponse = await blobClient.download();
@@ -210,7 +213,7 @@ export const getSpeciesAliases = async (connectionString: string): Promise<any> 
   }
 }
 
-export const getGearTypesData = async (connectionString: string): Promise<any[]> => {
+export const getGearTypesData = async (connectionString: string): Promise<GearRecord[]> => {
   try {
     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
     const containerClient = blobServiceClient.getContainerClient(GEAR_TYPES_DATA_CONTAINER_NAME);
@@ -243,3 +246,25 @@ export const getRfmosData = async (connectionString: string): Promise<any[]> => 
     throw new Error(e);
   }
 }
+
+export const getEuMemberStates = async (connectionString: string): Promise<string[]> => {
+  try {
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(EU_MEMBER_STATES_CONTAINER_NAME);
+    const blobClient = containerClient.getBlobClient(EU_MEMBER_STATES_FILE_NAME);
+
+    const euMemberStatesData = await readToText(blobClient) as string;
+    // CSV has one country per line, split and filter empty lines
+    const euMemberStates = euMemberStatesData.split('\n')
+      .map(country => country.trim())
+      .filter(country => country.length > 0);
+    return euMemberStates;
+
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot read remote file ${EU_MEMBER_STATES_FILE_NAME} from container ${EU_MEMBER_STATES_CONTAINER_NAME}`);
+    throw e;
+  }
+}
+
+

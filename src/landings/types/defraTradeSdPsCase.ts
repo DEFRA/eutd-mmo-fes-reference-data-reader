@@ -37,6 +37,7 @@ export interface IDefraTradeProcessingStatement {
     plantDateOfAcceptance: string;
     personResponsible : string;
     exportedTo: ICountry;
+    pointOfDestination?: string;
     processedFisheryProducts: string;
     catches?: IDefraTradeProcessingStatementCatch[];
     healthCertificateNumber: string;

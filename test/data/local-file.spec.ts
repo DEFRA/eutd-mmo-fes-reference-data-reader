@@ -8,7 +8,8 @@ import {
   getWeightingRiskFromFile,
   getExporterBehaviourFromCSV,
   getSpeciesAliasesFromFile,
-  getGearTypesDataFromCSV
+  getGearTypesDataFromCSV,
+  getEuMemberStatesFromCSV
 } from "../../src/data/local-file";
 
 describe('get conversion factors ', () => {
@@ -350,6 +351,56 @@ describe('get gear types data from CSV', () => {
 
     const result = await getGearTypesDataFromCSV(filePath);
     expect(result).toBeInstanceOf(Array);
+  });
+
+});
+
+describe('get EU member states from CSV', () => {
+
+  let mockLoggerError;
+
+  beforeEach(() => {
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should throw and log an error if file does not exist', async () => {
+    const filePath = 'pathToNonExistingFile';
+
+    try {
+      await getEuMemberStatesFromCSV(filePath);
+    }
+    catch (e) {
+      expect(e.message).toContain('no such file or directory');
+      expect(mockLoggerError).toHaveBeenCalledWith('Could not load EU member states data from file', filePath);
+    }
+  });
+
+  it('should return an array of EU member state country names', async () => {
+    const filePath = `${__dirname}/../../data/eumemberstates.csv`;
+
+    const result = await getEuMemberStatesFromCSV(filePath);
+    
+    expect(result).toBeInstanceOf(Array);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result).toContain('Austria');
+    expect(result).toContain('Belgium');
+    expect(result).toContain('France');
+    expect(result).toContain('Germany');
+  });
+
+  it('should filter out empty lines and trim whitespace', async () => {
+    const filePath = `${__dirname}/../../data/eumemberstates.csv`;
+
+    const result = await getEuMemberStatesFromCSV(filePath);
+    
+    // Check no empty strings in result
+    expect(result.every(country => country.length > 0)).toBe(true);
+    // Check no whitespace at start/end
+    expect(result.every(country => country === country.trim())).toBe(true);
   });
 
 });

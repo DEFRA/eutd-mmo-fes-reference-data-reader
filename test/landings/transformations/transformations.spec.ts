@@ -1161,7 +1161,7 @@ describe('map from the structure in orchestrator to cc', () => {
   });
 
   it('should be valid json schema', () => {
-    const ajv = new AJV();
+    const ajv = new AJV({ strict: false });
     addFormats(ajv);
     const validate = ajv.compile(minimalSchema)
     const outputFromMapping = Transformations.mapExportPayloadToCC(mockStructureInOrchestrator);

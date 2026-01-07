@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import { ICatchStatus } from '../../controllers/euUpgrade';
 
 export const DocumentStatuses = Object.freeze(
   {
@@ -20,6 +21,7 @@ const documentSchema = new Schema({
     __t:            { type: String, required: true  },
     documentNumber: { type: String, required: true  },
     status:         { type: String, required: false, enum: Object.values(DocumentStatuses) },
+    catchStatus:    { type: Object, required: false, default: {} },
     createdAt:      { type: Date,   required: true  },
     createdBy:      { type: String, required: true  },
     createdByEmail: { type: String },
@@ -40,6 +42,7 @@ export interface IDocument {
   contactId?: string,
   documentNumber: string,
   status: string,
+  catchStatus?: any,
   createdAt: Date,
   createdBy: string,
   createdByEmail: string,
@@ -52,7 +55,8 @@ export interface IDocument {
   numberOfFailedAttempts?: number,
   clonedFrom?: string,
   landingsCloned?: boolean,
-  parentDocumentVoid?: boolean
+  parentDocumentVoid?: boolean,
+  catchSubmission?: ICatchStatus;
 }
 
 export interface IDocumentModel extends IDocument, Document {}

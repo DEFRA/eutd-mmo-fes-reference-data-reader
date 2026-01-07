@@ -3,6 +3,6 @@ export interface IGearType {
   gearCode: string;
 }
 
-type GearRecordKeys = 'Gear category' | 'Gear name' | 'Gear code';
+type GearRecordKeys = 'Gear category' | 'Gear name' | 'Gear code' | 'ISSCFG code';
 
 export type GearRecord = Partial<Pick<{[key: string]: string;}, GearRecordKeys>>;

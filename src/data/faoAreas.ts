@@ -19,3 +19,25 @@ export const faoAreas: readonly string[] = [
   'FAO87',
   'FAO88',
 ];
+
+export const eufaoAreas = {
+  'FAO18': '18',
+  'FAO21': '21',
+  'FAO27': '27',
+  'FAO31': '31',
+  'FAO34': '34',
+  'FAO37': '37',
+  'FAO41': '41',
+  'FAO47': '47',
+  'FAO48': '48',
+  'FAO51': '51',
+  'FAO57': '57',
+  'FAO58': '58',
+  'FAO61': '61',
+  'FAO67': '67',
+  'FAO71': '71',
+  'FAO77': '77',
+  'FAO81': '81',
+  'FAO87': '87',
+  'FAO88': '88'
+}

@@ -59,7 +59,7 @@ export const reportDraft = async (certificateId: string) => {
     else {
       logger.info(`[REPORTING-CC-DRAFT][${certificateId}][Getting report]`);
       const requestByAdmin = certificate.requestByAdmin;
-      const catchCertificateReport = toCcDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin);
+      const catchCertificateReport = toCcDefraReport(certificateId, correlationId, DocumentStatuses.Draft, requestByAdmin, getVesselsIdx(), certificate);
 
       logger.info(`[REPORTING-CC-DRAFT][${certificateId}][REPORT-ID][${catchCertificateReport._correlationId}]`);
       await insertCcDefraValidationReport(catchCertificateReport);
@@ -103,7 +103,7 @@ export const reportDelete = async (certificateId: string) => {
     }
     else {
       const requestByAdmin = certificate.requestByAdmin;
-      const catchCertificateReport = toCcDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin);
+      const catchCertificateReport = toCcDefraReport(certificateId, correlationId, 'DELETE', requestByAdmin, getVesselsIdx(), certificate);
 
       if (certificate.exportData?.exporterDetails)
         catchCertificateReport.devolvedAuthority = DefraMapper.daLookUp(certificate.exportData.exporterDetails.postcode);

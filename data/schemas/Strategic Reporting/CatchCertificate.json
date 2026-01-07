@@ -865,6 +865,10 @@
           "items": { "$ref": "#/definitions/transportation" }
         },
         "failedSubmissions": { "type": "integer" },
+        "pointOfDestination": {
+            "type": "string",
+            "description": "The point of destination for the exported goods"
+        },
         "requestedByAdmin": {
           "type": "boolean",
           "definition": "Flag to identify applications made by an EACC"

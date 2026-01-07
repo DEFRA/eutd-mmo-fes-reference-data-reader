@@ -497,6 +497,10 @@
       "description": "Where the consignment was unloaded from when arriving in the UK",
       "type": "string"
     },
+    "pointOfDestination": {
+      "type": "string",
+      "description": "The point of destination for the exported goods"
+    },
     "da": {
       "type": "string"
     },

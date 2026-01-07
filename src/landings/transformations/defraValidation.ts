@@ -169,6 +169,7 @@ function addAdditionalDetailsToResult(result: IDefraValidationProcessingStatemen
 
    if (processingStatement.exportData) {
       result.exportedTo = processingStatement.exportData.exportedTo;
+      result.pointOfDestination = processingStatement.exportData.pointOfDestination;
    }
 
    result.userReference = processingStatement.userReference;
@@ -326,6 +327,7 @@ export function toDefraPsCatch(psCatch): ProcessingStatementReportCatch {
 }
 
 export function toDefraSdProduct(sdCatch): StorageDocumentReportCatch {
+   const issuingCountry = sdCatch?.certificateType === 'uk' ? 'United Kingdom' : sdCatch?.issuingCountry?.officialCountryName;
    return sdCatch ? {
       species: sdCatch.product,
       scientificName: sdCatch.scientificName,
@@ -334,6 +336,7 @@ export function toDefraSdProduct(sdCatch): StorageDocumentReportCatch {
       weightOnCertificate: parseInt(sdCatch.weightOnCC, 10),
       cnCode: sdCatch.commodityCode,
       isDocumentIssuedInUK: sdCatch.certificateType === 'uk',
+      ...(issuingCountry ? { issuingCountry } : {}),
    } : undefined;
 }
 
@@ -359,8 +362,8 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
 
 const handleEmptyValue = (value) => !isEmpty(value) ? value : undefined;
 
-export function toTransportation(transportation): CertificateTransport {
-   if (transportation === undefined)
+export function toTransportation(transportation: any): CertificateTransport | undefined {
+   if (transportation === undefined || transportation === null)
       return undefined;
 
    switch (transportation.vehicle) {
@@ -376,7 +379,9 @@ export function toTransportation(transportation): CertificateTransport {
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
-            placeOfUnloading: transportation.placeOfUnloading
+            placeOfUnloading: transportation.placeOfUnloading,
+            containerId: handleEmptyValue(transportation.containerIdentificationNumber),
+            pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_TRAIN:
          return {
@@ -388,7 +393,9 @@ export function toTransportation(transportation): CertificateTransport {
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
-            placeOfUnloading: transportation.placeOfUnloading
+            placeOfUnloading: transportation.placeOfUnloading,
+            containerId: handleEmptyValue(transportation.containerIdentificationNumber),
+            pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_PLANE:
          return {
@@ -402,7 +409,8 @@ export function toTransportation(transportation): CertificateTransport {
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
-            placeOfUnloading: transportation.placeOfUnloading
+            placeOfUnloading: transportation.placeOfUnloading,
+            pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_CONTAINER_VESSEL:
          return {
@@ -416,7 +424,8 @@ export function toTransportation(transportation): CertificateTransport {
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
-            placeOfUnloading: transportation.placeOfUnloading
+            placeOfUnloading: transportation.placeOfUnloading,
+            pointOfDestination: transportation.pointOfDestination
          }
       default:
          return {
@@ -428,6 +437,7 @@ export function toTransportation(transportation): CertificateTransport {
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
+            pointOfDestination: transportation.pointOfDestination
          }
    }
 }
@@ -530,11 +540,12 @@ export function toCatches(queryRes: ISdPsQueryResult[]): ProcessingStatementRepo
          exportWeightAfterProcessing: row.weightAfterProcessing,
          isOverUse: row.isOverAllocated,
          hasWeightMismatch: row.isMismatch,
+         ...(row.productDescription && row.productDescription.trim() !== '' ? { productDescription: row.productDescription } : {}),
          importWeightExceededAmount: row.overAllocatedByWeight,
          cnCode: row.commodityCode,
          isDocumentIssuedInUK: row.catchCertificateType === 'uk',
-         issuingCountry: row.catchCertificateType === 'uk' 
-            ? 'United Kingdom' 
+         issuingCountry: row.catchCertificateType === 'uk'
+            ? 'United Kingdom'
             : row.issuingCountry?.officialCountryName
       };
    });
@@ -542,6 +553,7 @@ export function toCatches(queryRes: ISdPsQueryResult[]): ProcessingStatementRepo
 
 export function toProducts(queryRes: ISdPsQueryResult[]): StorageDocumentReportCatch[] {
    return queryRes.map(row => {
+      const issuingCountry = row.catchCertificateType === 'uk' ? 'United Kingdom' : row.issuingCountry?.officialCountryName;
       return {
          species: row.species,
          scientificName: row.scientificName,
@@ -553,12 +565,13 @@ export function toProducts(queryRes: ISdPsQueryResult[]): StorageDocumentReportC
          isImportWeightMismatch: row.isMismatch,
          overUseExceededAmount: row.overAllocatedByWeight,
          isDocumentIssuedInUK: row.catchCertificateType === 'uk',
-         productDescription: row.productDescription,
+         ...(issuingCountry ? { issuingCountry } : {}),
+         ...(row.productDescription && row.productDescription.trim() !== '' ? { productDescription: row.productDescription } : {}),
          netWeightProductArrival: row.netWeightProductArrival,
          netWeightFisheryProductArrival: row.netWeightFisheryProductArrival,
          netWeightProductDeparture: row.netWeightProductDeparture,
          netWeightFisheryProductDeparture: row.netWeightFisheryProductDeparture,
          supportingDocuments: row.supportingDocuments,
-      }
-   })
+      };
+   });
 }

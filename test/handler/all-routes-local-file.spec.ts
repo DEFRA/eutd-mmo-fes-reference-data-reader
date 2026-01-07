@@ -266,7 +266,7 @@ describe("To Support Vessels Autocomplete- without mocking", () => {
 
 
 describe("Routes", () => {
-  let getVesselsDataMock;
+  let getVesselsDataMock: jest.SpyInstance;
   const error = new Error('error');
 
   beforeEach(() => {
@@ -309,7 +309,7 @@ describe("Routes", () => {
 
   it('should GET /v1/vessels/hasLicense', async () => {
     const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=E163&vesselName=STRIKER&landedDate=2016-09-01&flag=GBR&cfr=GBR000B10811&homePort=EXMOUTH&licenceNumber=22548&licenceValidTo=2030-12-31'
+      url: '/v1/vessels/hasLicense?vesselPln=E163&vesselName=STRIKER&landedDate=2016-09-01&flag=GBR&cfr=GBR000B10811&ircs=&homePort=EXMOUTH&licenceNumber=22548&licenceValidTo=2030-12-31'
     });
     expect(response.statusCode).toBe(200);
     expect(response.payload.length > 0).toBe(true);

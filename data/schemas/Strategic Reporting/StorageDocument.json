@@ -97,7 +97,8 @@
         "flag": "test flag",
         "containerId": "TRK-4589",
         "exportLocation": "UK",
-        "exportDate": "2023-01-10"
+        "exportDate": "2023-01-10",
+        "placeOfUnloading": "Dover Port"
       },
       "storageFacility" : {
         "name": "Fish Food LTD.",
@@ -122,6 +123,7 @@
         "overUseExceededAmount" : 500,
         "isImportWeightMismatch" : false,
         "isDocumentIssuedInUK": true,
+        "issuingCountry": "United Kingdom",
         "netWeightProductArrival": 9999999.99,
         "netWeightFisheryProductArrival": 9999999.99,
         "netWeightProductDeparture": 9999999.99,
@@ -259,6 +261,10 @@
                 "isDocumentIssuedInUK": {
                   "type": "boolean",
                   "description": "Flag to identify whether the certificate was issued in the UK"
+                },
+                "issuingCountry": {
+                  "type": "string",
+                  "description": "The country that issued the certificate"
                 }
             },
             "required" : ["species","productWeight","certificateNumber","weightOnCertificate"]
@@ -501,11 +507,12 @@
             "departureDate": {
               "type": "string"
             },
-            "placeOfUnloading": {
-              "type": "string"
-            },
             "transportUnloadedFrom": {
               "type": "string"
+            },
+            "placeOfUnloading": {
+              "type": "string",
+              "description": "The place where the transport was unloaded"
             }
           }
         },
@@ -514,6 +521,10 @@
         },
         "failedSubmissions": {
             "type": "integer"
+        },
+        "pointOfDestination": {
+            "type": "string",
+            "description": "The point of destination for the exported goods"
         },
         "_correlationId": {
           "type": "string",

@@ -37,6 +37,7 @@ export const vesselSearch = (searchTerm: string, landedDateISO: string): IVessel
       vesselName: item.fishingVesselName,
       flag: item.flag,
       cfr: item.cfr,
+      ircs: item.ircs,
       homePort: item.homePort,
       licenceNumber: item.fishingLicenceNumber,
       imoNumber: item.imo,

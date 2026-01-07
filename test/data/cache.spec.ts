@@ -285,28 +285,29 @@ const gearTypesData: any[] = mockGearTypesData
 const rfmosData: any[] = mockRfmosData;
 
 describe('when in production mode', () => {
-  let mockLoadAllSpecies;
-  let mockLoadSpecies;
-  let mockVesselsData;
-  let mockaddVesselNotFound;
-  let mockLoadSeasonalFishData;
-  let mockLoadCountries;
-  let mockLoadSpeciesAliases;
-  let mockLoadConversionFactors;
-  let mockSeedVesselsOfInterest;
-  let mockSeedWeightingRisk;
-  let mockGetAllVesselsOfInterest;
-  let mockGetWeightingRisk;
-  let mockGetSpeciesToggle;
-  let mockGetAddresses;
-  let mockGetCommodityCodes;
-  let mockGetEodSettings;
-  let mockLoadGearTypesData;
-  let mockGetRfmosData;
+  let mockLoadAllSpecies: jest.SpyInstance;
+  let mockLoadSpecies: jest.SpyInstance;
+  let mockVesselsData: jest.SpyInstance;
+  let mockaddVesselNotFound: jest.SpyInstance;
+  let mockLoadSeasonalFishData: jest.SpyInstance;
+  let mockLoadCountries: jest.SpyInstance;
+  let mockLoadSpeciesAliases: jest.SpyInstance;
+  let mockLoadConversionFactors: jest.SpyInstance;
+  let mockSeedVesselsOfInterest: jest.SpyInstance;
+  let mockSeedWeightingRisk: jest.SpyInstance;
+  let mockGetAllVesselsOfInterest: jest.SpyInstance;
+  let mockGetWeightingRisk: jest.SpyInstance;
+  let mockGetSpeciesToggle: jest.SpyInstance;
+  let mockGetAddresses: jest.SpyInstance;
+  let mockGetCommodityCodes: jest.SpyInstance;
+  let mockGetEodSettings: jest.SpyInstance;
+  let mockLoadGearTypesData: jest.SpyInstance;
+  let mockGetRfmosData: jest.SpyInstance;
+  let mockLoadEuMemberStatesData: jest.SpyInstance;
 
-  let mockLoggerInfo;
-  let mockLoggerError;
-  let mockLoggerDebug;
+  let mockLoggerInfo: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
+  let mockLoggerDebug: jest.SpyInstance;
 
   beforeEach(() => {
     appConfig.inDev = false;
@@ -331,6 +332,7 @@ describe('when in production mode', () => {
     mockGetEodSettings = jest.spyOn(EoDService, 'getEodSettings');
     mockLoadGearTypesData = jest.spyOn(SUT, 'loadGearTypesData');
     mockGetRfmosData = jest.spyOn(SUT, 'loadRfmosDataFromAzureBlob');
+    mockLoadEuMemberStatesData = jest.spyOn(SUT, 'loadEuMemberStatesData');
 
     mockLoggerInfo = jest.spyOn(logger, 'info');
     mockLoggerError = jest.spyOn(logger, 'error');
@@ -352,6 +354,7 @@ describe('when in production mode', () => {
     mockGetSpeciesToggle.mockResolvedValue(speciesToggleData);
     mockGetAddresses.mockResolvedValue(null);
     mockLoadGearTypesData.mockResolvedValue(gearTypesData);
+    mockLoadEuMemberStatesData.mockResolvedValue(['Austria', 'Belgium', 'France']);
     mockGetRfmosData.mockResolvedValue(rfmosData);
   });
 
@@ -370,8 +373,9 @@ describe('when in production mode', () => {
     mockGetSpeciesToggle.mockRestore();
     mockGetEodSettings.mockRestore();
     mockLoadGearTypesData.mockRestore();
+    mockLoadEuMemberStatesData.mockRestore();
     mockGetRfmosData.mockRestore();
-    
+
     mockLoggerInfo.mockRestore();
     mockLoggerError.mockRestore();
     mockLoggerDebug.mockRestore();
@@ -384,7 +388,8 @@ describe('when in production mode', () => {
       speciesAliases: {},
       commodityCodes: [],
       gearTypes: [],
-      rfmos: []
+      rfmos: [],
+      euMemberStates: []
     });
     SUT.updateVesselsCache([]);
     SUT.updateVesselsOfInterestCache([]);
@@ -575,22 +580,22 @@ describe('when in development mode', () => {
   const enableCountryData = appConfig.enableCountryData;
   const enableVesselNotFound = appConfig.vesselNotFoundEnabled;
 
-  let mockLoadAllSpecies;
-  let mockLoadSpeciesDataFromLocalFile;
-  let mockLoadVesselsDataFromLocalFile;
-  let mockaddVesselNotFound;
-  let mockLoadSeasonalFishData;
-  let mockLoadCountries;
-  let mockLoadSpeciesAliases;
-  let mockLoggerInfo;
-  let mockLoadConversionFactors;
-  let mockSeedWeightingRisk;
-  let mockSeedVesselsOfInterest;
-  let mockGetSpeciesToggle;
-  let mockSeedBlockingRules;
-  let mockGetEodSettings;
-  let mockLoadGearTypesData;
-  let mockGetRfmosData;
+  let mockLoadAllSpecies: jest.SpyInstance;
+  let mockLoadSpeciesDataFromLocalFile: jest.SpyInstance;
+  let mockLoadVesselsDataFromLocalFile: jest.SpyInstance;
+  let mockaddVesselNotFound: jest.SpyInstance;
+  let mockLoadSeasonalFishData: jest.SpyInstance;
+  let mockLoadCountries: jest.SpyInstance;
+  let mockLoadSpeciesAliases: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
+  let mockLoadConversionFactors: jest.SpyInstance;
+  let mockSeedWeightingRisk: jest.SpyInstance;
+  let mockSeedVesselsOfInterest: jest.SpyInstance;
+  let mockGetSpeciesToggle: jest.SpyInstance;
+  let mockSeedBlockingRules: jest.SpyInstance;
+  let mockGetEodSettings: jest.SpyInstance;
+  let mockLoadGearTypesData: jest.SpyInstance;
+  let mockGetRfmosData: jest.SpyInstance;
 
   beforeEach(() => {
     appConfig.inDev = true;
@@ -1165,8 +1170,8 @@ describe('getAllConversionFactors', () => {
 
 describe('loadExporterBehaviour', () => {
 
-  let mockLoadBlob;
-  let mockLoadLocal;
+  let mockLoadBlob: jest.SpyInstance;
+  let mockLoadLocal: jest.SpyInstance;
 
   beforeEach(() => {
     mockLoadBlob = jest.spyOn(SUT, 'loadExporterBehaviourFromAzureBlob');
@@ -1201,8 +1206,8 @@ describe('loadExporterBehaviour', () => {
 
 describe('loadExporterBehaviourFromLocalFile', () => {
 
-  let mockGetExporterBehaviourFromCSV;
-  let mockLogError;
+  let mockGetExporterBehaviourFromCSV: jest.SpyInstance;
+  let mockLogError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetExporterBehaviourFromCSV = jest.spyOn(file, 'getExporterBehaviourFromCSV');
@@ -1237,8 +1242,8 @@ describe('loadExporterBehaviourFromLocalFile', () => {
 
 describe('loadExporterBehaviourFromAzureBlob', () => {
 
-  let mockGetExporterBehaviourData;
-  let mockLogInfo;
+  let mockGetExporterBehaviourData: jest.SpyInstance;
+  let mockLogInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetExporterBehaviourData = jest.spyOn(blob, 'getExporterBehaviourData');
@@ -1277,8 +1282,8 @@ describe('loadExporterBehaviourFromAzureBlob', () => {
 
 describe('loadSpeciesAliases', () => {
 
-  let mockGetSpeciesAliases;
-  let mockLogInfo;
+  let mockGetSpeciesAliases: jest.SpyInstance;
+  let mockLogInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSpeciesAliases = jest.spyOn(blob, 'getSpeciesAliases');
@@ -1528,13 +1533,13 @@ describe('Refresh Risking Data', () => {
     }
   ];
 
-  let mockGetVesselsOfInterest;
-  let mockUpdateVesselsOfInterestCache;
-  let mockGetWeightingRisk;
-  let mockUpdateWeightingCache;
-  let mockGetSpeciesToggle;
-  let mockUpdateSpeciesToggleCache;
-  let mockGetEodSettingsCache;
+  let mockGetVesselsOfInterest: jest.SpyInstance;
+  let mockUpdateVesselsOfInterestCache: jest.SpyInstance;
+  let mockGetWeightingRisk: jest.SpyInstance;
+  let mockUpdateWeightingCache: jest.SpyInstance;
+  let mockGetSpeciesToggle: jest.SpyInstance;
+  let mockUpdateSpeciesToggleCache: jest.SpyInstance;
+  let mockGetEodSettingsCache: jest.SpyInstance;
 
   beforeEach(() => {
     SUT.updateVesselsCache(vesselData);
@@ -1835,8 +1840,8 @@ describe('loadAllSpecies', () => {
 
   const connString = 'connection string';
 
-  let mockGetSpeciesData;
-  let mockLoggerInfo;
+  let mockGetSpeciesData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSpeciesData = jest.spyOn(blob, 'getAllSpecies');
@@ -1887,8 +1892,8 @@ describe('loadSpeciesData', () => {
 
   const connString = 'connection string';
 
-  let mockGetSpeciesData;
-  let mockLoggerInfo;
+  let mockGetSpeciesData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSpeciesData = jest.spyOn(blob, 'getSpeciesData');
@@ -1939,8 +1944,8 @@ describe('loadCommodityData', () => {
 
   const connString = 'connection string';
 
-  let mockGetCommodityCodeData;
-  let mockLoggerInfo;
+  let mockGetCommodityCodeData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetCommodityCodeData = jest.spyOn(blob, 'getCommodityCodeData');
@@ -1991,8 +1996,8 @@ describe('loadSeasonalFishData', () => {
 
   const connString = 'connection string';
 
-  let mockGetSeasonalFishData;
-  let mockLoggerInfo;
+  let mockGetSeasonalFishData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSeasonalFishData = jest.spyOn(blob, 'getSeasonalFishData');
@@ -2043,8 +2048,8 @@ describe('loadConversionFactorsData', () => {
 
   const connString = 'connection string';
 
-  let mockGetConversionFactorsData;
-  let mockLoggerInfo;
+  let mockGetConversionFactorsData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetConversionFactorsData = jest.spyOn(blob, 'getConversionFactorsData');
@@ -2095,8 +2100,8 @@ describe('loadGearTypesData', () => {
 
   const connString = 'connection string';
 
-  let mockGetGearTypesData;
-  let mockLoggerInfo;
+  let mockGetGearTypesData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetGearTypesData = jest.spyOn(blob, 'getGearTypesData');
@@ -2147,8 +2152,8 @@ describe('loadRfmosData', () => {
 
   const connString = 'connection string';
 
-  let mockGetRfmosData;
-  let mockLoggerInfo;
+  let mockGetRfmosData: jest.SpyInstance;
+  let mockLoggerInfo: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetRfmosData = jest.spyOn(blob, 'getRfmosData');
@@ -2197,8 +2202,8 @@ describe('loadRfmosData', () => {
 
 describe('loadAllSpeciesFromLocalFile', () => {
 
-  let mockGetSpeciesData;
-  let mockLoggerError;
+  let mockGetSpeciesData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSpeciesData = jest.spyOn(file, 'getSpeciesDataFromCSV');
@@ -2240,8 +2245,8 @@ describe('loadAllSpeciesFromLocalFile', () => {
 
 describe('loadSpeciesDataFromLocalFile', () => {
 
-  let mockGetSpeciesData;
-  let mockLoggerError;
+  let mockGetSpeciesData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSpeciesData = jest.spyOn(file, 'getSpeciesDataFromFile');
@@ -2283,8 +2288,8 @@ describe('loadSpeciesDataFromLocalFile', () => {
 
 describe('loadVesselsDataFromLocalFile', () => {
 
-  let mockGetVesselData;
-  let mockLoggerError;
+  let mockGetVesselData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetVesselData = jest.spyOn(file, 'getVesselsDataFromFile');
@@ -2327,8 +2332,8 @@ describe('loadVesselsDataFromLocalFile', () => {
 
 describe('loadSeasonalFishDataFromLocalFile', () => {
 
-  let mockGetSeasonalFishData;
-  let mockLoggerError;
+  let mockGetSeasonalFishData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetSeasonalFishData = jest.spyOn(file, 'getSeasonalFishDataFromCSV');
@@ -2371,8 +2376,8 @@ describe('loadSeasonalFishDataFromLocalFile', () => {
 
 describe('loadCountriesDataFromLocalFile', () => {
 
-  let mockGetCountriesData;
-  let mockLoggerError;
+  let mockGetCountriesData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetCountriesData = jest.spyOn(file, 'getCountriesDataFromFile');
@@ -2453,8 +2458,8 @@ describe('loadCountriesDataFromLocalFile', () => {
 
 describe('loadSpeciesAliasesFromLocalFile', () => {
 
-  let mockgetSpeciesAliasesFromFile;
-  let mockLoggerError;
+  let mockgetSpeciesAliasesFromFile: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockgetSpeciesAliasesFromFile = jest.spyOn(file, 'getSpeciesAliasesFromFile');
@@ -2508,8 +2513,8 @@ describe('loadSpeciesAliasesFromLocalFile', () => {
 
 describe('loadGearTypesDataFromLocalFile', () => {
 
-  let mockGetGearTypesData;
-  let mockLoggerError;
+  let mockGetGearTypesData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetGearTypesData = jest.spyOn(file, 'getGearTypesDataFromCSV');
@@ -2552,8 +2557,8 @@ describe('loadGearTypesDataFromLocalFile', () => {
 
 describe('loadRfmosDataFromLocalFile', () => {
 
-  let mockGetRfmosData;
-  let mockLoggerError;
+  let mockGetRfmosData: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
 
   beforeEach(() => {
     mockGetRfmosData = jest.spyOn(file, 'getRfmosDataFromCSV');
