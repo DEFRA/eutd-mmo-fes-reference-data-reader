@@ -30,7 +30,7 @@ describe('that we can read catch certificates in bulk', () => {
 
     describe('testing the validation independently', () => {
 
-      const ajv = new Ajv()
+      const ajv = new Ajv({ strict: false })
       addFormats(ajv);
       const validate = ajv.compile(minimalSchema)
 
@@ -140,7 +140,7 @@ describe('that we can read catch certificates in bulk', () => {
 
 describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
-  let mongoServer;
+  let mongoServer: MongoMemoryServer;
   const opts = {}
 
   beforeAll(async () => {
@@ -151,7 +151,9 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
   afterAll(async () => {
     await mongoose.disconnect();
-    await mongoServer.stop();
+    
+      await mongoServer.stop();
+
   });
 
 describe('fetching catch certificates', () => {

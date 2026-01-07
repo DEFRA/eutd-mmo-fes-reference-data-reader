@@ -18,6 +18,7 @@ export interface IDynamicsProcessingStatementCase {
     requestedByAdmin: boolean;
     clonedFrom?: string;
     parentDocumentVoid?: boolean;
+    pointOfDestination?: string;
 }
 
 export interface IDynamicsProcessingStatementCatch {
@@ -59,6 +60,7 @@ export interface IDynamicsStorageDocumentCase {
     clonedFrom?: string;
     parentDocumentVoid?: boolean;
     placeOfUnloading?: string;
+    pointOfDestination?: string;
 }
 
 export interface IDynamicsStorageDocumentProduct {

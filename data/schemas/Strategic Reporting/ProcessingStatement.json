@@ -85,6 +85,7 @@
           "species": "Atlantic Herring (HER)",
           "scientificName": "some scientific name",
           "catchCertificateNumber": "GBR-3423-4234234942-234",
+          "productDescription": "Fresh whole herring",
           "totalWeightLanded": 1000,
           "exportWeightBeforeProcessing": 1000,
           "exportWeightAfterProcessing": 1000,
@@ -135,6 +136,7 @@
           "species": "Atlantic Salmon (SAL)",
           "scientificName": "Salmo salar",
           "catchCertificateNumber": "IRL-PS-4324-423423-234234",
+          "productDescription": "Filleted salmon portions",
           "totalWeightLanded": 500,
           "exportWeightBeforeProcessing": 450,
           "exportWeightAfterProcessing": 400,
@@ -343,6 +345,10 @@
         },
         "catchCertificateNumber": {
           "type": "string"
+        },
+        "productDescription": {
+          "type": "string",
+          "description": "Description of the product added to the consignment"
         },
         "totalWeightLanded": {
           "type": "number"
@@ -554,6 +560,10 @@
     },
     "failedSubmissions": {
       "type": "integer"
+    },
+    "pointOfDestination": {
+      "type": "string",
+      "description": "The point of destination for the exported goods"
     },
     "_correlationId": {
       "type": "string",

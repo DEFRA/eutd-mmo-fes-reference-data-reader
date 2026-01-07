@@ -803,6 +803,10 @@
     "transportations": {
       "type": "array",
       "items": { "$ref": "#/definitions/transportation" }
+    },
+    "pointOfDestination": {
+      "type": "string",
+      "description": "The point of destination for the exported goods"
     }
   },
   "required": [

@@ -381,6 +381,10 @@
     "requestedByAdmin": {
       "type": "boolean",
       "description": "Flag to identify applications made by an EACC"
+    },
+    "pointOfDestination": {
+      "type": "string",
+      "description": "The point of destination for the exported goods"
     }
   },
   "required": [

@@ -566,6 +566,11 @@
         "departureDate": {
           "type": "string"
         }
+        ,
+        "pointOfDestination": {
+          "type": ["string", "null"],
+          "description": "Point of destination as provided by the user."
+        }
       },
       "anyOf": [
         {
@@ -681,6 +686,10 @@
         },
         "placeOfUnloading": {
           "description": "Place of unloading",
+          "type": "string"
+        },
+        "pointOfDestination": {
+          "description": "Point of destination",
           "type": "string"
         }
       }
@@ -810,6 +819,7 @@
     "companyName": {
       "type": "string"
     },
+    
     "products": {
       "type": [
         "array",

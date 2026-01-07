@@ -283,7 +283,14 @@ describe("Report Draft", () => {
 
       await Controllers.reportDraft("GBR-CC-2342342-32423");
 
-      expect(mockToCcDefraReport).toHaveBeenCalledWith('GBR-CC-2342342-32423', 'some-uuid-correlation-id', 'DRAFT', false);
+      expect(mockToCcDefraReport).toHaveBeenCalledWith(
+        'GBR-CC-2342342-32423', 
+        'some-uuid-correlation-id', 
+        'DRAFT', 
+        false,
+        expect.any(Function),
+        catchCertificate
+      );
 
       const result = await DefraPersistance.getAllDefraValidationReports();
       expect(result[0]._correlationId).toEqual('some-uuid-correlation-id');
@@ -613,7 +620,8 @@ describe("Report Delete", () => {
 
     it("will correctly save the right type of data", async () => {
       const catchCertificate = {
-        "requestByAdmin": false
+        "requestByAdmin": false,
+        "audit": []
       };
 
       mockGetCertificateByDocumentNumber.mockResolvedValue(catchCertificate);
@@ -693,14 +701,22 @@ describe("Report Delete", () => {
 
     it("will include an internal _correlationId for end to end traceability", async () => {
       const catchCertificate = {
-        "requestByAdmin": false
+        "requestByAdmin": false,
+        "audit": []
       };
 
       mockGetCertificateByDocumentNumber.mockResolvedValue(catchCertificate);
 
       await Controllers.reportDelete("GBR-CC-2342342-32423");
 
-      expect(mockToCcDefraReport).toHaveBeenCalledWith('GBR-CC-2342342-32423', 'some-uuid-correlation-id', 'DELETE', false);
+      expect(mockToCcDefraReport).toHaveBeenCalledWith(
+        'GBR-CC-2342342-32423', 
+        'some-uuid-correlation-id', 
+        'DELETE', 
+        false,
+        expect.any(Function),
+        catchCertificate
+      );
 
       const result = await DefraPersistance.getAllDefraValidationReports();
       expect(result[0]._correlationId).toEqual('some-uuid-correlation-id');

@@ -33,6 +33,9 @@ import { isLegallyDueRoute } from './handler/isLegallyDue';
 import { purgeRoutes } from './handler/purge';
 import { gearTypeRoutes } from './handler/gearTypes';
 import { rfmoRoutes } from './handler/rfmo';
+import { euUpgradeRoutes } from './handler/euUpgrade';
+import { catchSubmissionRoutes } from './handler/catchSubmission';
+import { euMemberStatesRoutes } from './handler/euMemberStates';
 
 const Joi = require('joi');
 
@@ -225,5 +228,8 @@ const setupRoutes = server => {
   uploadValidatorRoutes(server);
   purgeRoutes(server);
   gearTypeRoutes(server);
-  rfmoRoutes(server)
+  rfmoRoutes(server);
+  euUpgradeRoutes(server);
+  catchSubmissionRoutes(server);
+  euMemberStatesRoutes(server);
 }

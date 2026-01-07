@@ -93,10 +93,9 @@ export const toDefraTradeLanding = (landing: ICcQueryResult): IDefraTradeLanding
 };
 
 export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCatchCertificateCase, ccQueryResults: ICcQueryResult[] | null): IDefraTradeCatchCertificate => {
-  const transportation: CertificateTransport = document.exportData?.transportation
-    ? toTransportation(document.exportData?.transportation)
-    : toTransportation(document.exportData?.transportations.find((t) => t.departurePlace || t.vehicle === 'truck' && t.cmr));
-  Object.keys(transportation).forEach(key => transportation[key] === undefined && delete transportation[key]);
+  const transportSource = document.exportData?.transportation ?? (Array.isArray(document.exportData?.transportations) ? document.exportData.transportations.find((t) => t.departurePlace || (t.vehicle === 'truck' && t.cmr)) : undefined);
+  const rawTransportation = transportSource ? toTransportation(transportSource) : undefined;
+  const transportation: CertificateTransport = rawTransportation ? Object.fromEntries(Object.entries(rawTransportation).filter(([, v]) => v !== undefined)) as CertificateTransport : undefined;
 
   let status: CertificateStatus;
   if (!Array.isArray(ccQueryResults)) {
@@ -104,6 +103,7 @@ export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCa
   } else {
     status = ccQueryResults.some((_: ICcQueryResult) => _.status === "BLOCKED") ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE;
   }
+  const ccPointOfDestination = (typeof document?.exportData?.pointOfDestination === 'string' ? document.exportData.pointOfDestination : transportation?.pointOfDestination) ?? undefined;
 
   return {
     ...certificateCase,
@@ -111,6 +111,7 @@ export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCa
     landings: Array.isArray(ccQueryResults) ? ccQueryResults.map((_: ICcQueryResult) => toDefraTradeLanding(_)) : null,
     exportedTo: document.exportData?.transportation?.exportedTo ?? document.exportData?.exportedTo,
     transportation,
+    ...(ccPointOfDestination !== undefined && { pointOfDestination: ccPointOfDestination }),
     multiVesselSchedule: isMultiVessel(document.exportData?.products)
   }
 };
@@ -154,6 +155,7 @@ export const toDefraTradePs = (document: IDocument, processingStatementCase: IDy
     toDefraTradePsCatch(_)
   ) : null,
   exportedTo: document.exportData?.exportedTo,
+  ...(typeof document?.exportData?.pointOfDestination === 'string' && { pointOfDestination: document.exportData.pointOfDestination }),
   plantAddress: {
     line1: document.exportData.plantAddressOne,
     building_name: document.exportData.plantBuildingName,

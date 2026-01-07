@@ -5,6 +5,7 @@ import { type IConversionFactor } from 'mmo-shared-reference-data';
 import { IExporterBehaviour } from '../landings/types/appConfig/exporterBehaviour';
 import { IVesselOfInterest, IWeighting } from '../landings/types/appConfig/risking';
 import { IVessel } from '../landings/types/appConfig/vessels';
+import { GearRecord } from '../interfaces/gearTypes.interface';
 
 export const getSpeciesDataFromFile = async (speciesFilePath: string): Promise<any[]> => {
   try {
@@ -118,7 +119,7 @@ export const getExporterBehaviourFromCSV = async (exporterBehaviourFilePath: str
   }
 };
 
-export const getGearTypesDataFromCSV = async (gearTypesFilePath: string): Promise<any[]> => {
+export const getGearTypesDataFromCSV = async (gearTypesFilePath: string): Promise<GearRecord[]> => {
   try {
     return await csv({ delimiter: ',' }).fromFile(gearTypesFilePath);
 
@@ -134,6 +135,21 @@ export const getRfmosDataFromCSV = async (rfmosFilePath: string): Promise<any[]>
 
   } catch(e) {
     logger.error('Could not load RFMOs data from file', rfmosFilePath);
+    throw new Error(e);
+  }
+};
+
+export const getEuMemberStatesFromCSV = async (euMemberStatesFilePath: string): Promise<string[]> => {
+  try {
+    const fileContent = fs.readFileSync(euMemberStatesFilePath, 'utf-8');
+    // CSV has one country per line, split and filter empty lines
+    const euMemberStates = fileContent.split('\n')
+      .map(country => country.trim())
+      .filter(country => country.length > 0);
+    return euMemberStates;
+
+  } catch(e) {
+    logger.error('Could not load EU member states data from file', euMemberStatesFilePath);
     throw new Error(e);
   }
 };

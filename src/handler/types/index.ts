@@ -10,4 +10,5 @@ export type CacheType = {
   commodityCodes: any[] | undefined;
   gearTypes?: any[];
   rfmos?: any[];
+  euMemberStates?: string[];
 };

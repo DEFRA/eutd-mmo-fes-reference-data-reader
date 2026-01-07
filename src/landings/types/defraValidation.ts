@@ -64,6 +64,7 @@ export interface ProcessingStatementReportCatch {
     catchCertificateNumber: string;
     isDocumentIssuedInUK?: boolean;
     issuingCountry?: string;
+    productDescription?: string;
     totalWeightLanded: number;
     exportWeightBeforeProcessing: number;
     exportWeightAfterProcessing: number;
@@ -83,6 +84,7 @@ export interface StorageDocumentReportCatch {
     isImportWeightMismatch?: boolean;
     overUseExceededAmount?: number;
     isDocumentIssuedInUK?: boolean;
+    issuingCountry?: string;
     supportingDocuments?: string;
     productDescription?: string;
     netWeightProductArrival?: string;
@@ -118,23 +120,26 @@ export interface CertificateStorageFacility {
 
 interface ModeOfTransport {
     modeofTransport: string;
-    placeOfUnloading?: string,
+    placeOfUnloading?: string;
     exportLocation?: string;
     exportDate?: string;
     freightbillNumber?: string;
     countryofDeparture?: string;
     whereDepartsFrom?: string;
     departureDate?: string;
+    pointOfDestination?: string;
 }
 
 export interface Truck extends ModeOfTransport {
     hasRoadTransportDocument: boolean;
     nationality?: string;
     registration?: string;
+    containerId?: string;
 }
 
 export interface Train extends ModeOfTransport {
     billNumber?: string;
+    containerId?: string;
 }
 
 export interface Plane extends ModeOfTransport {
@@ -192,6 +197,7 @@ export interface IDefraValidationProcessingStatement {
     plant?:             CertificatePlant;
     documentUri?:       string;
     failedSubmissions?: number;
+    pointOfDestination?: string;
     _correlationId:     string;
     requestedByAdmin:   boolean;
     exportedTo?:        ICountry;
@@ -217,6 +223,7 @@ export interface IDefraValidationStorageDocument {
     arrivalTransportation?: CertificateTransport;
     documentUri?:           string;
     failedSubmissions?:     number;
+    pointOfDestination?:    string;
     _correlationId:         string;
     requestedByAdmin:       boolean;
     exportedTo?:            ICountry;
@@ -253,6 +260,7 @@ export const DefraValidationProcessingStatementSchema = new Schema ({
     documentUri:        { type: String,  required: false },
     exportedTo:         { type: countrySchema, required: false },
     failedSubmissions:  { type: Number,  required: false },
+    pointOfDestination: { type: String,  required: false },
     _processed:         { type: Boolean, required: false, default: false },
     clonedFrom:         { type: String, required: false },
     parentDocumentVoid: { type: Boolean, required: false }
@@ -281,6 +289,7 @@ export const DefraValidationStorageDocumentSchema = new Schema ({
     documentUri:                { type: String,  required: false },
     exportedTo:                 { type: countrySchema, required: false },
     failedSubmissions:          { type: Number,  required: false },
+    pointOfDestination:         { type: String,  required: false },
     _processed:                 { type: Boolean, required: false, default: false },
     clonedFrom:                 { type: String, required: false },
     parentDocumentVoid:         { type: Boolean, required: false }
@@ -307,6 +316,7 @@ export const DefraValidationCatchCertificateSchema = new Schema ({
     transportation:        { type: Object,  required: false },
     transportations:       { type: [Schema.Types.Mixed],  required: false },
     failedSubmissions:     { type: Number,  required: false },
+    pointOfDestination:    { type: String,  required: false },
     _processed:            { type: Boolean, required: false, default: false },
     clonedFrom:            { type: String,  required: false },
     landingsCloned:        { type: Boolean, required: false },

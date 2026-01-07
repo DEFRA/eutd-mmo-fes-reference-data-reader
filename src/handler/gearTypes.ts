@@ -1,7 +1,7 @@
 import * as Hapi from '@hapi/hapi';
 import logger from '../logger';
 import { getGearTypes } from '../data/cache';
-import { IGearType } from '../interfaces/gearTypes.interface';
+import { GearRecord, IGearType } from '../interfaces/gearTypes.interface';
 
 export const gearTypeRoutes = (server: Hapi.Server) => {
   server.route([
@@ -14,9 +14,9 @@ export const gearTypeRoutes = (server: Hapi.Server) => {
 
       handler: async (req, h) => {
         try {
-          const gearTypes = getGearTypes();
+          const gearTypes: GearRecord[] = getGearTypes();
           const gearCategories = [
-            ...new Set(gearTypes.map((gear) => gear['Gear category'])),
+            ...new Set(gearTypes.map((gear: GearRecord) => gear['Gear category'])),
           ];
           return h.response(gearCategories).code(200);
         } catch (e) {
@@ -31,13 +31,12 @@ export const gearTypeRoutes = (server: Hapi.Server) => {
       options: {
         security: true,
       },
-
       handler: async (req, h) => {
         try {
-          const gearTypes = getGearTypes();
+          const gearTypes: GearRecord[] = getGearTypes();
           const gearCategory = req.params.gearCategory;
 
-          const gearTypesByCategory = gearTypes.reduce((acc, gear) => {
+          const gearTypesByCategory: IGearType[] = gearTypes.reduce((acc, gear) => {
             if (gear['Gear category'] === gearCategory) {
               acc.push({
                 gearName: gear['Gear name'],
@@ -45,7 +44,7 @@ export const gearTypeRoutes = (server: Hapi.Server) => {
               });
             }
             return acc;
-          }, [] as IGearType[]);
+          }, []);
           return h.response(gearTypesByCategory).code(200);
         } catch (e) {
           logger.error({ err: e }, `[GEAR-TYPES][GET][ERROR] ${e}`);

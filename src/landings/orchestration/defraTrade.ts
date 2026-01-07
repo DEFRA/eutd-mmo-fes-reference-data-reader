@@ -23,7 +23,7 @@ const Type = Object.freeze({
 });
 
 const getValidator = (schema: string): any => {
-  const ajv = new Ajv();
+  const ajv = new Ajv({ strict: false });
   ajv.addKeyword("definition")
   addFormats(ajv)
   const schemaData = readFileSync(path.join(__dirname + '../../../../data/schemas/Defra Trade Reporting/', schema), { encoding: 'utf8' });
@@ -187,6 +187,7 @@ export const reportSdToTrade = async (storageDocument: IDocument, caselabel: Mes
   delete storageDocumentCase.clonedFrom;
   delete storageDocumentCase.parentDocumentVoid;
   delete storageDocumentCase.placeOfUnloading;
+  delete storageDocumentCase.pointOfDestination
 
   if (!config.azureTradeQueueEnabled) {
     logger.info(`[DEFRA-TRADE-SD][DOCUMENT-NUMBER][${storageDocument.documentNumber}][CHIP-DISABLED]`);

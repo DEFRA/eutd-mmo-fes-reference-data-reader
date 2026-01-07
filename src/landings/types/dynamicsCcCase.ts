@@ -26,6 +26,7 @@ export interface IDynamicsCatchCertificateCase {
     clonedFrom?: string;
     landingsCloned?: boolean;
     parentDocumentVoid?: boolean;
+    pointOfDestination?: string;
 }
 
 export interface IDynamicsLandingValidation {

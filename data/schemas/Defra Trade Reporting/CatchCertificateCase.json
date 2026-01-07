@@ -812,6 +812,9 @@
         },
         "flag": {
           "type": "string"
+        },
+        "freightbillNumber": {
+          "type": "string"
         }
       },
       "anyOf": [
@@ -963,6 +966,10 @@
     },
     "documentDate": {
       "type": "string"
+    },
+    "pointOfDestination": {
+      "type": ["string", "null"],
+      "description": "Point of destination as provided by the user."
     },
     "exportedTo": {
       "type": "object",

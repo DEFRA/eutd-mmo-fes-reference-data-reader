@@ -208,6 +208,102 @@ describe('For processing statements', () => {
       expect(result).toEqual(expectedResult);
 
     });
+
+    it('should handle undefined issuingCountry for foreign certificate in toDefraPsCatch', () => {
+      const psCatch = {
+        species: "Atlantic cod (COD)",
+        scientificName: "Gadus morhua",
+        catchCertificateNumber: "FOR-2023-CC-12345",
+        catchCertificateType: "foreign",
+        totalWeightLanded: 50,
+        exportWeightBeforeProcessing: 40,
+        exportWeightAfterProcessing: 35
+      };
+
+      const result = toDefraPsCatch(psCatch);
+
+      expect(result.isDocumentIssuedInUK).toBe(false);
+      expect(result.issuingCountry).toBeUndefined();
+      expect(result.species).toBe("Atlantic cod (COD)");
+      expect(result.catchCertificateNumber).toBe("FOR-2023-CC-12345");
+    });
+
+    it('should handle null officialCountryName for foreign certificate in toDefraPsCatch', () => {
+      const psCatch = {
+        species: "Atlantic salmon (SAL)",
+        scientificName: "Salmo salar",
+        catchCertificateNumber: "NOR-2023-CC-67890",
+        catchCertificateType: "foreign",
+        issuingCountry: { officialCountryName: null },
+        totalWeightLanded: 80,
+        exportWeightBeforeProcessing: 70,
+        exportWeightAfterProcessing: 65
+      };
+
+      const result = toDefraPsCatch(psCatch);
+
+      expect(result.isDocumentIssuedInUK).toBe(false);
+      expect(result.issuingCountry).toBe(null);
+      expect(result.species).toBe("Atlantic salmon (SAL)");
+    });
+
+    it('should override issuingCountry for UK certificate regardless of input in toDefraPsCatch', () => {
+      const psCatch = {
+        species: "Atlantic mackerel (MAC)",
+        scientificName: "Scomber scombrus",
+        catchCertificateNumber: "GBR-2023-CC-99999",
+        catchCertificateType: "uk",
+        issuingCountry: { officialCountryName: "Norway" },
+        totalWeightLanded: 100,
+        exportWeightBeforeProcessing: 90,
+        exportWeightAfterProcessing: 85
+      };
+
+      const result = toDefraPsCatch(psCatch);
+
+      expect(result.isDocumentIssuedInUK).toBe(true);
+      expect(result.issuingCountry).toBe("United Kingdom");
+      expect(result.species).toBe("Atlantic mackerel (MAC)");
+    });
+
+    it('should handle German certificate in toDefraPsCatch', () => {
+      const psCatch = {
+        species: "European plaice (PLE)",
+        scientificName: "Pleuronectes platessa",
+        catchCertificateNumber: "DEU-2023-CC-11111",
+        catchCertificateType: "foreign",
+        issuingCountry: { officialCountryName: "Germany" },
+        totalWeightLanded: 120,
+        exportWeightBeforeProcessing: 110,
+        exportWeightAfterProcessing: 100
+      };
+
+      const result = toDefraPsCatch(psCatch);
+
+      expect(result.isDocumentIssuedInUK).toBe(false);
+      expect(result.issuingCountry).toBe("Germany");
+      expect(result.species).toBe("European plaice (PLE)");
+      expect(result.scientificName).toBe("Pleuronectes platessa");
+    });
+
+    it('should handle Netherlands certificate in toDefraPsCatch', () => {
+      const psCatch = {
+        species: "Common sole (SOL)",
+        scientificName: "Solea solea",
+        catchCertificateNumber: "NLD-2023-CC-22222",
+        catchCertificateType: "foreign",
+        issuingCountry: { officialCountryName: "Netherlands" },
+        totalWeightLanded: 60,
+        exportWeightBeforeProcessing: 55,
+        exportWeightAfterProcessing: 50
+      };
+
+      const result = toDefraPsCatch(psCatch);
+
+      expect(result.isDocumentIssuedInUK).toBe(false);
+      expect(result.issuingCountry).toBe("Netherlands");
+      expect(result.species).toBe("Common sole (SOL)");
+    });
   });
 
   it('will map correctly for a DRAFT with all required fields', () => {
@@ -718,7 +814,8 @@ describe('For storage documents', () => {
           "commodityCode": "0345603",
           "productWeight": "1000",
           "certificateNumber": "GBR-3453-3453-3443",
-          "weightOnCC": "1000"
+          "weightOnCC": "1000",
+          "issuingCountry": { "officialCountryName": "United Kingdom" }
         }],
         "facilityName": "Exporter Person",
         "facilityAddressOne": "Building Name",
@@ -858,7 +955,8 @@ describe('For storage documents', () => {
           "productWeight": "1000",
           "certificateNumber": "GBR-3453-3453-3443",
           "certificateType": "uk",
-          "weightOnCC": "1000"
+          "weightOnCC": "1000",
+          "issuingCountry": { "officialCountryName": "United Kingdom" }
         }],
         "facilityName": "Exporter Person",
         "facilityAddressOne": "Building Name",
@@ -1110,7 +1208,8 @@ describe('For storage documents', () => {
               "commodityCode": "0345603",
               "productWeight": "1000",
               "certificateNumber": "GBR-3453-3453-3443",
-              "weightOnCC": "1000"
+              "weightOnCC": "1000",
+              "issuingCountry": { "officialCountryName": "United Kingdom" }
             }],
             "facilityName": "Exporter Person",
             "facilityAddressOne": "Building Name",
@@ -1130,7 +1229,8 @@ describe('For storage documents', () => {
               "freightBillNumber": "",
               "departureCountry": "United Kingdom",
               "departurePort": "Hull",
-              "exportDate": "2023-08-31"
+              "exportDate": "2023-08-31",
+              "placeOfUnloading": "Dover",
             }, {
               "id": '0',
               "vehicle": "plane",
@@ -1141,6 +1241,7 @@ describe('For storage documents', () => {
               "departureCountry": "United Kingdom",
               "departurePort": "Hull",
               "exportDate": "2023-08-31",
+              "placeOfUnloading": "Dover",
             }, {
               "id": '0',
               "vehicle": "train",
@@ -1207,7 +1308,7 @@ describe('For storage documents', () => {
         expect(result).toBeUndefined();
       });
 
-      it('will include all the required properties for a product', () => {
+      it('will include all the required properties for a product with non uk', () => {
         const sdCatch = {
           product: "Atlantic herring (HER)",
           scientificName: "Clupea harengus",
@@ -1215,7 +1316,8 @@ describe('For storage documents', () => {
           productWeight: "1000",
           certificateNumber: "12345",
           weightOnCC: "1000",
-          certificateType: "uk"
+          certificateType: "non_uk",
+          issuingCountry: { officialCountryName: "United Kingdom State" },
         };
 
         const expectedResult: StorageDocumentReportCatch = {
@@ -1225,7 +1327,36 @@ describe('For storage documents', () => {
           certificateNumber: "12345",
           weightOnCertificate: 1000,
           cnCode: "1234",
-          isDocumentIssuedInUK: true
+          isDocumentIssuedInUK: false,
+          issuingCountry: "United Kingdom State"
+        };
+
+        const result = toDefraSdProduct(sdCatch);
+
+        expect(result).toEqual(expectedResult);
+      });
+
+      it('will include all the required properties for a product', () => {
+        const sdCatch = {
+          product: "Atlantic herring (HER)",
+          scientificName: "Clupea harengus",
+          commodityCode: "1234",
+          productWeight: "1000",
+          certificateNumber: "12345",
+          weightOnCC: "1000",
+          certificateType: "uk",
+          issuingCountry: { officialCountryName: "United Kingdom" },
+        };
+
+        const expectedResult: StorageDocumentReportCatch = {
+          species: "Atlantic herring (HER)",
+          scientificName: "Clupea harengus",
+          productWeight: 1000,
+          certificateNumber: "12345",
+          weightOnCertificate: 1000,
+          cnCode: "1234",
+          isDocumentIssuedInUK: true,
+          issuingCountry: "United Kingdom"
         };
 
         const result = toDefraSdProduct(sdCatch);
@@ -1241,11 +1372,108 @@ describe('For storage documents', () => {
           certificateNumber: "GBR-3453-3453-3443",
           weightOnCertificate: 1000,
           cnCode: "0345603",
-          isDocumentIssuedInUK: true
+          isDocumentIssuedInUK: true,
+          issuingCountry: "United Kingdom"
         }];
 
         const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-PS-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndSd);
         expect(result.products).toEqual(expectedResult)
+      });
+
+      it('should handle undefined issuingCountry for non-UK certificate in toDefraSdProduct', () => {
+        const sdCatch = {
+          product: "Atlantic cod (COD)",
+          scientificName: "Gadus morhua",
+          commodityCode: "03089090",
+          productWeight: "500",
+          certificateNumber: "FOR-2023-CC-12345",
+          weightOnCC: "500",
+          certificateType: "non_uk"
+        };
+
+        const result = toDefraSdProduct(sdCatch);
+
+        expect(result?.isDocumentIssuedInUK).toBe(false);
+        expect(result?.issuingCountry).toBeUndefined();
+        expect(result?.species).toBe("Atlantic cod (COD)");
+        expect(result?.certificateNumber).toBe("FOR-2023-CC-12345");
+      });
+
+      it('should handle null officialCountryName for non-UK certificate in toDefraSdProduct', () => {
+        const sdCatch = {
+          product: "Atlantic salmon (SAL)",
+          scientificName: "Salmo salar",
+          commodityCode: "03021100",
+          productWeight: "300",
+          certificateNumber: "NOR-2023-CC-67890",
+          weightOnCC: "300",
+          certificateType: "non_uk",
+          issuingCountry: { officialCountryName: null }
+        };
+
+        const result = toDefraSdProduct(sdCatch);
+
+        expect(result?.isDocumentIssuedInUK).toBe(false);
+        expect(result?.issuingCountry).toBeUndefined();
+        expect(result?.species).toBe("Atlantic salmon (SAL)");
+      });
+
+      it('should override issuingCountry for UK certificate regardless of input in toDefraSdProduct', () => {
+        const sdCatch = {
+          product: "Atlantic mackerel (MAC)",
+          scientificName: "Scomber scombrus",
+          commodityCode: "03034100",
+          productWeight: "200",
+          certificateNumber: "GBR-2023-CC-99999",
+          weightOnCC: "200",
+          certificateType: "uk",
+          issuingCountry: { officialCountryName: "Norway" }
+        };
+
+        const result = toDefraSdProduct(sdCatch);
+
+        expect(result?.isDocumentIssuedInUK).toBe(true);
+        expect(result?.issuingCountry).toBe("United Kingdom");
+        expect(result?.species).toBe("Atlantic mackerel (MAC)");
+      });
+
+      it('should handle French certificate in toDefraSdProduct', () => {
+        const sdCatch = {
+          product: "European seabass (BSS)",
+          scientificName: "Dicentrarchus labrax",
+          commodityCode: "03026930",
+          productWeight: "150",
+          certificateNumber: "FRA-2023-CC-11111",
+          weightOnCC: "150",
+          certificateType: "non_uk",
+          issuingCountry: { officialCountryName: "France" }
+        };
+
+        const result = toDefraSdProduct(sdCatch);
+
+        expect(result?.isDocumentIssuedInUK).toBe(false);
+        expect(result?.issuingCountry).toBe("France");
+        expect(result?.species).toBe("European seabass (BSS)");
+        expect(result?.scientificName).toBe("Dicentrarchus labrax");
+      });
+
+      it('should handle Iceland certificate in toDefraSdProduct', () => {
+        const sdCatch = {
+          product: "Atlantic halibut (HAL)",
+          scientificName: "Hippoglossus hippoglossus",
+          commodityCode: "03042100",
+          productWeight: "400",
+          certificateNumber: "ISL-2023-CC-22222",
+          weightOnCC: "400",
+          certificateType: "non_uk",
+          issuingCountry: { officialCountryName: "Iceland" }
+        };
+
+        const result = toDefraSdProduct(sdCatch);
+
+        expect(result?.isDocumentIssuedInUK).toBe(false);
+        expect(result?.issuingCountry).toBe("Iceland");
+        expect(result?.species).toBe("Atlantic halibut (HAL)");
       });
     });
 
@@ -1409,7 +1637,8 @@ describe('For storage documents', () => {
             "commodityCode": "0345603",
             "productWeight": "1000",
             "certificateNumber": "GBR-3453-3453-3443",
-            "weightOnCC": "1000"
+            "weightOnCC": "1000",
+            "issuingCountry": { "officialCountryName": "United Kingdom" }
           }],
           "facilityName": "Exporter Person",
           "facilityAddressOne": "Building Name",
@@ -1434,7 +1663,8 @@ describe('For storage documents', () => {
             "freightBillNumber": "BD51SMR",
             "departureCountry": "Algeria",
             "departurePort": "Port",
-            "departureDate": "06/10/2025"
+            "departureDate": "06/10/2025",
+            "placeOfUnloading": "Dover"
           }
         },
         "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf"
@@ -1490,7 +1720,8 @@ describe('For storage documents', () => {
             "commodityCode": "0345603",
             "productWeight": "1000",
             "certificateNumber": "GBR-3453-3453-3443",
-            "weightOnCC": "1000"
+            "weightOnCC": "1000",
+            "issuingCountry": ""
           }],
           "facilityName": "Exporter Person",
           "facilityAddressOne": "Building Name",
@@ -1521,7 +1752,8 @@ describe('For storage documents', () => {
             "freightBillNumber": "AA1234567",
             "departureCountry": "Afghanistan",
             "departurePort": "Calais port",
-            "departureDate": "06/10/2025"
+            "departureDate": "06/10/2025",
+            "placeOfUnloading": "Dover"
           }
         },
         "documentUri": "_0d8f98a1-c372-47c4-803f-dafd642c4941.pdf"
@@ -1531,6 +1763,75 @@ describe('For storage documents', () => {
       expect(result.failedSubmissions).toBe(0);
       expect(result.arrivalTransportation?.containerId).toBe("ABCD12345670,ABCD12345671,ABCD12345672,ABCD1234563");
       expect(result.arrivalTransportation?.freightbillNumber).toBe("AA1234567");
+    });
+
+    it('will include placeOfUnloading when provided in arrival transportation', () => {
+      const backEndSd: IDocument = {
+        "createdAt": new Date("2020-06-12T20:12:28.201Z"),
+        "__t": "storageDocument",
+        "createdBy": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
+        "createdByEmail": "foo@foo.com",
+        "status": "DRAFT",
+        "documentNumber": "GBR-2020-SD-C90A88218",
+        "requestByAdmin": false,
+        "exportData": {
+          "catches": [{
+            "product": "Atlantic herring (HER)",
+            "scientificName": "Clupea harengus",
+            "commodityCode": "0345603",
+            "productWeight": "1000",
+            "certificateNumber": "GBR-3453-3453-3443",
+            "weightOnCC": "1000"
+          }],
+          "arrivalTransportation": {
+            "vehicle": "truck",
+            "placeOfUnloading": "Dover Port",
+            "registrationNumber": "ABC123",
+            "departureCountry": "United Kingdom",
+            "departurePort": "Hull",
+            "departureDate": "06/10/2025",
+          }
+        },
+        "documentUri": "_test.pdf"
+      };
+
+      const result: IDefraValidationStorageDocument = toSdDefraReport('GBR-2020-SD-C90A88218', correlationId, 'COMPLETE', requestByAdmin, backEndSd);
+      expect(result.arrivalTransportation?.placeOfUnloading).toBe("Dover Port");
+    });
+
+    it('will not include placeOfUnloading when not provided in arrival transportation', () => {
+      const backEndSd: IDocument = {
+        "createdAt": new Date("2020-06-12T20:12:28.201Z"),
+        "__t": "storageDocument",
+        "createdBy": "ABCD-EFGH-IJKL-MNOP-QRST-UVWX-YZ12",
+        "createdByEmail": "foo@foo.com",
+        "status": "DRAFT",
+        "documentNumber": "GBR-2020-SD-C90A88218",
+        "requestByAdmin": false,
+        "exportData": {
+          "catches": [{
+            "product": "Atlantic herring (HER)",
+            "scientificName": "Clupea harengus",
+            "commodityCode": "0345603",
+            "productWeight": "1000",
+            "certificateNumber": "GBR-3453-3453-3443",
+            "weightOnCC": "1000",
+            "issuingCountry": { "officialCountryName": "United Kingdom" }
+          }],
+          "arrivalTransportation": {
+            "vehicle": "truck",
+            "registrationNumber": "ABC123",
+            "departureCountry": "United Kingdom",
+            "departurePort": "Hull",
+            "departureDate": "06/10/2025",
+            "placeOfUnloading": ""
+          }
+        },
+        "documentUri": "_test.pdf"
+      };
+
+      const result: IDefraValidationStorageDocument = toSdDefraReport('GBR-2020-SD-C90A88218', correlationId, 'COMPLETE', requestByAdmin, backEndSd);
+      expect(result.arrivalTransportation?.placeOfUnloading).toBe("");
     });
   });
 });
@@ -2300,6 +2601,363 @@ describe('toCatches', () => {
 
   });
 
+  it('should map ISdpsQueryResult with productDescription', () => {
+
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "PS2",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 80,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SDHSADJHSDHASDSD-1610018839',
+      },
+      catchCertificateType: 'uk',
+      productDescription: 'Fish pie'
+    };
+
+    const result = toCatches([input]);
+
+    expect(result).toEqual([{
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      catchCertificateNumber: "PS2",
+      productDescription: "Fish pie",
+      totalWeightLanded: 200,
+      exportWeightBeforeProcessing: 100,
+      exportWeightAfterProcessing: 80,
+      isOverUse: false,
+      hasWeightMismatch: false,
+      importWeightExceededAmount: 0,
+      cnCode: "FRESHCOD",
+      isDocumentIssuedInUK: true,
+      issuingCountry: "United Kingdom"
+    }]);
+
+  });
+
+  it('should exclude productDescription when undefined', () => {
+
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "PS2",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 80,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SDHSADJHSDHASDSD-1610018839',
+      },
+      catchCertificateType: 'uk',
+      productDescription: undefined
+    };
+
+    const result = toCatches([input]);
+    const expectedResult = {
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      catchCertificateNumber: "PS2",
+      totalWeightLanded: 200,
+      exportWeightBeforeProcessing: 100,
+      exportWeightAfterProcessing: 80,
+      isOverUse: false,
+      hasWeightMismatch: false,
+      importWeightExceededAmount: 0,
+      cnCode: "FRESHCOD",
+      isDocumentIssuedInUK: true,
+      issuingCountry: "United Kingdom"
+    };
+
+    expect(result).toEqual([expectedResult]);
+    expect(result[0]).not.toHaveProperty('productDescription');
+
+  });
+
+  it('should exclude productDescription when empty string', () => {
+
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "PS2",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 80,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SDHSADJHSDHASDSD-1610018839',
+      },
+      catchCertificateType: 'uk',
+      productDescription: ''
+    };
+
+    const result = toCatches([input]);
+    const expectedResult = {
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      catchCertificateNumber: "PS2",
+      totalWeightLanded: 200,
+      exportWeightBeforeProcessing: 100,
+      exportWeightAfterProcessing: 80,
+      isOverUse: false,
+      hasWeightMismatch: false,
+      importWeightExceededAmount: 0,
+      cnCode: "FRESHCOD",
+      isDocumentIssuedInUK: true,
+      issuingCountry: "United Kingdom"
+    };
+
+    expect(result).toEqual([expectedResult]);
+    expect(result[0]).not.toHaveProperty('productDescription');
+
+  });
+
+  it('should exclude productDescription when whitespace only', () => {
+
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "PS2",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 80,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SDHSADJHSDHASDSD-1610018839',
+      },
+      catchCertificateType: 'uk',
+      productDescription: '   '
+    };
+
+    const result = toCatches([input]);
+    const expectedResult = {
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      catchCertificateNumber: "PS2",
+      totalWeightLanded: 200,
+      exportWeightBeforeProcessing: 100,
+      exportWeightAfterProcessing: 80,
+      isOverUse: false,
+      hasWeightMismatch: false,
+      importWeightExceededAmount: 0,
+      cnCode: "FRESHCOD",
+      isDocumentIssuedInUK: true,
+      issuingCountry: "United Kingdom"
+    };
+
+    expect(result).toEqual([expectedResult]);
+    expect(result[0]).not.toHaveProperty('productDescription');
+
+  });
+
+  it('should handle undefined issuingCountry for non-UK certificate in toCatches', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "FOR-2023-CC-12345",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic cod (COD)",
+      scientificName: "Gadus morhua",
+      commodityCode: "03089090",
+      weightOnDoc: 500,
+      weightOnAllDocs: 500,
+      weightOnFCC: 600,
+      weightAfterProcessing: 450,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018850',
+      },
+      catchCertificateType: 'non_uk'
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBeUndefined();
+    expect(result[0].species).toBe('Atlantic cod (COD)');
+    expect(result[0].catchCertificateNumber).toBe('FOR-2023-CC-12345');
+  });
+
+  it('should handle null officialCountryName for non-UK certificate in toCatches', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "NOR-2023-CC-67890",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic salmon (SAL)",
+      scientificName: "Salmo salar",
+      commodityCode: "03021100",
+      weightOnDoc: 300,
+      weightOnAllDocs: 300,
+      weightOnFCC: 400,
+      weightAfterProcessing: 250,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018851',
+      },
+      catchCertificateType: 'non_uk',
+      issuingCountry: { officialCountryName: '' }
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBe('');
+    expect(result[0].species).toBe('Atlantic salmon (SAL)');
+  });
+
+  it('should override issuingCountry for UK certificate regardless of input in toCatches', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "GBR-2023-CC-99999",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic mackerel (MAC)",
+      scientificName: "Scomber scombrus",
+      commodityCode: "03034100",
+      weightOnDoc: 200,
+      weightOnAllDocs: 200,
+      weightOnFCC: 250,
+      weightAfterProcessing: 180,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018852',
+      },
+      catchCertificateType: 'uk',
+      issuingCountry: { officialCountryName: "Norway" }
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(true);
+    expect(result[0].issuingCountry).toBe("United Kingdom");
+    expect(result[0].species).toBe('Atlantic mackerel (MAC)');
+  });
+
+  it('should handle Spanish certificate in toCatches', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "ESP-2023-CC-11111",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "European hake (HKE)",
+      scientificName: "Merluccius merluccius",
+      commodityCode: "03044100",
+      weightOnDoc: 150,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      weightAfterProcessing: 130,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018853',
+      },
+      catchCertificateType: 'non_uk',
+      issuingCountry: { officialCountryName: "Spain" }
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBe("Spain");
+    expect(result[0].species).toBe('European hake (HKE)');
+    expect(result[0].scientificName).toBe('Merluccius merluccius');
+  });
+
+  it('should handle Iceland certificate in toCatches', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "ISL-2023-CC-22222",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic halibut (HAL)",
+      scientificName: "Hippoglossus hippoglossus",
+      commodityCode: "03042100",
+      weightOnDoc: 400,
+      weightOnAllDocs: 400,
+      weightOnFCC: 500,
+      weightAfterProcessing: 350,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018854',
+      },
+      catchCertificateType: 'non_uk',
+      issuingCountry: { officialCountryName: "Iceland" }
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBe("Iceland");
+    expect(result[0].species).toBe('Atlantic halibut (HAL)');
+  });
+
 });
 
 describe('toProduct', () => {
@@ -2330,7 +2988,13 @@ describe('toProduct', () => {
       netWeightProductArrival: "100",
       netWeightFisheryProductArrival: "110",
       netWeightProductDeparture: "90",
-      netWeightFisheryProductDeparture: "95"
+      netWeightFisheryProductDeparture: "95",
+      issuingCountry: { 
+        officialCountryName: "Spain",
+        isoCodeAlpha2: "GB",
+        isoCodeAlpha3: "GBR",
+        isoNumericCode: "826"
+      }
 
     }];
 
@@ -2352,9 +3016,268 @@ describe('toProduct', () => {
       netWeightFisheryProductArrival: "110",
       netWeightProductDeparture: "90",
       netWeightFisheryProductDeparture: "95",
-      isDocumentIssuedInUK: false
+      isDocumentIssuedInUK: false,
+      issuingCountry: "Spain"
     }]);
-  })
+  });
+
+  it('should exclude productDescription when undefined in toProducts', () => {
+    const queryResult: ISdPsQueryResult[] = [{
+      documentNumber: "SD1",
+      catchCertificateNumber: "SD2",
+      documentType: "SD",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SD2-1610018839',
+      },
+      productDescription: undefined,
+      supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+      netWeightProductArrival: "100",
+      netWeightFisheryProductArrival: "110",
+      netWeightProductDeparture: "90",
+      netWeightFisheryProductDeparture: "95",
+      issuingCountry: undefined
+    }];
+
+    const result = toProducts(queryResult);
+    const expectedResult = {
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      productWeight: 100,
+      certificateNumber: "SD2",
+      weightOnCertificate: 200,
+      cnCode: "FRESHCOD",
+      isOverUse: false,
+      isImportWeightMismatch: false,
+      overUseExceededAmount: 0,
+      supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+      netWeightProductArrival: "100",
+      netWeightFisheryProductArrival: "110",
+      netWeightProductDeparture: "90",
+      netWeightFisheryProductDeparture: "95",
+      isDocumentIssuedInUK: false,
+      issuingCountry: undefined
+    };
+
+    expect(result).toEqual([expectedResult]);
+    expect(result[0]).not.toHaveProperty('productDescription');
+  });
+
+  it('should exclude productDescription when empty string in toProducts', () => {
+    const queryResult: ISdPsQueryResult[] = [{
+      documentNumber: "SD1",
+      catchCertificateNumber: "SD2",
+      documentType: "SD",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      commodityCode: "FRESHCOD",
+      weightOnDoc: 100,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SD2-1610018839',
+      },
+      productDescription: '',
+      supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+      netWeightProductArrival: "100",
+      netWeightFisheryProductArrival: "110",
+      netWeightProductDeparture: "90",
+      netWeightFisheryProductDeparture: "95"
+    }];
+
+    const result = toProducts(queryResult);
+    const expectedResult = {
+      species: "COD",
+      scientificName: "Aspidophoroides bartoni",
+      productWeight: 100,
+      certificateNumber: "SD2",
+      weightOnCertificate: 200,
+      cnCode: "FRESHCOD",
+      isOverUse: false,
+      isImportWeightMismatch: false,
+      overUseExceededAmount: 0,
+      supportingDocuments: "GBR-2025-CC-ABB235F7F, GBR-2024-CC-BEFCD6036, GBR-2025-SD-6FFEAE1A1",
+      netWeightProductArrival: "100",
+      netWeightFisheryProductArrival: "110",
+      netWeightProductDeparture: "90",
+      netWeightFisheryProductDeparture: "95",
+      isDocumentIssuedInUK: false
+    };
+
+    expect(result).toEqual([expectedResult]);
+    expect(result[0]).not.toHaveProperty('productDescription');
+  });
+
+  it('should map issuingCountry for UK certificate in toProducts', () => {
+    const queryResult: ISdPsQueryResult[] = [{
+      documentNumber: "SD1",
+      catchCertificateNumber: "GBR-2023-CC-12345",
+      catchCertificateType: 'uk',
+      documentType: "SD",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic cod (COD)",
+      scientificName: "Gadus morhua",
+      commodityCode: "03089090",
+      weightOnDoc: 150,
+      weightOnAllDocs: 150,
+      weightOnFCC: 200,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SD1-1610018839',
+      },
+      supportingDocuments: "GBR-2025-CC-ABB235F7F",
+      netWeightProductArrival: "150",
+      netWeightFisheryProductArrival: "160",
+      netWeightProductDeparture: "145",
+      netWeightFisheryProductDeparture: "155"
+    }];
+
+    const result = toProducts(queryResult);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(true);
+    expect(result[0].issuingCountry).toBe('United Kingdom');
+    expect(result[0].species).toBe('Atlantic cod (COD)');
+    expect(result[0].certificateNumber).toBe('GBR-2023-CC-12345');
+  });
+
+  it('should map issuingCountry for foreign certificate in toProducts', () => {
+    const queryResult: ISdPsQueryResult[] = [{
+      documentNumber: "SD1",
+      catchCertificateNumber: "NOR-2023-CC-67890",
+      catchCertificateType: 'non_uk',
+      documentType: "SD",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic salmon (SAL)",
+      scientificName: "Salmo salar",
+      commodityCode: "03021100",
+      weightOnDoc: 120,
+      weightOnAllDocs: 120,
+      weightOnFCC: 180,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SD1-1610018840',
+      },
+      issuingCountry: {
+        officialCountryName: "Norway",
+        isoCodeAlpha2: "NO",
+        isoCodeAlpha3: "NOR",
+        isoNumericCode: "578"
+      },
+      supportingDocuments: "NOR-2025-CC-XYZ123",
+      netWeightProductArrival: "120",
+      netWeightFisheryProductArrival: "125",
+      netWeightProductDeparture: "115",
+      netWeightFisheryProductDeparture: "120"
+    }];
+
+    const result = toProducts(queryResult);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBe('Norway');
+    expect(result[0].species).toBe('Atlantic salmon (SAL)');
+    expect(result[0].certificateNumber).toBe('NOR-2023-CC-67890');
+  });
+
+  it('should handle undefined issuingCountry for foreign certificate in toProducts', () => {
+    const queryResult: ISdPsQueryResult[] = [{
+      documentNumber: "SD1",
+      catchCertificateNumber: "FOR-2023-CC-99999",
+      catchCertificateType: 'non_uk',
+      documentType: "SD",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic herring (HER)",
+      scientificName: "Clupea harengus",
+      commodityCode: "03031100",
+      weightOnDoc: 100,
+      weightOnAllDocs: 100,
+      weightOnFCC: 150,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SD1-1610018841',
+      },
+      supportingDocuments: "FOR-2025-CC-ABC456",
+      netWeightProductArrival: "100",
+      netWeightFisheryProductArrival: "105",
+      netWeightProductDeparture: "95",
+      netWeightFisheryProductDeparture: "100"
+    }];
+
+    const result = toProducts(queryResult);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBeUndefined();
+    expect(result[0].species).toBe('Atlantic herring (HER)');
+  });
+
+  it('should handle null issuingCountry object for foreign certificate in toProducts', () => {
+    const queryResult: ISdPsQueryResult[] = [{
+      documentNumber: "SD1",
+      catchCertificateNumber: "FOR-2023-CC-88888",
+      catchCertificateType: 'non_uk',
+      documentType: "SD",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic mackerel (MAC)",
+      scientificName: "Scomber scombrus",
+      commodityCode: "03034100",
+      weightOnDoc: 80,
+      weightOnAllDocs: 80,
+      weightOnFCC: 100,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'SD1-1610018842',
+      },
+      issuingCountry: undefined,
+      supportingDocuments: "FOR-2025-CC-DEF789",
+      netWeightProductArrival: "80",
+      netWeightFisheryProductArrival: "85",
+      netWeightProductDeparture: "75",
+      netWeightFisheryProductDeparture: "80"
+    }];
+
+    const result = toProducts(queryResult);
+
+    expect(result[0].isDocumentIssuedInUK).toBe(false);
+    expect(result[0].issuingCountry).toBeUndefined();
+  });
 });
 
 describe('For transportation', () => {

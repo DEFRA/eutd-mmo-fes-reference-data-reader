@@ -18,6 +18,7 @@ import { ILicence, IVessel } from '../landings/types/appConfig/vessels';
 import { IEodRule, IEodSetting, vesselSizeGroup } from '../landings/types/appConfig/eodSettings';
 import { getEodSettings } from '../landings/persistence/eodSettings';
 import { CacheType } from '../handler/types';
+import { GearRecord } from '../interfaces/gearTypes.interface';
 
 let VESSELS: IVessel[] = [];
 let VESSELS_IDX = (pln: string) => undefined;
@@ -38,8 +39,9 @@ let WEIGHTING: IWeighting = {
 };
 let SPECIES_ALIASES: any = {};
 let EOD_SETTINGS: IEodSetting[] = [];
-let GEAR_TYPES: any[] = [];
+let GEAR_TYPES: GearRecord[] = [];
 let RFMO_AREAS: any[] = [];
+let EU_MEMBER_STATES: string[] = [];
 
 export const loadLocalFishCountriesAndSpecies = async () => {
   logger.info('Loading data from local files in dev mode');
@@ -53,11 +55,12 @@ export const loadLocalFishCountriesAndSpecies = async () => {
   const vesselsOfInterest = await seedVesselsOfInterest();
   const weightingRisk = await seedWeightingRisk();
   const speciesToggle = await getSpeciesToggle();
-  const gearTypes =await loadGearTypesDataFromLocalFile();
+  const gearTypes = await loadGearTypesDataFromLocalFile();
   const rfmos = await loadRfmosDataFromLocalFile();
+  const euMemberStates = await loadEuMemberStatesFromLocalFile();
 
   logger.info(`Finished reading data from local file system, previously species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos});
+  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates});
   logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
   logger.info("Start setting the blocking rules");
@@ -120,8 +123,11 @@ export const loadProdFishCountriesAndSpecies = async () => {
     logger.debug('[LOAD-PROD-CONFIG] loadRfmosData');
     const rfmos = await loadRfmosDataFromAzureBlob(blobStorageConnStr);
 
+    logger.debug('[LOAD-PROD-CONFIG] loadEuMemberStatesData');
+    const euMemberStates = await loadEuMemberStatesData(blobStorageConnStr);
+
     logger.info(`[LOAD-PROD-CONFIG] Finished reading data, previously species: ${SPECIES.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos});
+    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates});
     logger.info(`[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
     logger.info(`[LOAD-PROD-CONFIG] Finished reading vessels of interest, previously: ${VESSELS_OF_INTEREST.length}`);
@@ -225,8 +231,7 @@ const getScoreByAccountOnly = (accountId: string): number | undefined => {
     (e) => e.accountId === accountId && !e.contactId,
   )?.score;
 };
-  
-  
+
 export const getExporterRiskScore = (
   accountId: string | null,
   contactId: string | null,
@@ -254,9 +259,24 @@ export const getRiskThreshold = (): number => WEIGHTING['threshold'];
 
 export const getSpeciesRiskToggle = (): boolean => SPECIES_TOGGLE;
 
-export const getGearTypes = () => { return GEAR_TYPES };
+export const getGearTypes = (): GearRecord[] => { return GEAR_TYPES };
 
 export const getRfmos = (): any[] => { return RFMO_AREAS };
+
+export const getEuMemberStates = (): string[] => { return EU_MEMBER_STATES };
+
+const mapConversionFactors = (factors: IConversionFactor[]): IConversionFactor[] => {
+  return factors.map(factorData => {
+    return {
+      species: factorData.species,
+      state: factorData.state,
+      presentation: factorData.presentation,
+      toLiveWeightFactor: isNaN(factorData.toLiveWeightFactor) ? undefined : Number(factorData.toLiveWeightFactor),
+      quotaStatus: factorData.quotaStatus,
+      riskScore: isNaN(factorData.riskScore) ? undefined : Number(factorData.riskScore)
+    }
+  });
+};
 
 export const updateCache = ({
   species,
@@ -267,7 +287,8 @@ export const updateCache = ({
   speciesAliases,
   commodityCodes,
   gearTypes,
-  rfmos
+  rfmos,
+  euMemberStates
 }: CacheType) => {
   if (species) {
     SPECIES = species;
@@ -286,16 +307,7 @@ export const updateCache = ({
   }
 
   if (factors) {
-    CONVERSION_FACTORS = factors.map(factorData => {
-      return {
-        species: factorData.species,
-        state: factorData.state,
-        presentation: factorData.presentation,
-        toLiveWeightFactor: isNaN(factorData.toLiveWeightFactor) ? undefined : Number(factorData.toLiveWeightFactor),
-        quotaStatus: factorData.quotaStatus,
-        riskScore: isNaN(factorData.riskScore) ? undefined : Number(factorData.riskScore)
-      }
-    });
+    CONVERSION_FACTORS = mapConversionFactors(factors);
   }
 
   if (speciesAliases) {
@@ -312,6 +324,10 @@ export const updateCache = ({
 
   if (rfmos) {
     RFMO_AREAS = rfmos;
+  }
+
+  if (euMemberStates) {
+    EU_MEMBER_STATES = euMemberStates;
   }
 }
 
@@ -480,7 +496,7 @@ export const loadCountriesData = async (): Promise<ICountry[] | undefined> => {
   }
 }
 
-export const loadGearTypesData = async (blobConnStr: string): Promise<any[] | undefined> => {
+export const loadGearTypesData = async (blobConnStr: string): Promise<GearRecord[]> => {
   try {
     logger.info('[BLOB-STORAGE-DATA-LOAD][GEAR-TYPES]');
     return await blob.getGearTypesData(blobConnStr);
@@ -604,7 +620,7 @@ export const loadExporterBehaviourFromAzureBlob = async (blobConnStr: string): P
   }
 };
 
-export const loadGearTypesDataFromLocalFile = async (gearTypesFilePath?: string): Promise<any[] | undefined> => {
+export const loadGearTypesDataFromLocalFile = async (gearTypesFilePath?: string): Promise<GearRecord[]> => {
   const path = gearTypesFilePath || `${__dirname}/../../data/geartypes.csv`;
   try {
     return await file.getGearTypesDataFromCSV(path);
@@ -623,3 +639,21 @@ export const loadRfmosDataFromLocalFile = async (rfmosFilePath?: string): Promis
     logger.error(`Cannot load rfmo list file from local file system, path: ${path}`);
   }
 }
+
+export const loadEuMemberStatesFromLocalFile = async (euMemberStatesFilePath?: string): Promise<string[] | undefined> => {
+  const path = euMemberStatesFilePath || `${__dirname}/../../data/eumemberstates.csv`;
+  try {
+    return await file.getEuMemberStatesFromCSV(path);
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot load EU member states file from local file system, path: ${path}`);
+  }
+};
+
+export const loadEuMemberStatesData = async (blobConnStr: string): Promise<string[]> => {
+  try {
+    return await blob.getEuMemberStates(blobConnStr);
+  } catch (e) {
+    throw new Error(`[BLOB-STORAGE-LOAD-ERROR][EU-MEMBER-STATES] ${e}`);
+  }
+};
