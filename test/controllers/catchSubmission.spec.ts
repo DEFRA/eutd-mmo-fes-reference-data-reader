@@ -3,12 +3,13 @@ import { BoomiService } from 'mmo-shared-reference-data';
 import logger from '../../src/logger';
 import CatchCertificateTransformerService from '../../src/services/catch-certificate-transformer.service';
 import ProcessingStatementTransformerService from '../../src/services/processing-statement-transformer.service';
-import { getCertificateByDocumentNumberWithNumberOfFailedAttempts } from '../../src/landings/persistence/catchCert';
+import { DocumentModel } from '../../src/landings/types/document';
 
 jest.mock('mmo-shared-reference-data');
 jest.mock('../../src/logger');
 jest.mock('../../src/services/catch-certificate-transformer.service');
 jest.mock('../../src/services/processing-statement-transformer.service');
+jest.mock('../../src/landings/types/document');
 jest.mock('../../src/landings/persistence/catchCert');
 
 describe('CATCH Submission Controller (FI0-10312)', () => {
@@ -17,7 +18,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
   let mockLoggerError: jest.SpyInstance;
   let mockGenerateCatchPayload: jest.SpyInstance;
   let mockGenerateVoidCatchPayload: jest.SpyInstance;
-  let mockGetCertificate: jest.Mock;
+  let mockFindOne: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -27,7 +28,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     mockLoggerError = logger.error as jest.Mock;
     mockGenerateCatchPayload = jest.spyOn(CatchCertificateTransformerService, 'generateCatchPayload');
     mockGenerateVoidCatchPayload = jest.spyOn(CatchCertificateTransformerService, 'generateVoidCatchPayload');
-    mockGetCertificate = getCertificateByDocumentNumberWithNumberOfFailedAttempts as jest.Mock;
+    mockFindOne = DocumentModel.findOne as jest.Mock;
   });
 
   afterEach(() => {
@@ -126,16 +127,19 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
       mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
 
       await submitDocumentToBoomi(mockRawPayload);
 
-      expect(mockGetCertificate).toHaveBeenCalledWith(
-        mockRawPayload.documentNumber,
-        'catchCert'
-      );
+      expect(mockFindOne).toHaveBeenCalledWith({
+        __t: "catchCert",
+        documentNumber: mockRawPayload.documentNumber,
+        status: { $in: ['COMPLETE', 'VOID'] },
+      });
 
       expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
         mockRawPayload.documentNumber,
@@ -180,7 +184,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Certificate voided successfully',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateVoidCatchPayload.mockReturnValueOnce(mockVoidPayload);
       mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
 
@@ -195,7 +201,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     });
 
     it('should handle certificate not found error', async () => {
-      mockGetCertificate.mockResolvedValueOnce(null);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(null),
+      });
 
       await expect(submitDocumentToBoomi(mockRawPayload)).rejects.toThrow(
         'Document not found for document number: GBR-2025-CC-TEST123'
@@ -215,7 +223,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         exportData: null,
       };
 
-      mockGetCertificate.mockResolvedValueOnce(certificateWithoutExportData);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(certificateWithoutExportData),
+      });
 
       await expect(submitDocumentToBoomi(mockRawPayload)).rejects.toThrow(
         'No exportData found for document number: GBR-2025-CC-TEST123'
@@ -227,7 +237,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     });
 
     it('should handle CATCH API errors', async () => {
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
       mockSendDocumentToBoomi.mockRejectedValueOnce(
         new Error('CATCH API error: 500 - Internal Server Error')
@@ -243,7 +255,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     });
 
     it('should handle OAuth token errors', async () => {
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
       mockSendDocumentToBoomi.mockRejectedValueOnce(
         new Error('Failed to get catchSubmit OAuth token')
@@ -256,7 +270,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
     it('should handle transformation errors', async () => {
       const error = new Error('Transformation failed: Invalid payload structure');
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockImplementation(() => {
         throw error;
       });
@@ -272,7 +288,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         documentNumber: undefined,
       };
 
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
 
       const mockResponse = {
@@ -291,9 +309,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     });
 
     it('should handle database errors', async () => {
-      mockGetCertificate.mockRejectedValueOnce(
-        new Error('Database connection error')
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockRejectedValue(new Error('Database connection error')),
+      });
 
       await expect(submitDocumentToBoomi(mockRawPayload)).rejects.toThrow(
         'Database connection error'
@@ -302,7 +320,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
     it('should handle network errors', async () => {
       const error = new Error('Network error: Connection refused');
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
       mockSendDocumentToBoomi.mockRejectedValue(error);
 
@@ -318,7 +338,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateFromDB);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
       mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
       mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
 
@@ -396,9 +418,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithDescriptionOnlyProduct
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithDescriptionOnlyProduct),
+      });
 
       await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
         'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
@@ -439,9 +461,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithValidProducts
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithValidProducts),
+      });
       mockGenerateProcessingStatementPayload.mockReturnValueOnce(
         mockTransformedPSPayload
       );
@@ -487,7 +509,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(mockCertificateWithCaughtBy);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithCaughtBy),
+      });
       mockGenerateProcessingStatementPayload.mockReturnValueOnce(
         mockTransformedPSPayload
       );
@@ -527,9 +551,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithMixedProducts
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithMixedProducts),
+      });
 
       await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
         'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
@@ -560,9 +584,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithEmptyProducts
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithEmptyProducts),
+      });
       mockGenerateProcessingStatementPayload.mockReturnValueOnce(
         mockTransformedPSPayload
       );
@@ -592,9 +616,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithConsignmentDescription
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithConsignmentDescription),
+      });
 
       await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
         'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
@@ -624,9 +648,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithEmptyCatches
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithEmptyCatches),
+      });
 
       await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
         'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
@@ -652,9 +676,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithEmptyCaughtBy
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithEmptyCaughtBy),
+      });
 
       await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
         'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
@@ -675,9 +699,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithNullProduct
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithNullProduct),
+      });
 
       await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
         'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
@@ -709,9 +733,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithWhitespaceDescription
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithWhitespaceDescription),
+      });
       mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
 
       // Whitespace-only description is treated as no description, so should be allowed
@@ -748,9 +772,9 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         message: 'Accepted for processing',
       };
 
-      mockGetCertificate.mockResolvedValueOnce(
-        mockCertificateWithNoCatchesButDescription
-      );
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateWithNoCatchesButDescription),
+      });
       mockGenerateProcessingStatementPayload.mockReturnValueOnce(
         mockTransformedPSPayload
       );
