@@ -26,7 +26,7 @@ export const euUpgradeRoutes = (server: Hapi.Server) => {
           logger.error(`[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:${requestId}][${e.message}]`);
 
           // Return 404 if certificate not found, 500 for other errors
-          if (e.message && e.message.includes('Certificate not found')) {
+          if (e.message?.includes('Certificate not found')) {
             return h.response({ error: 'Certificate not found' }).code(404);
           }
 
