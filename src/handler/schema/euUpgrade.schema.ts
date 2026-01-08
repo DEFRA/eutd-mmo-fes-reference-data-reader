@@ -49,7 +49,7 @@ export const euUpgradeCallbackSchema = Joi.object({
                     text: Joi.string().required(),
                   }).required(),
                   ID: Joi.object({
-                    '@schemeAgencyID': Joi.string().optional(),
+                    '@schemeAgencyID': Joi.string().required(),
                     text: Joi.string().required(),
                   }).required(),
                   AttachmentBinaryObject: Joi.object({
