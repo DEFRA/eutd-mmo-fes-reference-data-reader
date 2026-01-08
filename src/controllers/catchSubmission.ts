@@ -2,8 +2,8 @@ import { BoomiService, IEuUpgradeCallback, IEuUpgradeResponse } from 'mmo-shared
 import logger from '../logger';
 import CatchCertificateTransformerService from '../services/catch-certificate-transformer.service';
 import ProcessingStatementTransformerService from '../services/processing-statement-transformer.service';
-import { getCertificateByDocumentNumberWithNumberOfFailedAttempts, updateCertificateEuCatchStatus } from '../landings/persistence/catchCert';
-import { IDocument } from '../landings/types/document';
+import { updateCertificateEuCatchStatus } from '../landings/persistence/catchCert';
+import { DocumentModel, DocumentStatuses, IDocument } from '../landings/types/document';
 import { getDocumentType } from './dataHub';
 import StorageNotesTransformerService from '../services/storage-notes-transformer.service';
 import { ICatchStatus } from './euUpgrade';
@@ -45,10 +45,11 @@ const fetchDocumentData = async (documentNumber: string, docType: string): Promi
   try {
     logger.info(`[DOCUMENT-SUBMISSION][FETCH-DATA][${documentNumber}][TYPE:${docType}][START]`);
 
-    const document = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(
+    const document = await DocumentModel.findOne({
       documentNumber,
-      docType
-    );
+      __t: docType,
+      status: { $in: [DocumentStatuses.Complete, DocumentStatuses.Void] }
+    }).lean();
 
     if (!document) {
       throw new Error(`Document not found for document number: ${documentNumber}`);

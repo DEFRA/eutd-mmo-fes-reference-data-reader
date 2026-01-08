@@ -312,9 +312,6 @@ export default class CatchCertificateTransformerService {
         case TRANSPORT_VEHICLE_PLANE: {
           return transport.flightNumber;
         }
-        case TRANSPORT_VEHICLE_CONTAINER_VESSEL: {
-          return transport.vesselName;
-        }
         default: {
           return ''
         }
