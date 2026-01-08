@@ -347,7 +347,7 @@ export default class ProcessingStatementTransformerService {
     const catches = exportPayload?.catches || [];
     catches.forEach((catchItem: any) => {
       if (catchItem?.exportWeightAfterProcessing) {
-        totalWeight += parseFloat(catchItem.exportWeightAfterProcessing);
+        totalWeight += Number.parseFloat(catchItem.exportWeightAfterProcessing);
       }
     });
 
