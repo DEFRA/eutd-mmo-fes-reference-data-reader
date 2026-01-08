@@ -20,7 +20,7 @@ export const euUpgradeCallbackSchema = Joi.object({
         TimestampType: Joi.object({
           Created: Joi.string().required(),
           Expires: Joi.string().required(),
-        }).required(),
+        }).optional(),
       }).optional(),
     }).required(),
     Body: Joi.object({
@@ -49,7 +49,7 @@ export const euUpgradeCallbackSchema = Joi.object({
                     text: Joi.string().required(),
                   }).required(),
                   ID: Joi.object({
-                    '@schemeAgencyID': Joi.string().required(),
+                    '@schemeAgencyID': Joi.string().optional(),
                     text: Joi.string().required(),
                   }).required(),
                   AttachmentBinaryObject: Joi.object({
