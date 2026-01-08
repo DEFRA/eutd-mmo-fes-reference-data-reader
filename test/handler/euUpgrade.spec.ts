@@ -935,5 +935,116 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         'Receive EU CATCH status callbacks from BOOMI',
       );
     });
+
+    it('should return 404 when certificate is not found', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              '@severity': 'debugging',
+              ID: 'WS_REQUEST_ID',
+              Message: 'test-request-not-found',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
+                  StatusCode: { '@name': 'Issued', text: '70' },
+                  ReasonInformation: 'Processed',
+                  fesDocNumber: 'GBR-2023-CC-NOTFOUND',
+                  ReferenceSPSReferencedDocument: [{
+                    TypeCode: { '@name': 'Certificate', text: '16' },
+                    RelationshipTypeCode: {
+                      '@name': 'Document reference',
+                      text: 'CAW',
+                    },
+                    ID: { "@schemeAgencyID": "GB", text: 'EU.CATCH.CC.NOTFOUND' },
+                    AttachmentBinaryObject: {
+                      "@format": 'url',
+                      "@mimeCode": 'text/url',
+                      "@uri": 'https://example.com/cert',
+                    },
+                  }]
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockRejectedValueOnce(
+        new Error('Certificate not found: GBR-2023-CC-NOTFOUND'),
+      );
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(404);
+      expect(response.result).toEqual({ error: 'Certificate not found' });
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-not-found][Certificate not found: GBR-2023-CC-NOTFOUND]',
+      );
+    });
+
+    it('should return 500 for internal server errors', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              '@severity': 'debugging',
+              ID: 'WS_REQUEST_ID',
+              Message: 'test-request-server-error',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
+                  StatusCode: { '@name': 'Issued', text: '70' },
+                  ReasonInformation: 'Processed',
+                  fesDocNumber: 'GBR-2023-CC-TEST123',
+                  ReferenceSPSReferencedDocument: [{
+                    TypeCode: { '@name': 'Certificate', text: '16' },
+                    RelationshipTypeCode: {
+                      '@name': 'Document reference',
+                      text: 'CAW',
+                    },
+                    ID: { "@schemeAgencyID": "GB", text: 'EU.CATCH.CC.0123456789' },
+                    AttachmentBinaryObject: {
+                      "@format": 'url',
+                      "@mimeCode": 'text/url',
+                      "@uri": 'https://example.com/cert',
+                    },
+                  }]
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockRejectedValueOnce(
+        new Error('Unexpected database error'),
+      );
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(500);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-server-error][Unexpected database error]',
+      );
+    });
   });
 });

@@ -17,6 +17,7 @@ import {
   upsertExportPayload,
   upsertProductsByIgnore,
   getAllCatchCertsWithProducts,
+  updateCertificateEuCatchStatus,
   Product
 } from '../../../src/landings/persistence/catchCert';
 import {
@@ -151,7 +152,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
   afterAll(async () => {
     await mongoose.disconnect();
-    
+
       await mongoServer.stop();
 
   });
@@ -1658,6 +1659,234 @@ describe('updating certificates', () => {
 
     expect(results[0].status).toBe('DRAFT');
     expect(results[0].exportData.products[0].caughtBy[0]._status).toStrictEqual(LandingStatus.Complete);
+  });
+});
+
+
+describe('updating certificate EU catch status', () => {
+
+  beforeEach(async () => {
+    await DocumentModel.deleteMany({});
+  });
+
+  it('should update certificate with EU catch status data for SUCCESS', async () => {
+    const catchCert = new DocumentModel({
+      __t: "catchCert",
+      documentNumber: "GBR-2023-CC-TEST123",
+      status: "COMPLETE",
+      createdAt: "2023-07-10T08:26:06.939Z",
+      createdBy: "Bob",
+      createdByEmail: "foo@foo.com",
+      exportData: {
+        products: []
+      }
+    });
+
+    await catchCert.save();
+
+    const statusData = {
+      documentNumber: 'GBR-2023-CC-TEST123',
+      euCatchStatus: 'SUCCESS' as const,
+      euCatchReferenceNumber: 'EU.CATCH.CC.0123456789',
+      euCatchStatusCode: '70',
+      euCatchStatusName: 'Issued (Validated)',
+      euCatchUri: 'https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/GBR-2023-CC-TEST123',
+      euCatchTimestamp: '2025-11-21T10:00:00Z',
+      reasonInformation: 'Message has been successfully processed'
+    };
+
+    await updateCertificateEuCatchStatus('GBR-2023-CC-TEST123', statusData);
+
+    const results: any = await DocumentModel.find();
+
+    expect(results.length).toBe(1);
+    expect(results[0].catchSubmission).toBeDefined();
+    expect(results[0].catchSubmission.status).toBe('SUCCESS');
+    expect(results[0].catchSubmission.reference).toBe('EU.CATCH.CC.0123456789');
+    expect(results[0].catchSubmission.code).toBe('70');
+    expect(results[0].catchSubmission.name).toBe('Issued (Validated)');
+    expect(results[0].catchSubmission.uri).toBe('https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/GBR-2023-CC-TEST123');
+    expect(results[0].catchSubmission.timestamp).toBe('2025-11-21T10:00:00Z');
+    expect(results[0].catchSubmission.reasonInformation).toBe('Message has been successfully processed');
+  });
+
+  it('should update certificate with EU catch status data for ERROR', async () => {
+    const catchCert = new DocumentModel({
+      __t: "catchCert",
+      documentNumber: "GBR-2023-CC-ERROR123",
+      status: "COMPLETE",
+      createdAt: "2023-07-10T08:26:06.939Z",
+      createdBy: "Bob",
+      createdByEmail: "foo@foo.com",
+      exportData: {
+        products: []
+      }
+    });
+
+    await catchCert.save();
+
+    const statusData = {
+      documentNumber: 'GBR-2023-CC-ERROR123',
+      euCatchStatus: 'ERROR',
+      euCatchStatusMessage: 'Validation failed',
+      validationErrors: [
+        {
+          errorId: 'ERR001',
+          errorMessage: 'Invalid species code',
+          errorField: 'speciesCode'
+        }
+      ]
+    };
+
+    await updateCertificateEuCatchStatus('GBR-2023-CC-ERROR123', statusData);
+
+    const results: any = await DocumentModel.find();
+
+    expect(results.length).toBe(1);
+    expect(results[0].catchSubmission).toBeDefined();
+    expect(results[0].catchSubmission.status).toBe('ERROR');
+    expect(results[0].catchSubmission.message).toBe('Validation failed');
+    expect(results[0].catchSubmission.validationErrors).toHaveLength(1);
+  });
+
+  it('should update certificate with EU catch status data for PENDING', async () => {
+    const catchCert = new DocumentModel({
+      __t: "catchCert",
+      documentNumber: "GBR-2023-CC-PENDING123",
+      status: "COMPLETE",
+      createdAt: "2023-07-10T08:26:06.939Z",
+      createdBy: "Bob",
+      createdByEmail: "foo@foo.com",
+      exportData: {
+        products: []
+      }
+    });
+
+    await catchCert.save();
+
+    const statusData = {
+      documentNumber: 'GBR-2023-CC-PENDING123',
+      euCatchStatus: 'PENDING' as const,
+      euCatchStatusMessage: 'Processing in progress'
+    };
+
+    await updateCertificateEuCatchStatus('GBR-2023-CC-PENDING123', statusData);
+
+    const results: any = await DocumentModel.find();
+
+    expect(results.length).toBe(1);
+    expect(results[0].catchSubmission).toBeDefined();
+    expect(results[0].catchSubmission.status).toBe('PENDING');
+    expect(results[0].catchSubmission.message).toBe('Processing in progress');
+  });
+
+  it('should throw an error when certificate is not found', async () => {
+    const statusData = {
+      documentNumber: 'NON-EXISTENT-DOC',
+      euCatchStatus: 'SUCCESS' as const,
+      euCatchReferenceNumber: 'EU.CATCH.CC.0123456789'
+    };
+
+    await expect(
+      updateCertificateEuCatchStatus('NON-EXISTENT-DOC', statusData)
+    ).rejects.toThrow('Certificate not found: NON-EXISTENT-DOC');
+  });
+
+  it('should throw an error when certificate status is not COMPLETE', async () => {
+    const catchCert = new DocumentModel({
+      __t: "catchCert",
+      documentNumber: "GBR-2023-CC-DRAFT",
+      status: "DRAFT",
+      createdAt: "2023-07-10T08:26:06.939Z",
+      createdBy: "Bob",
+      createdByEmail: "foo@foo.com",
+      exportData: {
+        products: []
+      }
+    });
+
+    await catchCert.save();
+
+    const statusData = {
+      documentNumber: 'GBR-2023-CC-DRAFT',
+      euCatchStatus: 'SUCCESS' as const,
+      euCatchReferenceNumber: 'EU.CATCH.CC.0123456789'
+    };
+
+    await expect(
+      updateCertificateEuCatchStatus('GBR-2023-CC-DRAFT', statusData)
+    ).rejects.toThrow('Certificate not found: GBR-2023-CC-DRAFT');
+  });
+
+  it('should update certificate with fault information', async () => {
+    const catchCert = new DocumentModel({
+      __t: "catchCert",
+      documentNumber: "GBR-2023-CC-FAULT",
+      status: "COMPLETE",
+      createdAt: "2023-07-10T08:26:06.939Z",
+      createdBy: "Bob",
+      createdByEmail: "foo@foo.com",
+      exportData: {
+        products: []
+      }
+    });
+
+    await catchCert.save();
+
+    const statusData = {
+      documentNumber: 'GBR-2023-CC-FAULT',
+      euCatchStatus: 'ERROR' as const,
+      faultCode: 'SOAP-ENV:Server',
+      faultString: 'Internal server error occurred'
+    };
+
+    await updateCertificateEuCatchStatus('GBR-2023-CC-FAULT', statusData);
+
+    const results: any = await DocumentModel.find();
+
+    expect(results.length).toBe(1);
+    expect(results[0].catchSubmission).toBeDefined();
+    expect(results[0].catchSubmission.status).toBe('ERROR');
+    expect(results[0].catchSubmission.faultCode).toBe('SOAP-ENV:Server');
+    expect(results[0].catchSubmission.faultString).toBe('Internal server error occurred');
+  });
+
+  it('should update existing catchSubmission data', async () => {
+    const catchCert = new DocumentModel({
+      __t: "catchCert",
+      documentNumber: "GBR-2023-CC-UPDATE",
+      status: "COMPLETE",
+      createdAt: "2023-07-10T08:26:06.939Z",
+      createdBy: "Bob",
+      createdByEmail: "foo@foo.com",
+      exportData: {
+        products: []
+      },
+      catchSubmission: {
+        euCatchStatus: 'PENDING',
+        euCatchStatusMessage: 'Initial submission'
+      }
+    });
+
+    await catchCert.save();
+
+    const statusData = {
+      documentNumber: 'GBR-2023-CC-UPDATE',
+      euCatchStatus: 'SUCCESS' as const,
+      euCatchReferenceNumber: 'EU.CATCH.CC.9999999999',
+      euCatchStatusCode: '70',
+      euCatchStatusName: 'Issued (Validated)',
+      euCatchTimestamp: '2025-11-22T10:00:00Z'
+    };
+
+    await updateCertificateEuCatchStatus('GBR-2023-CC-UPDATE', statusData);
+
+    const results: any = await DocumentModel.find();
+
+    expect(results.length).toBe(1);
+    expect(results[0].catchSubmission.status).toBe('SUCCESS');
+    expect(results[0].catchSubmission.reference).toBe('EU.CATCH.CC.9999999999');
+    expect(results[0].catchSubmission.code).toBe('70');
   });
 });
 
