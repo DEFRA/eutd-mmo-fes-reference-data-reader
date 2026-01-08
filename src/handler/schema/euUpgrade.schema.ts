@@ -8,11 +8,15 @@ export const euUpgradeCallbackSchema = Joi.object({
   Envelope: Joi.object({
     Header: Joi.object({
       Message: Joi.object({
-        severity: Joi.string().required(),
+        '@severity': Joi.string().optional(),
+        severity: Joi.string().optional(),
+        '@xmlns': Joi.string().optional(),
         ID: Joi.string().required(),
         Message: Joi.string().required(),
-      }).required(),
+      }).optional(),
       Security: Joi.object({
+        '@xmlns:ns1': Joi.string().optional(),
+        '@xmlns:ns2': Joi.string().optional(),
         TimestampType: Joi.object({
           Created: Joi.string().required(),
           Expires: Joi.string().required(),
@@ -21,33 +25,42 @@ export const euUpgradeCallbackSchema = Joi.object({
     }).required(),
     Body: Joi.object({
       SubmitCatchResponse: Joi.object({
+        '@xmlns': Joi.string().optional(),
         SPSAcknowledgement: Joi.object({
           SPSAcknowledgementDocument: Joi.object({
             IssueDateTime: Joi.object({
               DateTime: Joi.string().required(),
             }).required(),
             StatusCode: Joi.object({
-              name: Joi.string().required(),
-              value: Joi.string().required(),
+              '@name': Joi.string().required(),
+              text: Joi.string().required(),
             }).required(),
             ReasonInformation: Joi.string().required(),
             fesDocNumber: Joi.string().required(),
-            ReferenceSPSReferencedDocument: Joi.object({
-              TypeCode: Joi.object({
-                name: Joi.string().required(),
-                value: Joi.string().required(),
-              }).required(),
-              RelationshipTypeCode: Joi.object({
-                name: Joi.string().required(),
-                value: Joi.string().required(),
-              }).required(),
-              ID: Joi.string().required(),
-              AttachmentBinaryObject: Joi.object({
-                format: Joi.string().required(),
-                mimeCode: Joi.string().required(),
-                uri: Joi.string().required(),
-              }).required(),
-            }).required(),
+            ReferenceSPSReferencedDocument: Joi.array()
+              .items(
+                Joi.object({
+                  TypeCode: Joi.object({
+                    '@name': Joi.string().required(),
+                    text: Joi.string().required(),
+                  }).required(),
+                  RelationshipTypeCode: Joi.object({
+                    '@name': Joi.string().required(),
+                    text: Joi.string().required(),
+                  }).required(),
+                  ID: Joi.object({
+                    '@schemeAgencyID': Joi.string().required(),
+                    text: Joi.string().required(),
+                  }).required(),
+                  AttachmentBinaryObject: Joi.object({
+                    '@format': Joi.string().required(),
+                    '@mimeCode': Joi.string().required(),
+                    '@uri': Joi.string().required(),
+                  }).required(),
+                }),
+              )
+              .min(1)
+              .required(),
           }).required(),
         }).required(),
       }).optional(),
