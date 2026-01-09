@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry, IEuUpgradeResponse } from 'mmo-shared-reference-data';
+import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry, IEuUpgradeResponse, CertificateStatus } from 'mmo-shared-reference-data';
 import { DocumentModel, DocumentStatuses, IDocument } from '../types/document';
 import logger from '../../logger';
 import { toBackEndCatchSubmission } from '../../controllers/euUpgrade';
@@ -20,14 +20,14 @@ export const getCertificateByDocumentNumberWithNumberOfFailedAttempts = async (d
 }
 
 export const upsertCertificate = async (documentNumber: string, parametersToUpdate: Object) => {
-  const certificate : any = await DocumentModel.findOne({
-    documentNumber : documentNumber,
+  const certificate: any = await DocumentModel.findOne({
+    documentNumber: documentNumber,
     status: { $nin: [DocumentStatuses.Locked, DocumentStatuses.Void] }
   });
 
   if (!certificate) return null;
 
-  for(const [key, value] of Object.entries(parametersToUpdate))
+  for (const [key, value] of Object.entries(parametersToUpdate))
     certificate[key] = value
 
   const response: any = await DocumentModel.findOneAndUpdate(
@@ -35,14 +35,14 @@ export const upsertCertificate = async (documentNumber: string, parametersToUpda
       documentNumber: documentNumber
     },
     certificate,
-    {new: true}
+    { new: true }
   )
 
   return response;
 }
 
 export const upsertProductsByIgnore = async (products: any, documentNumber: string) => {
-  const query : any = {documentNumber: documentNumber};
+  const query: any = { documentNumber: documentNumber };
   const update = {
     $set: { 'exportData.products': products },
   };
@@ -50,7 +50,7 @@ export const upsertProductsByIgnore = async (products: any, documentNumber: stri
 };
 
 export const upsertExportPayload = async (documentNumber: string, products: Product[]) => {
-  const query : any = {status: 'DRAFT', documentNumber: documentNumber};
+  const query: any = { status: 'DRAFT', documentNumber: documentNumber };
 
   const certificate = await DocumentModel.findOne(
     query,
@@ -61,7 +61,7 @@ export const upsertExportPayload = async (documentNumber: string, products: Prod
   if (!certificate) return null;
 
   const options = { upsert: true, omitUndefined: true };
-  const update = {'$set': { 'exportData.products': products } }
+  const update = { '$set': { 'exportData.products': products } }
 
   await DocumentModel.findOneAndUpdate(query, update, options);
 }
@@ -71,21 +71,15 @@ export const upsertExportPayload = async (documentNumber: string, products: Prod
  * Used by FI0-10355 EU upgrade callback
  */
 export const updateCertificateEuCatchStatus = async (documentNumber: string, statusData: IEuUpgradeResponse): Promise<void> => {
-  const query = { documentNumber: documentNumber };
+  const query = { status: CertificateStatus.COMPLETE, documentNumber: documentNumber };
 
   // Build the update object with catchStatus fields
   const update: Object = { '$set': { 'catchSubmission': toBackEndCatchSubmission(statusData) } }
 
-   const options = {
-    upsert: true,
+  const options = {
     omitUndefined: true,
     new: true
   };
-
-  logger.info(
-    `[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][UPDATE][${JSON.stringify(
-      update
-    )}]`);
 
   const result = await DocumentModel.findOneAndUpdate(query, update, options);
 
@@ -93,7 +87,7 @@ export const updateCertificateEuCatchStatus = async (documentNumber: string, sta
     throw new Error(`Certificate not found: ${documentNumber}`);
   }
 
-  logger.info(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][SUCCESS][${documentNumber}]`);
+  logger.info(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][UPDATE][${JSON.stringify(update)}]`);
 }
 
 export interface Catch {
@@ -151,7 +145,7 @@ export interface Product {
   state?: State,
   presentation?: Presentation,
   caughtBy?: Catch[],
-  factor? : number,
+  factor?: number,
   speciesOverriddenByAdmin?: boolean;
   stateAdmin?: string,
   presentationAdmin?: string,
@@ -160,9 +154,9 @@ export interface Product {
 export interface BasicTransportDetails {
   vehicle: string,
   exportedFrom?: string,
-  departurePlace? : string,
-  exportDate? : string,
-  exportedTo? : ICountry,
+  departurePlace?: string,
+  exportDate?: string,
+  exportedTo?: ICountry,
 }
 
 export interface Train extends BasicTransportDetails {
@@ -201,7 +195,7 @@ interface IGetCatchCerts {
 }
 
 export const getCatchCerts = async (
-  { fromDate, documentStatus=DocumentStatuses.Complete, landings, documentNumber, exporter, pln, landingStatuses }: IGetCatchCerts) => {
+  { fromDate, documentStatus = DocumentStatuses.Complete, landings, documentNumber, exporter, pln, landingStatuses }: IGetCatchCerts) => {
 
   if (landings && landings.length === 0) return []
 
@@ -211,7 +205,7 @@ export const getCatchCerts = async (
     __t: 'catchCert',
     createdAt: { $type: 9 },
     'exportData.products': { $exists: true },
-    $or: [ {'status': { $exists: false }}, {'status': documentStatus} ]
+    $or: [{ 'status': { $exists: false } }, { 'status': documentStatus }]
   }
 
   if (landings) {
@@ -251,7 +245,7 @@ export const getCatchCerts = async (
   if (documentNumber) query.documentNumber = documentNumber
 
   if (exporter) {
-     query['exportData.exporterDetails.exporterCompanyName'] = {'$regex': exporter,$options:'i'}
+    query['exportData.exporterDetails.exporterCompanyName'] = { '$regex': exporter, $options: 'i' }
   }
 
   if (pln) query['exportData.products.caughtBy.pln'] = pln
