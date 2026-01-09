@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry, IEuUpgradeResponse } from 'mmo-shared-reference-data';
+import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingStatus, ICountry, IEuUpgradeResponse, CertificateStatus } from 'mmo-shared-reference-data';
 import { DocumentModel, DocumentStatuses, IDocument } from '../types/document';
 import logger from '../../logger';
 import { toBackEndCatchSubmission } from '../../controllers/euUpgrade';
@@ -72,7 +72,7 @@ export const upsertExportPayload = async (documentNumber: string, products: Prod
  * Used by FI0-10355 EU upgrade callback
  */
 export const updateCertificateEuCatchStatus = async (documentNumber: string, statusData: IEuUpgradeResponse): Promise<void> => {
-  const query = { status:  { $in: [ DocumentStatuses.Complete, DocumentStatuses.Void ] }, documentNumber: documentNumber };
+  const query = { status: CertificateStatus.COMPLETE, documentNumber: documentNumber };
 
   // Build the update object with catchStatus fields
   const catchSubmission = toBackEndCatchSubmission(statusData);
@@ -90,8 +90,6 @@ export const updateCertificateEuCatchStatus = async (documentNumber: string, sta
   }
 
   logger.info(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][UPDATE][${JSON.stringify(update)}]`);
-
-  updateCcDefraValidationReport(documentNumber, catchSubmission);
 }
 
 export interface Catch {
