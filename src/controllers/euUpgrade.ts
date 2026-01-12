@@ -47,7 +47,7 @@ export const processEuUpgradeCallback = async (
     await updateCertificateEuCatchStatus(result.documentNumber, result);
     logger.info(`[EU-UPGRADE][CALLBACK][SUCCESS][CERTIFICATE-ID:${result.documentNumber}][DATABASE-UPDATED]`);
   } catch (error) {
-    logger.error( `[EU-UPGRADE][CALLBACK][ERROR][REQUEST-ID:${requestId}][${error.message}]`);
+    logger.error( `[EU-UPGRADE][CALLBACK][ERROR][${error.message}]`);
     throw error;
   }
 };
