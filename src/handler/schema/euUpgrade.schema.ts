@@ -22,7 +22,7 @@ export const euUpgradeCallbackSchema = Joi.object({
           Expires: Joi.string().required(),
         }).optional(),
       }).optional(),
-    }).required(),
+    }).optional(),
     Body: Joi.object({
       SubmitCatchResponse: Joi.object({
         '@xmlns': Joi.string().optional(),
@@ -80,7 +80,7 @@ export const euUpgradeCallbackSchema = Joi.object({
                   }).required(),
                   Field: Joi.object({
                     languageID: Joi.string().required(),
-                    text: Joi.string().allow('').required(),
+                    text: Joi.string().allow('').optional(),
                   }).required(),
                 }),
               )
