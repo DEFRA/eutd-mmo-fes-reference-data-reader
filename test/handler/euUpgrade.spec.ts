@@ -1044,7 +1044,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(response.result).toEqual({ error: 'Certificate not found' });
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
       expect(logger.error).toHaveBeenCalledWith(
-        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-not-found][Certificate not found: GBR-2023-CC-NOTFOUND]',
+        '[EU-UPGRADE][ENDPOINT][ERROR][Certificate not found: GBR-2023-CC-NOTFOUND]',
       );
     });
 
@@ -1099,7 +1099,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(response.statusCode).toBe(500);
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
       expect(logger.error).toHaveBeenCalledWith(
-        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-server-error][Unexpected database error]',
+        '[EU-UPGRADE][ENDPOINT][ERROR][Unexpected database error]',
       );
     });
   });
