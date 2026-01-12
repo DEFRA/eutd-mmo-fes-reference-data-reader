@@ -273,6 +273,62 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
     });
 
+    it('should successfully process EU upgrade callback with 200 response', async () => {
+      const payload = {
+        Envelope: {
+          Body: {
+            Fault: {
+              faultcode: "S:Client",
+              faultstring: "Some business rules are not met",
+              fesDocNumber: "GBR-2026-CC-474F089E0",
+              detail: {
+                BusinessRulesValidationException: {
+                  Error: [
+                    {
+                      ID: "CATCH-CONSIGNMENT-VERIFICATION-201",
+                      Message: {
+                        languageID: "en",
+                        text: " Document number - Document number is taken: this catch certificate or processing statement already exists in CATCH. Follow the \"re-use workflow\"."
+                      },
+                      Field: {
+                        languageID: "en"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      };
+
+      const mockFailureResponse = {
+        euCatchStatus: 'FAILURE',
+        faultCode: 'SOAP-ENV:Server',
+        faultString: 'Validation failed',
+        validationErrors: [
+          {
+            id: 'ERROR_001',
+            message: 'Invalid certificate number',
+            field: 'certificateId',
+          },
+        ],
+        requestId: 'test-request-failure',
+      };
+
+      mockProcessEuUpgradeCallback.mockResolvedValueOnce(mockFailureResponse);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.payload).toBe('');
+      expect(response.statusCode).toBe(200);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+    });
+
     it('should return 500 when processing throws an error', async () => {
       const payload = {
         Envelope: {
@@ -324,7 +380,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(response.statusCode).toBe(500);
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
       expect(logger.error).toHaveBeenCalledWith(
-        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-error][Database connection error]',
+        '[EU-UPGRADE][ENDPOINT][ERROR][Database connection error]',
       );
     });
 
@@ -988,7 +1044,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(response.result).toEqual({ error: 'Certificate not found' });
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
       expect(logger.error).toHaveBeenCalledWith(
-        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-not-found][Certificate not found: GBR-2023-CC-NOTFOUND]',
+        '[EU-UPGRADE][ENDPOINT][ERROR][Certificate not found: GBR-2023-CC-NOTFOUND]',
       );
     });
 
@@ -1043,7 +1099,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(response.statusCode).toBe(500);
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
       expect(logger.error).toHaveBeenCalledWith(
-        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-server-error][Unexpected database error]',
+        '[EU-UPGRADE][ENDPOINT][ERROR][Unexpected database error]',
       );
     });
   });
