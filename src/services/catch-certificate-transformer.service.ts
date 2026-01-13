@@ -282,7 +282,7 @@ export default class CatchCertificateTransformerService {
       'containerVessel': 'Maritime transport'
     };
 
-    const schemeAgencyID = {
+    const schemeID = {
       'truck': 'road_vehicle_registration_before_bcp',
       'train': 'train_identifier_before_bcp',
       'plane': 'airplane_flight_number_before_bcp',
@@ -318,12 +318,29 @@ export default class CatchCertificateTransformerService {
       }
     }
 
+    const getSchemeAgencyID: (transport: any) => string = (transport: any) => {
+      if (transport.vehicle === TRANSPORT_VEHICLE_TRUCK) {
+          const countries: ICountry[] = getCountries();
+          const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
+          return countryID?.isoCodeAlpha2 ?? 'GB';
+      }
+
+      return null;
+    }
+
+    const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : null;
+
     return transportations?.map((transport: any) => {
       const vehicle = transport.vehicle;
+      const schemeAgencyID = getSchemeAgencyID(transport);
+      const schemeAgencyName = getSchemeAgencyName(transport);
+
       const commonTransportInformation = {
         ID: {
-          schemeID: schemeAgencyID[vehicle],
+          schemeID: schemeID[vehicle],
           schemeName: schemeName[vehicle],
+          schemeAgencyID: schemeAgencyID ? schemeAgencyID : undefined,
+          schemeAgencyName: schemeAgencyName ? schemeAgencyName : undefined,
           value: getTransportId(transport)
         },
         ModeCode: {

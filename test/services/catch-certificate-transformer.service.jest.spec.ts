@@ -639,6 +639,139 @@ describe('CatchCertificateTransformerService', () => {
       expect(transport[0].UsedSPSTransportMeans).toBeUndefined();
     });
 
+    it('should set schemeAgencyID and schemeAgencyName for truck with nationalityOfVehicle', () => {
+      mockGetCountries.mockReturnValue([{
+        officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
+        isoCodeAlpha2: 'GB'
+      }, {
+        officialCountryName: 'France',
+        isoCodeAlpha2: 'FR'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'truck',
+          registrationNumber: 'ABC123',
+          nationalityOfVehicle: 'France'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBe('FR');
+      expect(transport[0].ID.schemeAgencyName).toBe('France');
+    });
+
+    it('should default schemeAgencyID to GB when truck nationalityOfVehicle not found', () => {
+      mockGetCountries.mockReturnValue([{
+        officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
+        isoCodeAlpha2: 'GB'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'truck',
+          registrationNumber: 'ABC123',
+          nationalityOfVehicle: 'Unknown Country'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBe('GB');
+      expect(transport[0].ID.schemeAgencyName).toBe('Unknown Country');
+    });
+
+    it('should not set schemeAgencyID and schemeAgencyName for non-truck vehicles', () => {
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-003';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'plane',
+          flightNumber: 'BA123',
+          nationalityOfVehicle: 'United Kingdom'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyName).toBeUndefined();
+    });
+
+    it('should handle truck without nationalityOfVehicle field', () => {
+      mockGetCountries.mockReturnValue([{
+        officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
+        isoCodeAlpha2: 'GB'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-004';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'truck',
+          registrationNumber: 'ABC123'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBe('GB');
+      expect(transport[0].ID.schemeAgencyName).toBeUndefined();
+    });
+
     it('should map train transport correctly', () => {
       const documentNumber = 'GBR-2025-CC-TRANS002';
       const createdAt = new Date('2025-12-01');
