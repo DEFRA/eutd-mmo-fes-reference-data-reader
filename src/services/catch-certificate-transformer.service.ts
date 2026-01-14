@@ -96,7 +96,7 @@ export default class CatchCertificateTransformerService {
             value: 'ALE'
           },
           ID: {
-            value: 'Regulation No 1005/2008 ARTICLE 12 ANNEX II'
+            value: 'Regulation (EU) 2023/2842'
           }
         }
       ],
