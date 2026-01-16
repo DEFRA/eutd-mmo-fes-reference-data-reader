@@ -242,12 +242,6 @@ export const DefraValidationProcessingStatementSchema = new Schema ({
     documentType:       { type: String,  required: true  },
     documentNumber:     { type: String,  required: true  },
     status:             { type: String,  required: true  },
-    _correlationId:     { type: String,  required: true  },
-    requestedByAdmin:   { type: Boolean, required: false, default: false },
-    lastUpdated:        { type: Date,    required: false, default: Date.now },
-    devolvedAuthority:  { type: String,  required: false },
-    contactId:          { type: String,  required: false },
-    accountId:          { type: String,  required: false },
     dateCreated:        { type: Date,    required: false },
     created:            { type: Object, required: false },
     userReference:      { type: String,  required: false },
@@ -261,9 +255,15 @@ export const DefraValidationProcessingStatementSchema = new Schema ({
     exportedTo:         { type: countrySchema, required: false },
     failedSubmissions:  { type: Number,  required: false },
     pointOfDestination: { type: String,  required: false },
+    accountId:          { type: String,  required: false },
     _processed:         { type: Boolean, required: false, default: false },
     clonedFrom:         { type: String, required: false },
-    parentDocumentVoid: { type: Boolean, required: false }
+    contactId:          { type: String,  required: false },
+    devolvedAuthority:  { type: String,  required: false },
+    parentDocumentVoid: { type: Boolean, required: false },
+    lastUpdated:        { type: Date,    required: false, default: Date.now },
+    _correlationId:     { type: String,  required: true  },
+    requestedByAdmin:   { type: Boolean, required: false, default: false },
 });
 
 export const DefraValidationStorageDocumentSchema = new Schema ({
@@ -320,7 +320,10 @@ export const DefraValidationCatchCertificateSchema = new Schema ({
     _processed:            { type: Boolean, required: false, default: false },
     clonedFrom:            { type: String,  required: false },
     landingsCloned:        { type: Boolean, required: false },
-    parentDocumentVoid:    { type: Boolean, required: false }
+    parentDocumentVoid:    { type: Boolean, required: false },
+    catchStatus:           { type: String, required: false },
+    catchReference:        { type: String, required: false },
+    rejectedReason:        { type: String, required: false }
 });
 
 export const DefraValidationReportSchema = new Schema({

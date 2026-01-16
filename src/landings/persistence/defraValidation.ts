@@ -11,6 +11,8 @@ import {
     DefraValidationStorageDocumentModel,
     DefraValidationCatchCertificateModel
 } from '../types/defraValidation';
+import { ICatchStatus } from '../../controllers/euUpgrade';
+import { DocumentStatuses } from '../types/document';
 
 export const insertDefraValidationReport = async (report: IDefraValidationReport): Promise<void> => {
     await new DefraValidationReportModel(report).save();
@@ -108,3 +110,16 @@ export const markAsProcessed = async (ids: string[]): Promise<void> => {
     { strict: false }
   );
 };
+
+export const updateCcDefraValidationReport = async (documentNumber: string, statusData: ICatchStatus): Promise<void> => {
+  const query = { status: DocumentStatuses.Complete, documentNumber: documentNumber };
+
+  const update = { '$set': { 'catchStatus': statusData.status, 'catchReference': statusData.reference, 'rejectedReason': statusData.faultString } };
+
+  const options = {
+    omitUndefined: true,
+    new: true
+  };
+
+  await DefraValidationCatchCertificateModel.findOneAndUpdate(query, update, options);
+}
