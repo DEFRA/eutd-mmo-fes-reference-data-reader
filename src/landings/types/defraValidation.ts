@@ -320,7 +320,10 @@ export const DefraValidationCatchCertificateSchema = new Schema ({
     _processed:            { type: Boolean, required: false, default: false },
     clonedFrom:            { type: String,  required: false },
     landingsCloned:        { type: Boolean, required: false },
-    parentDocumentVoid:    { type: Boolean, required: false }
+    parentDocumentVoid:    { type: Boolean, required: false },
+    catchStatus:           { type: String, required: false },
+    catchReference:        { type: String, required: false },
+    rejectedReason:        { type: String, required: false }
 });
 
 export const DefraValidationReportSchema = new Schema({
