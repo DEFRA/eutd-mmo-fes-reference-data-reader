@@ -3,6 +3,7 @@ import { getCertificateByDocumentNumberWithNumberOfFailedAttemptsQuery, LandingS
 import { DocumentModel, DocumentStatuses, IDocument } from '../types/document';
 import logger from '../../logger';
 import { toBackEndCatchSubmission } from '../../controllers/euUpgrade';
+import { updateCcDefraValidationReport } from './defraValidation';
 
 export const getCertificateByPdfReference = async (documentNumber: string) => {
   return await DocumentModel.findOne({ documentUri: `${documentNumber}.pdf` }).lean()
@@ -74,7 +75,8 @@ export const updateCertificateEuCatchStatus = async (documentNumber: string, sta
   const query = { status: CertificateStatus.COMPLETE, documentNumber: documentNumber };
 
   // Build the update object with catchStatus fields
-  const update: Object = { '$set': { 'catchSubmission': toBackEndCatchSubmission(statusData) } }
+  const catchSubmission = toBackEndCatchSubmission(statusData);
+  const update: Object = { '$set': { 'catchSubmission': catchSubmission } }
 
   const options = {
     omitUndefined: true,
@@ -88,6 +90,8 @@ export const updateCertificateEuCatchStatus = async (documentNumber: string, sta
   }
 
   logger.info(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][UPDATE][${JSON.stringify(update)}]`);
+
+  updateCcDefraValidationReport(documentNumber, catchSubmission);
 }
 
 export interface Catch {
