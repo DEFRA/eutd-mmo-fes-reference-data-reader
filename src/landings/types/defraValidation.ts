@@ -270,9 +270,6 @@ export const DefraValidationProcessingStatementSchema = new Schema ({
     lastUpdated:        { type: Date,    required: false, default: Date.now },
     _correlationId:     { type: String,  required: true  },
     requestedByAdmin:   { type: Boolean, required: false, default: false },
-    catchStatus:        { type: String, required: false },
-    catchReference:     { type: String, required: false },
-    rejectedReason:     { type: String, required: false }
 });
 
 export const DefraValidationStorageDocumentSchema = new Schema ({
