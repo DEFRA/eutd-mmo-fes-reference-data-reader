@@ -94,7 +94,7 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
+async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void') {
   const products = Array.isArray(exportData.products) ? exportData.products : [];
 
   const transformedExportData = {
