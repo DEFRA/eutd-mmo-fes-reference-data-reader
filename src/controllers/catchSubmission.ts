@@ -83,36 +83,8 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-/**
- * Checks if a product has only description with no substantive details (catches)
- */
-const isDescriptionOnlyProduct = (product: any): boolean => {
-  if (!product || typeof product !== 'object') return true;
-
-  // Check if product has catches array with content
-  const catches = product.catches || product.caughtBy || [];
-  const hasCatches = Array.isArray(catches) && catches.length > 0;
-
-  // Check if product has at least a description
-  const descriptionFields = ['description', 'productDescription', 'consignmentDescription'];
-  const hasDescription = descriptionFields.some(field => {
-    const value = product[field];
-    return value && typeof value === 'string' && value.trim().length > 0;
-  });
-
-  // Product is description-only if it has description but no catches
-  return hasDescription && !hasCatches;
-};
-
 async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void') {
   const products = Array.isArray(exportData.products) ? exportData.products : [];
-
-  // Validate: block products that have only description and no catches/certificates
-  const descriptionOnlyProducts = products.filter(isDescriptionOnlyProduct);
-  if (descriptionOnlyProducts.length > 0) {
-    logger.error(`[DOCUMENT-SUBMISSION][${documentNumber}][PS][VALIDATION][DESCRIPTION-ONLY-PRODUCTS][COUNT:${descriptionOnlyProducts.length}]`);
-    throw new Error('PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED');
-  }
 
   const transformedExportData = {
     products: products,
