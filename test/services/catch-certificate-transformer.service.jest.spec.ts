@@ -2150,7 +2150,7 @@ describe('CatchCertificateTransformerService', () => {
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
         transportations: [{
-          containerNumber: 'ABCU1234567 MACB1234567 BCBU1234567'
+          containerNumbers: 'ABCU1234567,MACB1234567,BCBU1234567'
         }]
       };
 
@@ -2182,7 +2182,7 @@ describe('CatchCertificateTransformerService', () => {
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
         transportations: [{
-          containerNumber: 'ABCU1234567 MACB1234567 BCBU1234567'
+          containerNumbers: 'ABCU1234567, MACB1234567, BCBU1234567'
         }]
       };
 
@@ -2200,157 +2200,6 @@ describe('CatchCertificateTransformerService', () => {
       expect(equipment[0].ID.value).toBe('ABCU1234567');
       expect(equipment[1].ID.value).toBe('MACB1234567');
       expect(equipment[2].ID.value).toBe('BCBU1234567');
-    });
-
-    it('should handle containerIdentificationNumber field (new field)', () => {
-      const documentNumber = 'GBR-2025-CC-EQUIP006';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{
-          containerIdentificationNumber: 'MSCU9876543'
-        }]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const equipment =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .UtilizedSPSTransportEquipment;
-
-      expect(equipment).toHaveLength(1);
-      expect(equipment[0].ID.value).toBe('MSCU9876543');
-      expect(equipment[0].ID.schemeID).toBe('container_number');
-    });
-
-    it('should handle multiple containers from containerIdentificationNumber field', () => {
-      const documentNumber = 'GBR-2025-CC-EQUIP007';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{
-          containerIdentificationNumber: 'CONT1111111 CONT2222222 CONT3333333'
-        }]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const equipment =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .UtilizedSPSTransportEquipment;
-
-      expect(equipment).toHaveLength(3);
-      expect(equipment[0].ID.value).toBe('CONT1111111');
-      expect(equipment[0].ID.schemeID).toBe('container_number');
-      expect(equipment[1].ID.value).toBe('CONT2222222');
-      expect(equipment[1].ID.schemeID).toBe('container_number');
-      expect(equipment[2].ID.value).toBe('CONT3333333');
-      expect(equipment[2].ID.schemeID).toBe('container_number');
-    });
-
-    it('should prioritize containerIdentificationNumber over containerNumber when both exist', () => {
-      const documentNumber = 'GBR-2025-CC-EQUIP008';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{
-          containerIdentificationNumber: 'NEW1234567',
-          containerNumber: 'OLD1234567'
-        }]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const equipment =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .UtilizedSPSTransportEquipment;
-
-      expect(equipment).toHaveLength(1);
-      expect(equipment[0].ID.value).toBe('NEW1234567');
-      expect(equipment[0].ID.schemeID).toBe('container_number');
-    });
-
-    it('should handle multiple transportations with different container fields', () => {
-      const documentNumber = 'GBR-2025-CC-EQUIP009';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [
-          {
-            containerIdentificationNumber: 'NEW1111111 NEW2222222'
-          },
-          {
-            containerNumber: 'OLD3333333'
-          }
-        ]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const equipment =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .UtilizedSPSTransportEquipment;
-
-      expect(equipment).toHaveLength(3);
-      expect(equipment[0].ID.value).toBe('NEW1111111');
-      expect(equipment[1].ID.value).toBe('NEW2222222');
-      expect(equipment[2].ID.value).toBe('OLD3333333');
-    });
-
-    it('should handle containerIdentificationNumber with extra spaces', () => {
-      const documentNumber = 'GBR-2025-CC-EQUIP010';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{
-          containerIdentificationNumber: '  CONT1234567   CONT7654321  '
-        }]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const equipment =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .UtilizedSPSTransportEquipment;
-
-      expect(equipment).toHaveLength(2);
-      expect(equipment[0].ID.value).toBe('CONT1234567');
-      expect(equipment[1].ID.value).toBe('CONT7654321');
     });
   });
 
