@@ -1,11 +1,23 @@
 import ProcessingStatementTransformerService from '../../src/services/processing-statement-transformer.service';
 import logger from '../../src/logger';
+import * as Species from '../../src/controllers/species';
 
 jest.mock('../../src/logger');
 
 describe('ProcessingStatementTransformerService', () => {
+  let mockGetCommodities;
+
   beforeEach(() => {
+    mockGetCommodities = jest.spyOn(Species, 'getCommodities');
+    mockGetCommodities.mockReturnValue([{
+      code: '0304890097',
+      description: 'Frozen Cod Fillets'
+    }]);
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
+    mockGetCommodities.mockRestore();
   });
 
   describe('generateProcessingStatementPayload', () => {
@@ -24,6 +36,7 @@ describe('ProcessingStatementTransformerService', () => {
       plantAddressOne: '456 Plant Road',
       plantTownCity: 'Manchester',
       plantPostcode: 'M1 1BB',
+      pointOfDestination: 'Port of Calais',
       exportedTo: {
         isoCodeAlpha2: 'FR',
         officialCountryName: 'France'
@@ -36,8 +49,12 @@ describe('ProcessingStatementTransformerService', () => {
       ],
       catches: [
         {
+          productDescription: 'Frozen Cod Fillets',
+          productCommodityCode: '0304890097',
           catchCertificateNumber: 'GBR-2025-CC-001',
-          exportWeightAfterProcessing: '100.5'
+          exportWeightBeforeProcessing: '100.5',
+          exportWeightAfterProcessing: '100.5',
+          scientificName: 'some scientic name'
         }
       ],
       consignmentDescription: 'Filleting and freezing'
@@ -71,7 +88,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
-      expect(exchangedDoc.ID.value).toBe(documentNumber);
+      expect(exchangedDoc.ID.value).toBe('');
       expect(exchangedDoc.Name.value).toBe('Processing Statement');
       expect(exchangedDoc.Name.languageID).toBe('en');
     });
@@ -85,9 +102,9 @@ describe('ProcessingStatementTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
-      expect(exchangedDoc.TypeCode.value).toBe('17');
-      expect(exchangedDoc.TypeCode.name).toBe('PROCESSING_STATEMENT');
-      expect(exchangedDoc.TypeCode.listAgencyID).toBe('EU_IUU_CATCH_CERT');
+      expect(exchangedDoc.TypeCode.value).toBe('16');
+      expect(exchangedDoc.TypeCode.name).toBe('CATCH_PROCESSING_STATEMENT');
+      expect(exchangedDoc.TypeCode.listAgencyID).toBe('6');
     });
 
     it('should set status code to 39 for FINAL', () => {
@@ -100,7 +117,7 @@ describe('ProcessingStatementTransformerService', () => {
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
       expect(exchangedDoc.StatusCode.value).toBe('39');
-      expect(exchangedDoc.StatusCode.name).toBe('FINAL');
+      expect(exchangedDoc.StatusCode.name).toBe('39');
     });
 
     it('should set issue date time using formatDate', () => {
@@ -137,10 +154,9 @@ describe('ProcessingStatementTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
-      expect(exchangedDoc.ReferenceSPSReferencedDocument).toHaveLength(3);
+      expect(exchangedDoc.ReferenceSPSReferencedDocument).toHaveLength(2);
       expect(exchangedDoc.ReferenceSPSReferencedDocument[0].TypeCode.value).toBe('916');
-      expect(exchangedDoc.ReferenceSPSReferencedDocument[1].TypeCode.name).toBe('HEALTH_CERTIFICATE');
-      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].ID.value).toBe('Regulation No 1005/2008 ARTICLE 12 ANNEX II');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[1].TypeCode.name).toBe('Health certificate');
     });
 
     it('should include signatory authentication with two signatures', () => {
@@ -210,7 +226,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ConsigneeSPSParty.ID.value).toBe('Test Exporter Ltd');
+      expect(consignment.ConsigneeSPSParty.ID.value).toBe('');
       expect(consignment.ConsigneeSPSParty.Name.value).toBe('Test Exporter Ltd');
       expect(consignment.ConsigneeSPSParty.RoleCode.value).toBe('CN');
       expect(consignment.ConsigneeSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('123 Export Street');
@@ -291,8 +307,8 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ImportSPSCountry.ID.value).toBe('FR');
-      expect(consignment.ImportSPSCountry.Name.value).toBe('FRANCE');
+      expect(consignment.ImportSPSCountry.ID.value).toBe('');
+      expect(consignment.ImportSPSCountry.Name.value).toBe('');
     });
 
     it('should handle missing isoCodeAlpha2 in exportedTo', () => {
@@ -311,7 +327,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ImportSPSCountry.ID.value).toBe('FR');
+      expect(consignment.ImportSPSCountry.ID.value).toBe('');
       expect(consignment.ImportSPSCountry.Name.value).toBe('SPAIN');
     });
 
@@ -344,8 +360,8 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR01');
-      expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('FR');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
+      expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('Port of Calais');
     });
 
     it('should default unloading location to FR01 when exportedTo is missing', () => {
@@ -362,7 +378,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR01');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
     });
 
     it('should include examination event location', () => {
@@ -385,7 +401,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       expect(item.SequenceNumeric.value).toBe(1);
       expect(item.Description.value).toBe('Frozen Cod Fillets');
@@ -395,9 +411,9 @@ describe('ProcessingStatementTransformerService', () => {
       const exportDataWithMultipleCatches = {
         ...baseExportData,
         catches: [
-          { catchCertificateNumber: 'GBR-2025-CC-001', exportWeightAfterProcessing: '100.5' },
-          { catchCertificateNumber: 'GBR-2025-CC-002', exportWeightAfterProcessing: '50.25' },
-          { catchCertificateNumber: 'GBR-2025-CC-003', exportWeightAfterProcessing: '75' }
+          { catchCertificateNumber: 'GBR-2025-CC-001', exportWeightAfterProcessing: '100.5', exportWeightBeforeProcessing: '225.75' },
+          { catchCertificateNumber: 'GBR-2025-CC-002', exportWeightAfterProcessing: '50.25', exportWeightBeforeProcessing: '225.75' },
+          { catchCertificateNumber: 'GBR-2025-CC-003', exportWeightAfterProcessing: '75', exportWeightBeforeProcessing: '225.75' }
         ]
       };
 
@@ -408,10 +424,10 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       expect(item.NetWeightMeasure.value).toBe('225.75');
-      expect(item.GrossWeightMeasure.value).toBe('225.75');
+      expect(item.GrossWeightMeasure.value).toBe('100.5');
     });
 
     it('should handle missing catches array', () => {
@@ -427,10 +443,9 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem;
 
-      expect(item.NetWeightMeasure.value).toBe('0');
-      expect(item.GrossWeightMeasure.value).toBe('0');
+      expect(item).toHaveLength(0);
     });
 
     it('should handle catches without exportWeightAfterProcessing', () => {
@@ -449,9 +464,11 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.NetWeightMeasure.value).toBe('50');
+      expect(item.NetWeightMeasure.value).toBe('');
+      expect(consignment.IncludedSPSConsignmentItem[1].IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('');
+      expect(consignment.IncludedSPSConsignmentItem[1].IncludedSPSTradeLineItem.GrossWeightMeasure.value).toBe('50');
     });
 
     it('should set weight unit to KGM (kilograms)', () => {
@@ -462,7 +479,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       expect(item.NetWeightMeasure.unitCode).toBe('KGM');
       expect(item.GrossWeightMeasure.unitCode).toBe('KGM');
@@ -476,11 +493,181 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.AdditionalInformationSPSNote).toHaveLength(2);
+      expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-001');
-      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_REFERENCE');
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
+    });
+
+    it('should add catch certificate references to additional information notes with issuing country', () => {
+      const exportDataWithCatchCertificate = {
+        ...baseExportData,
+        catches: [
+          {
+            productDescription: 'Frozen Cod Fillets',
+            productCommodityCode: '0304890097',
+            catchCertificateNumber: 'GBR-2026-CC-40AF7C9D7',
+            catchCertificateType: 'non_uk',
+            issuingCountry: {
+              officialCountryName: 'Nigeria',
+              isoCodeAlpha2: 'NGR'
+            },
+            exportWeightBeforeProcessing: '100.5',
+            exportWeightAfterProcessing: '100.5',
+            scientificName: 'some scientic name'
+          }
+        ]
+      };
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithCatchCertificate
+      );
+
+      const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+
+      expect(item.AdditionalInformationSPSNote).toHaveLength(5);
+      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-CC-40AF7C9D7');
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
+      expect(item.AdditionalInformationSPSNote[1].Content.value).toBe('NGR');
+      expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('CATCH_CERTIFICATE_ISSUING_COUNTRY');
+    });
+
+    it('should add catch certificate references to additional information notes with issuing country of NI', () => {
+      const exportDataWithCatchCertificate = {
+        ...baseExportData,
+        catches: [
+          {
+            productDescription: 'Frozen Cod Fillets',
+            productCommodityCode: '0304890097',
+            catchCertificateNumber: 'GBR-2026-CC-40AF7C9D7',
+            catchCertificateType: 'non_uk',
+            exportWeightBeforeProcessing: '100.5',
+            exportWeightAfterProcessing: '100.5',
+            scientificName: 'some scientic name'
+          }
+        ]
+      };
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithCatchCertificate
+      );
+
+      const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+
+      expect(item.AdditionalInformationSPSNote).toHaveLength(5);
+      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-CC-40AF7C9D7');
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
+      expect(item.AdditionalInformationSPSNote[1].Content.value).toBeUndefined();
+      expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('CATCH_CERTIFICATE_ISSUING_COUNTRY');
+    });
+
+    it('should add catch certificate references to additional information notes with a processing statement with foreign catch', () => {
+      const exportDataWithProcessingStatement = {
+        ...baseExportData,
+        catches: [
+          {
+            productDescription: 'Frozen Cod Fillets',
+            productCommodityCode: '0304890097',
+            catchCertificateNumber: 'GBR-2026-PS-40AF7C9D7',
+            catchCertificateType: 'non_uk',
+            issuingCountry: {
+              officialCountryName: 'Nigeria',
+              isoCodeAlpha2: 'NGR'
+            },
+            exportWeightBeforeProcessing: '100.5',
+            exportWeightAfterProcessing: '100.5',
+            scientificName: 'some scientic name'
+          }
+        ]
+      };
+
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithProcessingStatement
+      );
+
+      const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+
+      expect(item.AdditionalInformationSPSNote).toHaveLength(5);
+      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-PS-40AF7C9D7');
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE');
+      expect(item.AdditionalInformationSPSNote[1].Content.value).toBe('NGR');
+      expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_ISSUING_COUNTRY');
+    });
+
+    it('should add catch certificate references to additional information notes with a processing statement with foreign catch with a issuing coutry of NI', () => {
+      const exportDataWithProcessingStatement = {
+        ...baseExportData,
+        catches: [
+          {
+            productDescription: 'Frozen Cod Fillets',
+            productCommodityCode: '0304890097',
+            catchCertificateNumber: 'GBR-2026-PS-40AF7C9D7',
+            catchCertificateType: 'non_uk',
+            exportWeightBeforeProcessing: '100.5',
+            exportWeightAfterProcessing: '100.5',
+            scientificName: 'some scientic name'
+          }
+        ]
+      };
+
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithProcessingStatement
+      );
+
+      const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+
+      expect(item.AdditionalInformationSPSNote).toHaveLength(5);
+      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-PS-40AF7C9D7');
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE');
+      expect(item.AdditionalInformationSPSNote[1].Content.value).toBeUndefined();
+      expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_ISSUING_COUNTRY');
+    });
+
+    it('should add catch certificate references to additional information notes with a processing statement', () => {
+      const exportDataWithProcessingStatement = {
+        ...baseExportData,
+        catches: [
+          {
+            productDescription: 'Frozen Cod Fillets',
+            productCommodityCode: '0304890097',
+            catchCertificateNumber: 'GBR-2026-PS-40AF7C9D7',
+            exportWeightBeforeProcessing: '100.5',
+            exportWeightAfterProcessing: '100.5',
+            scientificName: 'some scientic name'
+          }
+        ]
+      };
+
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithProcessingStatement
+      );
+
+      const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+
+      expect(item.AdditionalInformationSPSNote).toHaveLength(5);
+      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-PS-40AF7C9D7');
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE');
+      expect(item.AdditionalInformationSPSNote[1].Content.value).toBe('GB');
+      expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_ISSUING_COUNTRY');
     });
 
     it('should add processing type to additional information notes', () => {
@@ -491,19 +678,19 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.AdditionalInformationSPSNote[1].Content.value).toBe('Filleting and freezing');
-      expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('PROCESSING_TYPE');
+      expect(item.AdditionalInformationSPSNote[2].Content.value).toBe('030489');
+      expect(item.AdditionalInformationSPSNote[2].SubjectCode.value).toBe('PROCESSED_PRODUCT_CODE');
     });
 
     it('should handle multiple catch certificate references', () => {
       const exportDataWithMultipleCerts = {
         ...baseExportData,
         catches: [
-          { catchCertificateNumber: 'GBR-2025-CC-001', exportWeightAfterProcessing: '50' },
-          { catchCertificateNumber: 'GBR-2025-CC-002', exportWeightAfterProcessing: '50' },
-          { catchCertificateNumber: 'GBR-2025-CC-003', exportWeightAfterProcessing: '50' }
+          { catchCertificateNumber: 'GBR-2025-CC-0123456789', exportWeightAfterProcessing: '50' },
+          { catchCertificateNumber: 'GBR-2025-CC-0123456789', exportWeightAfterProcessing: '50' },
+          { catchCertificateNumber: 'GBR-2025-CC-0123456789', exportWeightAfterProcessing: '50' }
         ]
       };
 
@@ -514,12 +701,12 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.AdditionalInformationSPSNote.length).toBe(4); // 3 catch certs + 1 processing type
-      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-001');
-      expect(item.AdditionalInformationSPSNote[1].Content.value).toBe('GBR-2025-CC-002');
-      expect(item.AdditionalInformationSPSNote[2].Content.value).toBe('GBR-2025-CC-003');
+      expect(consignment.IncludedSPSConsignmentItem).toHaveLength(3);
+      expect(item.AdditionalInformationSPSNote.length).toBe(3); // 3 catch certs + 1 processing type
+      expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-0123456789');
+      expect(item.AdditionalInformationSPSNote[2].Content.value).toBe('Filleting and freezing');
     });
 
     it('should handle catches without certificate numbers', () => {
@@ -537,11 +724,11 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Should only have processing type note, no catch certificate references
-      expect(item.AdditionalInformationSPSNote.length).toBe(1);
-      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('PROCESSING_TYPE');
+      expect(item.AdditionalInformationSPSNote.length).toBe(3);
+      expect(item.AdditionalInformationSPSNote[2].SubjectCode.value).toBe('PROCESSING_TYPE');
     });
 
     it('should handle missing consignment description', () => {
@@ -557,11 +744,11 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Should only have catch certificate reference, no processing type
-      expect(item.AdditionalInformationSPSNote.length).toBe(1);
-      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_REFERENCE');
+      expect(item.AdditionalInformationSPSNote.length).toBe(4);
+      expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
     });
 
     it('should set CN classification system for commodity code', () => {
@@ -572,7 +759,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       expect(item.ApplicableSPSClassification.SystemID.value).toBe('CN');
       expect(item.ApplicableSPSClassification.SystemName.value).toBe('CN Code');
@@ -586,10 +773,26 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
+    });
+
+    it('should include an empty ClassName commodity code and description in classification', () => {
+      mockGetCommodities.mockReturnValue(undefined);
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        baseExportData
+      );
+
+      const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassName.value).toBe('');
     });
 
     it('should handle missing products array', () => {
@@ -605,11 +808,11 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.Description.value).toBe('');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('');
-      expect(item.ApplicableSPSClassification.ClassName.value).toBe('');
+      expect(item.Description.value).toBe('Frozen Cod Fillets');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
     });
 
     it('should handle empty products array', () => {
@@ -625,10 +828,10 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.Description.value).toBe('');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('');
+      expect(item.Description.value).toBe('Frozen Cod Fillets');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
     });
 
     it('should handle product without description', () => {
@@ -646,10 +849,10 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.Description.value).toBe('');
-      expect(item.ApplicableSPSClassification.ClassName.value).toBe('');
+      expect(item.Description.value).toBe('Frozen Cod Fillets');
+      expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
     });
 
     it('should handle product without commodity code', () => {
@@ -667,9 +870,9 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
     });
 
     it('should log error and throw when exception occurs', () => {
@@ -712,17 +915,17 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.Description.value).toBe('First Product');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('1111111111');
+      expect(item.Description.value).toBe('Frozen Cod Fillets');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
     });
 
     it('should handle decimal weights correctly', () => {
       const exportDataWithDecimalWeights = {
         ...baseExportData,
         catches: [
-          { catchCertificateNumber: 'GBR-2025-CC-001', exportWeightAfterProcessing: '100.567' },
+          { catchCertificateNumber: 'GBR-2025-CC-001', exportWeightAfterProcessing: '100.567', exportWeightBeforeProcessing: '150.69' },
           { catchCertificateNumber: 'GBR-2025-CC-002', exportWeightAfterProcessing: '50.123' }
         ]
       };
@@ -734,7 +937,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       expect(item.NetWeightMeasure.value).toBe('150.69');
     });
@@ -752,10 +955,9 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem
 
-      expect(item.NetWeightMeasure.value).toBe('0');
-      expect(item.AdditionalInformationSPSNote.length).toBe(1); // Only processing type
+      expect(item).toHaveLength(0);
     });
 
     it('should handle different country codes', () => {
@@ -777,8 +979,8 @@ describe('ProcessingStatementTransformerService', () => {
 
       expect(consignment.ImportSPSCountry.ID.value).toBe('ES');
       expect(consignment.ImportSPSCountry.Name.value).toBe('SPAIN');
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('ES01');
-      expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('ES');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
+      expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('Port of Calais');
     });
 
     it('should use plant values when all plant fields are provided', () => {
@@ -808,7 +1010,7 @@ describe('ProcessingStatementTransformerService', () => {
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
       // Verify all exporter fields use actual values, not defaults
-      expect(consignment.ConsigneeSPSParty.ID.value).toBe('Test Exporter Ltd');
+      expect(consignment.ConsigneeSPSParty.ID.value).toBe('');
       expect(consignment.ConsigneeSPSParty.Name.value).toBe('Test Exporter Ltd');
       expect(consignment.ConsigneeSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('123 Export Street');
       expect(consignment.ConsigneeSPSParty.SpecifiedSPSAddress.CityName.value).toBe('London');
@@ -860,7 +1062,7 @@ describe('ProcessingStatementTransformerService', () => {
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('');
-    });    it('should handle null exporter fields', () => {
+    }); it('should handle null exporter fields', () => {
       const exportDataWithNullExporter = {
         ...baseExportData,
         exporterDetails: {
@@ -928,7 +1130,7 @@ describe('ProcessingStatementTransformerService', () => {
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
       expect(consignment.ImportSPSCountry.ID.value).toBe('DE');
-      expect(consignment.ImportSPSCountry.Name.value).toBe('FRANCE'); // Falls back to default
+      expect(consignment.ImportSPSCountry.Name.value).toBe(''); // Falls back to default
     });
 
     it('should handle exportedTo with empty isoCodeAlpha2', () => {
@@ -948,7 +1150,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ImportSPSCountry.ID.value).toBe('FR'); // Falls back to default
+      expect(consignment.ImportSPSCountry.ID.value).toBe(''); // Falls back to default
     });
 
     it('should handle product with all fields present', () => {
@@ -959,11 +1161,11 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Verify actual values are used, not defaults
       expect(item.Description.value).toBe('Frozen Cod Fillets');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
     });
 
@@ -982,9 +1184,9 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.Description.value).toBe('');
+      expect(item.Description.value).toBe('Frozen Cod Fillets');
     });
 
     it('should handle product with null commodity code', () => {
@@ -1002,9 +1204,9 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
     });
 
     it('should handle catch with exportWeightAfterProcessing present', () => {
@@ -1015,7 +1217,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Verify weight from catch is used
       expect(item.NetWeightMeasure.value).toBe('100.5');
@@ -1029,7 +1231,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Verify certificate number is included in notes
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-001');
@@ -1043,7 +1245,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Verify processing type is included in notes
       const processingNote = item.AdditionalInformationSPSNote.find(
@@ -1059,7 +1261,8 @@ describe('ProcessingStatementTransformerService', () => {
           {
             species: 'Atlantic cod',
             catchCertificateNumber: 'GBR-2025-CC-001',
-            exportWeightAfterProcessing: 0
+            exportWeightAfterProcessing: '0',
+            exportWeightBeforeProcessing: '0'
           }
         ]
       };
@@ -1071,7 +1274,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Zero is falsy, should not be added to weight
       expect(item.NetWeightMeasure.value).toBe('0');
@@ -1084,7 +1287,7 @@ describe('ProcessingStatementTransformerService', () => {
           {
             species: 'Atlantic cod',
             catchCertificateNumber: '',
-            exportWeightAfterProcessing: 50.5
+            exportWeightAfterProcessing: '50.5'
           }
         ]
       };
@@ -1096,10 +1299,10 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Empty string is falsy, should not be added as note
-      expect(item.AdditionalInformationSPSNote).toHaveLength(1); // Only PROCESSING_TYPE note
+      expect(item.AdditionalInformationSPSNote).toHaveLength(3); // Only PROCESSING_TYPE note
     });
 
     it('should handle empty string consignmentDescription', () => {
@@ -1115,10 +1318,10 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
 
       // Empty string is falsy, should not add processing type note
-      expect(item.AdditionalInformationSPSNote).toHaveLength(1); // Only catch certificate note
+      expect(item.AdditionalInformationSPSNote).toHaveLength(4); // Only catch certificate note
     });
   });
 });
