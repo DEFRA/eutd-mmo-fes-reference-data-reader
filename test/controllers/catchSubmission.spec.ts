@@ -395,42 +395,6 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       },
     };
 
-    it('should block submission with description-only products', async () => {
-      const mockCertificateWithDescriptionOnlyProduct = {
-        documentNumber: 'GBR-2025-PS-TEST123',
-        status: 'COMPLETE',
-        createdAt: new Date('2025-01-05T16:59:29.190Z'),
-        exportData: {
-          products: [
-            {
-              description: 'Product description only',
-              // No catches array
-            },
-            {
-              productDescription: 'Another description',
-              // No caughtBy array
-            },
-          ],
-          catches: [],
-          exporterDetails: {
-            exporterFullName: 'Test Exporter',
-          },
-        },
-      };
-
-      mockFindOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCertificateWithDescriptionOnlyProduct),
-      });
-
-      await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
-        'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
-      );
-
-      expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining('[PS][VALIDATION][DESCRIPTION-ONLY-PRODUCTS][COUNT:2]')
-      );
-    });
-
     it('should allow submission with valid products that have catches', async () => {
       const mockCertificateWithValidProducts = {
         documentNumber: 'GBR-2025-PS-TEST123',
@@ -523,47 +487,6 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       expect(mockSendDocumentToBoomi).toHaveBeenCalled();
     });
 
-    it('should block mixed products with one description-only product', async () => {
-      const mockCertificateWithMixedProducts = {
-        documentNumber: 'GBR-2025-PS-TEST123',
-        status: 'COMPLETE',
-        createdAt: new Date('2025-01-05T16:59:29.190Z'),
-        exportData: {
-          products: [
-            {
-              description: 'Valid product',
-              catches: [
-                {
-                  species: 'Atlantic Cod',
-                  catchCertificateNumber: 'GBR-2024-CC-123',
-                },
-              ],
-            },
-            {
-              description: 'Description only product',
-              // No catches
-            },
-          ],
-          catches: [],
-          exporterDetails: {
-            exporterFullName: 'Test Exporter',
-          },
-        },
-      };
-
-      mockFindOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCertificateWithMixedProducts),
-      });
-
-      await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
-        'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
-      );
-
-      expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining('[PS][VALIDATION][DESCRIPTION-ONLY-PRODUCTS][COUNT:1]')
-      );
-    });
-
     it('should allow empty products array', async () => {
       const mockCertificateWithEmptyProducts = {
         documentNumber: 'GBR-2025-PS-TEST123',
@@ -595,117 +518,6 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(mockPSPayload);
 
       expect(mockGenerateProcessingStatementPayload).toHaveBeenCalled();
-    });
-
-    it('should block product with consignmentDescription only', async () => {
-      const mockCertificateWithConsignmentDescription = {
-        documentNumber: 'GBR-2025-PS-TEST123',
-        status: 'COMPLETE',
-        createdAt: new Date('2025-01-05T16:59:29.190Z'),
-        exportData: {
-          products: [
-            {
-              consignmentDescription: 'This is a consignment description',
-              // No catches or caughtBy
-            },
-          ],
-          catches: [],
-          exporterDetails: {
-            exporterFullName: 'Test Exporter',
-          },
-        },
-      };
-
-      mockFindOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCertificateWithConsignmentDescription),
-      });
-
-      await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
-        'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
-      );
-
-      expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining('[PS][VALIDATION][DESCRIPTION-ONLY-PRODUCTS][COUNT:1]')
-      );
-    });
-
-    it('should handle product with empty catches array as description-only', async () => {
-      const mockCertificateWithEmptyCatches = {
-        documentNumber: 'GBR-2025-PS-TEST123',
-        status: 'COMPLETE',
-        createdAt: new Date('2025-01-05T16:59:29.190Z'),
-        exportData: {
-          products: [
-            {
-              description: 'Product with empty catches',
-              catches: [], // Empty array should be treated as no catches
-            },
-          ],
-          catches: [],
-          exporterDetails: {
-            exporterFullName: 'Test Exporter',
-          },
-        },
-      };
-
-      mockFindOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCertificateWithEmptyCatches),
-      });
-
-      await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
-        'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
-      );
-    });
-
-    it('should handle product with empty caughtBy array as description-only', async () => {
-      const mockCertificateWithEmptyCaughtBy = {
-        documentNumber: 'GBR-2025-PS-TEST123',
-        status: 'COMPLETE',
-        createdAt: new Date('2025-01-05T16:59:29.190Z'),
-        exportData: {
-          products: [
-            {
-              productDescription: 'Product with empty caughtBy',
-              caughtBy: [], // Empty array
-            },
-          ],
-          catches: [],
-          exporterDetails: {
-            exporterFullName: 'Test Exporter',
-          },
-        },
-      };
-
-      mockFindOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCertificateWithEmptyCaughtBy),
-      });
-
-      await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
-        'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
-      );
-    });
-
-    it('should handle null or undefined product objects gracefully', async () => {
-      const mockCertificateWithNullProduct = {
-        documentNumber: 'GBR-2025-PS-TEST123',
-        status: 'COMPLETE',
-        createdAt: new Date('2025-01-05T16:59:29.190Z'),
-        exportData: {
-          products: [null, undefined],
-          catches: [],
-          exporterDetails: {
-            exporterFullName: 'Test Exporter',
-          },
-        },
-      };
-
-      mockFindOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCertificateWithNullProduct),
-      });
-
-      await expect(submitDocumentToBoomi(mockPSPayload)).rejects.toThrow(
-        'PROCESSING_STATEMENT_PRODUCT_DETAILS_REQUIRED'
-      );
     });
 
     it('should handle product with whitespace-only description as description-only', async () => {

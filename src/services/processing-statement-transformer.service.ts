@@ -99,7 +99,7 @@ export default class ProcessingStatementTransformerService {
             value: 'ZZZ'
           },
           IssueDateTime: {
-            value: moment(exportData.healthCertificateDate).toISOString()
+            value: moment(exportData.healthCertificateDate, ["DD/MM/YYYY", "DD/M/YYYY", "D/MM/YYYY", "D/M/YYYY"]).toISOString()
           },
           ID: {
             schemeAgencyID: 'GB',
