@@ -188,7 +188,9 @@ export default class ProcessingStatementTransformerService {
           }
         }
       },
-      IncludedSPSConsignmentItem: this.buildConsignmentItem(exportData)
+      IncludedSPSConsignmentItem: {
+        IncludedSPSTradeLineItem: this.buildConsignmentItem(exportData)
+      }
     };
   }
 
