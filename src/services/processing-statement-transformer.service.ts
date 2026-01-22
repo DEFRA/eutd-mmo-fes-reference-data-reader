@@ -188,7 +188,9 @@ export default class ProcessingStatementTransformerService {
           }
         }
       },
-      IncludedSPSConsignmentItem: this.buildConsignmentItem(exportData)
+      IncludedSPSConsignmentItem: {
+        IncludedSPSTradeLineItem: this.buildConsignmentItem(exportData)
+      }
     };
   }
 
@@ -413,47 +415,45 @@ export default class ProcessingStatementTransformerService {
       }
 
       return {
-        IncludedSPSTradeLineItem: {
-          SequenceNumeric: {
-            format: sequenceNumeric.toString(),
-            value: sequenceNumeric
+        SequenceNumeric: {
+          format: sequenceNumeric.toString(),
+          value: sequenceNumeric
+        },
+        Description: {
+          languageID: 'en',
+          languageLocaleID: 'en',
+          value: ctch.productDescription || ''
+        },
+        NetWeightMeasure: {
+          unitCode: 'KGM',
+          unitCodeListVersionID: ctch.exportWeightBeforeProcessing?.toString() ?? '',
+          value: ctch.exportWeightBeforeProcessing ?? ''
+        },
+        GrossWeightMeasure: {
+          unitCode: 'KGM',
+          unitCodeListVersionID: ctch.exportWeightAfterProcessing?.toString() ?? '',
+          value: ctch.exportWeightAfterProcessing?.toString()
+        },
+        AdditionalInformationSPSNote: notes,
+        ApplicableSPSClassification: {
+          SystemID: {
+            value: 'CN'
           },
-          Description: {
+          SystemName: {
             languageID: 'en',
             languageLocaleID: 'en',
-            value: ctch.productDescription || ''
+            value: 'CN Code'
           },
-          NetWeightMeasure: {
-            unitCode: 'KGM',
-            unitCodeListVersionID: ctch.exportWeightBeforeProcessing?.toString() ?? '',
-            value: ctch.exportWeightBeforeProcessing ?? ''
+          ClassCode: {
+            value: ctch.productCommodityCode ? ctch.productCommodityCode.substring(0, 6) : ''
           },
-          GrossWeightMeasure: {
-            unitCode: 'KGM',
-            unitCodeListVersionID: ctch.exportWeightAfterProcessing?.toString() ?? '',
-            value: ctch.exportWeightAfterProcessing?.toString()
-          },
-          AdditionalInformationSPSNote: notes,
-          ApplicableSPSClassification: {
-            SystemID: {
-              value: 'CN'
-            },
-            SystemName: {
-              languageID: 'en',
-              languageLocaleID: 'en',
-              value: 'CN Code'
-            },
-            ClassCode: {
-              value: ctch.productCommodityCode ? ctch.productCommodityCode.substring(0, 6) : ''
-            },
-            ClassName: {
-              languageID: 'en',
-              languageLocaleID: 'en',
-              value: getCommodities()?.find((commodity: {
-                code: string;
-                description: string;
-              }) => commodity.code === ctch.productCommodityCode)?.description ?? ''
-            }
+          ClassName: {
+            languageID: 'en',
+            languageLocaleID: 'en',
+            value: getCommodities()?.find((commodity: {
+              code: string;
+              description: string;
+            }) => commodity.code === ctch.productCommodityCode)?.description ?? ''
           }
         }
       };
