@@ -399,7 +399,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.SequenceNumeric.value).toBe(1);
       expect(item.Description.value).toBe('Frozen Cod Fillets');
@@ -422,7 +422,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.SequenceNumeric.value).toBe(3);
       expect(item.NetWeightMeasure.value).toBe('225.75');
@@ -442,7 +442,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
 
       expect(item).toHaveLength(0);
     });
@@ -463,11 +463,11 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.NetWeightMeasure.value).toBe('');
-      expect(consignment.IncludedSPSConsignmentItem[1].IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('');
-      expect(consignment.IncludedSPSConsignmentItem[1].IncludedSPSTradeLineItem.GrossWeightMeasure.value).toBe('50');
+      expect(consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].NetWeightMeasure.value).toBe('');
+      expect(consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].GrossWeightMeasure.value).toBe('50');
     });
 
     it('should set weight unit to KGM (kilograms)', () => {
@@ -478,7 +478,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.NetWeightMeasure.unitCode).toBe('KGM');
       expect(item.GrossWeightMeasure.unitCode).toBe('KGM');
@@ -492,7 +492,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-001');
@@ -526,7 +526,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-CC-40AF7C9D7');
@@ -558,7 +558,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-CC-40AF7C9D7');
@@ -595,7 +595,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-PS-40AF7C9D7');
@@ -628,7 +628,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-PS-40AF7C9D7');
@@ -660,7 +660,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote).toHaveLength(5);
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2026-PS-40AF7C9D7');
@@ -677,7 +677,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.AdditionalInformationSPSNote[2].Content.value).toBe('030489');
       expect(item.AdditionalInformationSPSNote[2].SubjectCode.value).toBe('PROCESSED_PRODUCT_CODE');
@@ -700,9 +700,9 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-      expect(consignment.IncludedSPSConsignmentItem).toHaveLength(3);
+      expect(consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem).toHaveLength(3);
       expect(item.AdditionalInformationSPSNote.length).toBe(3); // 3 catch certs + 1 processing type
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-0123456789');
       expect(item.AdditionalInformationSPSNote[2].Content.value).toBe('Filleting and freezing');
@@ -723,7 +723,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Should only have processing type note, no catch certificate references
       expect(item.AdditionalInformationSPSNote.length).toBe(3);
@@ -743,7 +743,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Should only have catch certificate reference, no processing type
       expect(item.AdditionalInformationSPSNote.length).toBe(4);
@@ -758,7 +758,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.ApplicableSPSClassification.SystemID.value).toBe('CN');
       expect(item.ApplicableSPSClassification.SystemName.value).toBe('CN Code');
@@ -772,7 +772,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
@@ -788,7 +788,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('');
@@ -807,7 +807,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
@@ -827,7 +827,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
@@ -848,7 +848,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
@@ -869,7 +869,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
     });
@@ -914,7 +914,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
@@ -936,7 +936,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.NetWeightMeasure.value).toBe('150.69');
     });
@@ -954,7 +954,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
 
       expect(item).toHaveLength(0);
     });
@@ -1156,7 +1156,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Verify actual values are used, not defaults
       expect(item.Description.value).toBe('Frozen Cod Fillets');
@@ -1179,7 +1179,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
     });
@@ -1199,7 +1199,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
     });
@@ -1212,7 +1212,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Verify weight from catch is used
       expect(item.NetWeightMeasure.value).toBe('100.5');
@@ -1226,7 +1226,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Verify certificate number is included in notes
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-001');
@@ -1240,7 +1240,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Verify processing type is included in notes
       const processingNote = item.AdditionalInformationSPSNote.find(
@@ -1269,7 +1269,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Zero is falsy, should not be added to weight
       expect(item.NetWeightMeasure.value).toBe('0');
@@ -1294,7 +1294,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Empty string is falsy, should not be added as note
       expect(item.AdditionalInformationSPSNote).toHaveLength(3); // Only PROCESSING_TYPE note
@@ -1313,7 +1313,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem[0].IncludedSPSTradeLineItem;
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Empty string is falsy, should not add processing type note
       expect(item.AdditionalInformationSPSNote).toHaveLength(4); // Only catch certificate note
