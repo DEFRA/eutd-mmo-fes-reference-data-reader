@@ -180,6 +180,9 @@ export default class ProcessingStatementTransformerService {
       UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.pointOfDestination),
       ExaminationSPSEvent: {
         OccurrenceSPSLocation: {
+          ID: {
+            value: ''
+          },
           Name: {
             value: ''
           }
