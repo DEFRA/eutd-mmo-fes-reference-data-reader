@@ -31,63 +31,6 @@ export default class StorageNotesTransformerService {
     }
   }
 
-  private static buildExchangedDocument(documentNumber: string, createdAt: Date, exportData: any): any {
-    return {
-      Name: {
-        languageID: 'en',
-        value: 'Non Manipulation Document'
-      },
-      Description: {
-        value: ''
-      },
-      ID: {
-        value: ''
-      },
-      TypeCode: {
-        listID: '1001',
-        listAgencyID: '6',
-        listVersionID: 'D16B',
-        name: 'CATCH_NON_MANIPULATION_DOCUMENT',
-        listURI: '',
-        value: '16'
-      },
-      StatusCode: {
-        listID: '4405',
-        listAgencyID: '6',
-        listVersionID: 'D16B',
-        name: '39',
-        listURI: '39',
-        value: '39'
-      },
-      IssueDateTime: {
-        DateTime: {
-          value: createdAt.toISOString()
-        }
-      },
-      IssuerSPSParty: {
-        Name: {
-          languageID: 'en',
-          value: 'Marine Management Organization'
-        },
-        RoleCode: {
-          value: 'PQ'
-        }
-      },
-      IncludedSPSNote: {
-        Content: {
-          languageID: 'en',
-          value: exportData?.facilityStorage || 'CHILLED'
-        },
-        SubjectCode: {
-          languageID: 'en',
-          value: 'STORAGE_CONDITION'
-        }
-      },
-      ReferenceSPSReferencedDocument: this.buildReferencedDocuments(documentNumber, exportData),
-      SignatorySPSAuthentication: this.buildAuthentications(createdAt)
-    };
-  }
-
   private static buildReferencedDocuments(documentNumber: string, exportData: any): any[] {
     const documents = [
       {
@@ -162,8 +105,8 @@ export default class StorageNotesTransformerService {
     const consignment: any = {
       ExportExitDateTime: {
         DateTime: {
-          value: exportData?.transport?.exportDate 
-            ? new Date(exportData.transport.exportDate).toISOString() 
+          value: exportData?.transport?.exportDate
+            ? new Date(exportData.transport.exportDate).toISOString()
             : new Date().toISOString()
         }
       }
@@ -172,7 +115,7 @@ export default class StorageNotesTransformerService {
     if (type === 'arrival') {
       consignment.AvailabilityDueDateTime = {
         DateTime: {
-          value: exportData?.facilityArrivalDate 
+          value: exportData?.facilityArrivalDate
             ? new Date(exportData.facilityArrivalDate).toISOString()
             : new Date().toISOString()
         }
@@ -276,7 +219,7 @@ export default class StorageNotesTransformerService {
 
   private static buildConsigneeParty(exportData: any): any {
     const exporterDetails = exportData?.exporterDetails || {};
-    
+
     return {
       ID: {
         value: exporterDetails.exporterCompanyName || 'Exporter ID'
@@ -339,7 +282,7 @@ export default class StorageNotesTransformerService {
 
   private static buildTransportMovement(exportData: any): any {
     const transport = exportData?.transport || {};
-    
+
     return {
       ID: {
         schemeID: 'ship_imo_number_before_bcp',
@@ -383,7 +326,7 @@ export default class StorageNotesTransformerService {
 
   private static buildConsignmentItems(exportData: any): any {
     const catches = exportData?.catches || [];
-    
+
     if (catches.length === 0) {
       return this.createEmptyConsignmentItem();
     }
@@ -522,6 +465,63 @@ export default class StorageNotesTransformerService {
         languageLocaleID: 'en',
         value: catchData.commodityCodeDescription || 'Other prepared or preserved fish'
       }
+    };
+  }
+
+    private static buildExchangedDocument(documentNumber: string, createdAt: Date, exportData: any): any {
+    return {
+      Name: {
+        languageID: 'en',
+        value: 'Non Manipulation Document'
+      },
+      Description: {
+        value: ''
+      },
+      ID: {
+        value: ''
+      },
+      TypeCode: {
+        listID: '1001',
+        listAgencyID: '6',
+        listVersionID: 'D16B',
+        name: 'CATCH_NON_MANIPULATION_DOCUMENT',
+        listURI: '',
+        value: '16'
+      },
+      StatusCode: {
+        listID: '4405',
+        listAgencyID: '6',
+        listVersionID: 'D16B',
+        name: '39',
+        listURI: '39',
+        value: '39'
+      },
+      IssueDateTime: {
+        DateTime: {
+          value: createdAt.toISOString()
+        }
+      },
+      IssuerSPSParty: {
+        Name: {
+          languageID: 'en',
+          value: 'Marine Management Organization'
+        },
+        RoleCode: {
+          value: 'PQ'
+        }
+      },
+      IncludedSPSNote: {
+        Content: {
+          languageID: 'en',
+          value: exportData?.facilityStorage || 'CHILLED'
+        },
+        SubjectCode: {
+          languageID: 'en',
+          value: 'STORAGE_CONDITION'
+        }
+      },
+      ReferenceSPSReferencedDocument: this.buildReferencedDocuments(documentNumber, exportData),
+      SignatorySPSAuthentication: this.buildAuthentications(createdAt)
     };
   }
 }
