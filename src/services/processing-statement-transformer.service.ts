@@ -75,7 +75,7 @@ export default class ProcessingStatementTransformerService {
           value: 'Marine Management Organization'
         },
         RoleCode: {
-          value: 'PQ'
+          value: 'VJ'
         }
       },
       ReferenceSPSReferencedDocument: [
@@ -121,7 +121,7 @@ export default class ProcessingStatementTransformerService {
       SignatorySPSAuthentication: [
         {
           TypeCode: {
-            value: '1'
+            value: '5'
           },
           ActualDateTime: {
             DateTime: {
@@ -130,10 +130,10 @@ export default class ProcessingStatementTransformerService {
           },
           ProviderSPSParty: {
             Name: {
-              value: ''
+              value: 'Official Inspector'
             },
             RoleCode: {
-              value: 'PQ'
+              value: 'VJ'
             },
             SpecifiedSPSPerson: {
               Name: {
@@ -149,7 +149,7 @@ export default class ProcessingStatementTransformerService {
         },
         {
           TypeCode: {
-            value: '2'
+            value: '1'
           },
           ActualDateTime: {
             DateTime: {
@@ -159,10 +159,10 @@ export default class ProcessingStatementTransformerService {
           ProviderSPSParty: {
             Name: {
               languageID: 'en',
-              value: 'Marine Management Organization'
+              value: ''
             },
             RoleCode: {
-              value: 'CA'
+              value: 'VJ'
             },
             SpecifiedSPSPerson: {
               Name: {
