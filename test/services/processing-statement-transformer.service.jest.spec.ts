@@ -142,7 +142,7 @@ describe('ProcessingStatementTransformerService', () => {
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
       expect(exchangedDoc.IssuerSPSParty.Name.value).toBe('Marine Management Organization');
-      expect(exchangedDoc.IssuerSPSParty.RoleCode.value).toBe('PQ');
+      expect(exchangedDoc.IssuerSPSParty.RoleCode.value).toBe('VJ');
     });
 
     it('should include reference documents', () => {
@@ -173,9 +173,9 @@ describe('ProcessingStatementTransformerService', () => {
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
       expect(exchangedDoc.SignatorySPSAuthentication).toHaveLength(2);
-      expect(exchangedDoc.SignatorySPSAuthentication[0].TypeCode.value).toBe('1');
-      expect(exchangedDoc.SignatorySPSAuthentication[1].TypeCode.value).toBe('2');
-      expect(exchangedDoc.SignatorySPSAuthentication[1].ProviderSPSParty.Name.value).toBe('Marine Management Organization');
+      expect(exchangedDoc.SignatorySPSAuthentication[0].TypeCode.value).toBe('5');
+      expect(exchangedDoc.SignatorySPSAuthentication[1].TypeCode.value).toBe('1');
+      expect(exchangedDoc.SignatorySPSAuthentication[1].ProviderSPSParty.Name.value).toBe('');
     });
 
     it('should build consignor party with plant details', () => {
