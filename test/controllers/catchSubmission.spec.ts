@@ -17,7 +17,6 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
   let mockLoggerInfo: jest.SpyInstance;
   let mockLoggerError: jest.SpyInstance;
   let mockGenerateCatchPayload: jest.SpyInstance;
-  let mockGenerateVoidCatchPayload: jest.SpyInstance;
   let mockFindOne: jest.Mock;
 
   beforeEach(() => {
@@ -27,7 +26,6 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     mockLoggerInfo = logger.info as jest.Mock;
     mockLoggerError = logger.error as jest.Mock;
     mockGenerateCatchPayload = jest.spyOn(CatchCertificateTransformerService, 'generateCatchPayload');
-    mockGenerateVoidCatchPayload = jest.spyOn(CatchCertificateTransformerService, 'generateVoidCatchPayload');
     mockFindOne = DocumentModel.findOne as jest.Mock;
   });
 
@@ -39,7 +37,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     // Simplified payload from orchestration (only documentNumber and operation)
     const mockRawPayload = {
       documentNumber: 'GBR-2025-CC-TEST123',
-      operation: 'submit' as 'submit' | 'void',
+      operation: 'submit'
     };
 
     // Mock certificate data from database
@@ -173,7 +171,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         CancelCatchCertificateRequest: {
           SPSCertificate: {
             ID: {
-              value: 'GBR-2025-CC-TEST123'
+              value: 'CATCH.CC.GB.2026.0000006'
             }
           }
         }
@@ -187,12 +185,10 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       mockFindOne.mockReturnValue({
         lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
       });
-      mockGenerateVoidCatchPayload.mockReturnValueOnce(mockVoidPayload);
       mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
 
       await submitDocumentToBoomi(voidPayload);
 
-      expect(mockGenerateVoidCatchPayload).toHaveBeenCalledWith('CATCH.CC.GB.2026.0000006');
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
         { documentType: "CATCHCERTIFICATE" },
@@ -596,6 +592,70 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
       expect(mockGenerateProcessingStatementPayload).toHaveBeenCalled();
       expect(mockSendDocumentToBoomi).toHaveBeenCalled();
+    });
+
+    it('should use catchVoid resourceType for void operation', async () => {
+      const mockCertificateToVoid = {
+        documentNumber: 'GBR-2025-PS-TEST123',
+        status: 'COMPLETE',
+        createdAt: new Date('2025-01-05T16:59:29.190Z'),
+        exportData: {
+          products: [
+            {
+              // No description fields at all
+              catches: [
+                {
+                  species: 'Atlantic Cod',
+                  catchCertificateNumber: 'GBR-2024-CC-123',
+                },
+              ],
+            },
+          ],
+          catches: [],
+          exporterDetails: {
+            exporterFullName: 'Test Exporter',
+          },
+        },
+        catchSubmission: {
+          status: "SUCCESS",
+          reference: "CATCH.PS.GB.2026.0000006",
+          uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
+          timestamp: "2026-01-06T16:09:16.982+01:00",
+          reasonInformation: "Message has been successfully processed"
+        }
+      };
+
+      const voidPayload = {
+        documentNumber: 'GBR-2025-PS-TEST123',
+        operation: 'void' as const
+      }
+      const mockVoidPayload = {
+        CancelProcessingStatementRequest: {
+          SPSCertificate: {
+            ID: {
+              value: 'CATCH.PS.GB.2026.0000006'
+            }
+          }
+        }
+      };
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Certificate voided successfully',
+      };
+
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateToVoid),
+      });
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(voidPayload);
+
+      expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
+        mockVoidPayload,
+        { documentType: "PROCESSINGSTATEMENT" },
+        'catchVoid'
+      );
     });
   });
 });

@@ -224,773 +224,775 @@ describe('CATCH Submission Handler (FI0-10312)', () => {
   // as they represent dead code protected by the validation layer.
 });
 
-describe('submitDocumentToBoomi Controller Tests', () => {
+describe('Catch Certificate Submission', () => {
+  const mockCatchCertDocument = {
+    documentNumber: 'GBR-2025-CC-TEST001',
+    createdAt: new Date('2025-01-01'),
+    exportData: {
+      products: [
+        {
+          product: 'Cod',
+          caughtBy: [
+            { vesselName: 'Test Vessel', weight: 100 }
+          ]
+        }
+      ],
+      exporterDetails: { name: 'Test Exporter' },
+      transportation: { vehicle: 'truck' },
+      conservation: { method: 'frozen' }
+    },
+    catchSubmission: {
+      status: "SUCCESS",
+      reference: "CATCH.CC.GB.2026.0000006",
+      uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
+      timestamp: "2026-01-06T16:09:16.982+01:00",
+      reasonInformation: "Message has been successfully processed"
+    }
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('Catch Certificate Submission', () => {
-    const mockCatchCertDocument = {
+  it('should successfully submit a catch certificate', async () => {
+    const mockTransformedPayload = {
+      CreateCatchCertificateRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {
+      CatchCertificateResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Certificate submitted successfully',
+        fesDocNumber: 'GBR-CC-2025-01234567'
+      }
+    };
+
+    const mockProcessBoomiResponse = {
+      euCatchStatus: 'SUCCESS',
+      documentNumber: 'Certificate submitted successfully',
+      euCatchStatusMessage: 'GBR-CC-2025-01234567'
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockReturnValue(mockProcessBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
       documentNumber: 'GBR-2025-CC-TEST001',
+      operation: 'submit'
+    });
+
+    expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-CC-TEST001');
+    expect(DocumentModel.findOne).toHaveBeenCalledWith({
+      __t: "catchCert",
+      documentNumber: 'GBR-2025-CC-TEST001',
+      status: { $in: ['COMPLETE', 'VOID'] }
+    });
+    expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalled();
+    expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
+      mockTransformedPayload,
+      { documentType: 'CATCHCERTIFICATE' },
+      'catchSubmit'
+    );
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST001',
+      mockProcessBoomiResponse
+    );
+  });
+
+  it('should use void operation for catch certificate', async () => {
+    const mockVoidPayload = {
+      CancelCatchCertificateRequest: {
+        SPSCertificate: {
+          ID: {
+            value: 'CATCH.CC.GB.2026.0000006'
+          }
+        }
+      }
+    };
+    const mockBoomiResponse = {
+      CatchCertificateResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Certificate voided successfully'
+      }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-CC-TEST001',
+      operation: 'void'
+    });
+
+    expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
+      mockVoidPayload,
+      { documentType: 'CATCHCERTIFICATE' },
+      'catchVoid'
+    );
+  });
+
+  it('should use default status when CatchCertificateResponse is missing', async () => {
+    const mockTransformedPayload = {
+      CreateCatchCertificateRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {}; // No CatchCertificateResponse
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('no catch response')
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(() => Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-CC-TEST001',
+      operation: 'submit'
+    })).rejects.toThrow('no catch response')
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST001',
+      { euCatchStatus: 'FAILURE', faultCode: 'S:Client', documentNumber: "GBR-2025-CC-TEST001", faultString: "no catch response" }
+    );
+  });
+
+  it('should use default status when Boomi response is null', async () => {
+    const mockTransformedPayload = {
+      CreateCatchCertificateRequest: { SPSCertificate: {} }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(null);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('no catch response')
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(() => Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-CC-TEST001',
+      operation: 'submit'
+    })).rejects.toThrow('no catch response');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST001',
+      { euCatchStatus: 'FAILURE', faultCode: 'S:Client', documentNumber: "GBR-2025-CC-TEST001", faultString: "no catch response" }
+    );
+  });
+
+  it('should use default status when Boomi response is undefined', async () => {
+    const mockTransformedPayload = {
+      CreateCatchCertificateRequest: { SPSCertificate: {} }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(undefined);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('no catch response')
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-CC-TEST001',
+      operation: 'submit'
+    })).rejects.toThrow('no catch response');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST001',
+      { euCatchStatus: 'FAILURE', faultCode: 'S:Client', documentNumber: "GBR-2025-CC-TEST001", faultString: "no catch response" }
+    );
+  });
+
+  it('should handle products without caughtBy', async () => {
+    const mockDocumentNoCaughtBy = {
+      documentNumber: 'GBR-2025-CC-TEST002',
       createdAt: new Date('2025-01-01'),
       exportData: {
         products: [
           {
             product: 'Cod',
-            caughtBy: [
-              { vesselName: 'Test Vessel', weight: 100 }
-            ]
+            caughtBy: null
           }
         ],
         exporterDetails: { name: 'Test Exporter' },
         transportation: { vehicle: 'truck' },
         conservation: { method: 'frozen' }
-      },
-      catchSubmission: {
-        status: "SUCCESS",
-        reference: "CATCH.CC.GB.2026.0000006",
-        uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
-        timestamp: "2026-01-06T16:09:16.982+01:00",
-        reasonInformation: "Message has been successfully processed"
       }
     };
 
-    it('should successfully submit a catch certificate', async () => {
-      const mockTransformedPayload = {
-        CreateCatchCertificateRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        CatchCertificateResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Certificate submitted successfully',
-          fesDocNumber: 'GBR-CC-2025-01234567'
-        }
-      };
+    const mockTransformedPayload = {
+      CreateCatchCertificateRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {
+      CatchCertificateResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Certificate submitted'
+      }
+    };
 
-      const mockProcessBoomiResponse = {
-        euCatchStatus: 'SUCCESS',
-        documentNumber: 'Certificate submitted successfully',
-        euCatchStatusMessage: 'GBR-CC-2025-01234567'
-      };
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocumentNoCaughtBy)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
 
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockReturnValue(mockProcessBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST001',
-        operation: 'submit'
-      });
-
-      expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-CC-TEST001');
-      expect(DocumentModel.findOne).toHaveBeenCalledWith({
-        __t: "catchCert",
-        documentNumber: 'GBR-2025-CC-TEST001',
-        status: { $in: ['COMPLETE', 'VOID'] }
-      });
-      expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalled();
-      expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
-        mockTransformedPayload,
-        { documentType: 'CATCHCERTIFICATE' },
-        'catchSubmit'
-      );
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST001',
-        mockProcessBoomiResponse
-      );
+    await Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-CC-TEST002',
+      operation: 'submit'
     });
 
-    it('should use void operation for catch certificate', async () => {
-      const mockVoidPayload = {
-        CancelCatchCertificateRequest: {
-          SPSCertificate: {
-            ID: {
-              value: 'GBR-2025-CC-TEST001'
-            }
-          }
-        }
-      };
-      const mockBoomiResponse = {
-        CatchCertificateResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Certificate voided successfully'
-        }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateVoidCatchPayload as jest.Mock)
-        .mockReturnValue(mockVoidPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST001',
-        operation: 'void'
-      });
-
-      expect(CatchCertificateTransformerService.generateVoidCatchPayload).toHaveBeenCalledWith('CATCH.CC.GB.2026.0000006');
-      expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
-        mockVoidPayload,
-        { documentType: 'CATCHCERTIFICATE' },
-        'catchVoid'
-      );
-    });
-
-    it('should use default status when CatchCertificateResponse is missing', async () => {
-      const mockTransformedPayload = {
-        CreateCatchCertificateRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {}; // No CatchCertificateResponse
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('no catch response')
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(() => Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST001',
-        operation: 'submit'
-      })).rejects.toThrow('no catch response')
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST001',
-        { euCatchStatus: 'FAILURE', faultCode: 'S:Client', documentNumber: "GBR-2025-CC-TEST001", faultString: "no catch response" }
-      );
-    });
-
-    it('should use default status when Boomi response is null', async () => {
-      const mockTransformedPayload = {
-        CreateCatchCertificateRequest: { SPSCertificate: {} }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(null);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('no catch response')
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(() => Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST001',
-        operation: 'submit'
-      })).rejects.toThrow('no catch response');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST001',
-        { euCatchStatus: 'FAILURE', faultCode: 'S:Client', documentNumber: "GBR-2025-CC-TEST001", faultString: "no catch response" }
-      );
-    });
-
-    it('should use default status when Boomi response is undefined', async () => {
-      const mockTransformedPayload = {
-        CreateCatchCertificateRequest: { SPSCertificate: {} }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(undefined);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('no catch response')
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST001',
-        operation: 'submit'
-      })).rejects.toThrow('no catch response');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST001',
-        { euCatchStatus: 'FAILURE', faultCode: 'S:Client', documentNumber: "GBR-2025-CC-TEST001", faultString: "no catch response" }
-      );
-    });
-
-    it('should handle products without caughtBy', async () => {
-      const mockDocumentNoCaughtBy = {
-        documentNumber: 'GBR-2025-CC-TEST002',
-        createdAt: new Date('2025-01-01'),
-        exportData: {
-          products: [
-            {
-              product: 'Cod',
-              caughtBy: null
-            }
-          ],
-          exporterDetails: { name: 'Test Exporter' },
-          transportation: { vehicle: 'truck' },
-          conservation: { method: 'frozen' }
-        }
-      };
-
-      const mockTransformedPayload = {
-        CreateCatchCertificateRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        CatchCertificateResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Certificate submitted'
-        }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockDocumentNoCaughtBy)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST002',
-        operation: 'submit'
-      });
-
-      expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST002',
-        expect.any(Date),
-        mockDocumentNoCaughtBy.exportData
-      );
-    });
-
-    it('should handle null products array', async () => {
-      const mockDocumentNoProducts = {
-        documentNumber: 'GBR-2025-CC-TEST003',
-        createdAt: new Date('2025-01-01'),
-        exportData: {
-          products: null,
-          exporterDetails: { name: 'Test Exporter' },
-          transportation: { vehicle: 'truck' },
-          conservation: { method: 'frozen' }
-        }
-      };
-
-      const mockTransformedPayload = {
-        CreateCatchCertificateRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        CatchCertificateResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Certificate submitted'
-        }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockDocumentNoProducts)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-CC-TEST003',
-        operation: 'submit'
-      });
-
-      expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST003',
-        expect.any(Date),
-        mockDocumentNoProducts.exportData
-      );
-    });
+    expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST002',
+      expect.any(Date),
+      mockDocumentNoCaughtBy.exportData
+    );
   });
 
-  describe('Processing Statement Submission', () => {
-    const mockPsDocument = {
+  it('should handle null products array', async () => {
+    const mockDocumentNoProducts = {
+      documentNumber: 'GBR-2025-CC-TEST003',
+      createdAt: new Date('2025-01-01'),
+      exportData: {
+        products: null,
+        exporterDetails: { name: 'Test Exporter' },
+        transportation: { vehicle: 'truck' },
+        conservation: { method: 'frozen' }
+      }
+    };
+
+    const mockTransformedPayload = {
+      CreateCatchCertificateRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {
+      CatchCertificateResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Certificate submitted'
+      }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocumentNoProducts)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-CC-TEST003',
+      operation: 'submit'
+    });
+
+    expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST003',
+      expect.any(Date),
+      mockDocumentNoProducts.exportData
+    );
+  });
+});
+
+describe('Processing Statement Submission', () => {
+  const mockPsDocument = {
+    documentNumber: 'GBR-2025-PS-TEST001',
+    createdAt: new Date('2025-01-01'),
+    exportData: {
+      products: [{ product: 'Processed Cod' }],
+      catches: [{ species: 'Cod' }],
+      exporterDetails: { name: 'Test Processor' },
+      exportedTo: { country: 'France' },
+      plantName: 'Test Plant',
+      plantApprovalNumber: 'AP123',
+      plantAddressOne: '123 Test St',
+      plantTownCity: 'Test City',
+      plantPostcode: 'TE5T1NG',
+      healthCertificateNumber: 'HC123',
+      healthCertificateDate: '2025-01-01',
+      dateOfAcceptance: '2025-01-02',
+      consignmentDescription: 'Processed fish',
+      personResponsibleForConsignment: 'John Doe'
+    },
+    catchSubmission: {
+      status: "SUCCESS",
+      reference: "CATCH.PS.GB.2026.0000006",
+      uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
+      timestamp: "2026-01-06T16:09:16.982+01:00",
+      reasonInformation: "Message has been successfully processed"
+    }
+  };
+
+  it('should successfully submit a processing statement', async () => {
+    const mockTransformedPayload = {
+      CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {
+      ProcessingStatementResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Statement submitted successfully'
+      }
+    };
+
+    const mockProcessBoomiResponse = {
+      euCatchStatus: "IN_PROGRESS",
+      euCatchStatusMessage: "Processing Statement is being retried.",
+      documentNumber: "GBR-2026-CC-3FD5E066"
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocument)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockReturnValue(mockProcessBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
       documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'submit'
+    });
+
+    expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-PS-TEST001');
+    expect(DocumentModel.findOne).toHaveBeenCalledWith({
+      __t: "processingStatement",
+      documentNumber: 'GBR-2025-PS-TEST001',
+      status: { $in: ['COMPLETE', 'VOID'] }
+    });
+    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalled();
+    expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
+      mockTransformedPayload,
+      { documentType: 'PROCESSINGSTATEMENT' },
+      'catchSubmit'
+    );
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST001',
+      mockProcessBoomiResponse
+    );
+  });
+
+  it('should use void operation for processing statement', async () => {
+    const mockTransformedPayload = {
+      CancelProcessingStatementRequest: { SPSCertificate: { ID: { value: 'CATCH.PS.GB.2026.0000006' } } }
+    };
+    const mockBoomiResponse = {
+      ProcessingStatementResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Statement voided successfully'
+      }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocument)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'void'
+    });
+
+    expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
+      mockTransformedPayload,
+      { documentType: 'PROCESSINGSTATEMENT' },
+      'catchVoid'
+    );
+  });
+
+  it('should use default status when ProcessingStatementResponse is missing', async () => {
+    const mockTransformedPayload = {
+      CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {}; // No ProcessingStatementResponse
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocument)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('no catch response')
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'submit'
+    })).rejects.toThrow('no catch response');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST001',
+      {
+        documentNumber: "GBR-2025-PS-TEST001",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "no catch response",
+      }
+    );
+  });
+
+  it('should use default status when PS Boomi response is null', async () => {
+    const mockTransformedPayload = {
+      CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocument)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(null);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('no catch response')
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'submit'
+    })).rejects.toThrow('no catch response');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST001',
+      {
+        documentNumber: "GBR-2025-PS-TEST001",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "no catch response",
+      }
+    );
+  });
+
+  it('should use default status when PS Boomi response is undefined', async () => {
+    const mockTransformedPayload = {
+      CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocument)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(undefined);
+    (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('no catch response')
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'submit'
+    })).rejects.toThrow('no catch response');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST001',
+      {
+        documentNumber: "GBR-2025-PS-TEST001",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "no catch response",
+      }
+    );
+  });
+
+  it('should handle null products in processing statement', async () => {
+    const mockPsDocumentNullProducts = {
+      ...mockPsDocument,
+      exportData: {
+        ...mockPsDocument.exportData,
+        products: null
+      }
+    };
+
+    const mockTransformedPayload = {
+      CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {
+      ProcessingStatementResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Statement submitted'
+      }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocumentNullProducts)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'submit'
+    });
+
+    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST001',
+      expect.any(Date),
+      expect.objectContaining({
+        products: []
+      })
+    );
+  });
+
+  it('should handle null catches in processing statement', async () => {
+    const mockPsDocumentNullCatches = {
+      ...mockPsDocument,
+      exportData: {
+        ...mockPsDocument.exportData,
+        catches: null
+      }
+    };
+
+    const mockTransformedPayload = {
+      CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
+    };
+    const mockBoomiResponse = {
+      ProcessingStatementResponse: {
+        status: 'SUCCESS',
+        statusMessage: 'Statement submitted'
+      }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocumentNullCatches)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue(mockTransformedPayload);
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await Controller.submitDocumentToBoomi({
+      documentNumber: 'GBR-2025-PS-TEST001',
+      operation: 'submit'
+    });
+
+    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST001',
+      expect.any(Date),
+      expect.objectContaining({
+        catches: []
+      })
+    );
+  });
+});
+
+describe('Error Handling', () => {
+  it('should throw error when document is not found', async () => {
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(null)
+    });
+
+    await expect(
+      Controller.submitDocumentToBoomi({
+        documentNumber: 'GBR-2025-CC-NOTFOUND',
+        operation: 'submit'
+      })
+    ).rejects.toThrow('Document not found for document number: GBR-2025-CC-NOTFOUND');
+  });
+
+  it('should throw error when exportData is missing', async () => {
+    const mockDocumentNoExportData = {
+      documentNumber: 'GBR-2025-CC-TEST004',
+      createdAt: new Date('2025-01-01'),
+      exportData: null
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocumentNoExportData)
+    });
+
+    await expect(
+      Controller.submitDocumentToBoomi({
+        documentNumber: 'GBR-2025-CC-TEST004',
+        operation: 'submit'
+      })
+    ).rejects.toThrow('No exportData found for document number: GBR-2025-CC-TEST004');
+  });
+
+  it('should handle fetch error and update certificate status', async () => {
+    const fetchError = new Error('Database connection failed');
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockRejectedValue(fetchError)
+    });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(
+      Controller.submitDocumentToBoomi({
+        documentNumber: 'GBR-2025-CC-TEST005',
+        operation: 'submit'
+      })
+    ).rejects.toThrow('Database connection failed');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST005',
+      {
+        documentNumber: "GBR-2025-CC-TEST005",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "Database connection failed",
+      }
+    );
+  });
+
+  it('should handle Boomi service error and update certificate status', async () => {
+    const mockCatchCertDocument = {
+      documentNumber: 'GBR-2025-CC-TEST006',
+      createdAt: new Date('2025-01-01'),
+      exportData: {
+        products: [{ product: 'Cod' }],
+        exporterDetails: { name: 'Test Exporter' }
+      }
+    };
+
+    const boomiError = new Error('Boomi service unavailable');
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockReturnValue({ CreateCatchCertificateRequest: {} });
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockRejectedValue(boomiError);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(
+      Controller.submitDocumentToBoomi({
+        documentNumber: 'GBR-2025-CC-TEST006',
+        operation: 'submit'
+      })
+    ).rejects.toThrow('Boomi service unavailable');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST006',
+      {
+        documentNumber: "GBR-2025-CC-TEST006",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "Boomi service unavailable",
+      }
+    );
+  });
+
+  it('should handle transformer error and update certificate status', async () => {
+    const mockCatchCertDocument = {
+      documentNumber: 'GBR-2025-CC-TEST007',
+      createdAt: new Date('2025-01-01'),
+      exportData: {
+        products: [{ product: 'Cod' }],
+        exporterDetails: { name: 'Test Exporter' }
+      }
+    };
+
+    const transformerError = new Error('Transformation failed');
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
+      .mockImplementation(() => {
+        throw transformerError;
+      });
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
+
+    await expect(
+      Controller.submitDocumentToBoomi({
+        documentNumber: 'GBR-2025-CC-TEST007',
+        operation: 'submit'
+      })
+    ).rejects.toThrow('Transformation failed');
+
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-CC-TEST007',
+      {
+        documentNumber: "GBR-2025-CC-TEST007",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "Transformation failed",
+      }
+    );
+  });
+
+  it('should handle processing statement Boomi error', async () => {
+    const mockPsDocument = {
+      documentNumber: 'GBR-2025-PS-TEST002',
       createdAt: new Date('2025-01-01'),
       exportData: {
         products: [{ product: 'Processed Cod' }],
         catches: [{ species: 'Cod' }],
-        exporterDetails: { name: 'Test Processor' },
-        exportedTo: { country: 'France' },
-        plantName: 'Test Plant',
-        plantApprovalNumber: 'AP123',
-        plantAddressOne: '123 Test St',
-        plantTownCity: 'Test City',
-        plantPostcode: 'TE5T1NG',
-        healthCertificateNumber: 'HC123',
-        healthCertificateDate: '2025-01-01',
-        dateOfAcceptance: '2025-01-02',
-        consignmentDescription: 'Processed fish',
-        personResponsibleForConsignment: 'John Doe'
+        exporterDetails: { name: 'Test Processor' }
       }
     };
 
-    it('should successfully submit a processing statement', async () => {
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        ProcessingStatementResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Statement submitted successfully'
-        }
-      };
+    const boomiError = new Error('PS Boomi error');
 
-      const mockProcessBoomiResponse = {
-        euCatchStatus: "IN_PROGRESS",
-        euCatchStatusMessage: "Processing Statement is being retried.",
-        documentNumber: "GBR-2026-CC-3FD5E066"
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocument)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockReturnValue(mockProcessBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'submit'
-      });
-
-      expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-PS-TEST001');
-      expect(DocumentModel.findOne).toHaveBeenCalledWith({
-        __t: "processingStatement",
-        documentNumber: 'GBR-2025-PS-TEST001',
-        status: { $in: ['COMPLETE', 'VOID'] }
-      });
-      expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalled();
-      expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
-        mockTransformedPayload,
-        { documentType: 'PROCESSINGSTATEMENT' },
-        'catchSubmit'
-      );
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST001',
-        mockProcessBoomiResponse
-      );
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockPsDocument)
     });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
+      .mockReturnValue({ CreateCatchProcessingStatementRequest: {} });
+    (BoomiService.sendDocumentToBoomi as jest.Mock).mockRejectedValue(boomiError);
+    (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
 
-    it('should use void operation for processing statement', async () => {
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        ProcessingStatementResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Statement voided successfully'
-        }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocument)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'void'
-      });
-
-      expect(BoomiService.sendDocumentToBoomi).toHaveBeenCalledWith(
-        mockTransformedPayload,
-        { documentType: 'PROCESSINGSTATEMENT' },
-        'catchVoid'
-      );
-    });
-
-    it('should use default status when ProcessingStatementResponse is missing', async () => {
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {}; // No ProcessingStatementResponse
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocument)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('no catch response')
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'submit'
-      })).rejects.toThrow('no catch response');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST001',
-        {
-          documentNumber: "GBR-2025-PS-TEST001",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "no catch response",
-        }
-      );
-    });
-
-    it('should use default status when PS Boomi response is null', async () => {
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocument)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(null);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('no catch response')
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'submit'
-      })).rejects.toThrow('no catch response');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST001',
-        {
-          documentNumber: "GBR-2025-PS-TEST001",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "no catch response",
-        }
-      );
-    });
-
-    it('should use default status when PS Boomi response is undefined', async () => {
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocument)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(undefined);
-      (BoomiService.processEuUpgradeCallback as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('no catch response')
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'submit'
-      })).rejects.toThrow('no catch response');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST001',
-        {
-          documentNumber: "GBR-2025-PS-TEST001",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "no catch response",
-        }
-      );
-    });
-
-    it('should handle null products in processing statement', async () => {
-      const mockPsDocumentNullProducts = {
-        ...mockPsDocument,
-        exportData: {
-          ...mockPsDocument.exportData,
-          products: null
-        }
-      };
-
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        ProcessingStatementResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Statement submitted'
-        }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocumentNullProducts)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'submit'
-      });
-
-      expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST001',
-        expect.any(Date),
-        expect.objectContaining({
-          products: []
-        })
-      );
-    });
-
-    it('should handle null catches in processing statement', async () => {
-      const mockPsDocumentNullCatches = {
-        ...mockPsDocument,
-        exportData: {
-          ...mockPsDocument.exportData,
-          catches: null
-        }
-      };
-
-      const mockTransformedPayload = {
-        CreateCatchProcessingStatementRequest: { SPSCertificate: {} }
-      };
-      const mockBoomiResponse = {
-        ProcessingStatementResponse: {
-          status: 'SUCCESS',
-          statusMessage: 'Statement submitted'
-        }
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocumentNullCatches)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue(mockTransformedPayload);
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockResolvedValue(mockBoomiResponse);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await Controller.submitDocumentToBoomi({
-        documentNumber: 'GBR-2025-PS-TEST001',
-        operation: 'submit'
-      });
-
-      expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST001',
-        expect.any(Date),
-        expect.objectContaining({
-          catches: []
-        })
-      );
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should throw error when document is not found', async () => {
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null)
-      });
-
-      await expect(
-        Controller.submitDocumentToBoomi({
-          documentNumber: 'GBR-2025-CC-NOTFOUND',
-          operation: 'submit'
-        })
-      ).rejects.toThrow('Document not found for document number: GBR-2025-CC-NOTFOUND');
-    });
-
-    it('should throw error when exportData is missing', async () => {
-      const mockDocumentNoExportData = {
-        documentNumber: 'GBR-2025-CC-TEST004',
-        createdAt: new Date('2025-01-01'),
-        exportData: null
-      };
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockDocumentNoExportData)
-      });
-
-      await expect(
-        Controller.submitDocumentToBoomi({
-          documentNumber: 'GBR-2025-CC-TEST004',
-          operation: 'submit'
-        })
-      ).rejects.toThrow('No exportData found for document number: GBR-2025-CC-TEST004');
-    });
-
-    it('should handle fetch error and update certificate status', async () => {
-      const fetchError = new Error('Database connection failed');
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockRejectedValue(fetchError)
-      });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(
-        Controller.submitDocumentToBoomi({
-          documentNumber: 'GBR-2025-CC-TEST005',
-          operation: 'submit'
-        })
-      ).rejects.toThrow('Database connection failed');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST005',
-        {
-          documentNumber: "GBR-2025-CC-TEST005",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "Database connection failed",
-        }
-      );
-    });
-
-    it('should handle Boomi service error and update certificate status', async () => {
-      const mockCatchCertDocument = {
-        documentNumber: 'GBR-2025-CC-TEST006',
-        createdAt: new Date('2025-01-01'),
-        exportData: {
-          products: [{ product: 'Cod' }],
-          exporterDetails: { name: 'Test Exporter' }
-        }
-      };
-
-      const boomiError = new Error('Boomi service unavailable');
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockReturnValue({ CreateCatchCertificateRequest: {} });
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockRejectedValue(boomiError);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(
-        Controller.submitDocumentToBoomi({
-          documentNumber: 'GBR-2025-CC-TEST006',
-          operation: 'submit'
-        })
-      ).rejects.toThrow('Boomi service unavailable');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST006',
-        {
-          documentNumber: "GBR-2025-CC-TEST006",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "Boomi service unavailable",
-        }
-      );
-    });
-
-    it('should handle transformer error and update certificate status', async () => {
-      const mockCatchCertDocument = {
-        documentNumber: 'GBR-2025-CC-TEST007',
-        createdAt: new Date('2025-01-01'),
-        exportData: {
-          products: [{ product: 'Cod' }],
-          exporterDetails: { name: 'Test Exporter' }
-        }
-      };
-
-      const transformerError = new Error('Transformation failed');
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockCatchCertDocument)
-      });
-      (CatchCertificateTransformerService.generateCatchPayload as jest.Mock)
-        .mockImplementation(() => {
-          throw transformerError;
-        });
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(
-        Controller.submitDocumentToBoomi({
-          documentNumber: 'GBR-2025-CC-TEST007',
-          operation: 'submit'
-        })
-      ).rejects.toThrow('Transformation failed');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-CC-TEST007',
-        {
-          documentNumber: "GBR-2025-CC-TEST007",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "Transformation failed",
-        }
-      );
-    });
-
-    it('should handle processing statement Boomi error', async () => {
-      const mockPsDocument = {
+    await expect(
+      Controller.submitDocumentToBoomi({
         documentNumber: 'GBR-2025-PS-TEST002',
-        createdAt: new Date('2025-01-01'),
-        exportData: {
-          products: [{ product: 'Processed Cod' }],
-          catches: [{ species: 'Cod' }],
-          exporterDetails: { name: 'Test Processor' }
-        }
-      };
+        operation: 'submit'
+      })
+    ).rejects.toThrow('PS Boomi error');
 
-      const boomiError = new Error('PS Boomi error');
-
-      (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
-      (DocumentModel.findOne as jest.Mock).mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockPsDocument)
-      });
-      (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock)
-        .mockReturnValue({ CreateCatchProcessingStatementRequest: {} });
-      (BoomiService.sendDocumentToBoomi as jest.Mock).mockRejectedValue(boomiError);
-      (CatchCertPersistence.updateCertificateEuCatchStatus as jest.Mock).mockResolvedValue(undefined);
-
-      await expect(
-        Controller.submitDocumentToBoomi({
-          documentNumber: 'GBR-2025-PS-TEST002',
-          operation: 'submit'
-        })
-      ).rejects.toThrow('PS Boomi error');
-
-      expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
-        'GBR-2025-PS-TEST002',
-        {
-          documentNumber: "GBR-2025-PS-TEST002",
-          euCatchStatus: "FAILURE",
-          faultCode: "S:Client",
-          faultString: "PS Boomi error",
-        }
-      );
-    });
+    expect(CatchCertPersistence.updateCertificateEuCatchStatus).toHaveBeenCalledWith(
+      'GBR-2025-PS-TEST002',
+      {
+        documentNumber: "GBR-2025-PS-TEST002",
+        euCatchStatus: "FAILURE",
+        faultCode: "S:Client",
+        faultString: "PS Boomi error",
+      }
+    );
   });
 });
