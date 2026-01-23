@@ -15,18 +15,83 @@ export default class StorageNotesTransformerService {
   ): any {
     logger.info(`[STORAGE-NOTES-TRANSFORMER][GENERATING-PAYLOAD][${documentNumber}]`);
 
-    const payload = {
-      CreateCatchNonManipulationDocumentRequest: {
-        CatchNonManipulationDocument: {
-          SPSExchangedDocument: this.buildNonManipulationExchangedDocument(documentNumber, createdAt, exportData),
-          SPSArrivalConsignment: this.buildConsignment(exportData, 'arrival'),
-          SPSDepartureConsignment: this.buildConsignment(exportData, 'departure')
+    try {
+      const payload = {
+        CreateCatchNonManipulationDocumentRequest: {
+          CatchNonManipulationDocument: {
+            SPSExchangedDocument: this.buildNonManipulationExchangedDocument(documentNumber, createdAt, exportData),
+            SPSArrivalConsignment: this.buildConsignment(exportData, 'arrival'),
+            SPSDepartureConsignment: this.buildConsignment(exportData, 'departure')
+          }
         }
       }
     };
 
     logger.info(`[STORAGE-NOTES-TRANSFORMER][PAYLOAD-GENERATED][${documentNumber}]`);
     return payload;
+  }
+
+  private static buildNonManipulationExchangedDocument(documentNumber: string, createdAt: Date, exportData: any): any {
+    const emptyNode = {
+      value: ''
+    };
+
+    const typeCode = {
+      listID: '1001',
+      listAgencyID: '6',
+      listVersionID: 'D16B',
+      name: 'CATCH_NON_MANIPULATION_DOCUMENT',
+      listURI: '',
+      value: '16'
+    };
+
+    const statusCode = {
+      listID: '4405',
+      listAgencyID: '6',
+      listVersionID: 'D16B',
+      name: '39',
+      listURI: '39',
+      value: '39'
+    };
+
+    const issuerSpsParty = {
+      Name: {
+        languageID: 'en',
+        value: 'Marine Management Organization'
+      },
+      RoleCode: {
+        value: 'PQ'
+      }
+    }
+
+    return {
+      Name: {
+        languageID: 'en',
+        value: 'Non Manipulation Document'
+      },
+      Description: emptyNode,
+      ID: emptyNode,
+      TypeCode: typeCode,
+      StatusCode: statusCode,
+      IssueDateTime: {
+        DateTime: {
+          value: createdAt.toISOString()
+        }
+      },
+      IssuerSPSParty: issuerSpsParty,
+      IncludedSPSNote: {
+        Content: {
+          languageID: 'en',
+          value: exportData?.facilityStorage || 'CHILLED'
+        },
+        SubjectCode: {
+          languageID: 'en',
+          value: 'STORAGE_CONDITION'
+        }
+      },
+      ReferenceSPSReferencedDocument: this.buildReferencedDocuments(documentNumber, exportData),
+      SignatorySPSAuthentication: this.buildAuthentications(createdAt)
+    };
   }
 
   private static buildReferencedDocuments(documentNumber: string, exportData: any): any[] {
@@ -478,63 +543,6 @@ export default class StorageNotesTransformerService {
         languageLocaleID: 'en',
         value: catchData.commodityCodeDescription || 'Other prepared or preserved fish'
       }
-    };
-  }
-
-    private static buildExchangedDocument(documentNumber: string, createdAt: Date, exportData: any): any {
-    return {
-      Name: {
-        languageID: 'en',
-        value: 'Non Manipulation Document'
-      },
-      Description: {
-        value: ''
-      },
-      ID: {
-        value: ''
-      },
-      TypeCode: {
-        listID: '1001',
-        listAgencyID: '6',
-        listVersionID: 'D16B',
-        name: 'CATCH_NON_MANIPULATION_DOCUMENT',
-        listURI: '',
-        value: '16'
-      },
-      StatusCode: {
-        listID: '4405',
-        listAgencyID: '6',
-        listVersionID: 'D16B',
-        name: '39',
-        listURI: '39',
-        value: '39'
-      },
-      IssueDateTime: {
-        DateTime: {
-          value: createdAt.toISOString()
-        }
-      },
-      IssuerSPSParty: {
-        Name: {
-          languageID: 'en',
-          value: 'Marine Management Organization'
-        },
-        RoleCode: {
-          value: 'PQ'
-        }
-      },
-      IncludedSPSNote: {
-        Content: {
-          languageID: 'en',
-          value: exportData?.facilityStorage || 'CHILLED'
-        },
-        SubjectCode: {
-          languageID: 'en',
-          value: 'STORAGE_CONDITION'
-        }
-      },
-      ReferenceSPSReferencedDocument: this.buildReferencedDocuments(documentNumber, exportData),
-      SignatorySPSAuthentication: this.buildAuthentications(createdAt)
     };
   }
 }
