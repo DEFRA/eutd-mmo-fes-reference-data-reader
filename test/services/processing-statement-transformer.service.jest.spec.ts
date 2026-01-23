@@ -142,7 +142,7 @@ describe('ProcessingStatementTransformerService', () => {
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
       expect(exchangedDoc.IssuerSPSParty.Name.value).toBe('Marine Management Organization');
-      expect(exchangedDoc.IssuerSPSParty.RoleCode.value).toBe('PQ');
+      expect(exchangedDoc.IssuerSPSParty.RoleCode.value).toBe('VJ');
     });
 
     it('should include reference documents', () => {
@@ -154,9 +154,13 @@ describe('ProcessingStatementTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
-      expect(exchangedDoc.ReferenceSPSReferencedDocument).toHaveLength(2);
+      expect(exchangedDoc.ReferenceSPSReferencedDocument).toHaveLength(3);
       expect(exchangedDoc.ReferenceSPSReferencedDocument[0].TypeCode.value).toBe('916');
       expect(exchangedDoc.ReferenceSPSReferencedDocument[1].TypeCode.name).toBe('Health certificate');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].TypeCode.value).toBe('916');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].TypeCode.value).toBe('916');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].RelationshipTypeCode.value).toBe('AIS');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].ID.value).toBe('GB-001');
     });
 
     it('should include signatory authentication with two signatures', () => {
@@ -169,9 +173,9 @@ describe('ProcessingStatementTransformerService', () => {
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
       expect(exchangedDoc.SignatorySPSAuthentication).toHaveLength(2);
-      expect(exchangedDoc.SignatorySPSAuthentication[0].TypeCode.value).toBe('1');
-      expect(exchangedDoc.SignatorySPSAuthentication[1].TypeCode.value).toBe('2');
-      expect(exchangedDoc.SignatorySPSAuthentication[1].ProviderSPSParty.Name.value).toBe('Marine Management Organization');
+      expect(exchangedDoc.SignatorySPSAuthentication[0].TypeCode.value).toBe('5');
+      expect(exchangedDoc.SignatorySPSAuthentication[1].TypeCode.value).toBe('1');
+      expect(exchangedDoc.SignatorySPSAuthentication[1].ProviderSPSParty.Name.value).toBe('');
     });
 
     it('should build consignor party with plant details', () => {
@@ -183,7 +187,6 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ConsignorSPSParty.ID.value).toBe('GB-001');
       expect(consignment.ConsignorSPSParty.Name.value).toBe('Test Processing Plant');
       expect(consignment.ConsignorSPSParty.RoleCode.value).toBe('CZ');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Plant Road');
@@ -210,7 +213,6 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ConsignorSPSParty.ID.value).toBe('');
       expect(consignment.ConsignorSPSParty.Name.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('');
@@ -992,8 +994,6 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      // Verify all plant fields use actual values, not defaults
-      expect(consignment.ConsignorSPSParty.ID.value).toBe('GB-001');
       expect(consignment.ConsignorSPSParty.Name.value).toBe('Test Processing Plant');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Plant Road');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('Manchester');
@@ -1035,7 +1035,6 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ConsignorSPSParty.ID.value).toBe('');
       expect(consignment.ConsignorSPSParty.Name.value).toBe('');
     });
 
@@ -1057,12 +1056,13 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.ConsignorSPSParty.ID.value).toBe('');
       expect(consignment.ConsignorSPSParty.Name.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('');
-    }); it('should handle null exporter fields', () => {
+    });
+
+    it('should handle null exporter fields', () => {
       const exportDataWithNullExporter = {
         ...baseExportData,
         exporterDetails: {
