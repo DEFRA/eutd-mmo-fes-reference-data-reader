@@ -97,6 +97,17 @@ export default class ProcessingStatementTransformerService {
             schemeAgencyID: 'GB',
             value: exportData.healthCertificateNumber
           }
+        },
+        {
+          TypeCode: {
+            value: '916'
+          },
+          RelationshipTypeCode: {
+            value: 'AIS'
+          },
+          ID: {
+            value: exportData.plantApprovalNumber
+          }
         }
       ],
       SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
@@ -127,11 +138,8 @@ export default class ProcessingStatementTransformerService {
     };
   }
 
-  private static buildConsignorParty({ plantApprovalNumber, plantName, plantAddressOne, plantTownCity, plantPostcode }: any): any {
+  private static buildConsignorParty({ plantName, plantAddressOne, plantTownCity, plantPostcode }: any): any {
     return {
-      ID: {
-        value: plantApprovalNumber || ''
-      },
       Name: {
         languageID: 'en',
         value: plantName || ''

@@ -154,9 +154,13 @@ describe('ProcessingStatementTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSExchangedDocument;
 
-      expect(exchangedDoc.ReferenceSPSReferencedDocument).toHaveLength(2);
+      expect(exchangedDoc.ReferenceSPSReferencedDocument).toHaveLength(3);
       expect(exchangedDoc.ReferenceSPSReferencedDocument[0].TypeCode.value).toBe('916');
       expect(exchangedDoc.ReferenceSPSReferencedDocument[1].TypeCode.name).toBe('Health certificate');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].TypeCode.value).toBe('916');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].TypeCode.value).toBe('916');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].RelationshipTypeCode.value).toBe('AIS');
+      expect(exchangedDoc.ReferenceSPSReferencedDocument[2].ID.value).toBe('GB-001');
     });
 
     it('should include signatory authentication with two signatures', () => {
@@ -1057,7 +1061,9 @@ describe('ProcessingStatementTransformerService', () => {
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('');
       expect(consignment.ConsignorSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('');
-    }); it('should handle null exporter fields', () => {
+    });
+
+    it('should handle null exporter fields', () => {
       const exportDataWithNullExporter = {
         ...baseExportData,
         exporterDetails: {
