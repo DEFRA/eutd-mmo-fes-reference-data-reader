@@ -69,7 +69,15 @@ export default class ProcessingStatementTransformerService {
           value: createdAt.toISOString()
         }
       },
-      IssuerSPSParty,
+      IssuerSPSParty: {
+        Name: {
+          languageID: 'en',
+          value: 'Marine Management Organization'
+        },
+        RoleCode: {
+          value: 'VJ'
+        }
+      },
       ReferenceSPSReferencedDocument: [
         {
           TypeCode: {
@@ -110,7 +118,66 @@ export default class ProcessingStatementTransformerService {
           }
         }
       ],
-      SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
+      SignatorySPSAuthentication: [
+        {
+          TypeCode: {
+            value: '5'
+          },
+          ActualDateTime: {
+            DateTime: {
+              value: createdAt.toISOString()
+            }
+          },
+          ProviderSPSParty: {
+            Name: {
+              value: 'Official Inspector'
+            },
+            RoleCode: {
+              value: 'VJ'
+            },
+            SpecifiedSPSPerson: {
+              Name: {
+                value: ''
+              }
+            }
+          },
+          IncludedSPSClause: {
+            Content: {
+              value: ''
+            }
+          }
+        },
+        {
+          TypeCode: {
+            value: '1'
+          },
+          ActualDateTime: {
+            DateTime: {
+              value: createdAt.toISOString()
+            }
+          },
+          ProviderSPSParty: {
+            Name: {
+              languageID: 'en',
+              value: ''
+            },
+            RoleCode: {
+              value: 'VJ'
+            },
+            SpecifiedSPSPerson: {
+              Name: {
+                languageID: 'en',
+                value: ''
+              },
+              AttainedSPSQualification: {
+                Name: {
+                  value: ''
+                }
+              }
+            }
+          }
+        }
+      ]
     };
   }
 
