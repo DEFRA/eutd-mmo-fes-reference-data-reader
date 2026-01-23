@@ -66,17 +66,17 @@ const fetchDocumentData = async (documentNumber: string, docType: string): Promi
 const getDocumentNumberForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.documentNumber || 'UNKNOWN';
 const getOperationsForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.operation || 'submit';
 const getResourceType = (operation: "submit" | "void") => operation === 'void' ? 'catchVoid' : 'catchSubmit';
-const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCertificateRequest' | 'CancelProcessingStatementRequest') => {
-  return {
-    [key]: {
-      SPSCertificate: {
-        ID: {
-          value: documentNumber
+const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCertificateRequest' | 'CancelProcessingStatementRequest')=> {
+    return {
+      [key]: {
+        SPSCertificate: {
+          ID: {
+            value: documentNumber
+          }
         }
       }
     }
   }
-}
 
 
 async function handleCatchCertificateSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
@@ -94,7 +94,7 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void') {
+async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void',  catchSubmission: ICatchStatus | undefined) {
   const products = Array.isArray(exportData.products) ? exportData.products : [];
 
   const transformedExportData = {
