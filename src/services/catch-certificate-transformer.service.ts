@@ -375,7 +375,7 @@ export default class CatchCertificateTransformerService {
         }));
         return [...utilizedSPSTransportEquipments, ...containerEquipments];
       }
-      
+
       // Fallback to single containerNumber for backwards compatibility
       if (transport.containerNumber) {
         return [...utilizedSPSTransportEquipments, {
@@ -734,15 +734,4 @@ export default class CatchCertificateTransformerService {
     return additionalInformationSPSNote;
   }
 
-  public static generateVoidCatchPayload(documentNumber: string) {
-    return {
-      CancelCatchCertificateRequest: {
-        SPSCertificate: {
-          ID: {
-            value: documentNumber
-          }
-        }
-      }
-    }
-  }
 }
