@@ -705,7 +705,7 @@ describe('StorageNotesTransformerService', () => {
         const exportDataWithCC = {
           ...baseExportData,
           catches: [{
-            certificateNumber: 'GBR-2025-CC-001234',
+            certificateNumber: 'GBR-2025-CC-1234567890',
             product: 'Atlantic cod (COD)',
             commoditityCode: '030111',
             netWeightProductArrival: 100,
@@ -722,7 +722,7 @@ describe('StorageNotesTransformerService', () => {
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
         const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
         const certificateNote = tradeLineItem.AdditionalInformationSPSNote.find(
-          (note: any) => note.Content.value === 'GBR-2025-CC-001234'
+          (note: any) => note.Content.value === 'GBR-2025-CC-1234567890'
         );
 
         expect(certificateNote).toBeDefined();
@@ -733,7 +733,7 @@ describe('StorageNotesTransformerService', () => {
         const exportDataWithUKPS = {
           ...baseExportData,
           catches: [{
-            certificateNumber: 'GBR-2025-PS-001234',
+            certificateNumber: 'GBR-2026-PS-40AF7C9D7',
             product: 'Atlantic cod (COD)',
             commoditityCode: '030111',
             netWeightProductArrival: 100,
@@ -750,7 +750,7 @@ describe('StorageNotesTransformerService', () => {
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
         const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
         const certificateNote = tradeLineItem.AdditionalInformationSPSNote.find(
-          (note: any) => note.Content.value === 'GBR-2025-PS-001234'
+          (note: any) => note.Content.value === 'GBR-2026-PS-40AF7C9D7'
         );
 
         expect(certificateNote).toBeDefined();
@@ -761,7 +761,7 @@ describe('StorageNotesTransformerService', () => {
         const exportDataWithUKSD = {
           ...baseExportData,
           catches: [{
-            certificateNumber: 'GBR-2025-SD-001234',
+            certificateNumber: 'GBR-2026-SD-40AF7C9D7',
             product: 'Atlantic cod (COD)',
             commoditityCode: '030111',
             netWeightProductArrival: 100,
@@ -778,7 +778,7 @@ describe('StorageNotesTransformerService', () => {
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
         const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
         const certificateNote = tradeLineItem.AdditionalInformationSPSNote.find(
-          (note: any) => note.Content.value === 'GBR-2025-SD-001234'
+          (note: any) => note.Content.value === 'GBR-2026-SD-40AF7C9D7'
         );
 
         expect(certificateNote).toBeDefined();
@@ -843,21 +843,21 @@ describe('StorageNotesTransformerService', () => {
           ...baseExportData,
           catches: [
             {
-              certificateNumber: 'GBR-2025-CC-001234',
+              certificateNumber: 'GBR-2025-CC-1234567890',
               product: 'Atlantic cod (COD)',
               commoditityCode: '030111',
               netWeightProductArrival: 100,
               netWeightFisheryProductArrival: 105
             },
             {
-              certificateNumber: 'GBR-2025-PS-005678',
+              certificateNumber: 'GBR-2026-PS-40AF7C9D7',
               product: 'Atlantic salmon (SAL)',
               commoditityCode: '030121',
               netWeightProductArrival: 200,
               netWeightFisheryProductArrival: 210
             },
             {
-              certificateNumber: 'GBR-2025-SD-009999',
+              certificateNumber: 'GBR-2026-SD-40AF7C9D7',
               product: 'European plaice (PLE)',
               commoditityCode: '030131',
               netWeightProductArrival: 150,
@@ -879,19 +879,19 @@ describe('StorageNotesTransformerService', () => {
 
         // Verify first catch (CC)
         const firstCertNote = tradeLineItems[0].AdditionalInformationSPSNote.find(
-          (note: any) => note.Content.value === 'GBR-2025-CC-001234'
+          (note: any) => note.Content.value === 'GBR-2025-CC-1234567890'
         );
         expect(firstCertNote.SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
 
         // Verify second catch (PS)
         const secondCertNote = tradeLineItems[1].AdditionalInformationSPSNote.find(
-          (note: any) => note.Content.value === 'GBR-2025-PS-005678'
+          (note: any) => note.Content.value === 'GBR-2026-PS-40AF7C9D7'
         );
         expect(secondCertNote.SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE');
 
         // Verify third catch (SD)
         const thirdCertNote = tradeLineItems[2].AdditionalInformationSPSNote.find(
-          (note: any) => note.Content.value === 'GBR-2025-SD-009999'
+          (note: any) => note.Content.value === 'GBR-2026-SD-40AF7C9D7'
         );
         expect(thirdCertNote.SubjectCode.value).toBe('CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE');
       });
