@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
 import { toSpeciesCode } from '../landings/transformations/dynamicsValidation';
 
