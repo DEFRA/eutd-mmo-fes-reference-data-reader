@@ -106,12 +106,12 @@ export default class StorageNotesTransformerService {
 
       field.ExportExitDateTime = {
         DateTime: {
-          value: moment(exportData?.arrivalTransport.departureDate, ["DD/MM/YYYY", "YYYY-MM-DD", "D/M/YYYY", "YYYY-M-D"]).toISOString()
+          value: moment(exportData?.arrivalTransport?.departureDate, ["DD/MM/YYYY", "YYYY-MM-DD", "D/M/YYYY", "YYYY-M-D"]).toISOString()
         }
       };
 
       field.ConsignorSPSParty = this.buildConsignorParty(exportData, type);
-      field.ConsigneeReceiptSPSLocation = this.buildConsigneeReceiptLocation(exportData);
+      field.ConsigneeReceiptSPSLocation = this.buildConsigneeReceiptLocation(exportData?.arrivalTransport);
       field.ConsigneeSPSParty = this.buildConsigneeParty(exportData);
 
       field.LoadingBaseportSPSLocation = {
@@ -120,7 +120,7 @@ export default class StorageNotesTransformerService {
         },
         Name: {
           languageID: 'en',
-          value: exportData?.arrivalTransport.departureCountry
+          value: exportData?.arrivalTransport?.departureCountry
         }
       };
 
@@ -130,7 +130,7 @@ export default class StorageNotesTransformerService {
         },
         Name: {
           languageID: 'en',
-          value: exportData?.arrivalTransport.departurePort
+          value: exportData?.arrivalTransport?.departurePort
         }
       };
 

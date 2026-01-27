@@ -49,16 +49,6 @@ describe('StorageNotesTransformerService', () => {
         departureDate: "21/01/2026",
         placeOfUnloading: "Hull"
       },
-      arrivalTransport: {
-        vehicle: "truck",
-        nationalityOfVehicle: "Tanzania, United Republic of",
-        registrationNumber: "A123 4567",
-        freightBillNumber: "",
-        departureCountry: "United Kingdom of Great Britain and Northern Ireland",
-        departurePort: "Calais port",
-        departureDate: "21/01/2026",
-        placeOfUnloading: "Hull"
-      },
       catches: [
         {
           certificateNumber: 'GBR-2025-CC-001',
