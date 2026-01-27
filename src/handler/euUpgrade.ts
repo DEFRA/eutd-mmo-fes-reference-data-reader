@@ -17,16 +17,20 @@ export const euUpgradeRoutes = (server: Hapi.Server) => {
       method: 'POST',
       path: '/v1/eu-upgrade',
       handler: async (req: Hapi.Request, h: ResponseToolkit) => {
-        const payload = req.payload as IEuUpgradeCallback;
-        const requestId = (payload as any).Envelope.Header.Message.Message;
         try {
+          const payload = req.payload as IEuUpgradeCallback;
           await Controller.processEuUpgradeCallback(payload);
           return h.response().code(200);
         } catch (e) {
-          logger.error(`[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:${requestId}][${e.message}]`);
+          logger.error(`[EU-UPGRADE][ENDPOINT][ERROR][${e.message}]`);
+
+          // Return 404 if certificate not found, 500 for other errors
+          if (e.message?.includes('Certificate not found')) {
+            return h.response({ error: 'Certificate not found' }).code(404);
+          }
 
           // Return 500 for processing errors
-          return h.response().code(500);
+          return h.response({ error: e }).code(500);
         }
       },
       options: {

@@ -55,27 +55,27 @@ describe('EU Upgrade Controller (FI0-10355 Scenario 3)', () => {
                     DateTime: '2025-11-21T10:00:00Z',
                   },
                   StatusCode: {
-                    name: 'Issued (Validated)',
-                    value: '70',
+                    '@name': 'Issued (Validated)',
+                    text: '70',
                   },
                   ReasonInformation: 'Message has been successfully processed',
                   fesDocNumber: 'GBR-2023-CC-TEST123',
-                  ReferenceSPSReferencedDocument: {
+                  ReferenceSPSReferencedDocument: [{
                     TypeCode: {
-                      name: 'Certificate (Catch Certificate)',
-                      value: '16',
+                      '@name': 'Certificate (Catch Certificate)',
+                      text: '16',
                     },
                     RelationshipTypeCode: {
-                      name: 'Document reference, internal',
-                      value: 'CAW',
+                      '@name': 'Document reference, internal',
+                      text: 'CAW',
                     },
-                    ID: 'EU.CATCH.CC.0123456789',
+                    ID: { text: 'EU.CATCH.CC.0123456789' },
                     AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/GBR-2023-CC-TEST123',
+                      "@format": 'url',
+                      "@mimeCode": 'text/url',
+                      "@uri": 'https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/GBR-2023-CC-TEST123',
                     },
-                  },
+                  }],
                 },
               },
             },
@@ -280,6 +280,75 @@ describe('EU Upgrade Controller (FI0-10355 Scenario 3)', () => {
       );
       expect(mockLoggerError).toHaveBeenCalled();
     });
+
+    it('should handle certificate not found error', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: {
+            Message: {
+              severity: 'debugging',
+              ID: 'WS_REQUEST_ID',
+              Message: 'request-id-not-found',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
+                  StatusCode: { name: 'Issued', value: '70' },
+                  ReasonInformation: 'Processed',
+                  fesDocNumber: 'GBR-2023-CC-NOTFOUND',
+                  ReferenceSPSReferencedDocument: {
+                    TypeCode: { name: 'Certificate', value: '16' },
+                    RelationshipTypeCode: {
+                      name: 'Document reference',
+                      value: 'CAW',
+                    },
+                    ID: 'EU.CC.CATCH.NOTFOUND',
+                    AttachmentBinaryObject: {
+                      format: 'url',
+                      mimeCode: 'text/url',
+                      uri: 'https://example.com/cert',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const mockSuccessResponse = {
+        documentNumber: 'GBR-2023-CC-NOTFOUND',
+        euCatchStatus: 'SUCCESS',
+        euCatchReferenceNumber: 'EU.CC.CATCH.NOTFOUND',
+        euCatchStatusCode: '70',
+        euCatchStatusName: 'Issued',
+        euCatchUri: 'https://example.com/cert',
+        euCatchTimestamp: '2025-11-21T10:00:00Z',
+        reasonInformation: 'Processed',
+        requestId: 'request-id-not-found',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce(mockSuccessResponse);
+      mockUpdateCertificateStatus.mockRejectedValueOnce(
+        new Error('Certificate not found: GBR-2023-CC-NOTFOUND'),
+      );
+
+      await expect(processEuUpgradeCallback(callbackData)).rejects.toThrow(
+        'Certificate not found: GBR-2023-CC-NOTFOUND',
+      );
+      expect(mockLoggerError).toHaveBeenCalled();
+      expect(mockUpdateCertificateStatus).toHaveBeenCalledWith(
+        'GBR-2023-CC-NOTFOUND',
+        expect.objectContaining({
+          documentNumber: 'GBR-2023-CC-NOTFOUND',
+          euCatchStatus: 'SUCCESS',
+        }),
+      );
+    });
+
   });
 
   describe('toBackEndCatchSubmission', () => {

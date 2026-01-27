@@ -116,12 +116,12 @@
             },
             "exclusiveEconomicZones": [
               {
-                "officialCountryName": "Nigeria", 
-                "isoCodeAlpha2": "NG", 
-                "isoCodeAlpha3": "NGA", 
+                "officialCountryName": "Nigeria",
+                "isoCodeAlpha2": "NG",
+                "isoCodeAlpha3": "NGA",
                 "isoNumericCode": "566"
-              }, 
-              { 
+              },
+              {
                 "officialCountryName": "France",
                 "isoCodeAlpha2": "FR",
                 "isoCodeAlpha3": "FRA",
@@ -204,12 +204,12 @@
             },
             "exclusiveEconomicZones": [
               {
-                "officialCountryName": "Nigeria", 
-                "isoCodeAlpha2": "NG", 
-                "isoCodeAlpha3": "NGA", 
+                "officialCountryName": "Nigeria",
+                "isoCodeAlpha2": "NG",
+                "isoCodeAlpha3": "NGA",
                 "isoNumericCode": "566"
-              }, 
-              { 
+              },
+              {
                 "officialCountryName": "France",
                 "isoCodeAlpha2": "FR",
                 "isoCodeAlpha3": "FRA",
@@ -304,7 +304,9 @@
             "reference": "INV001"
           }]
         }],
-        "failedSubmissions": 5
+        "failedSubmissions": 5,
+        "rejectedReason": "Some business rules are not met",
+        "catchReference": "CATCH.CC.GB.0000056"
     }],
     "required": [
         "documentType",
@@ -872,6 +874,8 @@
         "requestedByAdmin": {
           "type": "boolean",
           "definition": "Flag to identify applications made by an EACC"
-        }
+        },
+        "rejectedReason": { "type": "string" },
+        "catchReference": { "type": "string" }
     }
 }

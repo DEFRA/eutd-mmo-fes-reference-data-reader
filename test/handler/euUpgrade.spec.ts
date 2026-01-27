@@ -30,62 +30,153 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
     mockProcessEuUpgradeCallback = jest.spyOn(
       Controller,
       'processEuUpgradeCallback',
     );
   });
 
+  afterEach(() => {
+    mockProcessEuUpgradeCallback.mockRestore();
+  });
+
   describe('POST /v1/eu-upgrade', () => {
-    it('should successfully process EU upgrade callback with success response', async () => {
+    it('should successfully process EU upgrade callback with success response from no security', async () => {
       const payload = {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-123',
-            },
+              ID: "WS_REQUEST_ID",
+              Message: "5360c8a1-0a95-4758-af18-78e4f09a5342"
+            }
           },
           Body: {
             SubmitCatchResponse: {
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
                   IssueDateTime: {
-                    DateTime: '2025-11-21T10:00:00Z',
+                    DateTime: "2026-01-07T15:56:26.311+01:00"
                   },
                   StatusCode: {
-                    name: 'Issued (Validated)',
-                    value: '70',
+                    "@name": "Issued (Validated)",
+                    text: "70"
                   },
-                  ReasonInformation: 'Successfully processed',
-                  fesDocNumber: 'GBR-2023-CC-TEST123',
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: {
-                      name: 'Certificate (Catch Certificate)',
-                      value: '16',
-                    },
-                    RelationshipTypeCode: {
-                      name: 'Document reference, internal',
-                      value: 'CAW',
-                    },
-                    ID: 'GBR-2023-CC-TEST123',
-                    AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/GBR-2023-CC-TEST123',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+                  ReasonInformation: "Message has been successfully processed",
+                  fesDocNumber: "GBR-2026-CC-3530192AB",
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Certificate (Catch Certificate)",
+                        text: "16"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        text: "CATCH.CC.GB.2026.0000021"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000021"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
       };
 
       const mockSuccessResponse = {
-        euCatchStatus: "SUCCESS",
+        euCatchStatus: 'SUCCESS',
+        certificateId: 'GBR-2023-CC-TEST123',
+        euCatchStatusCode: '70',
+        euCatchStatusName: 'Issued (Validated)',
+        euCatchUri:
+          'https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/GBR-2023-CC-TEST123',
+        euCatchTimestamp: '2025-11-21T10:00:00Z',
+        reasonInformation: 'Successfully processed',
+        requestId: 'test-request-123',
+      };
+
+      mockProcessEuUpgradeCallback.mockResolvedValueOnce(mockSuccessResponse);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+    });
+
+    it('should successfully process EU upgrade callback with success response', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              "@severity": "debugging",
+              "@xmlns": "http://ec.europa.eu/sanco/tracesnt/message/v1",
+              ID: "WS_REQUEST_ID",
+              Message: "eb9dc56a-a8df-44b7-9a02-2d03ecec748d"
+            },
+            Security: {
+              "@xmlns:ns1": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+              "@xmlns:ns2": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+              TimestampType: {
+                Created: "2025-10-06T16:50:40.447+02:00",
+                Expires: "2025-10-06T16:50:45.447+02:00"
+              }
+            }
+          },
+          Body: {
+            SubmitCatchResponse: {
+              "@xmlns": "http://ec.europa.eu/tracesnt/certificate/catch/submission/v1",
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: {
+                    DateTime: "2025-10-06T16:50:38.944+02:00"
+                  },
+                  StatusCode: {
+                    "@name": "Issued (Validated)",
+                    text: "70"
+                  },
+                  ReasonInformation: "Message has been successfully processed",
+                  fesDocNumber: 'GBR-2023-CC-TEST123',
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Goods control certificate (Catch Processing Statement)",
+                        text: "841"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        "@schemeAgencyID": "GB",
+                        text: "110632"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/processing-statement/CATCH.PS.GB.2025.0000069"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      };
+
+      const mockSuccessResponse = {
+        euCatchStatus: 'SUCCESS',
         certificateId: 'GBR-2023-CC-TEST123',
         euCatchStatusCode: '70',
         euCatchStatusName: 'Issued (Validated)',
@@ -113,36 +204,47 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-failure',
-            },
+              severity: "debugging",
+              ID: "WS_REQUEST_ID",
+              Message: "b62c0a35-839f-4d90-b745-4bbb8ab0f384"
+            }
           },
           Body: {
             Fault: {
-              faultcode: 'SOAP-ENV:Server',
-              faultstring: 'Validation failed',
-              fesDocNumber: 'GBR-2023-CC-TEST123',
+              faultcode: "S:Client",
+              faultstring: "Some business rules are not met",
+              fesDocNumber: "GBR-2026-CC-3530192AB",
               detail: {
                 BusinessRulesValidationException: {
                   Error: [
                     {
-                      ID: 'ERROR_001',
+                      ID: "SPS-CONSIGNOR-NOT-FOUND",
                       Message: {
-                        languageID: 'en',
-                        text: 'Invalid certificate number',
+                        languageID: "en",
+                        text: "ID not found or not compatible"
                       },
                       Field: {
-                        languageID: 'en',
-                        text: 'certificateId',
-                      },
+                        languageID: "en",
+                        text: "/SPSCertificate/SPSConsignment/ConsignorSPSParty"
+                      }
                     },
-                  ],
-                },
-              },
-            },
-          },
-        },
+                    {
+                      ID: "CATCH-WS-020",
+                      Message: {
+                        languageID: "en",
+                        text: "[en] catch.ws.invalid.vessel.fishing.gear.found"
+                      },
+                      Field: {
+                        languageID: "en",
+                        text: ""
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
       };
 
       const mockFailureResponse = {
@@ -171,12 +273,68 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
     });
 
+    it('should successfully process EU upgrade callback with 200 response', async () => {
+      const payload = {
+        Envelope: {
+          Body: {
+            Fault: {
+              faultcode: "S:Client",
+              faultstring: "Some business rules are not met",
+              fesDocNumber: "GBR-2026-CC-474F089E0",
+              detail: {
+                BusinessRulesValidationException: {
+                  Error: [
+                    {
+                      ID: "CATCH-CONSIGNMENT-VERIFICATION-201",
+                      Message: {
+                        languageID: "en",
+                        text: " Document number - Document number is taken: this catch certificate or processing statement already exists in CATCH. Follow the \"re-use workflow\"."
+                      },
+                      Field: {
+                        languageID: "en"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      };
+
+      const mockFailureResponse = {
+        euCatchStatus: 'FAILURE',
+        faultCode: 'SOAP-ENV:Server',
+        faultString: 'Validation failed',
+        validationErrors: [
+          {
+            id: 'ERROR_001',
+            message: 'Invalid certificate number',
+            field: 'certificateId',
+          },
+        ],
+        requestId: 'test-request-failure',
+      };
+
+      mockProcessEuUpgradeCallback.mockResolvedValueOnce(mockFailureResponse);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.payload).toBe('');
+      expect(response.statusCode).toBe(200);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+    });
+
     it('should return 500 when processing throws an error', async () => {
       const payload = {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
+              '@severity': 'debugging',
               ID: 'WS_REQUEST_ID',
               Message: 'test-request-error',
             },
@@ -186,22 +344,22 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
                   IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
-                  StatusCode: { name: 'Issued', value: '70' },
+                  StatusCode: { '@name': 'Issued', text: '70' },
                   ReasonInformation: 'Processed',
                   fesDocNumber: 'GBR-2023-CC-TEST123',
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: { name: 'Certificate', value: '16' },
+                  ReferenceSPSReferencedDocument: [{
+                    TypeCode: { '@name': 'Certificate', text: '16' },
                     RelationshipTypeCode: {
-                      name: 'Document reference',
-                      value: 'CAW',
+                      '@name': 'Document reference',
+                      text: 'CAW',
                     },
-                    ID: 'EU.CATCH.CC.0123456789',
+                    ID: { "@schemeAgencyID": "GB", text: 'EU.CATCH.CC.0123456789' },
                     AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://example.com/cert',
+                      "@format": 'url',
+                      "@mimeCode": 'text/url',
+                      "@uri": 'https://example.com/cert',
                     },
-                  },
+                  }]
                 },
               },
             },
@@ -222,7 +380,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(response.statusCode).toBe(500);
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
       expect(logger.error).toHaveBeenCalledWith(
-        '[EU-UPGRADE][ENDPOINT][ERROR][REQUEST-ID:test-request-error][Database connection error]',
+        '[EU-UPGRADE][ENDPOINT][ERROR][Database connection error]',
       );
     });
 
@@ -231,10 +389,19 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-validation',
+              "@severity": "debugging",
+              "@xmlns": "http://ec.europa.eu/sanco/tracesnt/message/v1",
+              ID: "WS_REQUEST_ID",
+              Message: "eb9dc56a-a8df-44b7-9a02-2d03ecec748d"
             },
+            Security: {
+              "@xmlns:ns1": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+              "@xmlns:ns2": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+              TimestampType: {
+                Created: "2025-10-06T16:50:40.447+02:00",
+                Expires: "2025-10-06T16:50:45.447+02:00"
+              }
+            }
           },
           // Missing Body
         },
@@ -272,28 +439,42 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
           // Missing Header
           Body: {
             SubmitCatchResponse: {
+              "@xmlns": "http://ec.europa.eu/tracesnt/certificate/catch/submission/v1",
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
-                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
-                  StatusCode: { name: 'Issued', value: '70' },
-                  ReasonInformation: 'Processed',
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: { name: 'Certificate', value: '16' },
-                    RelationshipTypeCode: {
-                      name: 'Document reference',
-                      value: 'CAW',
-                    },
-                    ID: 'GBR-2023-CC-TEST123',
-                    AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://example.com/cert',
-                    },
+                  IssueDateTime: {
+                    DateTime: "2025-10-06T16:50:38.944+02:00"
                   },
-                },
-              },
-            },
-          },
+                  StatusCode: {
+                    "@name": "Issued (Validated)",
+                    text: "70"
+                  },
+                  ReasonInformation: "Message has been successfully processed",
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Goods control certificate (Catch Processing Statement)",
+                        text: "841"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        "@schemeAgencyID": "GB",
+                        text: "110632"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/processing-statement/CATCH.PS.GB.2025.0000069"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
         },
       };
 
@@ -315,28 +496,42 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
           },
           Body: {
             SubmitCatchResponse: {
+              "@xmlns": "http://ec.europa.eu/tracesnt/certificate/catch/submission/v1",
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
-                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
-                  StatusCode: { name: 'Issued', value: '70' },
-                  ReasonInformation: 'Processed',
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: { name: 'Certificate', value: '16' },
-                    RelationshipTypeCode: {
-                      name: 'Document reference',
-                      value: 'CAW',
-                    },
-                    ID: 'GBR-2023-CC-TEST123',
-                    AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://example.com/cert',
-                    },
+                  IssueDateTime: {
+                    DateTime: "2025-10-06T16:50:38.944+02:00"
                   },
-                },
-              },
-            },
-          },
+                  StatusCode: {
+                    "@name": "Issued (Validated)",
+                    text: "70"
+                  },
+                  ReasonInformation: "Message has been successfully processed",
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Goods control certificate (Catch Processing Statement)",
+                        text: "841"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        "@schemeAgencyID": "GB",
+                        text: "110632"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/processing-statement/CATCH.PS.GB.2025.0000069"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
         },
       };
 
@@ -355,33 +550,56 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-both',
+              "@severity": "debugging",
+              "@xmlns": "http://ec.europa.eu/sanco/tracesnt/message/v1",
+              ID: "WS_REQUEST_ID",
+              Message: "eb9dc56a-a8df-44b7-9a02-2d03ecec748d"
             },
+            Security: {
+              "@xmlns:ns1": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+              "@xmlns:ns2": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+              TimestampType: {
+                Created: "2025-10-06T16:50:40.447+02:00",
+                Expires: "2025-10-06T16:50:45.447+02:00"
+              }
+            }
           },
           Body: {
             SubmitCatchResponse: {
+              "@xmlns": "http://ec.europa.eu/tracesnt/certificate/catch/submission/v1",
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
-                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
-                  StatusCode: { name: 'Issued', value: '70' },
-                  ReasonInformation: 'Processed',
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: { name: 'Certificate', value: '16' },
-                    RelationshipTypeCode: {
-                      name: 'Document reference',
-                      value: 'CAW',
-                    },
-                    ID: 'GBR-2023-CC-TEST123',
-                    AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://example.com/cert',
-                    },
+                  IssueDateTime: {
+                    DateTime: "2025-10-06T16:50:38.944+02:00"
                   },
-                },
-              },
+                  StatusCode: {
+                    "@name": "Issued (Validated)",
+                    text: "70"
+                  },
+                  ReasonInformation: "Message has been successfully processed",
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Goods control certificate (Catch Processing Statement)",
+                        text: "841"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        "@schemeAgencyID": "GB",
+                        text: "110632"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/processing-statement/CATCH.PS.GB.2025.0000069"
+                      }
+                    }
+                  ]
+                }
+              }
             },
             Fault: {
               faultcode: 'SOAP-ENV:Server',
@@ -417,10 +635,19 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-neither',
+              "@severity": "debugging",
+              "@xmlns": "http://ec.europa.eu/sanco/tracesnt/message/v1",
+              ID: "WS_REQUEST_ID",
+              Message: "eb9dc56a-a8df-44b7-9a02-2d03ecec748d"
             },
+            Security: {
+              "@xmlns:ns1": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+              "@xmlns:ns2": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+              TimestampType: {
+                Created: "2025-10-06T16:50:40.447+02:00",
+                Expires: "2025-10-06T16:50:45.447+02:00"
+              }
+            }
           },
           Body: {
             // Neither SubmitCatchResponse nor Fault
@@ -490,27 +717,41 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
           },
           Body: {
             SubmitCatchResponse: {
+              "@xmlns": "http://ec.europa.eu/tracesnt/certificate/catch/submission/v1",
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
-                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
-                  StatusCode: { name: 'Issued', value: '70' },
-                  // Missing ReasonInformation
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: { name: 'Certificate', value: '16' },
-                    RelationshipTypeCode: {
-                      name: 'Document reference',
-                      value: 'CAW',
-                    },
-                    ID: 'GBR-2023-CC-TEST123',
-                    AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://example.com/cert',
-                    },
+                  IssueDateTime: {
+                    DateTime: "2025-10-06T16:50:38.944+02:00"
                   },
-                },
-              },
-            },
+                  StatusCode: {
+                    "@name": "Issued (Validated)",
+                    text: "70"
+                  },
+                  ReasonInformation: "Message has been successfully processed",
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Goods control certificate (Catch Processing Statement)",
+                        text: "841"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        "@schemeAgencyID": "GB",
+                        text: "110632"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/processing-statement/CATCH.PS.GB.2025.0000069"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
         },
       };
@@ -530,41 +771,58 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-with-security',
+              "@severity": "debugging",
+              "@xmlns": "http://ec.europa.eu/sanco/tracesnt/message/v1",
+              ID: "WS_REQUEST_ID",
+              Message: "eb9dc56a-a8df-44b7-9a02-2d03ecec748d"
             },
             Security: {
+              "@xmlns:ns1": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+              "@xmlns:ns2": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
               TimestampType: {
-                Created: '2025-11-21T10:00:00Z',
-                Expires: '2025-11-21T11:00:00Z',
-              },
-            },
+                Created: "2025-10-06T16:50:40.447+02:00",
+                Expires: "2025-10-06T16:50:45.447+02:00"
+              }
+            }
           },
           Body: {
             SubmitCatchResponse: {
+              "@xmlns": "http://ec.europa.eu/tracesnt/certificate/catch/submission/v1",
               SPSAcknowledgement: {
                 SPSAcknowledgementDocument: {
-                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
-                  StatusCode: { name: 'Issued', value: '70' },
-                  ReasonInformation: 'Processed',
-                  fesDocNumber: 'GBR-2023-CC-TEST123',
-                  ReferenceSPSReferencedDocument: {
-                    TypeCode: { name: 'Certificate', value: '16' },
-                    RelationshipTypeCode: {
-                      name: 'Document reference',
-                      value: 'CAW',
-                    },
-                    ID: 'EU.CATCH.2023.CC',
-                    AttachmentBinaryObject: {
-                      format: 'url',
-                      mimeCode: 'text/url',
-                      uri: 'https://example.com/cert',
-                    },
+                  IssueDateTime: {
+                    DateTime: "2025-10-06T16:50:38.944+02:00"
                   },
-                },
-              },
-            },
+                  StatusCode: {
+                    "@name": "Issued (Validated)",
+                    text: "70"
+                  },
+                  fesDocNumber: "GBR-2023-CC-TEST123",
+                  ReasonInformation: "Message has been successfully processed",
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        "@name": "Goods control certificate (Catch Processing Statement)",
+                        text: "841"
+                      },
+                      RelationshipTypeCode: {
+                        "@name": "Document reference, internal (Document reference, internal)",
+                        text: "CAW"
+                      },
+                      ID: {
+                        "@schemeAgencyID": "GB",
+                        text: "110632"
+                      },
+                      AttachmentBinaryObject: {
+                        "@format": "url",
+                        "@mimeCode": "text/url",
+                        "@uri": "https://webgate.acceptance.ec.europa.eu/tracesnt-beta/certificate/catch-certificate/processing-statement/CATCH.PS.GB.2025.0000069"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
         },
       };
@@ -597,10 +855,19 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
-              ID: 'WS_REQUEST_ID',
-              Message: 'test-request-empty-errors',
+              "@severity": "debugging",
+              "@xmlns": "http://ec.europa.eu/sanco/tracesnt/message/v1",
+              ID: "WS_REQUEST_ID",
+              Message: "eb9dc56a-a8df-44b7-9a02-2d03ecec748d"
             },
+            Security: {
+              "@xmlns:ns1": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+              "@xmlns:ns2": "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+              TimestampType: {
+                Created: "2025-10-06T16:50:40.447+02:00",
+                Expires: "2025-10-06T16:50:45.447+02:00"
+              }
+            }
           },
           Body: {
             Fault: {
@@ -631,7 +898,7 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
         Envelope: {
           Header: {
             Message: {
-              severity: 'debugging',
+              '@severity': 'debugging',
               ID: 'WS_REQUEST_ID',
               Message: 'test-request-empty-field',
             },
@@ -722,6 +989,117 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(euUpgradeRoute).toBeDefined();
       expect(euUpgradeRoute?.settings.description).toBe(
         'Receive EU CATCH status callbacks from BOOMI',
+      );
+    });
+
+    it('should return 404 when certificate is not found', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              '@severity': 'debugging',
+              ID: 'WS_REQUEST_ID',
+              Message: 'test-request-not-found',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
+                  StatusCode: { '@name': 'Issued', text: '70' },
+                  ReasonInformation: 'Processed',
+                  fesDocNumber: 'GBR-2023-CC-NOTFOUND',
+                  ReferenceSPSReferencedDocument: [{
+                    TypeCode: { '@name': 'Certificate', text: '16' },
+                    RelationshipTypeCode: {
+                      '@name': 'Document reference',
+                      text: 'CAW',
+                    },
+                    ID: { "@schemeAgencyID": "GB", text: 'EU.CATCH.CC.NOTFOUND' },
+                    AttachmentBinaryObject: {
+                      "@format": 'url',
+                      "@mimeCode": 'text/url',
+                      "@uri": 'https://example.com/cert',
+                    },
+                  }]
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockRejectedValueOnce(
+        new Error('Certificate not found: GBR-2023-CC-NOTFOUND'),
+      );
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(404);
+      expect(response.result).toEqual({ error: 'Certificate not found' });
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[EU-UPGRADE][ENDPOINT][ERROR][Certificate not found: GBR-2023-CC-NOTFOUND]',
+      );
+    });
+
+    it('should return 500 for internal server errors', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              '@severity': 'debugging',
+              ID: 'WS_REQUEST_ID',
+              Message: 'test-request-server-error',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: { DateTime: '2025-11-21T10:00:00Z' },
+                  StatusCode: { '@name': 'Issued', text: '70' },
+                  ReasonInformation: 'Processed',
+                  fesDocNumber: 'GBR-2023-CC-TEST123',
+                  ReferenceSPSReferencedDocument: [{
+                    TypeCode: { '@name': 'Certificate', text: '16' },
+                    RelationshipTypeCode: {
+                      '@name': 'Document reference',
+                      text: 'CAW',
+                    },
+                    ID: { "@schemeAgencyID": "GB", text: 'EU.CATCH.CC.0123456789' },
+                    AttachmentBinaryObject: {
+                      "@format": 'url',
+                      "@mimeCode": 'text/url',
+                      "@uri": 'https://example.com/cert',
+                    },
+                  }]
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockRejectedValueOnce(
+        new Error('Unexpected database error'),
+      );
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(500);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[EU-UPGRADE][ENDPOINT][ERROR][Unexpected database error]',
       );
     });
   });

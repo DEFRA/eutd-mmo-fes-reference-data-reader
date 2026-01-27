@@ -38,10 +38,6 @@ export interface ICatchStatus {
 export const processEuUpgradeCallback = async (
   callbackData: IEuUpgradeCallback,
 ): Promise<void> => {
-  const requestId = callbackData.Envelope.Header.Message.Message;
-
-  logger.info(`[EU-UPGRADE][CALLBACK][REQUEST-ID:${requestId}]`);
-
   try {
     // Validate and process the callback data using the shared service
     const result = BoomiService.processEuUpgradeCallback(callbackData);
@@ -51,9 +47,7 @@ export const processEuUpgradeCallback = async (
     await updateCertificateEuCatchStatus(result.documentNumber, result);
     logger.info(`[EU-UPGRADE][CALLBACK][SUCCESS][CERTIFICATE-ID:${result.documentNumber}][DATABASE-UPDATED]`);
   } catch (error) {
-    logger.error(
-      `[EU-UPGRADE][CALLBACK][ERROR][REQUEST-ID:${requestId}][${error.message}]`,
-    );
+    logger.error( `[EU-UPGRADE][CALLBACK][ERROR][${error.message}]`);
     throw error;
   }
 };

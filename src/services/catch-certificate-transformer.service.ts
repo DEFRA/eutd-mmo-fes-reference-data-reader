@@ -96,7 +96,7 @@ export default class CatchCertificateTransformerService {
             value: 'ALE'
           },
           ID: {
-            value: 'Regulation No 1005/2008 ARTICLE 12 ANNEX II'
+            value: 'Regulation (EU) 2023/2842'
           }
         }
       ],
@@ -282,7 +282,7 @@ export default class CatchCertificateTransformerService {
       'containerVessel': 'Maritime transport'
     };
 
-    const schemeAgencyID = {
+    const schemeID = {
       'truck': 'road_vehicle_registration_before_bcp',
       'train': 'train_identifier_before_bcp',
       'plane': 'airplane_flight_number_before_bcp',
@@ -318,12 +318,29 @@ export default class CatchCertificateTransformerService {
       }
     }
 
+    const getSchemeAgencyID: (transport: any) => string = (transport: any) => {
+      if (transport.vehicle === TRANSPORT_VEHICLE_TRUCK) {
+          const countries: ICountry[] = getCountries();
+          const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
+          return countryID?.isoCodeAlpha2 ?? 'GB';
+      }
+
+      return null;
+    }
+
+    const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : null;
+
     return transportations?.map((transport: any) => {
       const vehicle = transport.vehicle;
+      const schemeAgencyID = getSchemeAgencyID(transport);
+      const schemeAgencyName = getSchemeAgencyName(transport);
+
       const commonTransportInformation = {
         ID: {
-          schemeID: schemeAgencyID[vehicle],
+          schemeID: schemeID[vehicle],
           schemeName: schemeName[vehicle],
+          schemeAgencyID: schemeAgencyID ? schemeAgencyID : undefined,
+          schemeAgencyName: schemeAgencyName ? schemeAgencyName : undefined,
           value: getTransportId(transport)
         },
         ModeCode: {
@@ -347,6 +364,19 @@ export default class CatchCertificateTransformerService {
 
   private static buildTransportEquipment(transportations: any[]): any {
     return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => {
+      // Handle containerNumbers (comma-separated string from multiple containers)
+      if (transport.containerNumbers) {
+        const containerArray = transport.containerNumbers.split(',').map((cn: string) => cn.trim());
+        const containerEquipments = containerArray.map((containerNum: string) => ({
+          ID: {
+            schemeID: 'container_number',
+            value: containerNum
+          }
+        }));
+        return [...utilizedSPSTransportEquipments, ...containerEquipments];
+      }
+      
+      // Fallback to single containerNumber for backwards compatibility
       if (transport.containerNumber) {
         return [...utilizedSPSTransportEquipments, {
           ID: {
