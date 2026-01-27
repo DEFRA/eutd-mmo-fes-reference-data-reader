@@ -141,7 +141,8 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
     facilityArrivalDate: exportData.facilityArrivalDate,
     facilityStorage: exportData.facilityStorage,
     transport: exportData.transportation,
-    arrivalTransport: exportData.arrivalTransportation
+    arrivalTransport: exportData.arrivalTransportation,
+    unloadingPlace: exportData.unloadingPlace
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-SD-TO-UN-CEFACT]`);
   const transformedPayload = operation === 'void' ? {

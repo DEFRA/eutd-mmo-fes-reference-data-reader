@@ -187,36 +187,3 @@ export const getApplicationSPSClassification = (commoditityCode: string | undefi
     }) => commodity.code === commoditityCode)?.description ?? ''
   }
 })
-
-export const validateUKPSNumberFormat = (str: string) => {
-  const regex = /^GBR-\d{4}-PS-[A-Z0-9]{9}$/;
-  return regex.test(str);
-}
-
-export const validateUKSDNumberFormat = (str: string) => {
-  const regex = /^GBR-\d{4}-SD-[A-Z0-9]{9}$/;
-  return regex.test(str);
-}
-
-// Unique Flag Codes: from vessel file
-// GBR - Great Britain (United Kingdom)
-// GGY - Guernsey
-// IMN - Isle of Man
-// JEY - Jersey
-const countryISOMapping = {
-  GBR: "GB",
-  GGY: "GB",
-  IMN: "GB",
-  JEY: "GB",
-}
-
-export function getCountryISO2(countryCode: string) {
-  return countryISOMapping[countryCode]
-}
-
-export const exportedFromMapping = {
-  ['United Kingdom']: 'GB',
-  ['Guernsey']: 'GG',
-  ['Isle Of Man']: 'IM',
-  ['Jersey']: 'JJ'
-}
