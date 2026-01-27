@@ -139,7 +139,8 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
     facilityPostcode: exportData.facilityPostcode,
     facilityArrivalDate: exportData.facilityArrivalDate,
     facilityStorage: exportData.facilityStorage,
-    transport: exportData.transport,
+    transport: exportData.transportation,
+    arrivalTransport: exportData.arrivalTransportation,
     unloadingPlace: exportData.unloadingPlace
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-SD-TO-UN-CEFACT]`);

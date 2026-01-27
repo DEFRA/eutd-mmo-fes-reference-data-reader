@@ -1,11 +1,6 @@
 import moment from 'moment';
 import logger from '../logger';
-import { getCommodities } from '../controllers/species';
-
-const validateUKPSNumberFormat = (str: string) => {
-  const regex = /^GBR-\d{4}-PS-[A-Z0-9]{9}$/;
-  return regex.test(str);
-}
+import { getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat } from '../data/euCatch';
 
 /**
  * Transforms processing statement data into UN/CEFACT CATCH API JSON schema format
@@ -69,15 +64,7 @@ export default class ProcessingStatementTransformerService {
           value: createdAt.toISOString()
         }
       },
-      IssuerSPSParty: {
-        Name: {
-          languageID: 'en',
-          value: 'Marine Management Organization'
-        },
-        RoleCode: {
-          value: 'VJ'
-        }
-      },
+      IssuerSPSParty,
       ReferenceSPSReferencedDocument: [
         {
           TypeCode: {
@@ -118,66 +105,7 @@ export default class ProcessingStatementTransformerService {
           }
         }
       ],
-      SignatorySPSAuthentication: [
-        {
-          TypeCode: {
-            value: '5'
-          },
-          ActualDateTime: {
-            DateTime: {
-              value: createdAt.toISOString()
-            }
-          },
-          ProviderSPSParty: {
-            Name: {
-              value: 'Official Inspector'
-            },
-            RoleCode: {
-              value: 'VJ'
-            },
-            SpecifiedSPSPerson: {
-              Name: {
-                value: ''
-              }
-            }
-          },
-          IncludedSPSClause: {
-            Content: {
-              value: ''
-            }
-          }
-        },
-        {
-          TypeCode: {
-            value: '1'
-          },
-          ActualDateTime: {
-            DateTime: {
-              value: createdAt.toISOString()
-            }
-          },
-          ProviderSPSParty: {
-            Name: {
-              languageID: 'en',
-              value: ''
-            },
-            RoleCode: {
-              value: 'VJ'
-            },
-            SpecifiedSPSPerson: {
-              Name: {
-                languageID: 'en',
-                value: ''
-              },
-              AttainedSPSQualification: {
-                Name: {
-                  value: ''
-                }
-              }
-            }
-          }
-        }
-      ]
+      SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
     };
   }
 
@@ -443,27 +371,7 @@ export default class ProcessingStatementTransformerService {
           value: ctch.exportWeightAfterProcessing?.toString()
         },
         AdditionalInformationSPSNote: notes,
-        ApplicableSPSClassification: {
-          SystemID: {
-            value: 'CN'
-          },
-          SystemName: {
-            languageID: 'en',
-            languageLocaleID: 'en',
-            value: 'CN Code'
-          },
-          ClassCode: {
-            value: ctch.productCommodityCode ? ctch.productCommodityCode.substring(0, 6) : ''
-          },
-          ClassName: {
-            languageID: 'en',
-            languageLocaleID: 'en',
-            value: getCommodities()?.find((commodity: {
-              code: string;
-              description: string;
-            }) => commodity.code === ctch.productCommodityCode)?.description ?? ''
-          }
-        }
+        ApplicableSPSClassification: getApplicationSPSClassification(ctch.productCommodityCode)
       };
     })
   }
