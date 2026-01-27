@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
 
 /**
@@ -327,13 +327,21 @@ export default class StorageNotesTransformerService {
     const notes = [];
 
     if (catchData.certificateNumber) {
+      let localReference = 'CATCH_CERTIFICATE_LOCAL_REFERENCE';
+
+      if (validateUKPSNumberFormat(catchData.certificateNumber)) {
+        localReference = 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE'
+      } else if (validateUKSDNumberFormat(catchData.certificateNumber)) {
+        localReference = 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE'
+      }
+
       notes.push({
         Content: {
           languageID: 'en',
           value: catchData.certificateNumber
         },
         SubjectCode: {
-          value: 'CATCH_CERTIFICATE_LOCAL_REFERENCE'
+          value: localReference
         }
       });
     }
