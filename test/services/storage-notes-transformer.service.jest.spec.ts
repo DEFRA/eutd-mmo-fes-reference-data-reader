@@ -699,5 +699,302 @@ describe('StorageNotesTransformerService', () => {
         expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe("O'Brien's Cold Storage & Co.");
       });
     });
+
+    describe('Certificate number validation and SubjectCode assignment', () => {
+      it('should set SubjectCode to CATCH_CERTIFICATE_LOCAL_REFERENCE for standard catch certificate', () => {
+        const exportDataWithCC = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-CC-001234',
+            product: 'Atlantic cod (COD)',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithCC
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const certificateNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.Content.value === 'GBR-2025-CC-001234'
+        );
+
+        expect(certificateNote).toBeDefined();
+        expect(certificateNote.SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
+      });
+
+      it('should set SubjectCode to CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE for UKPS certificate', () => {
+        const exportDataWithUKPS = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-PS-001234',
+            product: 'Atlantic cod (COD)',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithUKPS
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const certificateNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.Content.value === 'GBR-2025-PS-001234'
+        );
+
+        expect(certificateNote).toBeDefined();
+        expect(certificateNote.SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE');
+      });
+
+      it('should set SubjectCode to CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE for UKSD certificate', () => {
+        const exportDataWithUKSD = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-SD-001234',
+            product: 'Atlantic cod (COD)',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithUKSD
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const certificateNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.Content.value === 'GBR-2025-SD-001234'
+        );
+
+        expect(certificateNote).toBeDefined();
+        expect(certificateNote.SubjectCode.value).toBe('CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE');
+      });
+
+      it('should not add certificate note when certificateNumber is missing', () => {
+        const exportDataWithoutCertificate = {
+          ...baseExportData,
+          catches: [{
+            product: 'Atlantic cod (COD)',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutCertificate
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const certificateNotes = tradeLineItem.AdditionalInformationSPSNote.filter(
+          (note: any) => ['CATCH_CERTIFICATE_LOCAL_REFERENCE', 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE', 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE'].includes(note.SubjectCode.value)
+        );
+
+        expect(certificateNotes).toHaveLength(0);
+      });
+
+      it('should not add certificate note when certificateNumber is empty string', () => {
+        const exportDataWithEmptyCertificate = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: '',
+            product: 'Atlantic cod (COD)',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithEmptyCertificate
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const certificateNotes = tradeLineItem.AdditionalInformationSPSNote.filter(
+          (note: any) => ['CATCH_CERTIFICATE_LOCAL_REFERENCE', 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE', 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE'].includes(note.SubjectCode.value)
+        );
+
+        expect(certificateNotes).toHaveLength(0);
+      });
+
+      it('should handle multiple catches with different certificate types', () => {
+        const exportDataWithMultipleCertificates = {
+          ...baseExportData,
+          catches: [
+            {
+              certificateNumber: 'GBR-2025-CC-001234',
+              product: 'Atlantic cod (COD)',
+              commoditityCode: '030111',
+              netWeightProductArrival: 100,
+              netWeightFisheryProductArrival: 105
+            },
+            {
+              certificateNumber: 'GBR-2025-PS-005678',
+              product: 'Atlantic salmon (SAL)',
+              commoditityCode: '030121',
+              netWeightProductArrival: 200,
+              netWeightFisheryProductArrival: 210
+            },
+            {
+              certificateNumber: 'GBR-2025-SD-009999',
+              product: 'European plaice (PLE)',
+              commoditityCode: '030131',
+              netWeightProductArrival: 150,
+              netWeightFisheryProductArrival: 155
+            }
+          ]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithMultipleCertificates
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItems = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+
+        expect(tradeLineItems).toHaveLength(3);
+
+        // Verify first catch (CC)
+        const firstCertNote = tradeLineItems[0].AdditionalInformationSPSNote.find(
+          (note: any) => note.Content.value === 'GBR-2025-CC-001234'
+        );
+        expect(firstCertNote.SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
+
+        // Verify second catch (PS)
+        const secondCertNote = tradeLineItems[1].AdditionalInformationSPSNote.find(
+          (note: any) => note.Content.value === 'GBR-2025-PS-005678'
+        );
+        expect(secondCertNote.SubjectCode.value).toBe('CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE');
+
+        // Verify third catch (SD)
+        const thirdCertNote = tradeLineItems[2].AdditionalInformationSPSNote.find(
+          (note: any) => note.Content.value === 'GBR-2025-SD-009999'
+        );
+        expect(thirdCertNote.SubjectCode.value).toBe('CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE');
+      });
+
+      it('should always include CATCH_ISSUING_COUNTRY note with value GB', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const issuingCountryNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'CATCH_ISSUING_COUNTRY'
+        );
+
+        expect(issuingCountryNote).toBeDefined();
+        expect(issuingCountryNote.Content.value).toBe('GB');
+        expect(issuingCountryNote.Content.languageID).toBe('en');
+      });
+
+      it('should include SPECIES note when product is present', () => {
+        const exportDataWithProduct = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-CC-001234',
+            product: 'Atlantic cod (COD)',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithProduct
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const speciesNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'SPECIES'
+        );
+
+        expect(speciesNote).toBeDefined();
+        expect(speciesNote.Content.value).toBe('Atlantic cod (COD)');
+        expect(speciesNote.Content.languageID).toBe('en');
+      });
+
+      it('should not include SPECIES note when product is missing', () => {
+        const exportDataWithoutProduct = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-CC-001234',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutProduct
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const speciesNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'SPECIES'
+        );
+
+        expect(speciesNote).toBeUndefined();
+      });
+
+      it('should not include SPECIES note when product is empty string', () => {
+        const exportDataWithEmptyProduct = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-CC-001234',
+            product: '',
+            commoditityCode: '030111',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithEmptyProduct
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const speciesNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'SPECIES'
+        );
+
+        expect(speciesNote).toBeUndefined();
+      });
+    });
   });
 });

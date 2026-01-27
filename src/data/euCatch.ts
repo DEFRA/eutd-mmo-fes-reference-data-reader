@@ -187,3 +187,13 @@ export const getApplicationSPSClassification = (commoditityCode: string | undefi
     }) => commodity.code === commoditityCode)?.description ?? ''
   }
 })
+
+export const validateUKPSNumberFormat = (str: string) => {
+  const regex = /^GBR-\d{4}-PS-[A-Z0-9]{9}$/;
+  return regex.test(str);
+}
+
+export const validateUKSDNumberFormat = (str: string) => {
+  const regex = /^GBR-\d{4}-SD-[A-Z0-9]{9}$/;
+  return regex.test(str);
+}

@@ -1,11 +1,6 @@
 import moment from 'moment';
 import logger from '../logger';
-import { getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty } from '../data/euCatch';
-
-const validateUKPSNumberFormat = (str: string) => {
-  const regex = /^GBR-\d{4}-PS-[A-Z0-9]{9}$/;
-  return regex.test(str);
-}
+import { getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat } from '../data/euCatch';
 
 /**
  * Transforms processing statement data into UN/CEFACT CATCH API JSON schema format
