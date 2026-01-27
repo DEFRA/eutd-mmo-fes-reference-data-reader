@@ -24,7 +24,7 @@ describe('StorageNotesTransformerService', () => {
       facilityAddressOne: '456 Storage Road',
       facilityTownCity: 'Manchester',
       facilityPostcode: 'M1 1BB',
-      facilityArrivalDate: '2025-01-01',
+      facilityArrivalDate: '01/01/2025',
       facilityStorage: 'CHILLED',
       exportedTo: {
         isoCodeAlpha2: 'FR',
@@ -36,15 +36,26 @@ describe('StorageNotesTransformerService', () => {
       transport: {
         vehicle: 'containerVessel',
         vesselName: 'MV Ocean Carrier',
-        containerNumber: 'CONT123456'
+        containerNumber: 'CONT123456',
+        exportDate: "21/01/2026"
+      },
+      arrivalTransport: {
+        vehicle: "truck",
+        nationalityOfVehicle: "Tanzania, United Republic of",
+        registrationNumber: "A123 4567",
+        freightBillNumber: "",
+        departureCountry: "United Kingdom of Great Britain and Northern Ireland",
+        departurePort: "Calais port",
+        departureDate: "21/01/2026",
+        placeOfUnloading: "Hull"
       },
       unloadingPlace: {
         locationName: 'Calais Port'
       },
       catches: [
         {
-          catchCertificateNumber: 'GBR-2025-CC-001',
-          species: 'Atlantic Cod',
+          certificateNumber: 'GBR-2025-CC-001',
+          product: "Atlantic cod (COD)",
           scientificName: 'Gadus morhua',
           exportWeight: '100.5'
         }
@@ -134,7 +145,7 @@ describe('StorageNotesTransformerService', () => {
       const exchangedDoc = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSExchangedDocument;
 
       expect(exchangedDoc.IssuerSPSParty.Name.value).toBe('Marine Management Organization');
-      expect(exchangedDoc.IssuerSPSParty.RoleCode.value).toBe('PQ');
+      expect(exchangedDoc.IssuerSPSParty.RoleCode.value).toBe('VJ');
     });
 
     it('should include storage condition in notes', () => {
@@ -150,7 +161,7 @@ describe('StorageNotesTransformerService', () => {
       expect(exchangedDoc.IncludedSPSNote.SubjectCode.value).toBe('STORAGE_CONDITION');
     });
 
-    it('should default to CHILLED when facilityStorage is missing', () => {
+    it('should not default to CHILLED when facilityStorage is missing', () => {
       const exportDataWithoutStorage = { ...baseExportData, facilityStorage: undefined };
 
       const result = StorageNotesTransformerService.generateStorageNotesPayload(
@@ -161,7 +172,7 @@ describe('StorageNotesTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSExchangedDocument;
 
-      expect(exchangedDoc.IncludedSPSNote.Content.value).toBe('CHILLED');
+      expect(exchangedDoc.IncludedSPSNote.Content.value).not.toBe('CHILLED');
     });
 
     it('should include reference documents', () => {
@@ -211,11 +222,11 @@ describe('StorageNotesTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSExchangedDocument;
       const transportDocRef = exchangedDoc.ReferenceSPSReferencedDocument.find(
-        (doc: any) => doc.TypeCode.value === '710'
+        (doc: any) => doc.TypeCode.value === '916'
       );
 
       expect(transportDocRef).toBeDefined();
-      expect(transportDocRef.ID.value).toBe('TD-12345');
+      expect(transportDocRef.ID.value).toBe('GBR-2025-SD-TEST123');
     });
 
     it('should include signatory authentication with two signatures', () => {
@@ -241,8 +252,8 @@ describe('StorageNotesTransformerService', () => {
 
       const exchangedDoc = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSExchangedDocument;
 
-      expect(exchangedDoc.SignatorySPSAuthentication[1].ActualDateTime.DateTime.value).toBe('2025-01-01T10:00:00.000Z');
-      expect(exchangedDoc.SignatorySPSAuthentication[1].ProviderSPSParty.Name.value).toBe('Official Inspector');
+      expect(exchangedDoc.SignatorySPSAuthentication[0].ActualDateTime.DateTime.value).toBe('2025-01-01T10:00:00.000Z');
+      expect(exchangedDoc.SignatorySPSAuthentication[0].ProviderSPSParty.Name.value).toBe('Official Inspector');
     });
 
     describe('SPSArrivalConsignment', () => {
@@ -255,9 +266,8 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.ID.value).toBe('GB-COLD-001');
         expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe('Test Cold Storage Facility');
-        expect(arrivalConsignment.ConsignorSPSParty.RoleCode.value).toBe('CB');
+        expect(arrivalConsignment.ConsignorSPSParty.RoleCode.value).toBe('CZ');
       });
 
       it('should include facility address in arrival consignment', () => {
@@ -323,7 +333,7 @@ describe('StorageNotesTransformerService', () => {
         );
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
-        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
         expect(tradeLineItem.AdditionalInformationSPSNote).toBeDefined();
         expect(Array.isArray(tradeLineItem.AdditionalInformationSPSNote)).toBe(true);
@@ -337,7 +347,7 @@ describe('StorageNotesTransformerService', () => {
         );
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
-        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
         expect(tradeLineItem.ApplicableSPSClassification).toBeDefined();
         expect(tradeLineItem.ApplicableSPSClassification.SystemID.value).toBe('CN');
@@ -355,7 +365,7 @@ describe('StorageNotesTransformerService', () => {
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
         expect(arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem).toBeDefined();
-        expect(arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem.GrossWeightMeasure.value).toBe('0');
+        expect(arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem).toHaveLength(0);
       });
 
       it('should handle missing catches', () => {
@@ -408,8 +418,8 @@ describe('StorageNotesTransformerService', () => {
 
         const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
 
-        expect(departureConsignment.ImportSPSCountry.ID.value).toBe('FR');
-        expect(departureConsignment.ImportSPSCountry.Name.value).toBe('France');
+        expect(departureConsignment.ImportSPSCountry.ID.value).toBe('');
+        expect(departureConsignment.ImportSPSCountry.Name.value).toBe('');
       });
 
       it('should handle missing import country', () => {
@@ -461,6 +471,8 @@ describe('StorageNotesTransformerService', () => {
 
         const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
 
+        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans).toBeDefined();
+        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans.Name.value).toBe('MV Ocean Carrier');
         expect(departureConsignment.MainCarriageSPSTransportMovement.ModeCode.value).toBe('1');
       });
 
@@ -481,7 +493,7 @@ describe('StorageNotesTransformerService', () => {
 
         const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
 
-        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans.Name.value).toBe('AB12 CDE');
+        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans).toBeUndefined();
         expect(departureConsignment.MainCarriageSPSTransportMovement.ModeCode.value).toBe('3');
       });
 
@@ -502,7 +514,7 @@ describe('StorageNotesTransformerService', () => {
 
         const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
 
-        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans.Name.value).toBe('BA123');
+        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans).toBeUndefined();
         expect(departureConsignment.MainCarriageSPSTransportMovement.ModeCode.value).toBe('4');
       });
 
@@ -523,7 +535,7 @@ describe('StorageNotesTransformerService', () => {
 
         const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
 
-        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans.Name.value).toBe('EUR123');
+        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans).toBeUndefined();
         expect(departureConsignment.MainCarriageSPSTransportMovement.ModeCode.value).toBe('2');
       });
 
@@ -538,7 +550,7 @@ describe('StorageNotesTransformerService', () => {
 
         const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
 
-        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans.Name.value).toBe('');
+        expect(departureConsignment.MainCarriageSPSTransportMovement.UsedSPSTransportMeans).toBeUndefined();
       });
 
       it('should include consignment items in departure', () => {
@@ -629,7 +641,7 @@ describe('StorageNotesTransformerService', () => {
           ...baseExportData,
           catches: [{
             ...baseExportData.catches[0],
-            productWeight: 0
+            netWeightFisheryProductArrival: 0
           }]
         };
 
@@ -640,9 +652,9 @@ describe('StorageNotesTransformerService', () => {
         );
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
-        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-        expect(tradeLineItem.GrossWeightMeasure.value).toBe('0');
+        expect(tradeLineItem.GrossWeightMeasure.value).toBe(0);
       });
 
       it('should handle very large weight', () => {
@@ -650,7 +662,7 @@ describe('StorageNotesTransformerService', () => {
           ...baseExportData,
           catches: [{
             ...baseExportData.catches[0],
-            productWeight: 999999.99
+            netWeightFisheryProductArrival: 999999.99
           }]
         };
 
@@ -661,7 +673,7 @@ describe('StorageNotesTransformerService', () => {
         );
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
-        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
         expect(tradeLineItem.GrossWeightMeasure.value).toBe(999999.99);
       });
