@@ -66,17 +66,17 @@ const fetchDocumentData = async (documentNumber: string, docType: string): Promi
 const getDocumentNumberForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.documentNumber || 'UNKNOWN';
 const getOperationsForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.operation || 'submit';
 const getResourceType = (operation: "submit" | "void") => operation === 'void' ? 'catchVoid' : 'catchSubmit';
-const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCertificateRequest' | 'CancelProcessingStatementRequest')=> {
-    return {
-      [key]: {
-        SPSCertificate: {
-          ID: {
-            value: documentNumber
-          }
+const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCertificateRequest' | 'CancelProcessingStatementRequest') => {
+  return {
+    [key]: {
+      SPSCertificate: {
+        ID: {
+          value: documentNumber
         }
       }
     }
   }
+}
 
 
 async function handleCatchCertificateSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
@@ -94,7 +94,7 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void',  catchSubmission: ICatchStatus | undefined) {
+async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   const products = Array.isArray(exportData.products) ? exportData.products : [];
 
   const transformedExportData = {
@@ -126,7 +126,7 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-async function handleStorageNotesSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void') {
+async function handleStorageNotesSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   const transformedExportData = {
     catches: exportData.catches || [],
     exporterDetails: exportData.exporterDetails,
@@ -140,13 +140,20 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
     facilityArrivalDate: exportData.facilityArrivalDate,
     facilityStorage: exportData.facilityStorage,
     transport: exportData.transportation,
-    arrivalTransport: exportData.arrivalTransportation,
-    unloadingPlace: exportData.unloadingPlace
+    arrivalTransport: exportData.arrivalTransportation
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-SD-TO-UN-CEFACT]`);
-  const transformedPayload = StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
+  const transformedPayload = (operation === 'void') ? {
+    CancelCatchNonManipulationDocumentRequest: {
+      CatchNonManipulationDocument: {
+        ID: {
+          value: catchSubmission?.reference
+        }
+      }
+    }
+  } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
   const resourceType = getResourceType(operation);
-  const params = { documentType: "STORAGEDOCUMENT" };
+  const params = { documentType: "NONMANIPULATIONDOCUMENT" };
   const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
   const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
   await updateCertificateEuCatchStatus(documentNumber, statusData);
@@ -182,7 +189,7 @@ export const submitDocumentToBoomi = async (
     } else if (docType === 'processingStatement') {
       await handleProcessingStatementSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     } else if (docType === 'storageDocument') {
-      await handleStorageNotesSubmission(documentNumber, createdAt, exportData, operation);
+      await handleStorageNotesSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     }
 
   } catch (error) {

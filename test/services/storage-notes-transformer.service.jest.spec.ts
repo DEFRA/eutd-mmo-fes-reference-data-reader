@@ -49,9 +49,6 @@ describe('StorageNotesTransformerService', () => {
         departureDate: "21/01/2026",
         placeOfUnloading: "Hull"
       },
-      unloadingPlace: {
-        locationName: 'Calais Port'
-      },
       catches: [
         {
           certificateNumber: 'GBR-2025-CC-001',
@@ -380,6 +377,176 @@ describe('StorageNotesTransformerService', () => {
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
         expect(arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem).toBeDefined();
+      });
+
+      it('should include consignee receipt location in arrival consignment', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ConsigneeReceiptSPSLocation).toBeDefined();
+        expect(arrivalConsignment.ConsigneeReceiptSPSLocation.ID.value).toBe('');
+        expect(arrivalConsignment.ConsigneeReceiptSPSLocation.Name.value).toBe('Hull');
+      });
+
+      it('should set consignee party details in arrival consignment', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ConsigneeSPSParty).toBeDefined();
+        expect(arrivalConsignment.ConsigneeSPSParty.Name.value).toBe('Test Cold Storage Facility');
+        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('EX');
+      });
+
+      it('should set consignee party address in arrival consignment', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress).toBeDefined();
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Storage Road');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CityName.value).toBe('Manchester');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('M1 1BB');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CountryID.value).toBe('GB');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CountryName.value).toBe('UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND');
+      });
+
+      it('should set loading baseport location from arrival transport departure country', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.LoadingBaseportSPSLocation).toBeDefined();
+        expect(arrivalConsignment.LoadingBaseportSPSLocation.ID.value).toBe('');
+        expect(arrivalConsignment.LoadingBaseportSPSLocation.Name.languageID).toBe('en');
+        expect(arrivalConsignment.LoadingBaseportSPSLocation.Name.value).toBe('United Kingdom of Great Britain and Northern Ireland');
+      });
+
+      it('should set unloading baseport location from arrival transport departure port', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.UnloadingBaseportSPSLocation).toBeDefined();
+        expect(arrivalConsignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
+        expect(arrivalConsignment.UnloadingBaseportSPSLocation.Name.languageID).toBe('en');
+        expect(arrivalConsignment.UnloadingBaseportSPSLocation.Name.value).toBe('Calais port');
+      });
+
+      it('should handle missing arrival transport departure country', () => {
+        const exportDataWithoutDepartureCountry = {
+          ...baseExportData,
+          arrivalTransport: {
+            ...baseExportData.arrivalTransport,
+            departureCountry: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutDepartureCountry
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.LoadingBaseportSPSLocation.Name.value).toBeUndefined();
+      });
+
+      it('should handle missing arrival transport departure port', () => {
+        const exportDataWithoutDeparturePort = {
+          ...baseExportData,
+          arrivalTransport: {
+            ...baseExportData.arrivalTransport,
+            departurePort: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutDeparturePort
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.UnloadingBaseportSPSLocation.Name.value).toBeUndefined();
+      });
+
+      it('should handle missing unloading place', () => {
+        const exportDataWithoutUnloadingPlace = {
+          ...baseExportData,
+          arrivalTransport: {
+            ...baseExportData.arrivalTransport,
+            placeOfUnloading: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutUnloadingPlace
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ConsigneeReceiptSPSLocation.ID.value).toBe('');
+      });
+
+      it('should handle missing facility postcode', () => {
+        const exportDataWithoutPostcode = {
+          ...baseExportData,
+          facilityPostcode: undefined
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutPostcode
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('');
+      });
+
+      it('should handle missing entire arrival transport object', () => {
+        const exportDataWithoutArrivalTransport = {
+          ...baseExportData,
+          arrivalTransport: undefined
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutArrivalTransport
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.LoadingBaseportSPSLocation.Name.value).toBeUndefined();
+        expect(arrivalConsignment.UnloadingBaseportSPSLocation.Name.value).toBeUndefined();
       });
     });
 
