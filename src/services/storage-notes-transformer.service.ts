@@ -321,7 +321,7 @@ export default class StorageNotesTransformerService {
         value: type === 'arrival' ? ctch.netWeightFisheryProductArrival : ctch.netWeightFisheryProductDeparture
       },
       AdditionalInformationSPSNote: this.buildAdditionalNotes(ctch),
-      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commoditityCode)
+      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commodityCode)
     }));
   }
 
@@ -362,7 +362,7 @@ export default class StorageNotesTransformerService {
       notes.push({
         Content: {
           languageID: 'en',
-          value: catchData.product
+          value: toSpeciesCode(catchData.product)
         },
         SubjectCode: {
           value: 'SPECIES'
