@@ -832,7 +832,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
-        { documentType: 'NONMANIPULATIONDOCUMENT' },
+        { documentType: 'NMDOCUMENT' },
         'catchVoid'
       );
 
