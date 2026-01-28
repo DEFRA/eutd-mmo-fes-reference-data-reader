@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
+import { toSpeciesCode } from '../landings/transformations/dynamicsValidation';
 
 /**
  * Transforms storage notes data into UN/CEFACT CATCH API JSON schema format
@@ -320,7 +321,7 @@ export default class StorageNotesTransformerService {
         value: type === 'arrival' ? ctch.netWeightFisheryProductArrival : ctch.netWeightFisheryProductDeparture
       },
       AdditionalInformationSPSNote: this.buildAdditionalNotes(ctch),
-      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commoditityCode)
+      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commodityCode)
     }));
   }
 
@@ -361,7 +362,7 @@ export default class StorageNotesTransformerService {
       notes.push({
         Content: {
           languageID: 'en',
-          value: catchData.product
+          value: toSpeciesCode(catchData.product)
         },
         SubjectCode: {
           value: 'SPECIES'

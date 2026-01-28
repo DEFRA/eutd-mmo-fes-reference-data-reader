@@ -1106,7 +1106,7 @@ describe('StorageNotesTransformerService', () => {
         );
 
         expect(speciesNote).toBeDefined();
-        expect(speciesNote.Content.value).toBe('Atlantic cod (COD)');
+        expect(speciesNote.Content.value).toBe('COD');
         expect(speciesNote.Content.languageID).toBe('en');
       });
 
