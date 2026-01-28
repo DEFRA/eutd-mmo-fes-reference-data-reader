@@ -1,3 +1,5 @@
+import moment from 'moment';
+import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
 
 /**
@@ -12,31 +14,26 @@ export default class StorageNotesTransformerService {
   ): any {
     logger.info(`[STORAGE-NOTES-TRANSFORMER][GENERATING-PAYLOAD][${documentNumber}]`);
 
-    try {
-      const payload = {
-        CreateCatchNonManipulationDocumentRequest: {
-          CatchNonManipulationDocument: {
-            SPSExchangedDocument: this.buildNonManipulationExchangedDocument(documentNumber, createdAt, exportData),
-            SPSArrivalConsignment: this.buildConsignment(exportData, 'arrival'),
-            SPSDepartureConsignment: this.buildConsignment(exportData, 'departure')
-          }
+    const payload = {
+      CreateCatchNonManipulationDocumentRequest: {
+        CatchNonManipulationDocument: {
+          SPSExchangedDocument: this.buildNonManipulationExchangedDocument(documentNumber, createdAt, exportData),
+          SPSArrivalConsignment: this.buildConsignment(exportData, 'arrival'),
+          SPSDepartureConsignment: this.buildConsignment(exportData, 'departure')
         }
-      };
+      }
+    };
 
-      logger.info(`[STORAGE-NOTES-TRANSFORMER][PAYLOAD-GENERATED][${documentNumber}]`);
-      return payload;
-    } catch (error) {
-      logger.error(`[STORAGE-NOTES-TRANSFORMER][ERROR][${documentNumber}][${error.message}]`);
-      throw error;
-    }
+    logger.info(`[STORAGE-NOTES-TRANSFORMER][PAYLOAD-GENERATED][${documentNumber}]`);
+    return payload;
   }
 
   private static buildNonManipulationExchangedDocument(documentNumber: string, createdAt: Date, exportData: any): any {
-    const emptyNode = {
+    const EmptyNode = {
       value: ''
     };
 
-    const typeCode = {
+    const TypeCode = {
       listID: '1001',
       listAgencyID: '6',
       listVersionID: 'D16B',
@@ -45,7 +42,7 @@ export default class StorageNotesTransformerService {
       value: '16'
     };
 
-    const statusCode = {
+    const StatusCode = {
       listID: '4405',
       listAgencyID: '6',
       listVersionID: 'D16B',
@@ -54,155 +51,133 @@ export default class StorageNotesTransformerService {
       value: '39'
     };
 
-    const issuerSpsParty = {
-      Name: {
-        languageID: 'en',
-        value: 'Marine Management Organization'
-      },
-      RoleCode: {
-        value: 'PQ'
-      }
-    }
-
     return {
       Name: {
         languageID: 'en',
         value: 'Non Manipulation Document'
       },
-      Description: emptyNode,
-      ID: emptyNode,
-      TypeCode: typeCode,
-      StatusCode: statusCode,
+      ID: EmptyNode,
+      Description: EmptyNode,
+      TypeCode,
+      StatusCode,
       IssueDateTime: {
         DateTime: {
           value: createdAt.toISOString()
         }
       },
-      IssuerSPSParty: issuerSpsParty,
+      IssuerSPSParty,
       IncludedSPSNote: {
         Content: {
           languageID: 'en',
-          value: exportData?.facilityStorage || 'CHILLED'
+          value: exportData?.facilityStorage
         },
         SubjectCode: {
           languageID: 'en',
           value: 'STORAGE_CONDITION'
         }
       },
-      ReferenceSPSReferencedDocument: this.buildReferencedDocuments(documentNumber, exportData),
-      SignatorySPSAuthentication: this.buildAuthentications(createdAt)
+      ReferenceSPSReferencedDocument: [
+        {
+          TypeCode: {
+            value: '916'
+          },
+          RelationshipTypeCode: {
+            value: 'DM'
+          },
+          ID: {
+            value: documentNumber
+          }
+        }
+      ],
+      SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
     };
-  }
-
-  private static buildReferencedDocuments(documentNumber: string, exportData: any): any[] {
-    const documents = [
-      {
-        TypeCode: {
-          value: '916'
-        },
-        RelationshipTypeCode: {
-          value: 'DM'
-        },
-        ID: {
-          value: documentNumber
-        }
-      }
-    ];
-
-    // Add transport document reference if available
-    if (exportData?.transport?.transportDocumentReferenceNumber) {
-      documents.push({
-        TypeCode: {
-          value: '710'
-        },
-        RelationshipTypeCode: {
-          value: 'VON'
-        },
-        ID: {
-          value: exportData.transport.transportDocumentReferenceNumber,
-          schemeAgencyID: 'BEFORE_BCP'
-        }
-      } as any);
-    }
-
-    return documents;
-  }
-
-  private static buildAttainedSPSQualification(nameValue: string = '', languageID?: string) {
-    const nameObj: any = { value: nameValue };
-    if (languageID) nameObj.languageID = languageID;
-    return { Name: nameObj };
-  }
-
-  private static buildAuthentications(createdAt: Date): any[] {
-    return [
-      {
-        TypeCode: { value: '5' },
-        ActualDateTime: { DateTime: { value: createdAt.toISOString() } },
-        ProviderSPSParty: {
-          Name: { value: 'Official' },
-          RoleCode: { value: '' },
-          SpecifiedSPSPerson: {
-            Name: { value: 'John Dow' },
-            AttainedSPSQualification: this.buildAttainedSPSQualification('')
-          }
-        },
-        IncludedSPSClause: { Content: { value: '' } }
-      },
-      {
-        TypeCode: { value: '1' },
-        ActualDateTime: { DateTime: { value: createdAt.toISOString() } },
-        ProviderSPSParty: {
-          Name: { languageID: 'en', value: 'Official Inspector' },
-          RoleCode: { value: 'VJ' },
-          SpecifiedSPSPerson: {
-            Name: { languageID: 'en', value: 'John Doe' },
-            AttainedSPSQualification: this.buildAttainedSPSQualification('', 'en')
-          }
-        }
-      }
-    ];
   }
 
   private static buildConsignment(exportData: any, type: 'arrival' | 'departure'): any {
-    const consignment: any = {
-      ExportExitDateTime: {
-        DateTime: {
-          value: exportData?.transport?.exportDate
-            ? new Date(exportData.transport.exportDate).toISOString()
-            : new Date().toISOString()
-        }
-      }
-    };
+    const field: any = {};
 
     if (type === 'arrival') {
-      consignment.AvailabilityDueDateTime = {
+      field.AvailabilityDueDateTime = {
         DateTime: {
-          value: exportData?.facilityArrivalDate
-            ? new Date(exportData.facilityArrivalDate).toISOString()
-            : new Date().toISOString()
+          value: moment(exportData?.facilityArrivalDate, ["DD/MM/YYYY", "YYYY-MM-DD", "D/M/YYYY", "YYYY-M-D"]).toISOString()
         }
       };
 
-      consignment.ConsignorSPSParty = this.buildConsignorParty(exportData);
-      consignment.ConsigneeReceiptSPSLocation = this.buildConsigneeReceiptLocation(exportData);
-      consignment.ConsigneeSPSParty = this.buildConsigneeParty(exportData);
+      field.ExportExitDateTime = {
+        DateTime: {
+          value: moment(exportData?.arrivalTransport.departureDate, ["DD/MM/YYYY", "YYYY-MM-DD", "D/M/YYYY", "YYYY-M-D"]).toISOString()
+        }
+      };
+
+      field.ConsignorSPSParty = this.buildConsignorParty(exportData, type);
+      field.ConsigneeReceiptSPSLocation = this.buildConsigneeReceiptLocation(exportData);
+      field.ConsigneeSPSParty = this.buildConsigneeParty(exportData);
+
+      field.LoadingBaseportSPSLocation = {
+        ID: {
+          value: ''
+        },
+        Name: {
+          languageID: 'en',
+          value: exportData?.arrivalTransport.departureCountry
+        }
+      };
+
+      field.UnloadingBaseportSPSLocation = {
+        ID: {
+          value: ''
+        },
+        Name: {
+          languageID: 'en',
+          value: exportData?.arrivalTransport.departurePort
+        }
+      };
+
+      field.MainCarriageSPSTransportMovement = createMainCarriageSPSTransportMovement(exportData?.arrivalTransport);
     } else {
-      consignment.ConsignorSPSParty = {
+      field.ExportExitDateTime = {
+        DateTime: {
+          value: moment(exportData?.transport?.exportDate, ["DD/MM/YYYY", "YYYY-MM-DD", "D/M/YYYY", "YYYY-M-D"]).toISOString()
+        }
+      };
+
+      field.ConsignorSPSParty = {
         Name: {
           languageID: 'en',
           value: ''
         }
       };
-      consignment.ConsigneeSPSParty = {
+      field.ConsigneeSPSParty = {
         Name: {
           languageID: 'en',
           value: ''
         }
       };
+
+      field.LoadingBaseportSPSLocation = {
+        ID: {
+          value: ''
+        },
+        Name: {
+          languageID: 'en',
+          value: exportData?.transport?.departurePlace
+        }
+      };
+
+      field.UnloadingBaseportSPSLocation = {
+        ID: {
+          value: ''
+        },
+        Name: {
+          languageID: 'en',
+          value: exportData?.transport?.pointOfDestination
+        }
+      };
+
+      field.MainCarriageSPSTransportMovement = createMainCarriageSPSTransportMovement(exportData?.transport);
     }
 
-    consignment.ExportSPSCountry = {
+    field.ExportSPSCountry = {
       ID: {
         value: 'GB'
       },
@@ -212,11 +187,17 @@ export default class StorageNotesTransformerService {
       }
     };
 
-    consignment.LoadingBaseportSPSLocation = this.buildLocation(exportData?.exportLocation);
-    consignment.ImportSPSCountry = this.buildLocation(exportData?.exportedTo);
-    consignment.UnloadingBaseportSPSLocation = this.buildLocation(exportData?.exportedTo);
+    field.ImportSPSCountry = {
+      ID: {
+        value: ''
+      },
+      Name: {
+        languageID: 'en',
+        value: ''
+      }
+    };
 
-    consignment.ExaminationSPSEvent = {
+    field.ExaminationSPSEvent = {
       OccurrenceSPSLocation: {
         ID: {
           value: ''
@@ -227,32 +208,30 @@ export default class StorageNotesTransformerService {
       }
     };
 
-    consignment.MainCarriageSPSTransportMovement = this.buildTransportMovement(exportData);
-    consignment.IncludedSPSConsignmentItem = this.buildConsignmentItems(exportData);
+    field.IncludedSPSConsignmentItem = {
+      IncludedSPSTradeLineItem: this.buildConsignmentItems(exportData, type)
+    }
 
-    return consignment;
+    return field;
   }
 
-  private static buildConsignorParty(exportData: any): any {
+  private static buildConsigneeParty(exportData: any): any {
     return {
-      ID: {
-        value: exportData?.facilityApprovalNumber || 'Facility ID'
-      },
       Name: {
         languageID: 'en',
-        value: exportData?.facilityName || 'Facility Name'
+        value: exportData?.facilityName
       },
       RoleCode: {
-        value: 'CB'
+        value: 'EX'
       },
       SpecifiedSPSAddress: {
         LineOne: {
           languageID: 'en',
-          value: exportData?.facilityAddressOne || ''
+          value: exportData?.facilityAddressOne
         },
         CityName: {
           languageID: 'en',
-          value: exportData?.facilityTownCity || ''
+          value: exportData?.facilityTownCity
         },
         PostcodeCode: {
           languageID: 'en',
@@ -280,16 +259,13 @@ export default class StorageNotesTransformerService {
     };
   }
 
-  private static buildConsigneeParty(exportData: any): any {
+  private static buildConsignorParty(exportData: any, type: string): any {
     const exporterDetails = exportData?.exporterDetails || {};
 
     return {
-      ID: {
-        value: exporterDetails.exporterCompanyName || 'Exporter ID'
-      },
       Name: {
         languageID: 'en',
-        value: exporterDetails.exporterCompanyName || 'Exporter Name'
+        value: type === 'arrival' ? exportData?.facilityName : exporterDetails.exporterCompanyName
       },
       RoleCode: {
         name: 'Consignor (Exporter)',
@@ -298,189 +274,74 @@ export default class StorageNotesTransformerService {
       SpecifiedSPSAddress: {
         LineOne: {
           languageID: 'en',
-          value: exporterDetails.exporterAddressOne || ''
+          value: type === 'arrival' ? exportData?.facilityAddressOne : exporterDetails.exporterAddressOne
         },
         CityName: {
           languageID: 'en',
-          value: exporterDetails._townCity || ''
+          value: type === 'arrival' ? exportData?.facilityTownCity : exporterDetails.townCity
         },
         PostcodeCode: {
           languageID: 'en',
-          value: exporterDetails.exporterPostcode || ''
+          value: type === 'arrival' ? exportData?.facilityPostcode : exporterDetails.exporterPostcode
         },
         CountryID: {
           value: 'GB'
         },
         CountryName: {
           languageID: 'en',
-          value: 'UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND'
+          value: type === 'arrival' ? exportData?.facilityCountry : exporterDetails.country
         }
       }
     };
   }
 
-  private static buildLocation(location: any): any {
-    if (!location) {
-      return {
-        ID: {
-          value: ''
-        },
-        Name: {
-          languageID: 'en',
-          value: ''
-        }
-      };
-    }
-
-    return {
-      ID: {
-        value: location.officialCountryCode || location.isoCodeAlpha2 || ''
-      },
-      Name: {
-        languageID: 'en',
-        value: location.officialCountryName || location.name || ''
-      }
-    };
-  }
-
-  private static buildTransportMovement(exportData: any): any {
-    const transport = exportData?.transport || {};
-
-    return {
-      ID: {
-        schemeID: 'ship_imo_number_before_bcp',
-        value: transport.cmr || ''
-      },
-      ModeCode: {
-        name: this.getTransportModeName(transport.vehicle),
-        value: this.getTransportModeCode(transport.vehicle)
-      },
-      UsedSPSTransportMeans: {
-        Name: {
-          languageID: 'en',
-          languageLocaleID: 'en-nz',
-          value: transport.registrationNumber || transport.flightNumber || transport.vesselName || ''
-        }
-      }
-    };
-  }
-
-  private static getTransportModeName(vehicle: string): string {
-    const modes: Record<string, string> = {
-      truck: 'Road transport',
-      plane: 'Air transport',
-      ship: 'Maritime transport',
-      train: 'Rail transport',
-      containerVessel: 'Maritime transport'
-    };
-    return modes[vehicle] || 'Maritime transport';
-  }
-
-  private static getTransportModeCode(vehicle: string): string {
-    const codes: Record<string, string> = {
-      truck: '3',
-      plane: '4',
-      ship: '1',
-      train: '2',
-      containerVessel: '1'
-    };
-    return codes[vehicle] || '1';
-  }
-
-  private static buildConsignmentItems(exportData: any): any {
+  private static buildConsignmentItems(exportData: any, type: string): any {
     const catches = exportData?.catches || [];
 
-    if (catches.length === 0) {
-      return this.createEmptyConsignmentItem();
-    }
-
-    // For now, build single item with first catch
-    // In production, you may need to handle multiple items differently
-    const firstCatch = catches[0];
-
-    return {
-      IncludedSPSTradeLineItem: {
-        SequenceNumeric: {
-          format: '1',
-          value: 1
-        },
-        Description: {
-          languageID: 'en',
-          languageLocaleID: 'en',
-          value: firstCatch.productDescription || ''
-        },
-        NetWeightMeasure: {
-          unitCode: 'KGM',
-          unitCodeListVersionID: '100',
-          value: firstCatch.netWeightProductArrival || firstCatch.productWeight || '0'
-        },
-        GrossWeightMeasure: {
-          unitCode: 'KGM',
-          unitCodeListVersionID: '100',
-          value: firstCatch.netWeightProductArrival || firstCatch.productWeight || '0'
-        },
-        AdditionalInformationSPSNote: this.buildAdditionalNotes(firstCatch),
-        ApplicableSPSClassification: this.buildClassification(firstCatch)
-      }
-    };
-  }
-
-  private static createEmptyConsignmentItem(): any {
-    return {
-      IncludedSPSTradeLineItem: {
-        SequenceNumeric: {
-          format: '1',
-          value: 1
-        },
-        Description: {
-          languageID: 'en',
-          languageLocaleID: 'en',
-          value: ''
-        },
-        NetWeightMeasure: {
-          unitCode: 'KGM',
-          unitCodeListVersionID: '100',
-          value: '0'
-        },
-        GrossWeightMeasure: {
-          unitCode: 'KGM',
-          unitCodeListVersionID: '100',
-          value: '0'
-        },
-        AdditionalInformationSPSNote: [],
-        ApplicableSPSClassification: {
-          SystemID: {
-            value: 'CN'
-          },
-          SystemName: {
-            languageID: 'en',
-            languageLocaleID: 'en',
-            value: 'CN Code (Combined Nomenclature)'
-          },
-          ClassCode: {
-            value: ''
-          },
-          ClassName: {
-            languageID: 'en',
-            languageLocaleID: 'en',
-            value: ''
-          }
-        }
-      }
-    };
+    return catches.map((ctch: any, index: number) => ({
+      SequenceNumeric: {
+        format: (index + 1).toString(),
+        value: index + 1
+      },
+      Description: {
+        languageID: 'en',
+        languageLocaleID: 'en',
+        value: ''
+      },
+      NetWeightMeasure: {
+        unitCode: 'KGM',
+        unitCodeListVersionID: type === 'arrival' ? ctch.netWeightProductArrival : ctch.netWeightProductDeparture,
+        value: type === 'arrival' ? ctch.netWeightProductArrival : ctch.netWeightProductDeparture
+      },
+      GrossWeightMeasure: {
+        unitCode: 'KGM',
+        unitCodeListVersionID: type === 'arrival' ? ctch.netWeightFisheryProductArrival : ctch.netWeightFisheryProductDeparture,
+        value: type === 'arrival' ? ctch.netWeightFisheryProductArrival : ctch.netWeightFisheryProductDeparture
+      },
+      AdditionalInformationSPSNote: this.buildAdditionalNotes(ctch),
+      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commoditityCode)
+    }));
   }
 
   private static buildAdditionalNotes(catchData: any): any[] {
     const notes = [];
 
     if (catchData.certificateNumber) {
+      let localReference = 'CATCH_CERTIFICATE_LOCAL_REFERENCE';
+
+      if (validateUKPSNumberFormat(catchData.certificateNumber)) {
+        localReference = 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE'
+      } else if (validateUKSDNumberFormat(catchData.certificateNumber)) {
+        localReference = 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE'
+      }
+
       notes.push({
         Content: {
           languageID: 'en',
           value: catchData.certificateNumber
         },
         SubjectCode: {
-          value: 'CATCH_CERTIFICATE_LOCAL_REFERENCE'
+          value: localReference
         }
       });
     }
@@ -495,11 +356,11 @@ export default class StorageNotesTransformerService {
       }
     });
 
-    if (catchData.product?.scientificName) {
+    if (catchData.product) {
       notes.push({
         Content: {
           languageID: 'en',
-          value: catchData.product.scientificName
+          value: catchData.product
         },
         SubjectCode: {
           value: 'SPECIES'
@@ -510,24 +371,4 @@ export default class StorageNotesTransformerService {
     return notes;
   }
 
-  private static buildClassification(catchData: any): any {
-    return {
-      SystemID: {
-        value: 'CN'
-      },
-      SystemName: {
-        languageID: 'en',
-        languageLocaleID: 'en',
-        value: 'CN Code (Combined Nomenclature)'
-      },
-      ClassCode: {
-        value: catchData.commodityCode || ''
-      },
-      ClassName: {
-        languageID: 'en',
-        languageLocaleID: 'en',
-        value: catchData.commodityCodeDescription || 'Other prepared or preserved fish'
-      }
-    };
-  }
 }
