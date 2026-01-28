@@ -143,7 +143,7 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
     arrivalTransport: exportData.arrivalTransportation
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-SD-TO-UN-CEFACT]`);
-  const transformedPayload = (operation === 'void') ? {
+  const transformedPayload = operation === 'void' ? {
     CancelCatchNonManipulationDocumentRequest: {
       CatchNonManipulationDocument: {
         ID: {
@@ -153,7 +153,7 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
     }
   } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
   const resourceType = getResourceType(operation);
-  const params = { documentType: "NONMANIPULATIONDOCUMENT" };
+  const params = { documentType: operation === 'void' ? "NMDOCUMENT" : "NONMANIPULATIONDOCUMENT" };
   const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
   const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
   await updateCertificateEuCatchStatus(documentNumber, statusData);
