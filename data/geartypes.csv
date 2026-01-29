@@ -4,52 +4,58 @@ Traps,Pots (FPO),Pots,FPO,08.2
 Traps,Fyke nets (FYK),Fyke nets,FYK,08.3
 Traps,Stow nets (FSN),Stow nets,FSN,08.4
 Traps,Aerial traps (FAR),Aerial traps,FAR,08.6
-Traps,Traps (nei) (FIX),Traps (nei) ,FIX,08.9
+Traps,Traps (nei) (FIX),Traps (nei),FIX,08.9
 Trawls,Beam trawls (TBB),Beam trawls,TBB,03.11
-Trawls,Single boat bottom otter trawls (OTB),Single boat bottom otter trawls ,OTB,03.12
-Trawls,Twin bottom otter trawls (OTT),Twin bottom otter trawls ,OTT,03.13
+Trawls,Single boat bottom otter trawls (OTB),Single boat bottom otter trawls,OTB,03.12
+Trawls,Twin bottom otter trawls (OTT),Twin bottom otter trawls,OTT,03.13
 Trawls,Multiple bottom otter trawls (OTP),Multiple bottom otter trawls,OTP,03.14
 Trawls,Bottom pair trawls (PTB),Bottom pair trawls,PTB,03.15
 Trawls,Bottom trawls (nei) (TB),Bottom trawls (nei),TB,03.19
-Trawls,Single boat midwater otter trawls (OTM),Single boat midwater otter trawls ,OTM,03.21
+Trawls,Single boat midwater otter trawls (OTM),Single boat midwater otter trawls,OTM,03.21
 Trawls,Midwater pair trawls (PTM),Midwater pair trawls,PTM,03.22
 Trawls,Midwater trawls (nei) (TM),Midwater trawls (nei),TM,03.29
 Trawls,Semipelagic trawls (TSP),Semipelagic trawls,TSP,03.3
-Trawls,Trawls (nei) (TX),Trawls (nei) ,TX,03.9
+Trawls,Trawls (nei) (TX),Trawls (nei),TX,03.9
+Trawls,Nephrops trawls (TBN),Nephrops trawls,TBN,TBN
+Trawls,Shrimp trawls (TBS),Shrimp trawls,TBS,TBS
 Dredges,Towed dredges (DRB),Towed dredges,DRB,04.1
 Dredges,Mechanized dredges (DRM),Mechanized dredges,DRM,04.3
-Dredges,Dredges (nei) (DRX),Dredges (nei) ,DRX,04.9
-Hooks and lines,Handlines and hand operated pole and lines (LHP),Handlines and hand operated pole and lines ,LHP,09.1
+Dredges,Dredges (nei) (DRX),Dredges (nei),DRX,04.9
+Hooks and lines,Handlines and hand operated pole and lines (LHP),Handlines and hand operated pole and lines,LHP,09.1
 Hooks and lines,Mechanized lines and pole-and-lines (LHM),Mechanized lines and pole-and-lines,LHM,09.2
 Hooks and lines,Set longlines (LLS),Set longlines,LLS,09.31
 Hooks and lines,Drifting longlines (LLD),Drifting longlines,LLD,09.32
-Hooks and lines,Longlines (nei) (LL),Longlines (nei) ,LL,09.39
+Hooks and lines,Longlines (nei) (LL),Longlines (nei),LL,09.39
 Hooks and lines,Vertical lines (LVT),Vertical lines,LVT,09.4
 Hooks and lines,Trolling lines (LTL),Trolling lines,LTL,09.5
-Hooks and lines,Hooks and lines (nei) (LX),Hooks and lines (nei) ,LX,09.9
-Gillnets and entangling nets,Set gillnets (anchored) (GNS),Set gillnets (anchored) ,GNS,07.1
+Hooks and lines,Hooks and lines (nei) (LX),Hooks and lines (nei),LX,09.9
+Gillnets and entangling nets,Set gillnets (anchored) (GNS),Set gillnets (anchored),GNS,07.1
 Gillnets and entangling nets,Drift gillnets (GND),Drift gillnets,GND,07.2
 Gillnets and entangling nets,Encircling nets (GNC),Encircling nets,GNC,07.3
 Gillnets and entangling nets,Trammel nets (GTR),Trammel nets,GTR,07.5
 Gillnets and entangling nets,Combined gillnets-trammel nets (GTN),Combined gillnets-trammel nets,GTN,07.6
-Gillnets and entangling nets,Gillents and entangling nets (nei) (GEN),Gillents and entangling nets (nei) ,GEN,07.9
+Gillnets and entangling nets,Gillents and entangling nets (nei) (GEN),Gillents and entangling nets (nei),GEN,07.9
+Gillnets and entangling nets,Gillnets (not specified) (GN),Gillnets (not specified),GN,GN
 Miscellaneous gear,Harpoons (HAR),Harpoons,HAR,10.1
 Miscellaneous gear,"Hand implements (Wrenching gear, Clamps, Tongs, Rakes, Spears) (MHI)","Hand implements (Wrenching gear, Clamps, Tongs, Rakes, Spears)",MHI,10.2
 Miscellaneous gear,Pumps (MPM),Pumps,MPM,10.3
-Miscellaneous gear,Electric fishing (MEL),Electric fishing ,MEL,10.4
+Miscellaneous gear,Electric fishing (MEL),Electric fishing,MEL,10.4
 Miscellaneous gear,Pushnets (MPN),Pushnets,MPN,10.5
 Miscellaneous gear,Scoopnets (MSP),Scoopnets,MSP,10.6
 Miscellaneous gear,Drive-in-nets (MDR),Drive-in-nets,MDR,10.7
-Miscellaneous gear,Diving (MDV),Diving ,MDV,10.8
+Miscellaneous gear,Diving (MDV),Diving,MDV,10.8
 Surrounding nets,Purse seines (PS),Purse seines,PS,01.1
 Surrounding nets,Surrounding nets without purse lines (LA),Surrounding nets without purse lines,LA,01.2
 Surrounding nets,Surrounding nets (nei) (SUX),Surrounding nets (nei),SUX,01.9
 Seine nets,Beach seines (SB),Beach seines,SB,02.1
-Seine nets,Boat seines (SV),Boat seines ,SV,02.2
-Seine nets,Seine nets (nei) (SX),Seine nets (nei) ,SX,02.9
+Seine nets,Boat seines (SV),Boat seines,SV,02.2
+Seine nets,Seine nets (nei) (SX),Seine nets (nei),SX,02.9
+Seine nets,Danish anchor seine (SDN),Danish anchor seine,SDN,SDN
+Seine nets,Scottish seine (fly dragging) (SSC),Scottish seine (fly dragging),SSC,SSC
+Seine nets,Scottish pair seine (fly dragging) (SPR),Scottish pair seine (fly dragging),SPR,SPR
 Lift nets,Portable lift nets (LNP),Portable lift nets,LNP,05.1
-Lift nets,Boat-operated lift nets (LNB),Boat-operated lift nets ,LNB,05.2
-Lift nets,Lift nets (nei) (LN),Lift nets (nei) ,LN,05.9
+Lift nets,Boat-operated lift nets (LNB),Boat-operated lift nets,LNB,05.2
+Lift nets,Lift nets (nei) (LN),Lift nets (nei),LN,05.9
 Falling gear,Cast nets (FCN),Cast nets,FCN,06.1
 Falling gear,Cover pots/lantern nets (FCO),Cover pots/lantern nets,FCO,06.2
-Falling gear,Falling gear (nei) (FG),Falling gear (nei) ,FG,06.9
+Falling gear,Falling gear (nei) (FG),Falling gear (nei),FG,06.9
