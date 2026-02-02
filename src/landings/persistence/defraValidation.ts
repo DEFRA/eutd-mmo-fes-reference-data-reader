@@ -13,6 +13,7 @@ import {
 } from '../types/defraValidation';
 import { ICatchStatus } from '../../controllers/euUpgrade';
 import { DocumentStatuses } from '../types/document';
+import { validateUKPSNumberFormat, validateUKSDNumberFormat } from '../../data/euCatch';
 
 export const insertDefraValidationReport = async (report: IDefraValidationReport): Promise<void> => {
     await new DefraValidationReportModel(report).save();
@@ -121,5 +122,11 @@ export const updateCcDefraValidationReport = async (documentNumber: string, stat
     new: true
   };
 
-  await DefraValidationCatchCertificateModel.findOneAndUpdate(query, update, options);
+  if (validateUKPSNumberFormat(documentNumber)) {
+    await DefraValidationProcessingStatementModel.findOneAndUpdate(query, update, options);
+  } else if (validateUKSDNumberFormat(documentNumber)) {
+    await DefraValidationStorageDocumentModel.findOneAndUpdate(query, update, options);
+  } else {
+    await DefraValidationCatchCertificateModel.findOneAndUpdate(query, update, options);
+  }
 }

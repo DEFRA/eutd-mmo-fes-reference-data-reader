@@ -123,7 +123,8 @@
       "documentUri": "https://ukecc-snd.azure.defra.cloud/qr/export-certificates/_cc8a2e09-d16f-4fe5-a490-a31d430523b3.pdf",
       "failedSubmissions": 5,
       "_correlationId": "476ec752-bce3-4f38-aa96-089187f6bc40",
-      "requestedByAdmin": false
+      "requestedByAdmin": false,
+      "catchReference": "CATCH-REF-2024-001234"
     },
     {
       "documentType": "processingStatement",
@@ -144,6 +145,30 @@
           "hasWeightMismatch": false,
           "isDocumentIssuedInUK": false,
           "issuingCountry": "France"
+        }
+      ]
+    },
+    {
+      "documentType": "processingStatement",
+      "documentNumber": "GBR-98765-432109-876-543",
+      "lastUpdated": "2019-01-03 10:15:30",
+      "status": "COMPLETE",
+      "_correlationId": "d14593cb-97fe-4acf-ca0e-806fb38c4062",
+      "requestedByAdmin": false,
+      "rejectedReason": "Invalid catch certificate number format",
+      "catches": [
+        {
+          "species": "Atlantic Cod (COD)",
+          "scientificName": "Gadus morhua",
+          "catchCertificateNumber": "GBR-5678-567890-567",
+          "productDescription": "Fresh cod fillets",
+          "totalWeightLanded": 800,
+          "exportWeightBeforeProcessing": 750,
+          "exportWeightAfterProcessing": 700,
+          "isOverUse": false,
+          "hasWeightMismatch": false,
+          "isDocumentIssuedInUK": true,
+          "issuingCountry": "United Kingdom"
         }
       ]
     }
@@ -580,6 +605,14 @@
     "parentDocumentVoid": {
       "type": "boolean",
       "description": "Indicates if the original document is voided or not during cloning the document"
+    },
+    "catchReference": {
+      "type": "string",
+      "description": "The document reference from EU CATCH when submission is successful"
+    },
+    "rejectedReason": {
+      "type": "string",
+      "description": "The rejection reason from EU CATCH when submission is rejected"
     }
   }
 }

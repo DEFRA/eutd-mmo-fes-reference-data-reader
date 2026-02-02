@@ -672,3 +672,135 @@ describe('markAsProcessed', () => {
   });
 
 });
+
+describe('updateCcDefraValidationReport', () => {
+
+  it('will update Catch Certificate defra validation report with catch status data for CC document number', async () => {
+    const report: IDefraValidationCatchCertificate = {
+      documentType: "CatchCertificate",
+      documentNumber: "GBR-2024-CC-123456",
+      status: "COMPLETE",
+      _correlationId: 'some-uuid-correlation-id',
+      requestedByAdmin: false
+    };
+
+    await insertCcDefraValidationReport(report);
+
+    const statusData = {
+      status: 'ACCEPTED',
+      reference: 'CATCH-REF-2024-001234',
+      faultString: null
+    };
+
+    await SUT.updateCcDefraValidationReport('GBR-2024-CC-123456', statusData);
+
+    const result: any = await DefraValidationCatchCertificateModel.findOne({ documentNumber: 'GBR-2024-CC-123456' }).lean();
+
+    expect(result.catchStatus).toBe('ACCEPTED');
+    expect(result.catchReference).toBe('CATCH-REF-2024-001234');
+    expect(result.rejectedReason).toBeNull();
+  });
+
+  it('will update Processing Statement defra validation report with catch status data for PS document number', async () => {
+    const report: IDefraValidationProcessingStatement = {
+      documentType: "ProcessingStatement",
+      documentNumber: "GBR-2024-PS-A1B2C3D4E",
+      status: "COMPLETE",
+      _correlationId: 'some-uuid-correlation-id',
+      requestedByAdmin: false
+    };
+
+    await insertPsDefraValidationReport(report);
+
+    const statusData = {
+      status: 'ACCEPTED',
+      reference: 'CATCH-REF-2024-001235',
+      faultString: null
+    };
+
+    await SUT.updateCcDefraValidationReport('GBR-2024-PS-A1B2C3D4E', statusData);
+
+    const result: any = await DefraValidationProcessingStatementModel.findOne({ documentNumber: 'GBR-2024-PS-A1B2C3D4E' }).lean();
+
+    expect(result.catchStatus).toBe('ACCEPTED');
+    expect(result.catchReference).toBe('CATCH-REF-2024-001235');
+    expect(result.rejectedReason).toBeNull();
+  });
+
+  it('will update Storage Document defra validation report with catch status data for SD document number', async () => {
+    const report: IDefraValidationStorageDocument = {
+      documentType: "StorageDocument",
+      documentNumber: "GBR-2024-SD-F5G6H7I8J",
+      status: "COMPLETE",
+      _correlationId: 'some-uuid-correlation-id',
+      requestedByAdmin: false
+    };
+
+    await insertSdDefraValidationReport(report);
+
+    const statusData = {
+      status: 'ACCEPTED',
+      reference: 'CATCH-REF-2024-001236',
+      faultString: null
+    };
+
+    await SUT.updateCcDefraValidationReport('GBR-2024-SD-F5G6H7I8J', statusData);
+
+    const result: any = await DefraValidationStorageDocumentModel.findOne({ documentNumber: 'GBR-2024-SD-F5G6H7I8J' }).lean();
+
+    expect(result.catchStatus).toBe('ACCEPTED');
+    expect(result.catchReference).toBe('CATCH-REF-2024-001236');
+    expect(result.rejectedReason).toBeNull();
+  });
+
+  it('will update defra validation report with rejected reason when submission fails', async () => {
+    const report: IDefraValidationCatchCertificate = {
+      documentType: "CatchCertificate",
+      documentNumber: "GBR-2024-CC-789012",
+      status: "COMPLETE",
+      _correlationId: 'some-uuid-correlation-id',
+      requestedByAdmin: false
+    };
+
+    await insertCcDefraValidationReport(report);
+
+    const statusData = {
+      status: 'REJECTED',
+      reference: null,
+      faultString: 'Invalid catch certificate number format'
+    };
+
+    await SUT.updateCcDefraValidationReport('GBR-2024-CC-789012', statusData);
+
+    const result: any = await DefraValidationCatchCertificateModel.findOne({ documentNumber: 'GBR-2024-CC-789012' }).lean();
+
+    expect(result.catchStatus).toBe('REJECTED');
+    expect(result.catchReference).toBeNull();
+    expect(result.rejectedReason).toBe('Invalid catch certificate number format');
+  });
+
+  it('will only update COMPLETE status documents', async () => {
+    const draftReport: IDefraValidationCatchCertificate = {
+      documentType: "CatchCertificate",
+      documentNumber: "GBR-2024-CC-999999",
+      status: "DRAFT",
+      _correlationId: 'some-uuid-correlation-id',
+      requestedByAdmin: false
+    };
+
+    await insertCcDefraValidationReport(draftReport);
+
+    const statusData = {
+      status: 'ACCEPTED',
+      reference: 'CATCH-REF-2024-001237',
+      faultString: null
+    };
+
+    await SUT.updateCcDefraValidationReport('GBR-2024-CC-999999', statusData);
+
+    const result: any = await DefraValidationCatchCertificateModel.findOne({ documentNumber: 'GBR-2024-CC-999999' }).lean();
+
+    expect(result.catchStatus).toBeUndefined();
+    expect(result.catchReference).toBeUndefined();
+  });
+});
