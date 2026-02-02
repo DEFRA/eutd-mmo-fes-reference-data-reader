@@ -203,6 +203,9 @@ export interface IDefraValidationProcessingStatement {
     exportedTo?:        ICountry;
     clonedFrom?:        string;
     parentDocumentVoid?: boolean;
+    catchStatus?:       string;
+    catchReference?:    string;
+    rejectedReason?:    string;
 }
 
 export interface IDefraValidationStorageDocument {
@@ -229,6 +232,9 @@ export interface IDefraValidationStorageDocument {
     exportedTo?:            ICountry;
     clonedFrom?:            string;
     parentDocumentVoid?:    boolean;
+    catchStatus?:       string;
+    catchReference?:    string;
+    rejectedReason?:    string;
 }
 
 export const countrySchema = new Schema({
@@ -264,6 +270,9 @@ export const DefraValidationProcessingStatementSchema = new Schema ({
     lastUpdated:        { type: Date,    required: false, default: Date.now },
     _correlationId:     { type: String,  required: true  },
     requestedByAdmin:   { type: Boolean, required: false, default: false },
+    catchStatus:        { type: String, required: false },
+    catchReference:     { type: String, required: false },
+    rejectedReason:     { type: String, required: false }
 });
 
 export const DefraValidationStorageDocumentSchema = new Schema ({
@@ -292,7 +301,10 @@ export const DefraValidationStorageDocumentSchema = new Schema ({
     pointOfDestination:         { type: String,  required: false },
     _processed:                 { type: Boolean, required: false, default: false },
     clonedFrom:                 { type: String, required: false },
-    parentDocumentVoid:         { type: Boolean, required: false }
+    parentDocumentVoid:         { type: Boolean, required: false },
+    catchStatus:                { type: String, required: false },
+    catchReference:             { type: String, required: false },
+    rejectedReason:             { type: String, required: false }
 });
 
 export const DefraValidationCatchCertificateSchema = new Schema ({
