@@ -427,10 +427,20 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+      const item_2 = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1];
+      const item_3 = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2];
 
       expect(item.SequenceNumeric.value).toBe(3);
       expect(item.NetWeightMeasure.value).toBe('225.75');
-      expect(item.GrossWeightMeasure.value).toBe('100.5');
+      expect(item.GrossWeightMeasure.value).toBe('75');
+
+      expect(item_2.SequenceNumeric.value).toBe(2);
+      expect(item_2.NetWeightMeasure.value).toBe('225.75');
+      expect(item_2.GrossWeightMeasure.value).toBe('50.25');
+
+      expect(item_3.SequenceNumeric.value).toBe(1);
+      expect(item_3.NetWeightMeasure.value).toBe('225.75');
+      expect(item_3.GrossWeightMeasure.value).toBe('100.5');
     });
 
     it('should handle missing catches array', () => {
@@ -468,10 +478,11 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+      const item_1 = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1];
 
       expect(item.NetWeightMeasure.value).toBe('');
-      expect(consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].NetWeightMeasure.value).toBe('');
-      expect(consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].GrossWeightMeasure.value).toBe('50');
+      expect(item.GrossWeightMeasure.value).toBe('50');
+      expect(item_1.NetWeightMeasure.value).toBe('');
     });
 
     it('should set weight unit to KGM (kilograms)', () => {
@@ -940,7 +951,7 @@ describe('ProcessingStatementTransformerService', () => {
       );
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
-      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+      const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1];
 
       expect(item.NetWeightMeasure.value).toBe('150.69');
     });
