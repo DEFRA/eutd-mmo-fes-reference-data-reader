@@ -111,7 +111,8 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
     healthCertificateDate: exportData.healthCertificateDate,
     dateOfAcceptance: exportData.dateOfAcceptance,
     consignmentDescription: exportData.consignmentDescription,
-    personResponsibleForConsignment: exportData.personResponsibleForConsignment
+    personResponsibleForConsignment: exportData.personResponsibleForConsignment,
+    pointOfDestination: exportData.pointOfDestination,
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-PS-TO-UN-CEFACT]`);
   const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelProcessingStatementRequest') : ProcessingStatementTransformerService.generateProcessingStatementPayload(
