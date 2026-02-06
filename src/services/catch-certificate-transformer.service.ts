@@ -318,75 +318,90 @@ export default class CatchCertificateTransformerService {
       });
     });
 
-    // Create vessel consignment items (TypeCode "5")
+    // Collect all vessel trade line items (TypeCode "5")
+    const vesselTradeLineItems: any[] = [];
     uniqueVessels.forEach((vessel: any) => {
+      vesselTradeLineItems.push({
+        SequenceNumeric: {
+          format: vesselSequenceMap.get(vessel.cfr).toString(),
+          value: vesselSequenceMap.get(vessel.cfr)
+        },
+        Description: {
+          languageID: 'en',
+          languageLocaleID: 'en',
+          value: 'en'
+        },
+        AdditionalInformationSPSNote: this.buildTypeCode5AdditionalInformationSPSNote(vessel, exportData.conservation?.conservationReference)
+      });
+    });
+
+    // Create single consignment item for all vessels (TypeCode "5")
+    if (vesselTradeLineItems.length > 0) {
       consignmentItems.push({
         NatureIdentificationSPSCargo: {
           TypeCode: {
             value: '5'
           }
         },
-        IncludedSPSTradeLineItem: {
+        IncludedSPSTradeLineItem: vesselTradeLineItems
+      });
+    }
+
+    let productSequenceNumber = 0;
+
+    // Collect all product trade line items (TypeCode "12")
+    const productTradeLineItems: any[] = [];
+    exportData.products?.forEach((product: any) => {
+      product.caughtBy?.forEach((catchItem: any) => {
+        productSequenceNumber++;
+        productTradeLineItems.push({
           SequenceNumeric: {
-            format: vesselSequenceMap.get(vessel.cfr).toString(),
-            value: vesselSequenceMap.get(vessel.cfr)
+            format: Number(productSequenceNumber).toString(),
+            value: productSequenceNumber
           },
           Description: {
             languageID: 'en',
-            languageLocaleID: 'en',
-            value: 'en'
+            value: product.commodityCodeDescription || ''
           },
-          AdditionalInformationSPSNote: this.buildTypeCode5AdditionalInformationSPSNote(vessel, exportData.conservation?.conservationReference)
-        }
-      });
-    });
-
-    // Create product consignment items (TypeCode "12")
-    exportData.products?.forEach((product: any) => {
-      product.caughtBy?.forEach((catchItem: any) => {
-        consignmentItems.push({
-          NatureIdentificationSPSCargo: {
-            TypeCode: {
-              value: '12'
-            }
+          CommonName: {
+            value: product.scientificName || ''
           },
-          IncludedSPSTradeLineItem: {
-            SequenceNumeric: {
-              format: vesselSequenceMap.get(catchItem.cfr).toString(),
-              value: vesselSequenceMap.get(catchItem.cfr)
+          NetWeightMeasure: {
+            unitCode: 'KGM',
+            value: catchItem.weight?.toString() || '0'
+          },
+          AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
+          ApplicableSPSClassification: {
+            SystemID: {
+              value: 'CN'
             },
-            Description: {
+            SystemName: {
+              languageID: 'en',
+              value: 'CN Code'
+            },
+            ClassCode: {
+              value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
+            },
+            ClassName: {
               languageID: 'en',
               value: product.commodityCodeDescription || ''
-            },
-            CommonName: {
-              value: product.scientificName || ''
-            },
-            NetWeightMeasure: {
-              unitCode: 'KGM',
-              value: catchItem.weight?.toString() || '0'
-            },
-            AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
-            ApplicableSPSClassification: {
-              SystemID: {
-                value: 'CN'
-              },
-              SystemName: {
-                languageID: 'en',
-                value: 'CN Code'
-              },
-              ClassCode: {
-                value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
-              },
-              ClassName: {
-                languageID: 'en',
-                value: product.commodityCodeDescription || ''
-              }
             }
           }
         });
       });
     });
+
+    // Create single consignment item for all products (TypeCode "12")
+    if (productTradeLineItems.length > 0) {
+      consignmentItems.push({
+        NatureIdentificationSPSCargo: {
+          TypeCode: {
+            value: '12'
+          }
+        },
+        IncludedSPSTradeLineItem: productTradeLineItems
+      });
+    }
 
     return consignmentItems;
   }

@@ -1913,9 +1913,9 @@ describe('CatchCertificateTransformerService', () => {
 
       const conservationItem = items[0];
       expect(conservationItem.NatureIdentificationSPSCargo.TypeCode.value).toBe('5');
-      expect(conservationItem.IncludedSPSTradeLineItem.SequenceNumeric.value).toBe(1);
+      expect(conservationItem.IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
 
-      let notes = conservationItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      let notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       expect(notes.some((n: any) => n.SubjectCode.value === 'CONSERVATION_AND_MANAGEMENT_MEASURES')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'VESSEL_NAME')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'VESSEL_FLAG')).toBe(true);
@@ -1927,7 +1927,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(notes.some((n: any) => n.SubjectCode.value === 'FISHING_LICENSE_END_DATE')).toBe(true);
 
       const catchAreaItem = items[1];
-      notes = catchAreaItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      notes = catchAreaItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       expect(notes.some((n: any) => n.SubjectCode.value === 'CATCH_AREA')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'HIGH_SEAS_CATCH_AREA')).toBe(true);
     });
@@ -1938,7 +1938,6 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {},
             caughtBy: [
               {
                 vessel: 'Test Vessel'
@@ -1964,7 +1963,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const conservationItem = items[0];
-      const notes = conservationItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const phoneNote = notes.find((n: any) => n.SubjectCode.value === 'PHONE');
 
       expect(phoneNote).toBeDefined();
@@ -1977,7 +1976,6 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {}
           }
         ],
         exporterDetails: {},
@@ -2010,7 +2008,6 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {},
             caughtBy: [
               {
                 vessel: 'Test Vessel',
@@ -2038,7 +2035,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const conservationItem = items[0];
-      const notes = conservationItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
 
       expect(gearNote.Content.value).toBe('08.1');
@@ -2121,10 +2118,10 @@ describe('CatchCertificateTransformerService', () => {
       expect(items.length).toBe(2); // 1 vessel + 1 product
       const productItem = items[1];
       expect(productItem.NatureIdentificationSPSCargo.TypeCode.value).toBe('12');
-      expect(productItem.IncludedSPSTradeLineItem.Description.value).toBe('Fresh hake');
-      expect(productItem.IncludedSPSTradeLineItem.CommonName.value).toBe('Merluccius merluccius');
-      expect(productItem.IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('750');
-      expect(productItem.IncludedSPSTradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('030441');
+      expect(productItem.IncludedSPSTradeLineItem[0].Description.value).toBe('Fresh hake');
+      expect(productItem.IncludedSPSTradeLineItem[0].CommonName.value).toBe('Merluccius merluccius');
+      expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('750');
+      expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification.ClassCode.value).toBe('030441');
     });
 
     it('should calculate total weight from multiple landings', () => {
@@ -2133,10 +2130,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 cfr: 'GBR111',
@@ -2175,13 +2170,17 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(4); // 1 vessel + 3 products
-      const productItem1 = items[1];
-      expect(productItem1.IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('200');
-      const productItem2 = items[2];
-      expect(productItem2.IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('300');
-      const productItem3 = items[3];
-      expect(productItem3.IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('150');
+      expect(items.length).toBe(2); // 1 vessel + 3 products
+      const productsIncludedSPSConsignmentItem = items[1];
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].SequenceNumeric.format).toBe("1");
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('200');
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].SequenceNumeric.format).toBe("2");
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].NetWeightMeasure.value).toBe('300');
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].SequenceNumeric.format).toBe("3");
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].SequenceNumeric.value).toBe(3);
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].NetWeightMeasure.value).toBe('150');
     });
 
     it('should add notes for all EEZ zones', () => {
@@ -2190,10 +2189,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 pln: 'PZ444',
@@ -2226,7 +2223,7 @@ describe('CatchCertificateTransformerService', () => {
 
 
       const productItem = items[1];
-      const notes = productItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const eezNotes = notes.filter((n: any) => n.SubjectCode.value === 'EXCLUSIVE_ECONOMIC_ZONE');
 
       expect(eezNotes.length).toBe(3);
@@ -2238,10 +2235,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 weight: 100,
@@ -2268,7 +2263,7 @@ describe('CatchCertificateTransformerService', () => {
 
       expect(items.length).toBe(2); // 1 vessel + 1 product
       const productItem = items[1];
-      const notes = productItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
 
       expect(notes.length).toBeGreaterThan(0); // Notes are always added
     });
@@ -2279,11 +2274,9 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua',
-              species: { label: 'Atlantic Cod' }
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
+            species: 'Atlantic Cod',
             caughtBy: []
           }
         ],
@@ -2312,10 +2305,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 pln: 'PZ555',
@@ -2341,7 +2332,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const productItem = items[1];
-      expect(productItem.IncludedSPSTradeLineItem.NetWeightMeasure.value).toBe('0');
+      expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('0');
     });
   });
 
@@ -2352,10 +2343,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 pln: 'PZ001',
@@ -2385,7 +2374,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const productItem = items[1];
-      const notes = productItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
       const endDateNote = notes.find((n: any) => n.SubjectCode.value === 'END_DATE');
 
@@ -2399,10 +2388,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 pln: 'PZ001',
@@ -2431,7 +2418,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const productItem = items[1];
-      const notes = productItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
 
       expect(startDateNote.Content.value).toBe('03-Feb-2025');
@@ -2443,10 +2430,8 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 pln: 'PZ001',
@@ -2475,7 +2460,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const productItem = items[1];
-      const notes = productItem.IncludedSPSTradeLineItem.AdditionalInformationSPSNote;
+      const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
 
       expect(startDateNote.Content.value).toBe('NaN-undefined-NaN');
@@ -2489,32 +2474,31 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              commodityCodeDescription: 'Cod',
-              scientificName: 'Gadus morhua'
-            },
+            commodityCode: '03026100',
+            commodityCodeDescription: 'Cod',
+            scientificName: 'Gadus morhua',
             caughtBy: [
               {
                 vessel: 'Vessel 1',
                 pln: 'PZ001',
                 weight: 500,
                 gearType: 'OTB',
-                exclusiveEconomicZones: []
+                exclusiveEconomicZones: [],
+                cfr: '0000001'
               }
             ]
           },
           {
-            product: {
-              commodityCode: '03034100',
-              scientificName: 'Katsuwonus pelamis',
-              species: { label: 'Skipjack Tuna' }
-            },
+            commodityCode: '03034100',
+            scientificName: 'Katsuwonus pelamis',
+            species: 'Skipjack Tuna' ,
             caughtBy: [
               {
+                vessel: 'Vessel 2',
                 pln: 'PZ002',
                 weight: 300,
-                exclusiveEconomicZones: []
+                exclusiveEconomicZones: [],
+                cfr: '0000002'
               }
             ]
           }
@@ -2538,7 +2522,18 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(3); // 1 conservation + 2 products
+      expect(items.length).toBe(2);
+      expect(items[0].IncludedSPSTradeLineItem.length).toBe(2); // 2 vessels
+      expect(items[0].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
+      expect(items[0].IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote[0].Content.value).toBe('Vessel 1');
+      expect(items[0].IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
+      expect(items[0].IncludedSPSTradeLineItem[1].AdditionalInformationSPSNote[0].Content.value).toBe('Vessel 2');
+
+      expect(items[1].IncludedSPSTradeLineItem.length).toBe(2); // 2 products
+      expect(items[1].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
+      expect(items[1].IncludedSPSTradeLineItem[0].CommonName.value).toBe('Gadus morhua');
+      expect(items[1].IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
+      expect(items[1].IncludedSPSTradeLineItem[1].CommonName.value).toBe('Katsuwonus pelamis');
     });
 
     it('should handle complete real-world scenario', () => {
@@ -2547,12 +2542,10 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
-            product: {
-              commodityCode: '03026100',
-              commodityCodeDescription: 'Fresh or chilled Atlantic cod',
-              scientificName: 'Gadus morhua',
-              species: { label: 'Atlantic Cod' }
-            },
+            commodityCode: '03026100',
+            commodityCodeDescription: 'Fresh or chilled Atlantic cod',
+            scientificName: 'Gadus morhua',
+            species: 'Atlantic Cod',
             caughtBy: [
               {
                 vessel: 'Poseidon',
