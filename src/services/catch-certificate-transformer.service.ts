@@ -275,25 +275,26 @@ export default class CatchCertificateTransformerService {
   private static buildTransportEquipment(transportations: any[]): any {
     return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => {
       // Handle containerNumbers (comma-separated string from multiple containers)
-      if (transport.containerNumbers) {
-        const containerArray = transport.containerNumbers.split(',').map((cn: string) => cn.trim());
-        const containerEquipments = containerArray.map((containerNum: string) => ({
+      if (transport.containerIdentificationNumber) {
+        const containerArray = transport.containerIdentificationNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+        const containerNumbers = containerArray.map((containerNumber: string) => ({
           ID: {
             schemeID: 'container_number',
-            value: containerNum
+            value: containerNumber
           }
         }));
-        return [...utilizedSPSTransportEquipments, ...containerEquipments];
+        return [...utilizedSPSTransportEquipments, ...containerNumbers];
       }
 
       // Fallback to single containerNumber for backwards compatibility
       if (transport.containerNumber) {
-        return [...utilizedSPSTransportEquipments, {
+        const containerNumberArray = transport.containerNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+        return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
           ID: {
             schemeID: 'container_number',
-            value: transport.containerNumber
+            value: containerNumber
           }
-        }];
+        }))];
       }
 
       return utilizedSPSTransportEquipments;
