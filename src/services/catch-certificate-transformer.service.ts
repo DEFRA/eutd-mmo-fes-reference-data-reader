@@ -3,7 +3,7 @@ import { getCountries, getGearTypes } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
-import { createMainCarriageSPSTransportMovement } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, getCountryISO2 } from '../data/euCatch';
 
 const formatDate = (dateString: string | Date) => {
   const date = new Date(dateString);
@@ -435,7 +435,7 @@ export default class CatchCertificateTransformerService {
     if (vessel.flag) {
       additionalInformationSPSNote.push({
         Content: {
-          value: vessel.flag
+          value: getCountryISO2(vessel.flag)
         },
         SubjectCode: {
           value: 'VESSEL_FLAG'

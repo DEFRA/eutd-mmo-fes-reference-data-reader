@@ -197,3 +197,19 @@ export const validateUKSDNumberFormat = (str: string) => {
   const regex = /^GBR-\d{4}-SD-[A-Z0-9]{9}$/;
   return regex.test(str);
 }
+
+// Unique Flag Codes: from vessel file
+// GBR - Great Britain (United Kingdom)
+// GGY - Guernsey
+// IMN - Isle of Man
+// JEY - Jersey
+const countryISOMapping = {
+  GBR: "GB",
+  GGY: "GG",
+  IMN: "IM",
+  JEY: "JE",
+}
+
+export function getCountryISO2(countryCode: string) {
+  return countryISOMapping[countryCode]
+}
