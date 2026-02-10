@@ -1,11 +1,6 @@
 import moment from 'moment';
 import logger from '../logger';
-import { getCommodities } from '../controllers/species';
-
-const validateUKPSNumberFormat = (str: string) => {
-  const regex = /^GBR-\d{4}-PS-[A-Z0-9]{9}$/;
-  return regex.test(str);
-}
+import { getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat } from '../data/euCatch';
 
 /**
  * Transforms processing statement data into UN/CEFACT CATCH API JSON schema format
@@ -69,15 +64,7 @@ export default class ProcessingStatementTransformerService {
           value: createdAt.toISOString()
         }
       },
-      IssuerSPSParty: {
-        Name: {
-          languageID: 'en',
-          value: 'Marine Management Organization'
-        },
-        RoleCode: {
-          value: 'PQ'
-        }
-      },
+      IssuerSPSParty,
       ReferenceSPSReferencedDocument: [
         {
           TypeCode: {
@@ -105,68 +92,20 @@ export default class ProcessingStatementTransformerService {
             schemeAgencyID: 'GB',
             value: exportData.healthCertificateNumber
           }
-        }
-      ],
-      SignatorySPSAuthentication: [
-        {
-          TypeCode: {
-            value: '1'
-          },
-          ActualDateTime: {
-            DateTime: {
-              value: createdAt.toISOString()
-            }
-          },
-          ProviderSPSParty: {
-            Name: {
-              value: ''
-            },
-            RoleCode: {
-              value: 'PQ'
-            },
-            SpecifiedSPSPerson: {
-              Name: {
-                value: ''
-              }
-            }
-          },
-          IncludedSPSClause: {
-            Content: {
-              value: ''
-            }
-          }
         },
         {
           TypeCode: {
-            value: '2'
+            value: '916'
           },
-          ActualDateTime: {
-            DateTime: {
-              value: createdAt.toISOString()
-            }
+          RelationshipTypeCode: {
+            value: 'AIS'
           },
-          ProviderSPSParty: {
-            Name: {
-              languageID: 'en',
-              value: 'Marine Management Organization'
-            },
-            RoleCode: {
-              value: 'CA'
-            },
-            SpecifiedSPSPerson: {
-              Name: {
-                languageID: 'en',
-                value: ''
-              },
-              AttainedSPSQualification: {
-                Name: {
-                  value: ''
-                }
-              }
-            }
+          ID: {
+            value: exportData.plantApprovalNumber
           }
         }
-      ]
+      ],
+      SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
     };
   }
 
@@ -180,20 +119,22 @@ export default class ProcessingStatementTransformerService {
       UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.pointOfDestination),
       ExaminationSPSEvent: {
         OccurrenceSPSLocation: {
+          ID: {
+            value: ''
+          },
           Name: {
             value: ''
           }
         }
       },
-      IncludedSPSConsignmentItem: this.buildConsignmentItem(exportData)
+      IncludedSPSConsignmentItem: {
+        IncludedSPSTradeLineItem: this.buildConsignmentItem(exportData)
+      }
     };
   }
 
-  private static buildConsignorParty({ plantApprovalNumber, plantName, plantAddressOne, plantTownCity, plantPostcode }: any): any {
+  private static buildConsignorParty({ plantName, plantAddressOne, plantTownCity, plantPostcode }: any): any {
     return {
-      ID: {
-        value: plantApprovalNumber || ''
-      },
       Name: {
         languageID: 'en',
         value: plantName || ''
@@ -321,8 +262,8 @@ export default class ProcessingStatementTransformerService {
   private static buildConsignmentItem(exportData: any): any {
     // Get first product for basic information
     const catches = exportData.catches || [];
-    return catches.map((ctch: any, index: number) => {
-      const sequenceNumeric = index + 1;
+    return catches.reverse().map((ctch: any, index: number) => {
+      const sequenceNumeric = catches.length - index;
 
       // Build additional information notes
       const notes: any[] = [];
@@ -410,49 +351,27 @@ export default class ProcessingStatementTransformerService {
       }
 
       return {
-        IncludedSPSTradeLineItem: {
-          SequenceNumeric: {
-            format: sequenceNumeric.toString(),
-            value: sequenceNumeric
-          },
-          Description: {
-            languageID: 'en',
-            languageLocaleID: 'en',
-            value: ctch.productDescription || ''
-          },
-          NetWeightMeasure: {
-            unitCode: 'KGM',
-            unitCodeListVersionID: ctch.exportWeightBeforeProcessing?.toString() ?? '',
-            value: ctch.exportWeightBeforeProcessing ?? ''
-          },
-          GrossWeightMeasure: {
-            unitCode: 'KGM',
-            unitCodeListVersionID: ctch.exportWeightAfterProcessing?.toString() ?? '',
-            value: ctch.exportWeightAfterProcessing?.toString()
-          },
-          AdditionalInformationSPSNote: notes,
-          ApplicableSPSClassification: {
-            SystemID: {
-              value: 'CN'
-            },
-            SystemName: {
-              languageID: 'en',
-              languageLocaleID: 'en',
-              value: 'CN Code'
-            },
-            ClassCode: {
-              value: ctch.productCommodityCode ? ctch.productCommodityCode.substring(0, 6) : ''
-            },
-            ClassName: {
-              languageID: 'en',
-              languageLocaleID: 'en',
-              value: getCommodities()?.find((commodity: {
-                code: string;
-                description: string;
-              }) => commodity.code === ctch.productCommodityCode)?.description ?? ''
-            }
-          }
-        }
+        SequenceNumeric: {
+          format: sequenceNumeric.toString(),
+          value: sequenceNumeric
+        },
+        Description: {
+          languageID: 'en',
+          languageLocaleID: 'en',
+          value: ctch.productDescription || ''
+        },
+        NetWeightMeasure: {
+          unitCode: 'KGM',
+          unitCodeListVersionID: ctch.exportWeightBeforeProcessing?.toString() ?? '',
+          value: ctch.exportWeightBeforeProcessing ?? ''
+        },
+        GrossWeightMeasure: {
+          unitCode: 'KGM',
+          unitCodeListVersionID: ctch.exportWeightAfterProcessing?.toString() ?? '',
+          value: ctch.exportWeightAfterProcessing?.toString()
+        },
+        AdditionalInformationSPSNote: notes,
+        ApplicableSPSClassification: getApplicationSPSClassification(ctch.productCommodityCode)
       };
     })
   }

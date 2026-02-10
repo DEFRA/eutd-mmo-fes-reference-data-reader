@@ -66,11 +66,22 @@ const fetchDocumentData = async (documentNumber: string, docType: string): Promi
 const getDocumentNumberForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.documentNumber || 'UNKNOWN';
 const getOperationsForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.operation || 'submit';
 const getResourceType = (operation: "submit" | "void") => operation === 'void' ? 'catchVoid' : 'catchSubmit';
+const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCertificateRequest' | 'CancelProcessingStatementRequest') => {
+  return {
+    [key]: {
+      SPSCertificate: {
+        ID: {
+          value: documentNumber
+        }
+      }
+    }
+  }
+}
 
 
 async function handleCatchCertificateSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-CC-TO-UN-CEFACT]`);
-  const transformedPayload = (operation === 'void') ? CatchCertificateTransformerService.generateVoidCatchPayload(catchSubmission?.reference) : CatchCertificateTransformerService.generateCatchPayload(
+  const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelCatchCertificateRequest') : CatchCertificateTransformerService.generateCatchPayload(
     documentNumber,
     createdAt,
     exportData
@@ -83,7 +94,7 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void') {
+async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   const products = Array.isArray(exportData.products) ? exportData.products : [];
 
   const transformedExportData = {
@@ -100,10 +111,11 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
     healthCertificateDate: exportData.healthCertificateDate,
     dateOfAcceptance: exportData.dateOfAcceptance,
     consignmentDescription: exportData.consignmentDescription,
-    personResponsibleForConsignment: exportData.personResponsibleForConsignment
+    personResponsibleForConsignment: exportData.personResponsibleForConsignment,
+    pointOfDestination: exportData.pointOfDestination,
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-PS-TO-UN-CEFACT]`);
-  const transformedPayload = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+  const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelProcessingStatementRequest') : ProcessingStatementTransformerService.generateProcessingStatementPayload(
     documentNumber,
     createdAt,
     transformedExportData
@@ -115,7 +127,7 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
   await updateCertificateEuCatchStatus(documentNumber, statusData);
 }
 
-async function handleStorageNotesSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void') {
+async function handleStorageNotesSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   const transformedExportData = {
     catches: exportData.catches || [],
     exporterDetails: exportData.exporterDetails,
@@ -128,13 +140,21 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
     facilityPostcode: exportData.facilityPostcode,
     facilityArrivalDate: exportData.facilityArrivalDate,
     facilityStorage: exportData.facilityStorage,
-    transport: exportData.transport,
-    unloadingPlace: exportData.unloadingPlace
+    transport: exportData.transportation,
+    arrivalTransport: exportData.arrivalTransportation
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-SD-TO-UN-CEFACT]`);
-  const transformedPayload = StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
+  const transformedPayload = operation === 'void' ? {
+    CancelCatchNonManipulationDocumentRequest: {
+      CatchNonManipulationDocument: {
+        ID: {
+          value: catchSubmission?.reference
+        }
+      }
+    }
+  } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
   const resourceType = getResourceType(operation);
-  const params = { documentType: "STORAGEDOCUMENT" };
+  const params = { documentType: operation === 'void' ? "NMDOCUMENT" : "NONMANIPULATIONDOCUMENT" };
   const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
   const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
   await updateCertificateEuCatchStatus(documentNumber, statusData);
@@ -168,9 +188,9 @@ export const submitDocumentToBoomi = async (
     if (docType === 'catchCert') {
       await handleCatchCertificateSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     } else if (docType === 'processingStatement') {
-      await handleProcessingStatementSubmission(documentNumber, createdAt, exportData, operation);
+      await handleProcessingStatementSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     } else if (docType === 'storageDocument') {
-      await handleStorageNotesSubmission(documentNumber, createdAt, exportData, operation);
+      await handleStorageNotesSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     }
 
   } catch (error) {

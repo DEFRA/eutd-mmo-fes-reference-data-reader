@@ -7,7 +7,7 @@ let server;
 
 beforeAll(async () => {
   server = Hapi.server({
-    port: 9010,
+    port: 0, // Use dynamic port to avoid EADDRINUSE
     host: 'localhost'
   });
 
@@ -33,9 +33,9 @@ describe('When retrieving conversion factors from mongo', () => {
     });
 
     afterEach(() => {
-        getConversionFactorsStub.mockRestore();
-        mockLoggerInfo.mockRestore();
-        mockLoggerError.mockRestore();
+        if (getConversionFactorsStub) getConversionFactorsStub.mockRestore();
+        if (mockLoggerInfo) mockLoggerInfo.mockRestore();
+        if (mockLoggerError) mockLoggerError.mockRestore();
     });
 
     it('will a 200 OK all factors are found', async () => {

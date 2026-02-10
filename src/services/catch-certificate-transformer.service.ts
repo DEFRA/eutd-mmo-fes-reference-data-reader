@@ -3,6 +3,7 @@ import { getCountries, getGearTypes } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
+import { createMainCarriageSPSTransportMovement, getCountryISO2 } from '../data/euCatch';
 
 const formatDate = (dateString: string | Date) => {
   const date = new Date(dateString);
@@ -268,122 +269,32 @@ export default class CatchCertificateTransformerService {
   }
 
   private static buildTransportMovement(transportations: any[]): any {
-    const modeMap = {
-      'truck': '3',
-      'train': '2',
-      'plane': '4',
-      'containerVessel': '1'
-    };
-
-    const modeName = {
-      'truck': 'Road transport',
-      'train': 'Rail transport',
-      'plane': 'Air transport',
-      'containerVessel': 'Maritime transport'
-    };
-
-    const schemeID = {
-      'truck': 'road_vehicle_registration_before_bcp',
-      'train': 'train_identifier_before_bcp',
-      'plane': 'airplane_flight_number_before_bcp',
-      'containerVessel': 'ship_imo_number_before_bcp'
-    };
-
-    const schemeName = {
-      'truck': 'Road vehicle registration (before BCP)',
-      'train': 'Rail Identifier (before BCP)',
-      'plane': 'Flight number (before BCP)',
-      'containerVessel': 'Ship IMO Number (before BCP)'
-    }
-
-    const TRANSPORT_VEHICLE_TRUCK = 'truck';
-    const TRANSPORT_VEHICLE_TRAIN = 'train';
-    const TRANSPORT_VEHICLE_PLANE = 'plane';
-    const TRANSPORT_VEHICLE_CONTAINER_VESSEL = 'containerVessel';
-
-    const getTransportId: (transport: any) => string = (transport: any) => {
-      switch (transport.vehicle) {
-        case TRANSPORT_VEHICLE_TRUCK: {
-          return transport.registrationNumber;
-        }
-        case TRANSPORT_VEHICLE_TRAIN: {
-          return transport.railwayBillNumber;
-        }
-        case TRANSPORT_VEHICLE_PLANE: {
-          return transport.flightNumber;
-        }
-        default: {
-          return ''
-        }
-      }
-    }
-
-    const getSchemeAgencyID: (transport: any) => string = (transport: any) => {
-      if (transport.vehicle === TRANSPORT_VEHICLE_TRUCK) {
-          const countries: ICountry[] = getCountries();
-          const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
-          return countryID?.isoCodeAlpha2 ?? 'GB';
-      }
-
-      return null;
-    }
-
-    const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : null;
-
-    return transportations?.map((transport: any) => {
-      const vehicle = transport.vehicle;
-      const schemeAgencyID = getSchemeAgencyID(transport);
-      const schemeAgencyName = getSchemeAgencyName(transport);
-
-      const commonTransportInformation = {
-        ID: {
-          schemeID: schemeID[vehicle],
-          schemeName: schemeName[vehicle],
-          schemeAgencyID: schemeAgencyID ? schemeAgencyID : undefined,
-          schemeAgencyName: schemeAgencyName ? schemeAgencyName : undefined,
-          value: getTransportId(transport)
-        },
-        ModeCode: {
-          name: modeName[vehicle],
-          value: modeMap[vehicle]
-        }
-      };
-
-      return (transport.vehicle === TRANSPORT_VEHICLE_CONTAINER_VESSEL) ? {
-        ...commonTransportInformation,
-        UsedSPSTransportMeans: {
-          Name: {
-            languageID: 'en',
-            languageLocaleID: 'en-nz',
-            value: transport.vesselName
-          }
-        }
-      } : commonTransportInformation
-    });
+    return transportations?.map(createMainCarriageSPSTransportMovement);
   }
 
   private static buildTransportEquipment(transportations: any[]): any {
     return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => {
       // Handle containerNumbers (comma-separated string from multiple containers)
-      if (transport.containerNumbers) {
-        const containerArray = transport.containerNumbers.split(',').map((cn: string) => cn.trim());
-        const containerEquipments = containerArray.map((containerNum: string) => ({
+      if (transport.containerIdentificationNumber) {
+        const containerArray = transport.containerIdentificationNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+        const containerNumbers = containerArray.map((containerNumber: string) => ({
           ID: {
             schemeID: 'container_number',
-            value: containerNum
+            value: containerNumber
           }
         }));
-        return [...utilizedSPSTransportEquipments, ...containerEquipments];
+        return [...utilizedSPSTransportEquipments, ...containerNumbers];
       }
-      
+
       // Fallback to single containerNumber for backwards compatibility
       if (transport.containerNumber) {
-        return [...utilizedSPSTransportEquipments, {
+        const containerNumberArray = transport.containerNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+        return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
           ID: {
             schemeID: 'container_number',
-            value: transport.containerNumber
+            value: containerNumber
           }
-        }];
+        }))];
       }
 
       return utilizedSPSTransportEquipments;
@@ -407,75 +318,90 @@ export default class CatchCertificateTransformerService {
       });
     });
 
-    // Create vessel consignment items (TypeCode "5")
+    // Collect all vessel trade line items (TypeCode "5")
+    const vesselTradeLineItems: any[] = [];
     uniqueVessels.forEach((vessel: any) => {
+      vesselTradeLineItems.push({
+        SequenceNumeric: {
+          format: vesselSequenceMap.get(vessel.cfr).toString(),
+          value: vesselSequenceMap.get(vessel.cfr)
+        },
+        Description: {
+          languageID: 'en',
+          languageLocaleID: 'en',
+          value: 'en'
+        },
+        AdditionalInformationSPSNote: this.buildTypeCode5AdditionalInformationSPSNote(vessel, exportData.conservation?.conservationReference)
+      });
+    });
+
+    // Create single consignment item for all vessels (TypeCode "5")
+    if (vesselTradeLineItems.length > 0) {
       consignmentItems.push({
         NatureIdentificationSPSCargo: {
           TypeCode: {
             value: '5'
           }
         },
-        IncludedSPSTradeLineItem: {
+        IncludedSPSTradeLineItem: vesselTradeLineItems
+      });
+    }
+
+    let productSequenceNumber = 0;
+
+    // Collect all product trade line items (TypeCode "12")
+    const productTradeLineItems: any[] = [];
+    exportData.products?.forEach((product: any) => {
+      product.caughtBy?.forEach((catchItem: any) => {
+        productSequenceNumber++;
+        productTradeLineItems.push({
           SequenceNumeric: {
-            format: vesselSequenceMap.get(vessel.cfr).toString(),
-            value: vesselSequenceMap.get(vessel.cfr)
+            format: Number(productSequenceNumber).toString(),
+            value: productSequenceNumber
           },
           Description: {
             languageID: 'en',
-            languageLocaleID: 'en',
-            value: 'en'
+            value: product.commodityCodeDescription || ''
           },
-          AdditionalInformationSPSNote: this.buildTypeCode5AdditionalInformationSPSNote(vessel, exportData.conservation?.conservationReference)
-        }
-      });
-    });
-
-    // Create product consignment items (TypeCode "12")
-    exportData.products?.forEach((product: any) => {
-      product.caughtBy?.forEach((catchItem: any) => {
-        consignmentItems.push({
-          NatureIdentificationSPSCargo: {
-            TypeCode: {
-              value: '12'
-            }
+          CommonName: {
+            value: product.scientificName || ''
           },
-          IncludedSPSTradeLineItem: {
-            SequenceNumeric: {
-              format: vesselSequenceMap.get(catchItem.cfr).toString(),
-              value: vesselSequenceMap.get(catchItem.cfr)
+          NetWeightMeasure: {
+            unitCode: 'KGM',
+            value: catchItem.weight?.toString() || '0'
+          },
+          AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
+          ApplicableSPSClassification: {
+            SystemID: {
+              value: 'CN'
             },
-            Description: {
+            SystemName: {
+              languageID: 'en',
+              value: 'CN Code'
+            },
+            ClassCode: {
+              value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
+            },
+            ClassName: {
               languageID: 'en',
               value: product.commodityCodeDescription || ''
-            },
-            CommonName: {
-              value: product.scientificName || ''
-            },
-            NetWeightMeasure: {
-              unitCode: 'KGM',
-              value: catchItem.weight?.toString() || '0'
-            },
-            AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
-            ApplicableSPSClassification: {
-              SystemID: {
-                value: 'CN'
-              },
-              SystemName: {
-                languageID: 'en',
-                value: 'CN Code'
-              },
-              ClassCode: {
-                value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
-              },
-              ClassName: {
-                languageID: 'en',
-                value: product.commodityCodeDescription || ''
-              }
             }
           }
         });
       });
     });
+
+    // Create single consignment item for all products (TypeCode "12")
+    if (productTradeLineItems.length > 0) {
+      consignmentItems.push({
+        NatureIdentificationSPSCargo: {
+          TypeCode: {
+            value: '12'
+          }
+        },
+        IncludedSPSTradeLineItem: productTradeLineItems
+      });
+    }
 
     return consignmentItems;
   }
@@ -509,7 +435,7 @@ export default class CatchCertificateTransformerService {
     if (vessel.flag) {
       additionalInformationSPSNote.push({
         Content: {
-          value: vessel.flag
+          value: getCountryISO2(vessel.flag)
         },
         SubjectCode: {
           value: 'VESSEL_FLAG'
@@ -734,15 +660,4 @@ export default class CatchCertificateTransformerService {
     return additionalInformationSPSNote;
   }
 
-  public static generateVoidCatchPayload(documentNumber: string) {
-    return {
-      CancelCatchCertificateRequest: {
-        SPSCertificate: {
-          ID: {
-            value: documentNumber
-          }
-        }
-      }
-    }
-  }
 }
