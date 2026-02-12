@@ -184,7 +184,10 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
 
   const startDate = moment(landing.startDate, 'DD/MM/YYYY', true);
 
-  if (startDate.isValid()) {
+  // Skip start date validation for European Seabass (BSS)
+  // No validation required on start date regardless of date provided
+  // Seasonal validation only applies to landing date
+  if (startDate.isValid() && favouriteProduct.speciesCode !== 'BSS') {
     const dateIsRestricted = hasSeasonalFishingRestriction(startDate.format('YYYY-MM-DD'), favouriteProduct.speciesCode, seasonalRestrictions);
 
     if (dateIsRestricted) {
