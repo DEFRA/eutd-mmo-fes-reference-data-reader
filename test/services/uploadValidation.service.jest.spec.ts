@@ -1205,6 +1205,106 @@ describe('uploadValidation.service', () => {
 
     });
 
+    it('should skip start date validation for BSS (European Seabass) species', () => {
+      const bssProduct = [{
+        id: 'bssId',
+        species: 'European seabass (BSS)',
+        speciesCode: 'BSS',
+        scientificName: 'Dicentrarchus labrax',
+        state: 'FRE',
+        stateLabel: 'fresh',
+        presentation: 'WHL',
+        presentationLabel: 'whole',
+        commodity_code: '03028410',
+        commodity_code_description: 'Fresh or chilled European sea bass'
+      }];
+
+      const bssRestrictions = [
+        {
+          fao: 'BSS',
+          validFrom: '2020-02-01',
+          validTo: '2020-03-30'
+        }
+      ];
+
+      mockCommoditySearch.mockReturnValue([
+        {
+          code: '03028410',
+          description: 'Fresh or chilled European sea bass',
+          faoName: 'European seabass',
+          stateLabel: 'fresh',
+          presentationLabel: 'whole',
+        }
+      ]);
+
+      const result = SUT.validateProductForLanding(
+        {
+          ...uploadedLanding,
+          productId: 'bssId',
+          startDate: '31/03/2020', // Date during restricted period
+          landingDate: '01/04/2020', // Date after restricted period
+          errors : []
+        },
+        bssProduct,
+        bssRestrictions
+      );
+
+      // Should have no start date error, but would still validate landing date
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should still validate landing date for BSS even when start date validation is skipped', () => {
+      const bssProduct = [{
+        id: 'bssId',
+        species: 'European seabass (BSS)',
+        speciesCode: 'BSS',
+        scientificName: 'Dicentrarchus labrax',
+        state: 'FRE',
+        stateLabel: 'fresh',
+        presentation: 'WHL',
+        presentationLabel: 'whole',
+        commodity_code: '03028410',
+        commodity_code_description: 'Fresh or chilled European sea bass'
+      }];
+
+      const bssRestrictions = [
+        {
+          fao: 'BSS',
+          validFrom: '2020-02-01',
+          validTo: '2020-03-30'
+        }
+      ];
+
+      mockCommoditySearch.mockReturnValue([
+        {
+          code: '03028410',
+          description: 'Fresh or chilled European sea bass',
+          faoName: 'European seabass',
+          stateLabel: 'fresh',
+          presentationLabel: 'whole',
+        }
+      ]);
+
+      const result = SUT.validateProductForLanding(
+        {
+          ...uploadedLanding,
+          productId: 'bssId',
+          startDate: '31/03/2020', // Date during restricted period - should be allowed
+          landingDate: '15/02/2020', // Date during restricted period - should error
+          errors : []
+        },
+        bssProduct,
+        bssRestrictions
+      );
+
+      const error = {
+        key: 'validation.product.seasonal.invalid-date',
+        params: ['European seabass (BSS)']
+      };
+
+      expect(result.errors).toStrictEqual([error]);
+    });
+
   });
 
   describe('validateGearCodeForLanding', () => {
