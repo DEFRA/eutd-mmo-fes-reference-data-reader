@@ -184,7 +184,10 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
 
   const startDate = moment(landing.startDate, 'DD/MM/YYYY', true);
 
-  if (startDate.isValid()) {
+  // Skip start date validation for European Seabass (BSS)
+  // Business rule: fishermen can start trip on restricted period end date (31/03)
+  // if they catch no fish during restricted period and land after it ends
+  if (startDate.isValid() && favouriteProduct.speciesCode !== 'BSS') {
     const dateIsRestricted = hasSeasonalFishingRestriction(startDate.format('YYYY-MM-DD'), favouriteProduct.speciesCode, seasonalRestrictions);
 
     if (dateIsRestricted) {
