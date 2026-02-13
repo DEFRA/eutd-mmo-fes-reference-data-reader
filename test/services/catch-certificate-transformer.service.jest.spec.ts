@@ -8,11 +8,13 @@ describe('CatchCertificateTransformerService', () => {
   const mockLogger = logger as jest.Mocked<typeof logger>;
   let mockGetCountries: jest.SpyInstance;
   let mockGetGearCodes: jest.SpyInstance;
+  let mockGetRFMO: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetCountries = jest.spyOn(Cache, 'getCountries');
     mockGetGearCodes = jest.spyOn(Cache, 'getGearTypes');
+    mockGetRFMO = jest.spyOn(Cache, 'getRfmos');
   });
 
   describe('generateCatchPayload', () => {
@@ -201,6 +203,341 @@ describe('CatchCertificateTransformerService', () => {
 
       expect(parsedTimestamp.getTime()).toBeGreaterThanOrEqual(createdAt.getTime());
       expect(parsedTimestamp.getTime()).toBeLessThanOrEqual(createdAt.getTime());
+    });
+
+    it('should include transport document references for containerVessel', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'containerVessel',
+          vesselName: 'MV Ocean Carrier',
+          transportDocuments: [
+            { name: 'Bill of Lading', reference: 'BOL123456' },
+            { name: 'Packing List', reference: 'PKL789012' }
+          ]
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      expect(references.length).toBeGreaterThanOrEqual(4); // 2 default + 2 transport docs
+      const transportDocRefs = references.filter((ref: any) => ref.TypeCode.value === '710');
+      expect(transportDocRefs).toHaveLength(2);
+      expect(transportDocRefs[0].RelationshipTypeCode.value).toBe('BM');
+      expect(transportDocRefs[0].ID.value).toBe('BOL123456');
+      expect(transportDocRefs[0].Information.value).toBe('MV Ocean Carrier');
+      expect(transportDocRefs[1].ID.value).toBe('PKL789012');
+      expect(transportDocRefs[1].Information.value).toBe('MV Ocean Carrier');
+    });
+
+    it('should include transport document references for train', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'train',
+          railwayBillNumber: 'RAIL12345',
+          transportDocuments: [
+            { name: 'Railway Bill', reference: 'RB001' }
+          ]
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      const transportDocRefs = references.filter((ref: any) => ref.TypeCode.value === '720');
+      expect(transportDocRefs).toHaveLength(1);
+      expect(transportDocRefs[0].RelationshipTypeCode.value).toBe('BM');
+      expect(transportDocRefs[0].ID.value).toBe('RB001');
+      expect(transportDocRefs[0].Information.value).toBe('RAIL12345');
+    });
+
+    it('should include transport document references for truck', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC003';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'truck',
+          registrationNumber: 'ABC123',
+          transportDocuments: [
+            { name: 'CMR', reference: 'CMR456' }
+          ]
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      const transportDocRefs = references.filter((ref: any) => ref.TypeCode.value === '730');
+      expect(transportDocRefs).toHaveLength(1);
+      expect(transportDocRefs[0].RelationshipTypeCode.value).toBe('BM');
+      expect(transportDocRefs[0].ID.value).toBe('CMR456');
+      expect(transportDocRefs[0].Information.value).toBe('ABC123');
+    });
+
+    it('should include transport document references for plane', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC004';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'plane',
+          flightNumber: 'BA456',
+          transportDocuments: [
+            { name: 'Airway Bill', reference: 'AWB789' }
+          ]
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      const transportDocRefs = references.filter((ref: any) => ref.TypeCode.value === '740');
+      expect(transportDocRefs).toHaveLength(1);
+      expect(transportDocRefs[0].RelationshipTypeCode.value).toBe('BM');
+      expect(transportDocRefs[0].ID.value).toBe('AWB789');
+      expect(transportDocRefs[0].Information.value).toBe('BA456');
+    });
+
+    it('should handle multiple transportations with different vehicle types', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [
+          {
+            vehicle: 'truck',
+            registrationNumber: 'TRUCK001',
+            transportDocuments: [
+              { name: 'CMR', reference: 'CMR001' }
+            ]
+          },
+          {
+            vehicle: 'containerVessel',
+            vesselName: 'MV Vessel',
+            transportDocuments: [
+              { name: 'Bill of Lading', reference: 'BOL001' },
+              { name: 'Manifest', reference: 'MAN001' }
+            ]
+          }
+        ]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      const truckRefs = references.filter((ref: any) => ref.TypeCode.value === '730');
+      expect(truckRefs).toHaveLength(1);
+      expect(truckRefs[0].ID.value).toBe('CMR001');
+      expect(truckRefs[0].Information.value).toBe('TRUCK001');
+
+      const vesselRefs = references.filter((ref: any) => ref.TypeCode.value === '710');
+      expect(vesselRefs).toHaveLength(2);
+      expect(vesselRefs[0].ID.value).toBe('BOL001');
+      expect(vesselRefs[0].Information.value).toBe('MV Vessel');
+      expect(vesselRefs[1].ID.value).toBe('MAN001');
+      expect(vesselRefs[1].Information.value).toBe('MV Vessel');
+    });
+
+    it('should handle missing transportDocuments array', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'truck',
+          registrationNumber: 'ABC123'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      // Should only have the 2 default references
+      expect(references).toHaveLength(2);
+      expect(references[0].TypeCode.value).toBe('916');
+      expect(references[1].TypeCode.value).toBe('916');
+    });
+
+    it('should handle empty transportDocuments array', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'truck',
+          registrationNumber: 'ABC123',
+          transportDocuments: []
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      // Should only have the 2 default references
+      expect(references).toHaveLength(2);
+    });
+
+    it('should skip transportations with unknown vehicle types', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'hovercraft',
+          transportDocuments: [
+            { name: 'Doc', reference: 'REF001' }
+          ]
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      // Should only have the 2 default references
+      expect(references).toHaveLength(2);
+    });
+
+    it('should handle missing vehicle identifier fields', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC009';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'containerVessel',
+          transportDocuments: [
+            { name: 'Bill of Lading', reference: 'BOL123' }
+          ]
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      const transportDocRefs = references.filter((ref: any) => ref.TypeCode.value === '710');
+      expect(transportDocRefs).toHaveLength(1);
+      expect(transportDocRefs[0].Information.value).toBe('');
+    });
+
+    it('should handle null transportations array', () => {
+      const documentNumber = 'GBR-2025-CC-TRANSDOC010';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: null
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const references =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument
+          .ReferenceSPSReferencedDocument;
+
+      // Should only have the 2 default references
+      expect(references).toHaveLength(2);
     });
   });
 
@@ -961,7 +1298,7 @@ describe('CatchCertificateTransformerService', () => {
 
       expect(transport[0].ModeCode.value).toBe('1');
       expect(transport[0].ModeCode.name).toBe('Maritime transport');
-      expect(transport[0].UsedSPSTransportMeans).toEqual({ Name: {  languageID: 'en', languageLocaleID: 'en-nz', value: 'MSC Express III' }});
+      expect(transport[0].UsedSPSTransportMeans).toEqual({ Name: { languageID: 'en', languageLocaleID: 'en-nz', value: 'MSC Express III' } });
     });
 
     it('should use empty string when all transport means are missing', () => {
@@ -1296,19 +1633,35 @@ describe('CatchCertificateTransformerService', () => {
         transportations: [
           {
             vehicle: 'truck',
-            registrationNumber: 'TRUCK-001'
+            registrationNumber: 'TRUCK-001',
+            transportDocuments: [{
+              name: "Truck Documentation",
+              reference: "INV00001"
+            }]
           },
           {
             vehicle: 'train',
-            railwayBillNumber: 'TRAIN-002'
+            railwayBillNumber: 'TRAIN-002',
+            transportDocuments: [{
+              name: "Train documentation",
+              reference: "INV00001"
+            }]
           },
           {
             vehicle: 'plane',
-            flightNumber: 'PLANE-003'
+            flightNumber: 'PLANE-003',
+            transportDocuments: [{
+              name: "Plane",
+              reference: "INV00001"
+            }]
           },
           {
             vehicle: 'containerVessel',
-            vesselName: 'VESSEL-004'
+            vesselName: 'VESSEL-004',
+            transportDocuments: [{
+              name: "Container vessel",
+              reference: "INV00001"
+            }]
           }
         ]
       };
@@ -1881,6 +2234,7 @@ describe('CatchCertificateTransformerService', () => {
                 licenceNumber: 'LIC999',
                 licenceValidTo: '2025-12-31',
                 faoArea: 'FAO27',
+                rfmo: 'Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)',
                 highSeasArea: 'Yes',
                 ircs: 'D5RX8',
                 gearCode: 'PTM',
@@ -1900,7 +2254,22 @@ describe('CatchCertificateTransformerService', () => {
           user_submitted_conservation_info: 'Frozen at sea'
         }
       };
+      const rfmoRecords = [
+        {
+          "Full text": "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+          Abbreviation: "CCAMLR",
+        },
+        {
+          "Full text": "General Fisheries Commission for the Mediterranean (GFCM)",
+          Abbreviation: "GFCM",
+        },
+        {
+          "Full text": "North East Atlantic Fisheries Commission (NEAFC)",
+          Abbreviation: "NEAFC"
+        }
+      ];
 
+      mockGetRFMO.mockReturnValue(rfmoRecords);
       const result = CatchCertificateTransformerService.generateCatchPayload(
         documentNumber,
         createdAt,
@@ -1930,6 +2299,8 @@ describe('CatchCertificateTransformerService', () => {
       notes = catchAreaItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       expect(notes.some((n: any) => n.SubjectCode.value === 'CATCH_AREA')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'HIGH_SEAS_CATCH_AREA')).toBe(true);
+      expect(notes.some((n: any) => n.SubjectCode.value === 'REGIONAL_FISHERIES_MANAGEMENT_ORGANISATION')).toBe(true);
+      expect(notes.some((n: any) => n.Content.value === 'CCAMLR')).toBe(true);
     });
 
     it('should include phone note even when empty', () => {
@@ -2090,7 +2461,7 @@ describe('CatchCertificateTransformerService', () => {
                 startDate: '2025-02-01',
                 date: '2025-02-10',
                 faoArea: '27.7.e',
-                rfmo: 'ICCAT',
+                rfmo: 'Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)',
                 exclusiveEconomicZones: [
                   { isoCodeAlpha2: 'GB' },
                   { officialCountryName: 'Ireland' }
@@ -2491,7 +2862,7 @@ describe('CatchCertificateTransformerService', () => {
           {
             commodityCode: '03034100',
             scientificName: 'Katsuwonus pelamis',
-            species: 'Skipjack Tuna' ,
+            species: 'Skipjack Tuna',
             caughtBy: [
               {
                 vessel: 'Vessel 2',
@@ -2561,7 +2932,7 @@ describe('CatchCertificateTransformerService', () => {
                 startDate: '2025-01-10',
                 dateLanded: '2025-01-15',
                 faoArea: '27.4.a',
-                rfmo: 'NEAFC',
+                rfmo: 'Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)',
                 exclusiveEconomicZones: [
                   { isoCodeAlpha2: 'GB', officialCountryName: 'United Kingdom' }
                 ]
