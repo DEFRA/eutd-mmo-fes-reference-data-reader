@@ -4,6 +4,7 @@ import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
 import { createMainCarriageSPSTransportMovement, getCountryISO2 } from '../data/euCatch';
+import { equalsIgnoreCase } from '../utils/string';
 
 const formatDate = (dateString: string | Date) => {
   const date = new Date(dateString);
@@ -213,7 +214,6 @@ export default class CatchCertificateTransformerService {
             value: 'BM'
           },
           ID: {
-            schemeID: 'BEFORE_BCP',
             value: doc.reference || ''
           },
           Information: {

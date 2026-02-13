@@ -3144,7 +3144,7 @@ describe('CatchCertificateTransformerService', () => {
           {
             commodityCode: '03034100',
             scientificName: 'Katsuwonus pelamis',
-            species: 'Skipjack Tuna' ,
+            species: 'Skipjack Tuna',
             caughtBy: [
               {
                 vessel: 'Vessel 2',
