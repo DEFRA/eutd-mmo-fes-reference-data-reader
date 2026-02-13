@@ -214,6 +214,7 @@ export default class CatchCertificateTransformerService {
             value: 'BM'
           },
           ID: {
+            schemeID: 'BEFORE_BCP',
             value: doc.reference || ''
           },
           Information: {
