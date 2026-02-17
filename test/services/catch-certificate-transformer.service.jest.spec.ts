@@ -552,7 +552,41 @@ describe('CatchCertificateTransformerService', () => {
           townCity: 'Plymouth',
           country: 'United Kingdom'
         },
-        exportedFrom: 'Heathrow',
+        exportedFrom: 'Nothing',
+        exportedTo: { isoCodeAlpha2: 'ES', officialCountryName: 'Spain' },
+        pointOfDestination: 'Madrid',
+        transportations: [{
+          vehicle: 'plane',
+          flightNumber: 'BA123'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const consignment =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment;
+
+      expect(consignment.ConsignorSPSParty.Name.value).toBe('Fish Traders Ltd');
+      expect(consignment.ConsigneeSPSParty.RoleCode.value).toBe('CN');
+      expect(consignment.ExportSPSCountry.ID.value).toBe('GB');
+      expect(consignment.ImportSPSCountry.ID.value).toBe('ES');
+    });
+
+    it('should build consignment with all parties for United Kingdom', () => {
+      const documentNumber = 'GBR-2025-CC-CONS001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {
+          exporterCompanyName: 'Fish Traders Ltd',
+          addressOne: '456 Harbor Road',
+          townCity: 'Plymouth',
+          country: 'United Kingdom'
+        },
+        exportedFrom: 'Nothing',
         exportedTo: { isoCodeAlpha2: 'ES', officialCountryName: 'Spain' },
         pointOfDestination: 'Madrid',
         transportations: [{
@@ -652,33 +686,8 @@ describe('CatchCertificateTransformerService', () => {
         exportedFrom: 'United Kingdom',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
-        transportations: []
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const loadingLocation =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .LoadingBaseportSPSLocation;
-
-      expect(loadingLocation.ID.value).toBe('GB01');
-      expect(loadingLocation.Name.value).toBe('GB');
-    });
-
-    it('should use exportLocation as fallback', () => {
-      const documentNumber = 'GBR-2025-CC-LOAD002';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporter: {},
-        exportedFrom: 'United Kingdom',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
         transportations: [{
-          exportLocation: 'Bristol Port'
+          departurePlace: 'Hull'
         }]
       };
 
@@ -692,8 +701,35 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .LoadingBaseportSPSLocation;
 
-      expect(loadingLocation.ID.value).toBe('GB01');
-      expect(loadingLocation.Name.value).toBe('GB');
+      expect(loadingLocation.ID.value).toBe('GB');
+      expect(loadingLocation.Name.value).toBe('Hull');
+    });
+
+    it('should use exportLocation as fallback', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporter: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          departurePlace: 'Hull'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.ID.value).toBe('GB');
+      expect(loadingLocation.Name.value).toBe('Hull');
     });
 
     it('should use default GB01 when no location provided', () => {
@@ -704,7 +740,9 @@ describe('CatchCertificateTransformerService', () => {
         exportedFrom: 'GB01',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
-        transportations: [{}]
+        transportations: [{
+          departurePlace: 'Hull'
+        }]
       };
 
       const result = CatchCertificateTransformerService.generateCatchPayload(
@@ -717,7 +755,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .LoadingBaseportSPSLocation;
 
-      expect(loadingLocation.ID.value).toBe('GB01');
+      expect(loadingLocation.ID.value).toBe('GB');
     });
 
     it('should handle null transport object', () => {
@@ -728,7 +766,9 @@ describe('CatchCertificateTransformerService', () => {
         exportedFrom: 'GB01',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
-        transportations: [{}]
+        transportations: [{
+          departurePlace: 'Hull'
+        }]
       };
 
       const result = CatchCertificateTransformerService.generateCatchPayload(
@@ -741,7 +781,249 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .LoadingBaseportSPSLocation;
 
-      expect(loadingLocation.ID.value).toBe('GB01');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should return comma-separated list of departure places from multiple transportations', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [
+          {
+            vehicle: 'truck',
+            departurePlace: 'Hull'
+          },
+          {
+            vehicle: 'plane',
+            departurePlace: 'London'
+          },
+          {
+            vehicle: 'train',
+            departurePlace: 'Dover'
+          }
+        ]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('Hull, London, Dover');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should deduplicate departure places when multiple transportations have same departure', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [
+          {
+            vehicle: 'truck',
+            departurePlace: 'Hull'
+          },
+          {
+            vehicle: 'plane',
+            departurePlace: 'Hull'
+          },
+          {
+            vehicle: 'containerVessel',
+            departurePlace: 'Dover'
+          },
+          {
+            vehicle: 'train',
+            departurePlace: 'Hull'
+          }
+        ]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('Hull, Dover');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should filter out transportations without departure place', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [
+          {
+            vehicle: 'truck',
+            departurePlace: 'Hull'
+          },
+          {
+            vehicle: 'plane'
+          },
+          {
+            vehicle: 'containerVessel',
+            departurePlace: 'Dover'
+          },
+          {
+            vehicle: 'train',
+            departurePlace: null
+          }
+        ]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('Hull, Dover');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should return empty string when transportations array is empty', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should return empty string when transportations is null', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD009';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: null
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should return empty string when transportations is undefined', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD010';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('');
+      expect(loadingLocation.ID.value).toBe('GB');
+    });
+
+    it('should handle transportations with all different vehicle types', () => {
+      const documentNumber = 'GBR-2025-CC-LOAD011';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'United Kingdom',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [
+          {
+            vehicle: 'truck',
+            departurePlace: 'Hull',
+            nationalityOfVehicle: 'United Arab Emirates'
+          },
+          {
+            vehicle: 'plane',
+            departurePlace: 'London',
+            flightNumber: 'BA078'
+          },
+          {
+            vehicle: 'train',
+            departurePlace: 'Dover',
+            railwayBillNumber: 'AB12345C'
+          },
+          {
+            vehicle: 'containerVessel',
+            departurePlace: 'Southampton',
+            vesselName: 'Felicity Ace',
+            flagState: 'Greece'
+          }
+        ]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const loadingLocation =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .LoadingBaseportSPSLocation;
+
+      expect(loadingLocation.Name.value).toBe('Hull, London, Dover, Southampton');
+      expect(loadingLocation.ID.value).toBe('GB');
     });
   });
 
@@ -892,7 +1174,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .UnloadingBaseportSPSLocation;
 
-      expect(unloadingLocation.ID.value).toBe('FR');
+      expect(unloadingLocation.ID.value).toBe('NL');
       expect(unloadingLocation.Name.value).toBe('Netherlands');
     });
 
