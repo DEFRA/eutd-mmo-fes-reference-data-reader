@@ -213,3 +213,10 @@ const countryISOMapping = {
 export function getCountryISO2(countryCode: string) {
   return countryISOMapping[countryCode]
 }
+
+export const exportedFromMapping = {
+  ['United Kingdom']: 'GB',
+  ['Guernsey']: 'GG',
+  ['Isle Of Man']: 'IM',
+  ['Jersey']: 'JJ'
+}

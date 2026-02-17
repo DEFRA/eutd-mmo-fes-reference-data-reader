@@ -3,7 +3,7 @@ import { getCountries, getGearTypes, getRfmos } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
-import { createMainCarriageSPSTransportMovement, getCountryISO2 } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
 import { equalsIgnoreCase } from '../utils/string';
 
 const formatDate = (dateString: string | Date) => {
@@ -241,7 +241,7 @@ export default class CatchCertificateTransformerService {
       ExportSPSCountry: {
         ID: {
           schemeAgencyID: 'agency',
-          value: 'GB'
+          value: exportedFromMapping[exportData.exportedFrom] ?? 'GB'
         },
         Name: {
           languageID: 'en',
@@ -249,9 +249,9 @@ export default class CatchCertificateTransformerService {
           value: exportData.exportedFrom
         }
       },
-      LoadingBaseportSPSLocation: this.buildLoadingLocation(),
+      LoadingBaseportSPSLocation: this.buildLoadingLocation(exportData),
       ImportSPSCountry: this.buildImportCountry(exportData.exportedTo),
-      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.pointOfDestination),
+      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.exportedTo, exportData.pointOfDestination),
       ExaminationSPSEvent: {
         OccurrenceSPSLocation: {
           Name: {
@@ -300,16 +300,24 @@ export default class CatchCertificateTransformerService {
     };
   }
 
-  private static buildLoadingLocation(): any {
+  private static buildLoadingLocation(exportData: any): any {
+    const pointsOfDeparture = exportData.transportations
+      ? [...new Set(
+          exportData.transportations
+            .map((t: any) => t.departurePlace)
+            .filter((place: string) => place)
+        )].join(', ')
+      : '';
+
     return {
       ID: {
         schemeID: 'controlled_location_id',
-        value: 'GB01'
+        value: 'GB'
       },
       Name: {
         languageID: 'en',
         languageLocaleID: 'en-nz',
-        value: 'GB'
+        value: pointsOfDeparture
       }
     };
   }
@@ -326,11 +334,11 @@ export default class CatchCertificateTransformerService {
     };
   }
 
-  private static buildUnloadingLocation(pointOfDestination: string): any {
+  private static buildUnloadingLocation(exportedTo: ICountry, pointOfDestination: string): any {
     return {
       ID: {
         schemeID: 'controlled_location_id',
-        value: 'FR'
+        value: exportedTo.isoCodeAlpha2
       },
       Name: {
         languageID: 'en',
