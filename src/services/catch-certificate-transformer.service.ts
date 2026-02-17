@@ -3,7 +3,7 @@ import { getCountries, getGearTypes, getRfmos } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
-import { createMainCarriageSPSTransportMovement, getCountryISO2 } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
 import { equalsIgnoreCase } from '../utils/string';
 
 const formatDate = (dateString: string | Date) => {
