@@ -144,8 +144,8 @@ export const createMainCarriageSPSTransportMovement = (transport: any) => {
     ID: {
       schemeID: schemeID[vehicle],
       schemeName: schemeName[vehicle],
-      schemeAgencyID: schemeAgencyID ? schemeAgencyID : undefined,
-      schemeAgencyName: schemeAgencyName ? schemeAgencyName : undefined,
+      schemeAgencyID: schemeAgencyID,
+      schemeAgencyName: schemeAgencyName,
       value: getTransportId(transport)
     },
     ModeCode: {
