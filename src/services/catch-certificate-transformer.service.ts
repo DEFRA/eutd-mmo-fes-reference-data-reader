@@ -1,9 +1,10 @@
 import { ICountry } from 'mmo-shared-reference-data';
-import { getCountries, getGearTypes } from '../data/cache';
+import { getCountries, getGearTypes, getRfmos } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
-import { createMainCarriageSPSTransportMovement, getCountryISO2 } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
+import { equalsIgnoreCase } from '../utils/string';
 
 const formatDate = (dateString: string | Date) => {
   const date = new Date(dateString);
@@ -29,7 +30,7 @@ export default class CatchCertificateTransformerService {
       const payload = {
         CreateCatchCertificateRequest: {
           SPSCertificate: {
-            SPSExchangedDocument: this.buildExchangedDocument(documentNumber, createdAt),
+            SPSExchangedDocument: this.buildExchangedDocument(documentNumber, createdAt, exportData),
             SPSConsignment: this.buildConsignment(exportData)
           }
         }
@@ -43,7 +44,9 @@ export default class CatchCertificateTransformerService {
     }
   }
 
-  private static buildExchangedDocument(documentNumber: string, createdAt: Date): any {
+  private static buildExchangedDocument(documentNumber: string, createdAt: Date, exportData: any): any {
+    const transportDocumentReferences = this.buildTransportDocumentReferences(exportData.transportations);
+
     return {
       Name: {
         languageID: 'en',
@@ -99,7 +102,8 @@ export default class CatchCertificateTransformerService {
           ID: {
             value: 'Regulation (EU) 2023/2842'
           }
-        }
+        },
+        ...transportDocumentReferences
       ],
       SignatorySPSAuthentication: {
         TypeCode: {
@@ -155,6 +159,74 @@ export default class CatchCertificateTransformerService {
     };
   }
 
+  private static buildTransportDocumentReferences(transportations: any[]): any[] {
+    if (!transportations || !Array.isArray(transportations)) {
+      return [];
+    }
+
+    const references: any[] = [];
+
+    for (const transport of transportations) {
+      if (!transport.transportDocuments || !Array.isArray(transport.transportDocuments)) {
+        continue;
+      }
+
+      const vehicle = transport.vehicle;
+      let typeCodeValue: string;
+      let typeCodeName: string;
+      let informationValue: string;
+
+      // Determine TypeCode based on vehicle type
+      switch (vehicle) {
+        case 'containerVessel':
+          typeCodeValue = '710';
+          typeCodeName = 'Sea waybill (International transport document for Ship)';
+          informationValue = transport.vesselName || '';
+          break;
+        case 'train':
+          typeCodeValue = '720';
+          typeCodeName = 'Rail consignment note (International transport document for Rail)';
+          informationValue = transport.railwayBillNumber || '';
+          break;
+        case 'truck':
+          typeCodeValue = '730';
+          typeCodeName = 'Road consignment note (International transport document for Road Vehicle)';
+          informationValue = transport.registrationNumber || '';
+          break;
+        case 'plane':
+          typeCodeValue = '740';
+          typeCodeName = 'Air waybill (International transport document for Airplane)';
+          informationValue = transport.flightNumber || '';
+          break;
+        default:
+          continue; // Skip if vehicle type is not recognized
+      }
+
+      // Create a reference object for each transport document
+      for (const doc of transport.transportDocuments) {
+        references.push({
+          TypeCode: {
+            name: typeCodeName,
+            value: typeCodeValue
+          },
+          RelationshipTypeCode: {
+            name: 'Bill of lading number (International transport document)',
+            value: 'BM'
+          },
+          ID: {
+            schemeID: 'BEFORE_BCP',
+            value: doc.reference || ''
+          },
+          Information: {
+            value: informationValue
+          }
+        });
+      }
+    }
+
+    return references;
+  }
+
   private static buildConsignment(exportData: any): any {
     return {
       ConsignorSPSParty: this.buildConsignorParty(exportData.exporterDetails),
@@ -169,7 +241,7 @@ export default class CatchCertificateTransformerService {
       ExportSPSCountry: {
         ID: {
           schemeAgencyID: 'agency',
-          value: 'GB'
+          value: exportedFromMapping[exportData.exportedFrom] ?? 'GB'
         },
         Name: {
           languageID: 'en',
@@ -177,9 +249,9 @@ export default class CatchCertificateTransformerService {
           value: exportData.exportedFrom
         }
       },
-      LoadingBaseportSPSLocation: this.buildLoadingLocation(),
+      LoadingBaseportSPSLocation: this.buildLoadingLocation(exportData),
       ImportSPSCountry: this.buildImportCountry(exportData.exportedTo),
-      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.pointOfDestination),
+      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.exportedTo, exportData.pointOfDestination),
       ExaminationSPSEvent: {
         OccurrenceSPSLocation: {
           Name: {
@@ -228,16 +300,24 @@ export default class CatchCertificateTransformerService {
     };
   }
 
-  private static buildLoadingLocation(): any {
+  private static buildLoadingLocation(exportData: any): any {
+    const pointsOfDeparture = exportData.transportations
+      ? [...new Set(
+          exportData.transportations
+            .map((t: any) => t.departurePlace)
+            .filter((place: string) => place)
+        )].join(', ')
+      : '';
+
     return {
       ID: {
         schemeID: 'controlled_location_id',
-        value: 'GB01'
+        value: 'GB'
       },
       Name: {
         languageID: 'en',
         languageLocaleID: 'en-nz',
-        value: 'GB'
+        value: pointsOfDeparture
       }
     };
   }
@@ -254,11 +334,11 @@ export default class CatchCertificateTransformerService {
     };
   }
 
-  private static buildUnloadingLocation(pointOfDestination: string): any {
+  private static buildUnloadingLocation(exportedTo: ICountry, pointOfDestination: string): any {
     return {
       ID: {
         schemeID: 'controlled_location_id',
-        value: 'FR'
+        value: exportedTo.isoCodeAlpha2
       },
       Name: {
         languageID: 'en',
@@ -646,10 +726,11 @@ export default class CatchCertificateTransformerService {
     }
 
     if (catchItem.rfmo) {
+      const abbreviation = getRfmos()?.find(r => equalsIgnoreCase(catchItem.rfmo, r['Full text']))?.Abbreviation;
       additionalInformationSPSNote.push({
         Content: {
           languageID: 'en',
-          value: catchItem.rfmo
+          value: abbreviation
         },
         SubjectCode: {
           value: 'REGIONAL_FISHERIES_MANAGEMENT_ORGANISATION'

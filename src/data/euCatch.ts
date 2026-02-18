@@ -205,11 +205,18 @@ export const validateUKSDNumberFormat = (str: string) => {
 // JEY - Jersey
 const countryISOMapping = {
   GBR: "GB",
-  GGY: "GG",
-  IMN: "IM",
-  JEY: "JE",
+  GGY: "GB",
+  IMN: "GB",
+  JEY: "GB",
 }
 
 export function getCountryISO2(countryCode: string) {
   return countryISOMapping[countryCode]
+}
+
+export const exportedFromMapping = {
+  ['United Kingdom']: 'GB',
+  ['Guernsey']: 'GG',
+  ['Isle Of Man']: 'IM',
+  ['Jersey']: 'JJ'
 }
