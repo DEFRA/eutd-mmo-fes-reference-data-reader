@@ -129,11 +129,9 @@ export const getSchemeAgencyID: (transport: any) => string = (transport: any) =>
     const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
     return countryID?.isoCodeAlpha2 ?? 'GB';
   }
-
-  return null;
 }
 
-export const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : null;
+export const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : undefined;
 
 export const createMainCarriageSPSTransportMovement = (transport: any) => {
   const vehicle = transport?.vehicle;
