@@ -305,8 +305,8 @@ export default class CatchCertificateTransformerService {
       ? [...new Set(
           exportData.transportations
             .map((t: any) => t.departurePlace)
-            .filter((place: string) => place)
-        )].join(', ')
+            .filter(Boolean)
+        )].map(String).join(', ')
       : '';
 
     return {
