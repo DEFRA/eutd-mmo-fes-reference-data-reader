@@ -380,7 +380,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
-            containerId: handleEmptyValue(transportation.containerIdentificationNumber),
+            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
             pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_TRAIN:
@@ -394,14 +394,14 @@ export function toTransportation(transportation: any): CertificateTransport | un
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
-            containerId: handleEmptyValue(transportation.containerIdentificationNumber),
+            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
             pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_PLANE:
          return {
             modeofTransport: transportation.vehicle,
             flightNumber: transportation.flightNumber,
-            containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
+            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
@@ -417,7 +417,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             modeofTransport: TRANSPORT_VEHICLE_VESSEL,
             name: transportation.vesselName,
             flag: transportation.flagState,
-            containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
+            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
