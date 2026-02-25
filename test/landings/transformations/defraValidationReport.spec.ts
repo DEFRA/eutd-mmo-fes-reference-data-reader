@@ -3357,7 +3357,7 @@ describe('For transportation', () => {
       const planeTransport = {
         vehicle: "plane",
         flightNumber: "BA078",
-        containerNumber: "1234",
+        containerNumbers: "1234",
         departurePlace: "Telford",
         exportDate: "30/05/2020"
       };
@@ -3382,7 +3382,7 @@ describe('For transportation', () => {
         vehicle: "containerVessel",
         vesselName: "WIRON 5",
         flagState: "UK",
-        containerNumber: "1234",
+        containerNumbers: "1234",
         departurePlace: "Telford",
         exportDate: "30/05/2020"
       };
@@ -3551,7 +3551,7 @@ describe('For transportations', () => {
       const planeTransport = {
         vehicle: "plane",
         flightNumber: "BA078",
-        containerNumber: "1234",
+        containerNumbers: "1234",
         departurePlace: "Telford",
         freightBillNumber: "0",
         id: "0",
@@ -3586,7 +3586,7 @@ describe('For transportations', () => {
         vehicle: "containerVessel",
         vesselName: "WIRON 5",
         flagState: "UK",
-        containerNumber: "1234",
+        containerNumbers: "1234",
         departurePlace: "Telford",
         freightBillNumber: "0",
         id: "0",

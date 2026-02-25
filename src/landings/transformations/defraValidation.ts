@@ -380,7 +380,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
-            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
+            containerId: transportation.containerNumbers,
             pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_TRAIN:
@@ -394,14 +394,14 @@ export function toTransportation(transportation: any): CertificateTransport | un
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
-            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
+            containerId: transportation.containerNumbers,
             pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_PLANE:
          return {
             modeofTransport: transportation.vehicle,
             flightNumber: transportation.flightNumber,
-            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
+            containerId: transportation.containerNumbers,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
@@ -417,7 +417,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             modeofTransport: TRANSPORT_VEHICLE_VESSEL,
             name: transportation.vesselName,
             flag: transportation.flagState,
-            containerId: Array.isArray(transportation.containerNumbers) ? transportation.containerNumbers.join(", ") : undefined,
+            containerId: transportation.containerNumbers,
             exportLocation: transportation.departurePlace,
             exportDate: transportation.exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
