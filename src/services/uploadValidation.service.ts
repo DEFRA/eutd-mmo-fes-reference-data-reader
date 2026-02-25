@@ -33,7 +33,7 @@ export const validateLandings = async (products: IProduct[], landingLimitDaysInF
   const validateGearCode = (landing: IUploadedLanding) =>
     validateGearCodeForLanding(landing, gearRecords);
 
-  return landings.map(l =>
+  const validatedLandings = landings.map(l =>
     pipe(
       initialiseErrorsForLanding,
       validateProduct,
@@ -47,6 +47,8 @@ export const validateLandings = async (products: IProduct[], landingLimitDaysInF
       validateExportWeightForLanding,
     )(l)
   );
+
+  return validateTotalExportWeight(validatedLandings);
 }
 
 export const initialiseErrorsForLanding = (landing: IUploadedLanding): IUploadedLanding => {
@@ -90,6 +92,16 @@ export const validateDateForLanding = (
     }
   }
   return landing;
+};
+
+export const validateTotalExportWeight = (landings: IUploadedLanding[]): IUploadedLanding[] => {
+  const totalWeight = landings.reduce((sum, landing) => sum + (Number(landing.exportWeight) || 0), 0);
+
+  if (totalWeight >= ApplicationConfig.maxTotalExportWeight) {
+    landings.forEach(landing => landing.errors.push('validation.totalExportWeight.number.max'));
+  }
+
+  return landings;
 };
 
 export const validateExportWeightForLanding = (landing: IUploadedLanding): IUploadedLanding => {

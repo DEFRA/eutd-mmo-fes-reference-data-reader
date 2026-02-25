@@ -61,6 +61,8 @@ export class ApplicationConfig {
   public eodRulesMigration: boolean;
   //EEZ max codes
   public euCatchMaxEEZ: number;
+  // max total combined export weight
+  public maxTotalExportWeight: number;
   // Boomi CATCH submission URL
   public boomiCatchSubmissionUrl: string;
 
@@ -122,6 +124,7 @@ export class ApplicationConfig {
     // sets eod default rules when going live for the first time
     ApplicationConfig.prototype.eodRulesMigration = env.EOD_RULES_MIGRATION === 'true';
     ApplicationConfig.prototype.euCatchMaxEEZ = parseInt(env.EU_CATCH_MAX_EEZ, 10) || 5;
+    ApplicationConfig.prototype.maxTotalExportWeight = parseFloat(env.MAX_TOTAL_EXPORT_WEIGHT) || 10_000_000;
     
     ApplicationConfig.prototype.boomiCatchSubmissionUrl = env.BOOMI_CATCH_SUBMISSION_URL;
   }
