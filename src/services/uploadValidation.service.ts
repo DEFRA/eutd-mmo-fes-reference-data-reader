@@ -78,6 +78,8 @@ export const validateDateForLanding = (
     landing.errors.push('error.dateLanded.date.missing');
   } else if (!moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).isValid()) {
     landing.errors.push('error.dateLanded.date.base');
+  } else if (moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).utc().isAfter(moment.utc().add(landingLimitDaysInFuture, 'days'))) {
+    landing.errors.push({ key: 'error.dateLanded.date.max', params: [landingLimitDaysInFuture] });
   }
 
   // Validate landing date is not before start date
@@ -87,14 +89,6 @@ export const validateDateForLanding = (
 
     if (landingDate.isBefore(startDate, 'day')) {
       landing.errors.push('error.startDate.date.max');
-    }
-    // Validate landing date is not too far in future
-    const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
-    if (landingDate.utc().isAfter(maxValidDate)) {
-      landing.errors.push({
-        key: 'error.dateLanded.date.max',
-        params: [landingLimitDaysInFuture],
-      });
     }
   }
   return landing;

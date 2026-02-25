@@ -680,6 +680,29 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toStrictEqual([]);
     });
 
+    it('should not validate future date when landing date format is invalid', () => {
+      // This test verifies the else-if behavior: future date check only runs 
+      // when landing date exists AND has valid format
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '24/12/2020',
+          landingDate: 'invalid-date',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      // Should only have format error, NOT future date error
+      expect(result.errors).toStrictEqual([
+        'error.dateLanded.date.base'
+      ]);
+      expect(result.errors).not.toContainEqual({
+        key: 'error.dateLanded.date.max',
+        params: expect.anything()
+      });
+    });
+
     describe('should return errors when both dates have issues', () => {
       it('should return both missing errors when both startDate and landingDate are missing', () => {
         const result = SUT.validateDateForLanding(

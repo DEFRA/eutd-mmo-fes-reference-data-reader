@@ -129,11 +129,9 @@ export const getSchemeAgencyID: (transport: any) => string = (transport: any) =>
     const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
     return countryID?.isoCodeAlpha2 ?? 'GB';
   }
-
-  return null;
 }
 
-export const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : null;
+export const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : undefined;
 
 export const createMainCarriageSPSTransportMovement = (transport: any) => {
   const vehicle = transport?.vehicle;
@@ -144,8 +142,8 @@ export const createMainCarriageSPSTransportMovement = (transport: any) => {
     ID: {
       schemeID: schemeID[vehicle],
       schemeName: schemeName[vehicle],
-      schemeAgencyID: schemeAgencyID ? schemeAgencyID : undefined,
-      schemeAgencyName: schemeAgencyName ? schemeAgencyName : undefined,
+      schemeAgencyID: schemeAgencyID,
+      schemeAgencyName: schemeAgencyName,
       value: getTransportId(transport)
     },
     ModeCode: {
@@ -212,4 +210,11 @@ const countryISOMapping = {
 
 export function getCountryISO2(countryCode: string) {
   return countryISOMapping[countryCode]
+}
+
+export const exportedFromMapping = {
+  ['United Kingdom']: 'GB',
+  ['Guernsey']: 'GG',
+  ['Isle Of Man']: 'IM',
+  ['Jersey']: 'JJ'
 }
