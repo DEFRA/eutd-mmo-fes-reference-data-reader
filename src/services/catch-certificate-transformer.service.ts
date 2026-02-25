@@ -650,19 +650,16 @@ export default class CatchCertificateTransformerService {
       })
     }
 
-    // Get all EEZ or use empty array
-    const eezCode = catchItem.exclusiveEconomicZones?.map((exclusiveEconomicZone: ICountry) => ({
-      Content: {
-        languageID: 'en',
-        value: exclusiveEconomicZone.isoCodeAlpha2 || ''
-      },
-      SubjectCode: {
-        value: 'EXCLUSIVE_ECONOMIC_ZONE'
-      }
-    })) || [];
-
-    if (eezCode.length > 0) {
-      additionalInformationSPSNote.push(...eezCode);
+    if (Array.isArray(catchItem.exclusiveEconomicZones) && catchItem.exclusiveEconomicZones.length > 0) {
+      additionalInformationSPSNote.push({
+        Content: catchItem.exclusiveEconomicZones.map((exclusiveEconomicZone: ICountry) => ({
+          languageID: 'en',
+          value: exclusiveEconomicZone.isoCodeAlpha2 || ''
+        })),
+        SubjectCode: {
+          value: 'EXCLUSIVE_ECONOMIC_ZONE'
+        }
+      });
     }
 
     if (catchItem.licenceHolder) {

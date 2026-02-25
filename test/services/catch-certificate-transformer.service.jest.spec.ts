@@ -2879,7 +2879,8 @@ describe('CatchCertificateTransformerService', () => {
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const eezNotes = notes.filter((n: any) => n.SubjectCode.value === 'EXCLUSIVE_ECONOMIC_ZONE');
 
-      expect(eezNotes.length).toBe(3);
+      expect(eezNotes).toHaveLength(1);
+      expect(eezNotes[0].Content).toHaveLength(3);
     });
 
     it('should handle landings without vessel data', () => {
