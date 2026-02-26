@@ -2,18 +2,22 @@ name: $(BuildID).$(Date:yyyyMMdd).$(SourceBranchName)
 
 parameters:
   - name: deployFromFeature
-    displayName: 'Deploy from Feature Branch'
+    displayName: "Deploy from Feature Branch"
     type: boolean
     default: false
   - name: deployToSecondaryRegion
-    displayName: 'Deploy to Secondary Region for DR'
+    displayName: "Deploy to Secondary Region for DR"
     type: boolean
     default: false
   - name: skipPRE1
-    displayName: 'Skip PRE1 Deployment'
+    displayName: "Skip PRE1 Deployment"
     type: boolean
     default: false
-
+  - name: deployAppConfigOnly
+    displayName: "Deploy App Settings Only"
+    type: boolean
+    default: false 
+    
 trigger:
   branches:
     include:
@@ -22,16 +26,11 @@ trigger:
       - 'hotfix/*'
       - 'feature/*'
       - 'epic/*'
-pr:
-  branches:
-    include:
-      - 'main'
-      - 'develop'
 
 resources:
   repositories:
     - repository: MMOPipelineCommon
-      name: 'DEFRA/eutd-mmo-fes-pipeline-common'
+      name: "DEFRA/eutd-mmo-fes-pipeline-common"
       endpoint: DEFRA
       type: github
       ref: refs/heads/main
@@ -43,3 +42,4 @@ extends:
     deployFromFeature: ${{ parameters.deployFromFeature }}
     deployToSecondaryRegion: ${{ parameters.deployToSecondaryRegion }}
     skipPRE1: ${{ parameters.skipPRE1 }}
+    deployAppConfigOnly: ${{ parameters.deployAppConfigOnly }}
