@@ -262,8 +262,8 @@ export default class ProcessingStatementTransformerService {
   private static buildConsignmentItem(exportData: any): any {
     // Get first product for basic information
     const catches = exportData.catches || [];
-    return catches.reverse().map((ctch: any, index: number) => {
-      const sequenceNumeric = catches.length - index;
+    return catches.map((ctch: any, index: number) => {
+      const sequenceNumeric = index + 1;
 
       // Build additional information notes
       const notes: any[] = [];
