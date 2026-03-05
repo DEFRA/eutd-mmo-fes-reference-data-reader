@@ -2582,7 +2582,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(notes.some((n: any) => n.SubjectCode.value === 'CATCH_AREA')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'HIGH_SEAS_CATCH_AREA')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'REGIONAL_FISHERIES_MANAGEMENT_ORGANISATION')).toBe(true);
-      expect(notes.some((n: any) => n.Content.value === 'CCAMLR')).toBe(true);
+      expect(notes.some((n: any) => n.Content[0].value === 'CCAMLR')).toBe(true);
     });
 
     it('should include phone note even when empty', () => {
@@ -2620,7 +2620,7 @@ describe('CatchCertificateTransformerService', () => {
       const phoneNote = notes.find((n: any) => n.SubjectCode.value === 'PHONE');
 
       expect(phoneNote).toBeDefined();
-      expect(phoneNote.Content.value).toBe('');
+      expect(phoneNote.Content[0].value).toBe('');
     });
 
     it('should handle missing landings array', () => {
@@ -2691,7 +2691,7 @@ describe('CatchCertificateTransformerService', () => {
       const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
 
-      expect(gearNote.Content.value).toBe('08.1');
+      expect(gearNote.Content[0].value).toBe('08.1');
     });
   });
 
@@ -3032,8 +3032,8 @@ describe('CatchCertificateTransformerService', () => {
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
       const endDateNote = notes.find((n: any) => n.SubjectCode.value === 'END_DATE');
 
-      expect(startDateNote.Content.value).toBe('05-Jan-2025');
-      expect(endDateNote.Content.value).toBe('25-Dec-2025');
+      expect(startDateNote.Content[0].value).toBe('05-Jan-2025');
+      expect(endDateNote.Content[0].value).toBe('25-Dec-2025');
     });
 
     it('should handle single-digit dates with leading zero', () => {
@@ -3075,7 +3075,7 @@ describe('CatchCertificateTransformerService', () => {
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
 
-      expect(startDateNote.Content.value).toBe('03-Feb-2025');
+      expect(startDateNote.Content[0].value).toBe('03-Feb-2025');
     });
 
     it('should return original string on invalid date', () => {
@@ -3117,7 +3117,7 @@ describe('CatchCertificateTransformerService', () => {
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
 
-      expect(startDateNote.Content.value).toBe('NaN-undefined-NaN');
+      expect(startDateNote.Content[0].value).toBe('NaN-undefined-NaN');
     });
   });
 
@@ -3179,9 +3179,9 @@ describe('CatchCertificateTransformerService', () => {
       expect(items.length).toBe(2);
       expect(items[0].IncludedSPSTradeLineItem.length).toBe(2); // 2 vessels
       expect(items[0].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
-      expect(items[0].IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote[0].Content.value).toBe('Vessel 1');
+      expect(items[0].IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote[0].Content[0].value).toBe('Vessel 1');
       expect(items[0].IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
-      expect(items[0].IncludedSPSTradeLineItem[1].AdditionalInformationSPSNote[0].Content.value).toBe('Vessel 2');
+      expect(items[0].IncludedSPSTradeLineItem[1].AdditionalInformationSPSNote[0].Content[0].value).toBe('Vessel 2');
 
       expect(items[1].IncludedSPSTradeLineItem.length).toBe(2); // 2 products
       expect(items[1].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
