@@ -219,13 +219,13 @@ export default class ProcessingStatementTransformerService {
   private static buildLoadingLocation(): any {
     return {
       ID: {
-        schemeID: 'controlled_location_id',
-        value: 'GB01'
+        schemeID: '',
+        value: ''
       },
       Name: {
-        languageID: 'en',
-        languageLocaleID: 'en-nz',
-        value: 'GB'
+        languageID: '',
+        languageLocaleID: '',
+        value: ''
       }
     };
   }
@@ -248,8 +248,8 @@ export default class ProcessingStatementTransformerService {
   private static buildUnloadingLocation(pointOfDestination: string): any {
     return {
       ID: {
-        schemeID: 'controlled_location_id',
-        value: 'FR'
+        schemeID: '',
+        value: ''
       },
       Name: {
         languageID: 'en',

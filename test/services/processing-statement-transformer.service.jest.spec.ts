@@ -278,8 +278,8 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.LoadingBaseportSPSLocation.ID.value).toBe('GB01');
-      expect(consignment.LoadingBaseportSPSLocation.Name.value).toBe('GB');
+      expect(consignment.LoadingBaseportSPSLocation.ID.value).toBe('');
+      expect(consignment.LoadingBaseportSPSLocation.Name.value).toBe('');
     });
 
     it('should build import country from exportedTo details', () => {
@@ -362,7 +362,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
       expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('Port of Calais');
     });
 
@@ -380,7 +380,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
     });
 
     it('should include examination event location', () => {
@@ -981,7 +981,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       expect(consignment.ImportSPSCountry.ID.value).toBe('ES');
       expect(consignment.ImportSPSCountry.Name.value).toBe('SPAIN');
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
       expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('Port of Calais');
     });
 
