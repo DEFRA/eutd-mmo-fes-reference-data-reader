@@ -1,6 +1,7 @@
 import moment from 'moment';
 import logger from '../logger';
 import { getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat } from '../data/euCatch';
+import { ICountry } from 'mmo-shared-reference-data';
 
 /**
  * Transforms processing statement data into UN/CEFACT CATCH API JSON schema format
@@ -116,7 +117,7 @@ export default class ProcessingStatementTransformerService {
       ExportSPSCountry: this.buildExportCountry(),
       LoadingBaseportSPSLocation: this.buildLoadingLocation(),
       ImportSPSCountry: this.buildImportCountry(exportData.exportedTo),
-      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.pointOfDestination),
+      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.exportedTo, exportData.pointOfDestination),
       ExaminationSPSEvent: {
         OccurrenceSPSLocation: {
           ID: {
@@ -245,11 +246,11 @@ export default class ProcessingStatementTransformerService {
     };
   }
 
-  private static buildUnloadingLocation(pointOfDestination: string): any {
+  private static buildUnloadingLocation(exportedTo: ICountry, pointOfDestination: string): any {
     return {
       ID: {
-        schemeID: '',
-        value: ''
+        schemeID: 'controlled_location_id',
+        value: exportedTo?.isoCodeAlpha2 ?? ''
       },
       Name: {
         languageID: 'en',
