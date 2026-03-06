@@ -362,11 +362,11 @@ describe('ProcessingStatementTransformerService', () => {
 
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
 
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('FR');
       expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('Port of Calais');
     });
 
-    it('should default unloading location to FR01 when exportedTo is missing', () => {
+    it('should default unloading location is blank when exportedTo is missing', () => {
       const exportDataWithoutDestination = {
         ...baseExportData,
         exportedTo: undefined
@@ -981,7 +981,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       expect(consignment.ImportSPSCountry.ID.value).toBe('ES');
       expect(consignment.ImportSPSCountry.Name.value).toBe('SPAIN');
-      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
+      expect(consignment.UnloadingBaseportSPSLocation.ID.value).toBe('ES');
       expect(consignment.UnloadingBaseportSPSLocation.Name.value).toBe('Port of Calais');
     });
 
