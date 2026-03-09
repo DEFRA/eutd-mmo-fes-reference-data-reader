@@ -1358,6 +1358,68 @@ describe('CatchCertificateTransformerService', () => {
       expect(transport[0].ID.schemeAgencyName).toBeUndefined();
     });
 
+    it('should return undefined (not null) for schemeAgencyID and schemeAgencyName for train vehicle', () => {
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'train',
+          railwayBillNumber: 'RAIL12345',
+          nationalityOfVehicle: 'United Kingdom'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyID).not.toBeNull();
+      expect(transport[0].ID.schemeAgencyName).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyName).not.toBeNull();
+    });
+
+    it('should return undefined (not null) for schemeAgencyID and schemeAgencyName for containerVessel vehicle', () => {
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'containerVessel',
+          vesselName: 'MV Atlantic',
+          nationalityOfVehicle: 'United Kingdom'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyID).not.toBeNull();
+      expect(transport[0].ID.schemeAgencyName).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyName).not.toBeNull();
+    });
+
     it('should handle truck without nationalityOfVehicle field', () => {
       mockGetCountries.mockReturnValue([{
         officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
@@ -2351,6 +2413,66 @@ describe('CatchCertificateTransformerService', () => {
       expect(equipment).toHaveLength(2);
       expect(equipment[0].ID.value).toBe('CONT1234567');
       expect(equipment[1].ID.value).toBe('CONT7654321');
+    });
+
+    it('should handle container numbers field (new field)', () => {
+      const documentNumber = 'GBR-2025-CC-EQUIP006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          containerNumbers: 'MSCU9876543'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const equipment =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .UtilizedSPSTransportEquipment;
+
+      expect(equipment).toHaveLength(1);
+      expect(equipment[0].ID.value).toBe('MSCU9876543');
+      expect(equipment[0].ID.schemeID).toBe('container_number');
+    });
+
+    it('should handle multiple containers from containerNumbers field', () => {
+      const documentNumber = 'GBR-2025-CC-EQUIP007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          containerNumbers: 'CONT1111111 CONT2222222 CONT3333333'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const equipment =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .UtilizedSPSTransportEquipment;
+
+      expect(equipment).toHaveLength(3);
+      expect(equipment[0].ID.value).toBe('CONT1111111');
+      expect(equipment[0].ID.schemeID).toBe('container_number');
+      expect(equipment[1].ID.value).toBe('CONT2222222');
+      expect(equipment[1].ID.schemeID).toBe('container_number');
+      expect(equipment[2].ID.value).toBe('CONT3333333');
+      expect(equipment[2].ID.schemeID).toBe('container_number');
     });
   });
 
