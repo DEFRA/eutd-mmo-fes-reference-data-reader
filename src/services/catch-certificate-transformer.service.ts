@@ -3,7 +3,7 @@ import { getCountries, getGearTypes, getRfmos } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
-import { createMainCarriageSPSTransportMovement, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
 import { equalsIgnoreCase } from '../utils/string';
 
 const formatDate = (dateString: string | Date) => {
@@ -353,32 +353,7 @@ export default class CatchCertificateTransformerService {
   }
 
   private static buildTransportEquipment(transportations: any[]): any {
-    return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => {
-      // Handle containerNumbers (comma-separated string from multiple containers)
-      if (transport.containerIdentificationNumber) {
-        const containerArray = transport.containerIdentificationNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-        const containerNumbers = containerArray.map((containerNumber: string) => ({
-          ID: {
-            schemeID: 'container_number',
-            value: containerNumber
-          }
-        }));
-        return [...utilizedSPSTransportEquipments, ...containerNumbers];
-      }
-
-      // Fallback to single containerNumber for backwards compatibility
-      if (transport.containerNumber) {
-        const containerNumberArray = transport.containerNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-        return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
-          ID: {
-            schemeID: 'container_number',
-            value: containerNumber
-          }
-        }))];
-      }
-
-      return utilizedSPSTransportEquipments;
-    }, []);
+    return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => createUtilizedSPSTransportEquipments(utilizedSPSTransportEquipments, transport), []);
   }
 
   private static buildConsignmentItems(exportData: any): any[] {
