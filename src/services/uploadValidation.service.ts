@@ -33,7 +33,7 @@ export const validateLandings = async (products: IProduct[], landingLimitDaysInF
   const validateGearCode = (landing: IUploadedLanding) =>
     validateGearCodeForLanding(landing, gearRecords);
 
-  return landings.map(l =>
+  const validatedLandings = landings.map(l =>
     pipe(
       initialiseErrorsForLanding,
       validateProduct,
@@ -47,6 +47,8 @@ export const validateLandings = async (products: IProduct[], landingLimitDaysInF
       validateExportWeightForLanding,
     )(l)
   );
+
+  return validateTotalExportWeight(validatedLandings);
 }
 
 export const initialiseErrorsForLanding = (landing: IUploadedLanding): IUploadedLanding => {
@@ -76,6 +78,8 @@ export const validateDateForLanding = (
     landing.errors.push('error.dateLanded.date.missing');
   } else if (!moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).isValid()) {
     landing.errors.push('error.dateLanded.date.base');
+  } else if (moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).utc().isAfter(moment.utc().add(landingLimitDaysInFuture, 'days'))) {
+    landing.errors.push({ key: 'error.dateLanded.date.max', params: [landingLimitDaysInFuture] });
   }
 
   // Validate landing date is not before start date
@@ -86,16 +90,18 @@ export const validateDateForLanding = (
     if (landingDate.isBefore(startDate, 'day')) {
       landing.errors.push('error.startDate.date.max');
     }
-    // Validate landing date is not too far in future
-    const maxValidDate = moment.utc().add(landingLimitDaysInFuture, 'days');
-    if (landingDate.utc().isAfter(maxValidDate)) {
-      landing.errors.push({
-        key: 'error.dateLanded.date.max',
-        params: [landingLimitDaysInFuture],
-      });
-    }
   }
   return landing;
+};
+
+export const validateTotalExportWeight = (landings: IUploadedLanding[]): IUploadedLanding[] => {
+  const totalWeight = landings.reduce((sum, landing) => sum + (Number(landing.exportWeight) || 0), 0);
+
+  if (totalWeight >= ApplicationConfig.maxTotalExportWeight) {
+    landings.forEach(landing => landing.errors.push('validation.totalExportWeight.number.max'));
+  }
+
+  return landings;
 };
 
 export const validateExportWeightForLanding = (landing: IUploadedLanding): IUploadedLanding => {
@@ -184,7 +190,10 @@ export const validateProductForLanding = (landing: IUploadedLanding, products: I
 
   const startDate = moment(landing.startDate, 'DD/MM/YYYY', true);
 
-  if (startDate.isValid()) {
+  // Skip start date validation for European Seabass (BSS)
+  // No validation required on start date regardless of date provided
+  // Seasonal validation only applies to landing date
+  if (startDate.isValid() && favouriteProduct.speciesCode !== 'BSS') {
     const dateIsRestricted = hasSeasonalFishingRestriction(startDate.format('YYYY-MM-DD'), favouriteProduct.speciesCode, seasonalRestrictions);
 
     if (dateIsRestricted) {

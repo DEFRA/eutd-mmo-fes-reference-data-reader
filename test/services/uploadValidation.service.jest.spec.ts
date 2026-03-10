@@ -103,6 +103,7 @@ describe('uploadValidation.service', () => {
     let mockInitialiseErrorsForLanding;
     let mockValidateDateForLanding;
     let mockValidateExportWeightForLanding;
+    let mockValidateTotalExportWeight;
     let mockValidateFaoAreaForLanding;
     let mockValidateHighSeasAreaForLanding;
     let mockValidateProductForLanding;
@@ -158,6 +159,9 @@ describe('uploadValidation.service', () => {
 
       mockValidateEezCodeForLanding = jest.spyOn(SUT, 'validateEezCodeForLanding');
       mockValidateEezCodeForLanding.mockImplementation((landing) => landing);
+
+      mockValidateTotalExportWeight = jest.spyOn(SUT, 'validateTotalExportWeight');
+      mockValidateTotalExportWeight.mockImplementation((landings) => landings);
     });
 
     afterEach(() => {
@@ -262,17 +266,80 @@ describe('uploadValidation.service', () => {
       expect(mockValidateExportWeightForLanding).toHaveBeenCalledWith('landing 2 - gear code validated');
     });
 
-    it('should return the result of validateExportWeightForLanding', async () => {
+    it('should call validateTotalExportWeight with all per-row validated landings', async () => {
       mockValidateExportWeightForLanding.mockImplementation((landing) => `${landing.id} - export weight validated`);
 
-      const result = await SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
+      await SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
 
-      expect(result).toStrictEqual([
+      expect(mockValidateTotalExportWeight).toHaveBeenCalledTimes(1);
+      expect(mockValidateTotalExportWeight).toHaveBeenCalledWith([
         'landing 1 - export weight validated',
         'landing 2 - export weight validated'
       ]);
     });
 
+    it('should return the result of validateTotalExportWeight', async () => {
+      mockValidateTotalExportWeight.mockReturnValue(['validated landing 1', 'validated landing 2']);
+
+      const result = await SUT.validateLandings(favourites, landingLimitDaysInFuture, landings);
+
+      expect(result).toStrictEqual(['validated landing 1', 'validated landing 2']);
+    });
+
+  });
+
+  describe('validateTotalExportWeight', () => {
+    const makeLanding = (exportWeight: number) =>
+      ({ exportWeight, errors: [] } as any);
+
+    it('should return landings unchanged when total weight is below the limit', () => {
+      ApplicationConfig.loadEnv({ EU_CATCH_MAX_EEZ: '5', MAX_TOTAL_EXPORT_WEIGHT: '10000000' });
+      const landings = [makeLanding(5000000), makeLanding(4999999.99)];
+
+      const result = SUT.validateTotalExportWeight(landings);
+
+      result.forEach(landing => expect(landing.errors).toStrictEqual([]));
+    });
+
+    it('should add an error to every row when total weight equals the limit', () => {
+      ApplicationConfig.loadEnv({ EU_CATCH_MAX_EEZ: '5', MAX_TOTAL_EXPORT_WEIGHT: '10000000' });
+      const landings = [makeLanding(5000000), makeLanding(5000000)];
+
+      const result = SUT.validateTotalExportWeight(landings);
+
+      result.forEach(landing =>
+        expect(landing.errors).toStrictEqual(['validation.totalExportWeight.number.max'])
+      );
+    });
+
+    it('should add an error to every row when total weight exceeds the limit', () => {
+      ApplicationConfig.loadEnv({ EU_CATCH_MAX_EEZ: '5', MAX_TOTAL_EXPORT_WEIGHT: '10000000' });
+      const landings = [makeLanding(9999999.9), makeLanding(100), makeLanding(100)];
+
+      const result = SUT.validateTotalExportWeight(landings);
+
+      result.forEach(landing =>
+        expect(landing.errors).toStrictEqual(['validation.totalExportWeight.number.max'])
+      );
+    });
+
+    it('should handle landings with no exportWeight gracefully', () => {
+      ApplicationConfig.loadEnv({ EU_CATCH_MAX_EEZ: '5', MAX_TOTAL_EXPORT_WEIGHT: '10000000' });
+      const landings = [makeLanding(undefined), makeLanding(undefined)];
+
+      const result = SUT.validateTotalExportWeight(landings);
+
+      result.forEach(landing => expect(landing.errors).toStrictEqual([]));
+    });
+
+    it('should return the same landings array reference', () => {
+      ApplicationConfig.loadEnv({ EU_CATCH_MAX_EEZ: '5', MAX_TOTAL_EXPORT_WEIGHT: '10000000' });
+      const landings = [makeLanding(100)];
+
+      const result = SUT.validateTotalExportWeight(landings);
+
+      expect(result).toBe(landings);
+    });
   });
 
   describe('initialiseErrorsForLanding', () => {
@@ -611,6 +678,29 @@ describe('uploadValidation.service', () => {
       );
 
       expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should not validate future date when landing date format is invalid', () => {
+      // This test verifies the else-if behavior: future date check only runs 
+      // when landing date exists AND has valid format
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '24/12/2020',
+          landingDate: 'invalid-date',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      // Should only have format error, NOT future date error
+      expect(result.errors).toStrictEqual([
+        'error.dateLanded.date.base'
+      ]);
+      expect(result.errors).not.toContainEqual({
+        key: 'error.dateLanded.date.max',
+        params: expect.anything()
+      });
     });
 
     describe('should return errors when both dates have issues', () => {
@@ -1203,6 +1293,106 @@ describe('uploadValidation.service', () => {
 
       expect(result.errors).toStrictEqual([]);
 
+    });
+
+    it('should skip start date validation for BSS (European Seabass) species', () => {
+      const bssProduct = [{
+        id: 'bssId',
+        species: 'European seabass (BSS)',
+        speciesCode: 'BSS',
+        scientificName: 'Dicentrarchus labrax',
+        state: 'FRE',
+        stateLabel: 'fresh',
+        presentation: 'WHL',
+        presentationLabel: 'whole',
+        commodity_code: '03028410',
+        commodity_code_description: 'Fresh or chilled European sea bass'
+      }];
+
+      const bssRestrictions = [
+        {
+          fao: 'BSS',
+          validFrom: '2020-02-01',
+          validTo: '2020-03-30'
+        }
+      ];
+
+      mockCommoditySearch.mockReturnValue([
+        {
+          code: '03028410',
+          description: 'Fresh or chilled European sea bass',
+          faoName: 'European seabass',
+          stateLabel: 'fresh',
+          presentationLabel: 'whole',
+        }
+      ]);
+
+      const result = SUT.validateProductForLanding(
+        {
+          ...uploadedLanding,
+          productId: 'bssId',
+          startDate: '31/03/2020', // Date during restricted period
+          landingDate: '01/04/2020', // Date after restricted period
+          errors : []
+        },
+        bssProduct,
+        bssRestrictions
+      );
+
+      // Should have no start date error, but would still validate landing date
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should still validate landing date for BSS even when start date validation is skipped', () => {
+      const bssProduct = [{
+        id: 'bssId',
+        species: 'European seabass (BSS)',
+        speciesCode: 'BSS',
+        scientificName: 'Dicentrarchus labrax',
+        state: 'FRE',
+        stateLabel: 'fresh',
+        presentation: 'WHL',
+        presentationLabel: 'whole',
+        commodity_code: '03028410',
+        commodity_code_description: 'Fresh or chilled European sea bass'
+      }];
+
+      const bssRestrictions = [
+        {
+          fao: 'BSS',
+          validFrom: '2020-02-01',
+          validTo: '2020-03-30'
+        }
+      ];
+
+      mockCommoditySearch.mockReturnValue([
+        {
+          code: '03028410',
+          description: 'Fresh or chilled European sea bass',
+          faoName: 'European seabass',
+          stateLabel: 'fresh',
+          presentationLabel: 'whole',
+        }
+      ]);
+
+      const result = SUT.validateProductForLanding(
+        {
+          ...uploadedLanding,
+          productId: 'bssId',
+          startDate: '31/03/2020', // Date during restricted period - should be allowed
+          landingDate: '15/02/2020', // Date during restricted period - should error
+          errors : []
+        },
+        bssProduct,
+        bssRestrictions
+      );
+
+      const error = {
+        key: 'validation.product.seasonal.invalid-date',
+        params: ['European seabass (BSS)']
+      };
+
+      expect(result.errors).toStrictEqual([error]);
     });
 
   });

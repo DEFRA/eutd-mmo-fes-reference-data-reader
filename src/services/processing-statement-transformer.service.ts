@@ -1,6 +1,7 @@
 import moment from 'moment';
 import logger from '../logger';
 import { getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat } from '../data/euCatch';
+import { ICountry } from 'mmo-shared-reference-data';
 
 /**
  * Transforms processing statement data into UN/CEFACT CATCH API JSON schema format
@@ -116,7 +117,7 @@ export default class ProcessingStatementTransformerService {
       ExportSPSCountry: this.buildExportCountry(),
       LoadingBaseportSPSLocation: this.buildLoadingLocation(),
       ImportSPSCountry: this.buildImportCountry(exportData.exportedTo),
-      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.pointOfDestination),
+      UnloadingBaseportSPSLocation: this.buildUnloadingLocation(exportData.exportedTo, exportData.pointOfDestination),
       ExaminationSPSEvent: {
         OccurrenceSPSLocation: {
           ID: {
@@ -219,13 +220,13 @@ export default class ProcessingStatementTransformerService {
   private static buildLoadingLocation(): any {
     return {
       ID: {
-        schemeID: 'controlled_location_id',
-        value: 'GB01'
+        schemeID: '',
+        value: ''
       },
       Name: {
-        languageID: 'en',
-        languageLocaleID: 'en-nz',
-        value: 'GB'
+        languageID: '',
+        languageLocaleID: '',
+        value: ''
       }
     };
   }
@@ -245,11 +246,11 @@ export default class ProcessingStatementTransformerService {
     };
   }
 
-  private static buildUnloadingLocation(pointOfDestination: string): any {
+  private static buildUnloadingLocation(exportedTo: ICountry, pointOfDestination: string): any {
     return {
       ID: {
         schemeID: 'controlled_location_id',
-        value: 'FR'
+        value: exportedTo?.isoCodeAlpha2 ?? ''
       },
       Name: {
         languageID: 'en',
@@ -262,8 +263,8 @@ export default class ProcessingStatementTransformerService {
   private static buildConsignmentItem(exportData: any): any {
     // Get first product for basic information
     const catches = exportData.catches || [];
-    return catches.reverse().map((ctch: any, index: number) => {
-      const sequenceNumeric = catches.length - index;
+    return catches.map((ctch: any, index: number) => {
+      const sequenceNumeric = index + 1;
 
       // Build additional information notes
       const notes: any[] = [];
