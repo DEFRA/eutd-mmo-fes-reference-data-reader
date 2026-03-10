@@ -548,6 +548,187 @@ describe('StorageNotesTransformerService', () => {
         expect(arrivalConsignment.LoadingBaseportSPSLocation.Name.value).toBeUndefined();
         expect(arrivalConsignment.UnloadingBaseportSPSLocation.Name.value).toBeUndefined();
       });
+
+      it('should set ExportExitDateTime from arrivalTransport departureDate', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ExportExitDateTime).toBeDefined();
+        expect(arrivalConsignment.ExportExitDateTime.DateTime.value).toContain('2026-01-21');
+      });
+
+      it('should handle missing arrivalTransport departureDate gracefully', () => {
+        const exportDataWithoutDepartureDate = {
+          ...baseExportData,
+          arrivalTransport: {
+            ...baseExportData.arrivalTransport,
+            departureDate: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutDepartureDate
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ExportExitDateTime).toBeDefined();
+        expect(arrivalConsignment.ExportExitDateTime.DateTime.value).toBeDefined();
+      });
+
+      it('should include ExaminationSPSEvent with empty location in arrival consignment', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ExaminationSPSEvent).toBeDefined();
+        expect(arrivalConsignment.ExaminationSPSEvent.OccurrenceSPSLocation).toBeDefined();
+        expect(arrivalConsignment.ExaminationSPSEvent.OccurrenceSPSLocation.ID.value).toBe('');
+        expect(arrivalConsignment.ExaminationSPSEvent.OccurrenceSPSLocation.Name.value).toBe('');
+      });
+
+      it('should include UtilizedSPSTransportEquipment for arrival transport with containerNumber', () => {
+        const exportDataWithContainer = {
+          ...baseExportData,
+          arrivalTransport: {
+            ...baseExportData.arrivalTransport,
+            containerNumber: 'ARRCONT123456'
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithContainer
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.UtilizedSPSTransportEquipment).toBeDefined();
+        expect(arrivalConsignment.UtilizedSPSTransportEquipment).toHaveLength(1);
+        expect(arrivalConsignment.UtilizedSPSTransportEquipment[0].ID.value).toBe('ARRCONT123456');
+        expect(arrivalConsignment.UtilizedSPSTransportEquipment[0].ID.schemeID).toBe('container_number');
+      });
+
+      it('should return empty UtilizedSPSTransportEquipment array when no container number on arrival transport', () => {
+        const exportDataWithoutContainer = {
+          ...baseExportData,
+          arrivalTransport: {
+            vehicle: 'truck',
+            registrationNumber: 'AB12 CDE',
+            departureCountry: 'United Kingdom',
+            departurePort: 'Dover',
+            departureDate: '21/01/2026',
+            placeOfUnloading: 'Hull'
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutContainer
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.UtilizedSPSTransportEquipment).toBeDefined();
+        expect(arrivalConsignment.UtilizedSPSTransportEquipment).toHaveLength(0);
+      });
+
+      it('should set SequenceNumeric correctly for each catch item', () => {
+        const exportDataWithMultipleCatches = {
+          ...baseExportData,
+          catches: [
+            { ...baseExportData.catches[0] },
+            { ...baseExportData.catches[0], product: 'Atlantic salmon (SAL)' },
+            { ...baseExportData.catches[0], product: 'European plaice (PLE)' }
+          ]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithMultipleCatches
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItems = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+
+        expect(tradeLineItems[0].SequenceNumeric.value).toBe(1);
+        expect(tradeLineItems[0].SequenceNumeric.format).toBe('1');
+        expect(tradeLineItems[1].SequenceNumeric.value).toBe(2);
+        expect(tradeLineItems[1].SequenceNumeric.format).toBe('2');
+        expect(tradeLineItems[2].SequenceNumeric.value).toBe(3);
+        expect(tradeLineItems[2].SequenceNumeric.format).toBe('3');
+      });
+
+      it('should use arrival weight fields in arrival consignment trade line items', () => {
+        const exportDataWithArrivalWeights = {
+          ...baseExportData,
+          catches: [{
+            ...baseExportData.catches[0],
+            netWeightProductArrival: 80,
+            netWeightFisheryProductArrival: 95
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithArrivalWeights
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+
+        expect(tradeLineItem.NetWeightMeasure.value).toBe(80);
+        expect(tradeLineItem.NetWeightMeasure.unitCode).toBe('KGM');
+        expect(tradeLineItem.GrossWeightMeasure.value).toBe(95);
+        expect(tradeLineItem.GrossWeightMeasure.unitCode).toBe('KGM');
+      });
+
+      it('should set ConsignorSPSParty CountryName from facilityCountry in arrival', () => {
+        const exportDataWithFacilityCountry = {
+          ...baseExportData,
+          facilityCountry: 'United Kingdom'
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithFacilityCountry
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+
+        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.CountryName.value).toBe('United Kingdom');
+      });
+
+      it('should set Description as empty languageID en in trade line items', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+
+        expect(tradeLineItem.Description).toBeDefined();
+        expect(tradeLineItem.Description.languageID).toBe('en');
+        expect(tradeLineItem.Description.value).toBe('');
+      });
     });
 
     describe('SPSDepartureConsignment', () => {
@@ -731,6 +912,238 @@ describe('StorageNotesTransformerService', () => {
 
         expect(departureConsignment.IncludedSPSConsignmentItem).toBeDefined();
         expect(departureConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem).toBeDefined();
+      });
+
+      it('should set ExportExitDateTime from transport exportDate in departure', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.ExportExitDateTime).toBeDefined();
+        expect(departureConsignment.ExportExitDateTime.DateTime.value).toContain('2026-01-21');
+      });
+
+      it('should handle missing transport exportDate gracefully', () => {
+        const exportDataWithoutExportDate = {
+          ...baseExportData,
+          transport: {
+            ...baseExportData.transport,
+            exportDate: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutExportDate
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.ExportExitDateTime).toBeDefined();
+        expect(departureConsignment.ExportExitDateTime.DateTime.value).toBeDefined();
+      });
+
+      it('should set LoadingBaseportSPSLocation from transport departurePlace', () => {
+        const exportDataWithDeparturePlace = {
+          ...baseExportData,
+          transport: {
+            ...baseExportData.transport,
+            departurePlace: 'Hull Port'
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithDeparturePlace
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.LoadingBaseportSPSLocation.ID.value).toBe('');
+        expect(departureConsignment.LoadingBaseportSPSLocation.Name.value).toBe('Hull Port');
+      });
+
+      it('should return undefined LoadingBaseportSPSLocation name when departurePlace is missing', () => {
+        const exportDataWithoutDeparturePlace = {
+          ...baseExportData,
+          transport: {
+            ...baseExportData.transport,
+            departurePlace: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutDeparturePlace
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.LoadingBaseportSPSLocation.Name.value).toBeUndefined();
+      });
+
+      it('should set UnloadingBaseportSPSLocation from transport pointOfDestination', () => {
+        const exportDataWithDestination = {
+          ...baseExportData,
+          transport: {
+            ...baseExportData.transport,
+            pointOfDestination: 'Calais Port'
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithDestination
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.UnloadingBaseportSPSLocation.ID.value).toBe('');
+        expect(departureConsignment.UnloadingBaseportSPSLocation.Name.value).toBe('Calais Port');
+      });
+
+      it('should return undefined UnloadingBaseportSPSLocation name when pointOfDestination is missing', () => {
+        const exportDataWithoutDestination = {
+          ...baseExportData,
+          transport: {
+            ...baseExportData.transport,
+            pointOfDestination: undefined
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithoutDestination
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.UnloadingBaseportSPSLocation.Name.value).toBeUndefined();
+      });
+
+      it('should include ExaminationSPSEvent with empty location in departure consignment', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.ExaminationSPSEvent).toBeDefined();
+        expect(departureConsignment.ExaminationSPSEvent.OccurrenceSPSLocation).toBeDefined();
+        expect(departureConsignment.ExaminationSPSEvent.OccurrenceSPSLocation.ID.value).toBe('');
+        expect(departureConsignment.ExaminationSPSEvent.OccurrenceSPSLocation.Name.value).toBe('');
+      });
+
+      it('should include UtilizedSPSTransportEquipment from transport containerNumber in departure', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.UtilizedSPSTransportEquipment).toBeDefined();
+        expect(departureConsignment.UtilizedSPSTransportEquipment).toHaveLength(1);
+        expect(departureConsignment.UtilizedSPSTransportEquipment[0].ID.value).toBe('CONT123456');
+        expect(departureConsignment.UtilizedSPSTransportEquipment[0].ID.schemeID).toBe('container_number');
+      });
+
+      it('should include multiple containers in UtilizedSPSTransportEquipment when containerIdentificationNumber has comma-separated values', () => {
+        const exportDataWithMultipleContainers = {
+          ...baseExportData,
+          transport: {
+            ...baseExportData.transport,
+            containerNumber: undefined,
+            containerIdentificationNumber: 'CONT111, CONT222, CONT333'
+          }
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithMultipleContainers
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.UtilizedSPSTransportEquipment).toHaveLength(3);
+        expect(departureConsignment.UtilizedSPSTransportEquipment[0].ID.value).toBe('CONT111');
+        expect(departureConsignment.UtilizedSPSTransportEquipment[1].ID.value).toBe('CONT222');
+        expect(departureConsignment.UtilizedSPSTransportEquipment[2].ID.value).toBe('CONT333');
+      });
+
+      it('should use departure weight fields in departure consignment trade line items', () => {
+        const exportDataWithDepartureWeights = {
+          ...baseExportData,
+          catches: [{
+            ...baseExportData.catches[0],
+            netWeightProductDeparture: 90,
+            netWeightFisheryProductDeparture: 95
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithDepartureWeights
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+        const tradeLineItem = departureConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+
+        expect(tradeLineItem.NetWeightMeasure.value).toBe(90);
+        expect(tradeLineItem.NetWeightMeasure.unitCode).toBe('KGM');
+        expect(tradeLineItem.GrossWeightMeasure.value).toBe(95);
+        expect(tradeLineItem.GrossWeightMeasure.unitCode).toBe('KGM');
+      });
+
+      it('should set ConsigneeSPSParty with empty name in departure consignment', () => {
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          baseExportData
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+
+        expect(departureConsignment.ConsigneeSPSParty).toBeDefined();
+        expect(departureConsignment.ConsigneeSPSParty.Name.value).toBe('');
+      });
+
+      it('should set SequenceNumeric correctly for catches in departure consignment', () => {
+        const exportDataWithMultipleCatches = {
+          ...baseExportData,
+          catches: [
+            { ...baseExportData.catches[0] },
+            { ...baseExportData.catches[0], product: 'Atlantic salmon (SAL)' }
+          ]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithMultipleCatches
+        );
+
+        const departureConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSDepartureConsignment;
+        const tradeLineItems = departureConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem;
+
+        expect(tradeLineItems[0].SequenceNumeric.value).toBe(1);
+        expect(tradeLineItems[0].SequenceNumeric.format).toBe('1');
+        expect(tradeLineItems[1].SequenceNumeric.value).toBe(2);
+        expect(tradeLineItems[1].SequenceNumeric.format).toBe('2');
       });
     });
 
