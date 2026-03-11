@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
+import { buildTransportDocumentReferences, createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
 import { toSpeciesCode } from '../landings/transformations/dynamicsValidation';
 
@@ -52,6 +52,8 @@ export default class StorageNotesTransformerService {
       value: '39'
     };
 
+    const transportDocumentReferences = buildTransportDocumentReferences([exportData?.arrivalTransport, exportData?.transport]);
+
     return {
       Name: {
         languageID: 'en',
@@ -88,7 +90,8 @@ export default class StorageNotesTransformerService {
           ID: {
             value: documentNumber
           }
-        }
+        },
+        ...transportDocumentReferences
       ],
       SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
     };
