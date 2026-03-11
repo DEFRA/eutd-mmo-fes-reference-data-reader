@@ -251,7 +251,7 @@ export const buildSupportingDocumentReferences = (catches: any[]): any[] => {
 
       references.push({
         TypeCode: {
-          value: '890'
+          value: '916'
         },
         RelationshipTypeCode: {
           name: 'Mutually defined reference number (Supporting document)',
