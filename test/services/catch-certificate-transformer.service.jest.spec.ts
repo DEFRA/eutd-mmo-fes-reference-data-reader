@@ -1358,6 +1358,68 @@ describe('CatchCertificateTransformerService', () => {
       expect(transport[0].ID.schemeAgencyName).toBeUndefined();
     });
 
+    it('should return undefined (not null) for schemeAgencyID and schemeAgencyName for train vehicle', () => {
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'train',
+          railwayBillNumber: 'RAIL12345',
+          nationalityOfVehicle: 'United Kingdom'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyID).not.toBeNull();
+      expect(transport[0].ID.schemeAgencyName).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyName).not.toBeNull();
+    });
+
+    it('should return undefined (not null) for schemeAgencyID and schemeAgencyName for containerVessel vehicle', () => {
+      const documentNumber = 'GBR-2025-CC-TRANS-SCHEME-006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          vehicle: 'containerVessel',
+          vesselName: 'MV Atlantic',
+          nationalityOfVehicle: 'United Kingdom'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeAgencyID).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyID).not.toBeNull();
+      expect(transport[0].ID.schemeAgencyName).toBeUndefined();
+      expect(transport[0].ID.schemeAgencyName).not.toBeNull();
+    });
+
     it('should handle truck without nationalityOfVehicle field', () => {
       mockGetCountries.mockReturnValue([{
         officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
@@ -2352,6 +2414,66 @@ describe('CatchCertificateTransformerService', () => {
       expect(equipment[0].ID.value).toBe('CONT1234567');
       expect(equipment[1].ID.value).toBe('CONT7654321');
     });
+
+    it('should handle container numbers field (new field)', () => {
+      const documentNumber = 'GBR-2025-CC-EQUIP006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          containerNumbers: 'MSCU9876543'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const equipment =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .UtilizedSPSTransportEquipment;
+
+      expect(equipment).toHaveLength(1);
+      expect(equipment[0].ID.value).toBe('MSCU9876543');
+      expect(equipment[0].ID.schemeID).toBe('container_number');
+    });
+
+    it('should handle multiple containers from containerNumbers field', () => {
+      const documentNumber = 'GBR-2025-CC-EQUIP007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{
+          containerNumbers: 'CONT1111111 CONT2222222 CONT3333333'
+        }]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const equipment =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .UtilizedSPSTransportEquipment;
+
+      expect(equipment).toHaveLength(3);
+      expect(equipment[0].ID.value).toBe('CONT1111111');
+      expect(equipment[0].ID.schemeID).toBe('container_number');
+      expect(equipment[1].ID.value).toBe('CONT2222222');
+      expect(equipment[1].ID.schemeID).toBe('container_number');
+      expect(equipment[2].ID.value).toBe('CONT3333333');
+      expect(equipment[2].ID.schemeID).toBe('container_number');
+    });
   });
 
   describe('buildConsignmentItems', () => {
@@ -2582,7 +2704,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(notes.some((n: any) => n.SubjectCode.value === 'CATCH_AREA')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'HIGH_SEAS_CATCH_AREA')).toBe(true);
       expect(notes.some((n: any) => n.SubjectCode.value === 'REGIONAL_FISHERIES_MANAGEMENT_ORGANISATION')).toBe(true);
-      expect(notes.some((n: any) => n.Content.value === 'CCAMLR')).toBe(true);
+      expect(notes.some((n: any) => n.Content[0].value === 'CCAMLR')).toBe(true);
     });
 
     it('should include phone note even when empty', () => {
@@ -2620,7 +2742,7 @@ describe('CatchCertificateTransformerService', () => {
       const phoneNote = notes.find((n: any) => n.SubjectCode.value === 'PHONE');
 
       expect(phoneNote).toBeDefined();
-      expect(phoneNote.Content.value).toBe('');
+      expect(phoneNote.Content[0].value).toBe('');
     });
 
     it('should handle missing landings array', () => {
@@ -2691,7 +2813,7 @@ describe('CatchCertificateTransformerService', () => {
       const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
 
-      expect(gearNote.Content.value).toBe('08.1');
+      expect(gearNote.Content[0].value).toBe('08.1');
     });
   });
 
@@ -2879,7 +3001,8 @@ describe('CatchCertificateTransformerService', () => {
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const eezNotes = notes.filter((n: any) => n.SubjectCode.value === 'EXCLUSIVE_ECONOMIC_ZONE');
 
-      expect(eezNotes.length).toBe(3);
+      expect(eezNotes).toHaveLength(1);
+      expect(eezNotes[0].Content).toHaveLength(3);
     });
 
     it('should handle landings without vessel data', () => {
@@ -3031,8 +3154,8 @@ describe('CatchCertificateTransformerService', () => {
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
       const endDateNote = notes.find((n: any) => n.SubjectCode.value === 'END_DATE');
 
-      expect(startDateNote.Content.value).toBe('05-Jan-2025');
-      expect(endDateNote.Content.value).toBe('25-Dec-2025');
+      expect(startDateNote.Content[0].value).toBe('05-Jan-2025');
+      expect(endDateNote.Content[0].value).toBe('25-Dec-2025');
     });
 
     it('should handle single-digit dates with leading zero', () => {
@@ -3074,7 +3197,7 @@ describe('CatchCertificateTransformerService', () => {
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
 
-      expect(startDateNote.Content.value).toBe('03-Feb-2025');
+      expect(startDateNote.Content[0].value).toBe('03-Feb-2025');
     });
 
     it('should return original string on invalid date', () => {
@@ -3116,7 +3239,7 @@ describe('CatchCertificateTransformerService', () => {
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
       const startDateNote = notes.find((n: any) => n.SubjectCode.value === 'START_DATE');
 
-      expect(startDateNote.Content.value).toBe('NaN-undefined-NaN');
+      expect(startDateNote.Content[0].value).toBe('NaN-undefined-NaN');
     });
   });
 
@@ -3178,9 +3301,9 @@ describe('CatchCertificateTransformerService', () => {
       expect(items.length).toBe(2);
       expect(items[0].IncludedSPSTradeLineItem.length).toBe(2); // 2 vessels
       expect(items[0].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
-      expect(items[0].IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote[0].Content.value).toBe('Vessel 1');
+      expect(items[0].IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote[0].Content[0].value).toBe('Vessel 1');
       expect(items[0].IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
-      expect(items[0].IncludedSPSTradeLineItem[1].AdditionalInformationSPSNote[0].Content.value).toBe('Vessel 2');
+      expect(items[0].IncludedSPSTradeLineItem[1].AdditionalInformationSPSNote[0].Content[0].value).toBe('Vessel 2');
 
       expect(items[1].IncludedSPSTradeLineItem.length).toBe(2); // 2 products
       expect(items[1].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);

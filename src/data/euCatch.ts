@@ -164,6 +164,45 @@ export const createMainCarriageSPSTransportMovement = (transport: any) => {
   } : commonTransportInformation
 }
 
+export const createUtilizedSPSTransportEquipments = (utilizedSPSTransportEquipments: any, transport: any, delimiter: any = ' ') => {
+  // Handle containerNumbers (comma-separated string from multiple containers)
+  if (transport.containerIdentificationNumber) {
+    const containerArray = transport.containerIdentificationNumber.split(delimiter).map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+    const containerNumbers = containerArray.map((containerNumber: string) => ({
+      ID: {
+        schemeID: 'container_number',
+        value: containerNumber
+      }
+    }));
+    return [...utilizedSPSTransportEquipments, ...containerNumbers];
+  }
+
+  // Fallback to single containerNumber for backwards compatibility
+  if (transport.containerNumber) {
+    const containerNumberArray = transport.containerNumber.split(delimiter).map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+    return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
+      ID: {
+        schemeID: 'container_number',
+        value: containerNumber
+      }
+    }))];
+  }
+
+  // Fallback for containerNumbers for backwards compatibility with non-manipulation documents
+  if (transport.containerNumbers) {
+    const containerNumberArray = transport.containerNumbers.split(delimiter).map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
+    return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
+      ID: {
+        schemeID: 'container_number',
+        value: containerNumber
+      }
+    }))];
+  }
+
+
+  return utilizedSPSTransportEquipments;
+}
+
 export const getApplicationSPSClassification = (commoditityCode: string | undefined) => ({
   SystemID: {
     value: 'CN'

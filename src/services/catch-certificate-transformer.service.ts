@@ -3,7 +3,7 @@ import { getCountries, getGearTypes, getRfmos } from '../data/cache';
 import logger from '../logger';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 import { eufaoAreas } from '../data/faoAreas';
-import { createMainCarriageSPSTransportMovement, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, exportedFromMapping, getCountryISO2 } from '../data/euCatch';
 import { equalsIgnoreCase } from '../utils/string';
 
 const formatDate = (dateString: string | Date) => {
@@ -353,32 +353,7 @@ export default class CatchCertificateTransformerService {
   }
 
   private static buildTransportEquipment(transportations: any[]): any {
-    return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => {
-      // Handle containerNumbers (comma-separated string from multiple containers)
-      if (transport.containerIdentificationNumber) {
-        const containerArray = transport.containerIdentificationNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-        const containerNumbers = containerArray.map((containerNumber: string) => ({
-          ID: {
-            schemeID: 'container_number',
-            value: containerNumber
-          }
-        }));
-        return [...utilizedSPSTransportEquipments, ...containerNumbers];
-      }
-
-      // Fallback to single containerNumber for backwards compatibility
-      if (transport.containerNumber) {
-        const containerNumberArray = transport.containerNumber.split(' ').map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-        return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
-          ID: {
-            schemeID: 'container_number',
-            value: containerNumber
-          }
-        }))];
-      }
-
-      return utilizedSPSTransportEquipments;
-    }, []);
+    return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => createUtilizedSPSTransportEquipments(utilizedSPSTransportEquipments, transport), []);
   }
 
   private static buildConsignmentItems(exportData: any): any[] {
@@ -491,9 +466,9 @@ export default class CatchCertificateTransformerService {
 
     if (conservationReference) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: conservationReference
-        },
+        }],
         SubjectCode: {
           value: 'CONSERVATION_AND_MANAGEMENT_MEASURES'
         }
@@ -502,10 +477,10 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.vessel) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: vessel.vessel
-        },
+        }],
         SubjectCode: {
           value: 'VESSEL_NAME'
         }
@@ -514,9 +489,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.flag) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: getCountryISO2(vessel.flag)
-        },
+        }],
         SubjectCode: {
           value: 'VESSEL_FLAG'
         }
@@ -525,9 +500,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.cfr) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: vessel.cfr
-        },
+        }],
         SubjectCode: {
           value: 'VESSEL_REGISTRATION'
         }
@@ -536,9 +511,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.ircs) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: vessel.ircs
-        },
+        }],
         SubjectCode: {
           value: 'CALL_SIGN'
         }
@@ -547,9 +522,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.homePort) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: vessel.homePort
-        },
+        }],
         SubjectCode: {
           value: 'HOME_PORT'
         }
@@ -559,9 +534,9 @@ export default class CatchCertificateTransformerService {
     if (vessel.gearCode) {
       const gearTypes: GearRecord[] = getGearTypes();
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: gearTypes.find((gearType: GearRecord) => gearType['Gear code'] === vessel.gearCode)?.['ISSCFG code'] || '99.9'
-        },
+        }],
         SubjectCode: {
           value: 'FISHING_GEAR'
         }
@@ -570,9 +545,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.licenceNumber) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: vessel.licenceNumber
-        },
+        }],
         SubjectCode: {
           value: 'FISHING_LICENSE'
         }
@@ -581,9 +556,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.licenceValidTo) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: formatDate(new Date(vessel.licenceValidTo))
-        },
+        }],
         SubjectCode: {
           value: 'FISHING_LICENSE_END_DATE'
         }
@@ -591,9 +566,9 @@ export default class CatchCertificateTransformerService {
     }
 
     additionalInformationSPSNote.push({
-      Content: {
+      Content: [{
         value: ''
-      },
+      }],
       SubjectCode: {
         value: 'PHONE'
       }
@@ -601,9 +576,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.licenceHolder) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: vessel.licenceHolder
-        },
+        }],
         SubjectCode: {
           value: 'MASTER_OF_VESSEL'
         }
@@ -612,9 +587,9 @@ export default class CatchCertificateTransformerService {
 
     if (vessel.imoNumber) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: vessel.imoNumber
-        },
+        }],
         SubjectCode: {
           value: 'IMO'
         }
@@ -629,9 +604,9 @@ export default class CatchCertificateTransformerService {
 
     if (catchItem.weight) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           value: catchItem.weight?.toString() || '0'
-        },
+        }],
         SubjectCode: {
           value: 'NET_WEIGHT'
         }
@@ -640,37 +615,34 @@ export default class CatchCertificateTransformerService {
 
     if (catchItem.cfr) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: catchItem.cfr
-        },
+        }],
         SubjectCode: {
           value: 'VESSEL_REGISTRATION'
         }
       })
     }
 
-    // Get all EEZ or use empty array
-    const eezCode = catchItem.exclusiveEconomicZones?.map((exclusiveEconomicZone: ICountry) => ({
-      Content: {
-        languageID: 'en',
-        value: exclusiveEconomicZone.isoCodeAlpha2 || ''
-      },
-      SubjectCode: {
-        value: 'EXCLUSIVE_ECONOMIC_ZONE'
-      }
-    })) || [];
-
-    if (eezCode.length > 0) {
-      additionalInformationSPSNote.push(...eezCode);
+    if (Array.isArray(catchItem.exclusiveEconomicZones) && catchItem.exclusiveEconomicZones.length > 0) {
+      additionalInformationSPSNote.push({
+        Content: catchItem.exclusiveEconomicZones.map((exclusiveEconomicZone: ICountry) => ({
+          languageID: 'en',
+          value: exclusiveEconomicZone.isoCodeAlpha2 || ''
+        })),
+        SubjectCode: {
+          value: 'EXCLUSIVE_ECONOMIC_ZONE'
+        }
+      });
     }
 
     if (catchItem.licenceHolder) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: catchItem.licenceHolder
-        },
+        }],
         SubjectCode: {
           value: 'MASTER_OF_VESSEL'
         }
@@ -679,10 +651,10 @@ export default class CatchCertificateTransformerService {
 
     if (catchItem.startDate) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: formatDate(catchItem.startDate)
-        },
+        }],
         SubjectCode: {
           value: 'START_DATE'
         }
@@ -691,10 +663,10 @@ export default class CatchCertificateTransformerService {
 
     if (catchItem.date) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: formatDate(catchItem.date)
-        },
+        }],
         SubjectCode: {
           value: 'END_DATE'
         }
@@ -703,10 +675,10 @@ export default class CatchCertificateTransformerService {
 
     if (catchItem.faoArea) {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: eufaoAreas[catchItem.faoArea]
-        },
+        }],
         SubjectCode: {
           value: 'CATCH_AREA'
         }
@@ -715,10 +687,10 @@ export default class CatchCertificateTransformerService {
 
     if (catchItem.highSeasArea === 'Yes') {
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: eufaoAreas[catchItem.faoArea]
-        },
+        }],
         SubjectCode: {
           value: 'HIGH_SEAS_CATCH_AREA'
         }
@@ -728,10 +700,10 @@ export default class CatchCertificateTransformerService {
     if (catchItem.rfmo) {
       const abbreviation = getRfmos()?.find(r => equalsIgnoreCase(catchItem.rfmo, r['Full text']))?.Abbreviation;
       additionalInformationSPSNote.push({
-        Content: {
+        Content: [{
           languageID: 'en',
           value: abbreviation
-        },
+        }],
         SubjectCode: {
           value: 'REGIONAL_FISHERIES_MANAGEMENT_ORGANISATION'
         }
