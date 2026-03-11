@@ -17,7 +17,8 @@ describe('StorageNotesTransformerService', () => {
         exporterCompanyName: 'Test Exporter Ltd',
         addressOne: '123 Export Street',
         townCity: 'London',
-        postcode: 'E1 1AA'
+        postcode: 'E1 1AA',
+        country: 'United Kingdom'
       },
       facilityName: 'Test Cold Storage Facility',
       facilityApprovalNumber: 'GB-COLD-001',
@@ -263,8 +264,8 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe('Test Cold Storage Facility');
-        expect(arrivalConsignment.ConsignorSPSParty.RoleCode.value).toBe('CZ');
+        expect(arrivalConsignment.ConsigneeSPSParty.Name.value).toBe('Test Cold Storage Facility');
+        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('CN');
       });
 
       it('should include facility address in arrival consignment', () => {
@@ -276,10 +277,10 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Storage Road');
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('Manchester');
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('M1 1BB');
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.CountryID.value).toBe('GB');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Storage Road');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CityName.value).toBe('Manchester');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('M1 1BB');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CountryID.value).toBe('GB');
       });
 
       it('should include availability due date time in arrival consignment', () => {
@@ -404,7 +405,7 @@ describe('StorageNotesTransformerService', () => {
 
         expect(arrivalConsignment.ConsigneeSPSParty).toBeDefined();
         expect(arrivalConsignment.ConsigneeSPSParty.Name.value).toBe('Test Cold Storage Facility');
-        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('EX');
+        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('CN');
       });
 
       it('should set consignee party address in arrival consignment', () => {
@@ -698,7 +699,7 @@ describe('StorageNotesTransformerService', () => {
         expect(tradeLineItem.GrossWeightMeasure.unitCode).toBe('KGM');
       });
 
-      it('should set ConsignorSPSParty CountryName from facilityCountry in arrival', () => {
+      it('should set ConsignorSPSParty CountryName from exporter in arrival', () => {
         const exportDataWithFacilityCountry = {
           ...baseExportData,
           facilityCountry: 'United Kingdom'
@@ -1276,7 +1277,7 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe("O'Brien's Cold Storage & Co.");
+        expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe("Fish & Chips Ltd™");
       });
     });
 
