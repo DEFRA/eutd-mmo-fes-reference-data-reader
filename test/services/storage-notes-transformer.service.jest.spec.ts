@@ -1,4 +1,5 @@
 import StorageNotesTransformerService from '../../src/services/storage-notes-transformer.service';
+import { buildSupportingDocumentReferences } from '../../src/data/euCatch';
 import logger from '../../src/logger';
 
 jest.mock('../../src/logger');
@@ -1575,6 +1576,171 @@ describe('StorageNotesTransformerService', () => {
         );
 
         expect(speciesNote).toBeUndefined();
+      });
+    });
+  });
+});
+
+describe('buildSupportingDocumentReferences', () => {
+  describe('guard clauses', () => {
+    it('should return empty array when catches is null', () => {
+      const result = buildSupportingDocumentReferences(null);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is undefined', () => {
+      const result = buildSupportingDocumentReferences(undefined);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is not an array (string)', () => {
+      const result = buildSupportingDocumentReferences('invalid' as any);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is not an array (object)', () => {
+      const result = buildSupportingDocumentReferences({} as any);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is an empty array', () => {
+      const result = buildSupportingDocumentReferences([]);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('supportingDocuments guard clauses', () => {
+    it('should skip a catch item that has no supportingDocuments property', () => {
+      const result = buildSupportingDocumentReferences([{ product: 'Cod' }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a catch item where supportingDocuments is null', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: null }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a catch item where supportingDocuments is a string (not an array)', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: 'DOC-001' }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a catch item where supportingDocuments is an object (not an array)', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: { ref: 'DOC-001' } }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should continue to next catch when one has non-array supportingDocuments and another has valid ones', () => {
+      const result = buildSupportingDocumentReferences([
+        { supportingDocuments: 'not-an-array' },
+        { supportingDocuments: ['VALID-DOC'] }
+      ]);
+      expect(result).toHaveLength(1);
+      expect(result[0].ID.value).toBe('VALID-DOC');
+    });
+  });
+
+  describe('empty and falsy document filtering', () => {
+    it('should skip an empty string entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [''] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a null entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [null] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip an undefined entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [undefined] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a zero entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [0] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should only include non-empty entries from a mixed array', () => {
+      const result = buildSupportingDocumentReferences([{
+        supportingDocuments: ['', 'VALID-DOC', null, undefined, 'ANOTHER-DOC', '']
+      }]);
+      expect(result).toHaveLength(2);
+      expect(result[0].ID.value).toBe('VALID-DOC');
+      expect(result[1].ID.value).toBe('ANOTHER-DOC');
+    });
+  });
+
+  describe('reference object shape', () => {
+    it('should return a reference with the correct TypeCode', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(result[0].TypeCode).toEqual({ value: '890' });
+    });
+
+    it('should return a reference with the correct RelationshipTypeCode', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(result[0].RelationshipTypeCode).toEqual({
+        name: 'Mutually defined reference number (Supporting document)',
+        value: 'ZZZ'
+      });
+    });
+
+    it('should return a reference with schemeID BK', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(result[0].ID.schemeID).toBe('BK');
+    });
+
+    it('should set ID.value to the document reference string', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['MY-SUPP-DOC-123'] }]);
+      expect(result[0].ID.value).toBe('MY-SUPP-DOC-123');
+    });
+
+    it('should not add any extra properties beyond TypeCode, RelationshipTypeCode, and ID', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(Object.keys(result[0])).toEqual(['TypeCode', 'RelationshipTypeCode', 'ID']);
+    });
+  });
+
+  describe('multiple catches and documents', () => {
+    it('should create one entry per valid document across a single catch', () => {
+      const result = buildSupportingDocumentReferences([{
+        supportingDocuments: ['DOC-A', 'DOC-B', 'DOC-C']
+      }]);
+      expect(result).toHaveLength(3);
+      expect(result[0].ID.value).toBe('DOC-A');
+      expect(result[1].ID.value).toBe('DOC-B');
+      expect(result[2].ID.value).toBe('DOC-C');
+    });
+
+    it('should flatten documents from multiple catches into a single array', () => {
+      const result = buildSupportingDocumentReferences([
+        { supportingDocuments: ['DOC-A1', 'DOC-A2'] },
+        { supportingDocuments: ['DOC-B1'] },
+        { supportingDocuments: ['DOC-C1', 'DOC-C2'] }
+      ]);
+      expect(result).toHaveLength(5);
+      expect(result.map((r: any) => r.ID.value)).toEqual(['DOC-A1', 'DOC-A2', 'DOC-B1', 'DOC-C1', 'DOC-C2']);
+    });
+
+    it('should skip catches without supportingDocuments and still include valid ones', () => {
+      const result = buildSupportingDocumentReferences([
+        { product: 'Cod' },
+        { supportingDocuments: ['DOC-001'] },
+        { supportingDocuments: null },
+        { supportingDocuments: ['DOC-002'] }
+      ]);
+      expect(result).toHaveLength(2);
+      expect(result[0].ID.value).toBe('DOC-001');
+      expect(result[1].ID.value).toBe('DOC-002');
+    });
+
+    it('should produce consistent schemeID BK on all returned references', () => {
+      const result = buildSupportingDocumentReferences([
+        { supportingDocuments: ['X1', 'X2'] },
+        { supportingDocuments: ['X3'] }
+      ]);
+      result.forEach((ref: any) => {
+        expect(ref.ID.schemeID).toBe('BK');
       });
     });
   });
