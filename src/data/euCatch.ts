@@ -164,6 +164,110 @@ export const createMainCarriageSPSTransportMovement = (transport: any) => {
   } : commonTransportInformation
 }
 
+export const buildTransportDocumentReferences = (transportations: any[]): any[] => {
+  if (!transportations || !Array.isArray(transportations)) {
+    return [];
+  }
+
+  const references: any[] = [];
+
+  for (const transport of transportations) {
+    if (!Array.isArray(transport?.transportDocuments)) {
+      continue;
+    }
+
+    const vehicle = transport.vehicle;
+    let typeCodeValue: string;
+    let typeCodeName: string;
+    let informationValue: string;
+
+    // Determine TypeCode based on vehicle type
+    switch (vehicle) {
+      case 'containerVessel':
+        typeCodeValue = '710';
+        typeCodeName = 'Sea waybill (International transport document for Ship)';
+        informationValue = transport.vesselName || '';
+        break;
+      case 'train':
+        typeCodeValue = '720';
+        typeCodeName = 'Rail consignment note (International transport document for Rail)';
+        informationValue = transport.railwayBillNumber || '';
+        break;
+      case 'truck':
+        typeCodeValue = '730';
+        typeCodeName = 'Road consignment note (International transport document for Road Vehicle)';
+        informationValue = transport.registrationNumber || '';
+        break;
+      case 'plane':
+        typeCodeValue = '740';
+        typeCodeName = 'Air waybill (International transport document for Airplane)';
+        informationValue = transport.flightNumber || '';
+        break;
+      default:
+        continue; // Skip if vehicle type is not recognized
+    }
+
+    // Create a reference object for each transport document
+    for (const doc of transport.transportDocuments) {
+      references.push({
+        TypeCode: {
+          name: typeCodeName,
+          value: typeCodeValue
+        },
+        RelationshipTypeCode: {
+          name: 'Bill of lading number (International transport document)',
+          value: 'BM'
+        },
+        ID: {
+          schemeID: 'BEFORE_BCP',
+          value: doc.reference || ''
+        },
+        Information: {
+          value: informationValue
+        }
+      });
+    }
+  }
+
+  return references;
+}
+
+export const buildSupportingDocumentReferences = (catches: any[]): any[] => {
+  if (!catches || !Array.isArray(catches)) {
+    return [];
+  }
+
+  const references: any[] = [];
+
+  for (const catchItem of catches) {
+    if (!Array.isArray(catchItem?.supportingDocuments)) {
+      continue;
+    }
+
+    for (const doc of catchItem.supportingDocuments) {
+      if (!doc) {
+        continue;
+      }
+
+      references.push({
+        TypeCode: {
+          value: '890'
+        },
+        RelationshipTypeCode: {
+          name: 'Mutually defined reference number (Supporting document)',
+          value: 'ZZZ'
+        },
+        ID: {
+          schemeID: 'GB',
+          value: doc
+        }
+      });
+    }
+  }
+
+  return references;
+}
+
 export const createUtilizedSPSTransportEquipments = (utilizedSPSTransportEquipments: any, transport: any, delimiter: any = ' ') => {
   // Handle containerNumbers (comma-separated string from multiple containers)
   if (transport?.containerIdentificationNumber) {

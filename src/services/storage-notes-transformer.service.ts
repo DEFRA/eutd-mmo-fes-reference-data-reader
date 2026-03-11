@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
+import { buildSupportingDocumentReferences, createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
 import { toSpeciesCode } from '../landings/transformations/dynamicsValidation';
 
@@ -52,6 +52,8 @@ export default class StorageNotesTransformerService {
       value: '39'
     };
 
+    const supportingDocumentReferences = buildSupportingDocumentReferences(exportData?.catches);
+
     return {
       Name: {
         languageID: 'en',
@@ -88,7 +90,8 @@ export default class StorageNotesTransformerService {
           ID: {
             value: documentNumber
           }
-        }
+        },
+        ...supportingDocumentReferences
       ],
       SignatorySPSAuthentication: getSignatorySPSAuthentication(createdAt)
     };
@@ -110,7 +113,7 @@ export default class StorageNotesTransformerService {
         }
       };
 
-      field.ConsignorSPSParty = this.buildConsignorParty(exportData, type);
+      field.ConsignorSPSParty = this.buildConsignorParty(exportData);
       field.ConsigneeReceiptSPSLocation = this.buildConsigneeReceiptLocation(exportData?.arrivalTransport);
       field.ConsigneeSPSParty = this.buildConsigneeParty(exportData);
 
@@ -145,13 +148,11 @@ export default class StorageNotesTransformerService {
 
       field.ConsignorSPSParty = {
         Name: {
-          languageID: 'en',
           value: ''
         }
       };
       field.ConsigneeSPSParty = {
         Name: {
-          languageID: 'en',
           value: ''
         }
       };
@@ -220,12 +221,15 @@ export default class StorageNotesTransformerService {
 
   private static buildConsigneeParty(exportData: any): any {
     return {
+      ID: {
+        value: ''
+      },
       Name: {
         languageID: 'en',
         value: exportData?.facilityName
       },
       RoleCode: {
-        value: 'EX'
+        value: 'CN'
       },
       SpecifiedSPSAddress: {
         LineOne: {
@@ -263,37 +267,40 @@ export default class StorageNotesTransformerService {
     };
   }
 
-  private static buildConsignorParty(exportData: any, type: string): any {
+  private static buildConsignorParty(exportData: any): any {
     const exporterDetails = exportData?.exporterDetails || {};
 
     return {
+      ID: {
+        value: ''
+      },
       Name: {
         languageID: 'en',
-        value: type === 'arrival' ? exportData?.facilityName : exporterDetails.exporterCompanyName
+        value: exporterDetails.exporterCompanyName
       },
       RoleCode: {
         name: 'Consignor (Exporter)',
-        value: 'CZ'
+        value: 'EX'
       },
       SpecifiedSPSAddress: {
         LineOne: {
           languageID: 'en',
-          value: type === 'arrival' ? exportData?.facilityAddressOne : exporterDetails.exporterAddressOne
+          value: exporterDetails.exporterAddressOne
         },
         CityName: {
           languageID: 'en',
-          value: type === 'arrival' ? exportData?.facilityTownCity : exporterDetails.townCity
+          value: exporterDetails.townCity
         },
         PostcodeCode: {
           languageID: 'en',
-          value: type === 'arrival' ? exportData?.facilityPostcode : exporterDetails.exporterPostcode
+          value: exporterDetails.exporterPostcode
         },
         CountryID: {
           value: 'GB'
         },
         CountryName: {
           languageID: 'en',
-          value: type === 'arrival' ? exportData?.facilityCountry : exporterDetails.country
+          value: exporterDetails.country
         }
       }
     };

@@ -1,4 +1,5 @@
 import StorageNotesTransformerService from '../../src/services/storage-notes-transformer.service';
+import { buildSupportingDocumentReferences } from '../../src/data/euCatch';
 import logger from '../../src/logger';
 
 jest.mock('../../src/logger');
@@ -17,7 +18,8 @@ describe('StorageNotesTransformerService', () => {
         exporterCompanyName: 'Test Exporter Ltd',
         addressOne: '123 Export Street',
         townCity: 'London',
-        postcode: 'E1 1AA'
+        postcode: 'E1 1AA',
+        country: 'United Kingdom'
       },
       facilityName: 'Test Cold Storage Facility',
       facilityApprovalNumber: 'GB-COLD-001',
@@ -263,8 +265,8 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe('Test Cold Storage Facility');
-        expect(arrivalConsignment.ConsignorSPSParty.RoleCode.value).toBe('CZ');
+        expect(arrivalConsignment.ConsigneeSPSParty.Name.value).toBe('Test Cold Storage Facility');
+        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('CN');
       });
 
       it('should include facility address in arrival consignment', () => {
@@ -276,10 +278,10 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Storage Road');
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.CityName.value).toBe('Manchester');
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('M1 1BB');
-        expect(arrivalConsignment.ConsignorSPSParty.SpecifiedSPSAddress.CountryID.value).toBe('GB');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.LineOne.value).toBe('456 Storage Road');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CityName.value).toBe('Manchester');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.PostcodeCode.value).toBe('M1 1BB');
+        expect(arrivalConsignment.ConsigneeSPSParty.SpecifiedSPSAddress.CountryID.value).toBe('GB');
       });
 
       it('should include availability due date time in arrival consignment', () => {
@@ -404,7 +406,7 @@ describe('StorageNotesTransformerService', () => {
 
         expect(arrivalConsignment.ConsigneeSPSParty).toBeDefined();
         expect(arrivalConsignment.ConsigneeSPSParty.Name.value).toBe('Test Cold Storage Facility');
-        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('EX');
+        expect(arrivalConsignment.ConsigneeSPSParty.RoleCode.value).toBe('CN');
       });
 
       it('should set consignee party address in arrival consignment', () => {
@@ -698,7 +700,7 @@ describe('StorageNotesTransformerService', () => {
         expect(tradeLineItem.GrossWeightMeasure.unitCode).toBe('KGM');
       });
 
-      it('should set ConsignorSPSParty CountryName from facilityCountry in arrival', () => {
+      it('should set ConsignorSPSParty CountryName from exporter in arrival', () => {
         const exportDataWithFacilityCountry = {
           ...baseExportData,
           facilityCountry: 'United Kingdom'
@@ -1276,7 +1278,7 @@ describe('StorageNotesTransformerService', () => {
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
 
-        expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe("O'Brien's Cold Storage & Co.");
+        expect(arrivalConsignment.ConsignorSPSParty.Name.value).toBe("Fish & Chips Ltd™");
       });
     });
 
@@ -1574,6 +1576,171 @@ describe('StorageNotesTransformerService', () => {
         );
 
         expect(speciesNote).toBeUndefined();
+      });
+    });
+  });
+});
+
+describe('buildSupportingDocumentReferences', () => {
+  describe('guard clauses', () => {
+    it('should return empty array when catches is null', () => {
+      const result = buildSupportingDocumentReferences(null);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is undefined', () => {
+      const result = buildSupportingDocumentReferences(undefined);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is not an array (string)', () => {
+      const result = buildSupportingDocumentReferences('invalid' as any);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is not an array (object)', () => {
+      const result = buildSupportingDocumentReferences({} as any);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when catches is an empty array', () => {
+      const result = buildSupportingDocumentReferences([]);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('supportingDocuments guard clauses', () => {
+    it('should skip a catch item that has no supportingDocuments property', () => {
+      const result = buildSupportingDocumentReferences([{ product: 'Cod' }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a catch item where supportingDocuments is null', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: null }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a catch item where supportingDocuments is a string (not an array)', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: 'DOC-001' }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a catch item where supportingDocuments is an object (not an array)', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: { ref: 'DOC-001' } }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should continue to next catch when one has non-array supportingDocuments and another has valid ones', () => {
+      const result = buildSupportingDocumentReferences([
+        { supportingDocuments: 'not-an-array' },
+        { supportingDocuments: ['VALID-DOC'] }
+      ]);
+      expect(result).toHaveLength(1);
+      expect(result[0].ID.value).toBe('VALID-DOC');
+    });
+  });
+
+  describe('empty and falsy document filtering', () => {
+    it('should skip an empty string entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [''] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a null entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [null] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip an undefined entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [undefined] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should skip a zero entry in supportingDocuments', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: [0] }]);
+      expect(result).toEqual([]);
+    });
+
+    it('should only include non-empty entries from a mixed array', () => {
+      const result = buildSupportingDocumentReferences([{
+        supportingDocuments: ['', 'VALID-DOC', null, undefined, 'ANOTHER-DOC', '']
+      }]);
+      expect(result).toHaveLength(2);
+      expect(result[0].ID.value).toBe('VALID-DOC');
+      expect(result[1].ID.value).toBe('ANOTHER-DOC');
+    });
+  });
+
+  describe('reference object shape', () => {
+    it('should return a reference with the correct TypeCode', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(result[0].TypeCode).toEqual({ value: '890' });
+    });
+
+    it('should return a reference with the correct RelationshipTypeCode', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(result[0].RelationshipTypeCode).toEqual({
+        name: 'Mutually defined reference number (Supporting document)',
+        value: 'ZZZ'
+      });
+    });
+
+    it('should return a reference with schemeID GB', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(result[0].ID.schemeID).toBe('GB');
+    });
+
+    it('should set ID.value to the document reference string', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['MY-SUPP-DOC-123'] }]);
+      expect(result[0].ID.value).toBe('MY-SUPP-DOC-123');
+    });
+
+    it('should not add any extra properties beyond TypeCode, RelationshipTypeCode, and ID', () => {
+      const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
+      expect(Object.keys(result[0])).toEqual(['TypeCode', 'RelationshipTypeCode', 'ID']);
+    });
+  });
+
+  describe('multiple catches and documents', () => {
+    it('should create one entry per valid document across a single catch', () => {
+      const result = buildSupportingDocumentReferences([{
+        supportingDocuments: ['DOC-A', 'DOC-B', 'DOC-C']
+      }]);
+      expect(result).toHaveLength(3);
+      expect(result[0].ID.value).toBe('DOC-A');
+      expect(result[1].ID.value).toBe('DOC-B');
+      expect(result[2].ID.value).toBe('DOC-C');
+    });
+
+    it('should flatten documents from multiple catches into a single array', () => {
+      const result = buildSupportingDocumentReferences([
+        { supportingDocuments: ['DOC-A1', 'DOC-A2'] },
+        { supportingDocuments: ['DOC-B1'] },
+        { supportingDocuments: ['DOC-C1', 'DOC-C2'] }
+      ]);
+      expect(result).toHaveLength(5);
+      expect(result.map((r: any) => r.ID.value)).toEqual(['DOC-A1', 'DOC-A2', 'DOC-B1', 'DOC-C1', 'DOC-C2']);
+    });
+
+    it('should skip catches without supportingDocuments and still include valid ones', () => {
+      const result = buildSupportingDocumentReferences([
+        { product: 'Cod' },
+        { supportingDocuments: ['DOC-001'] },
+        { supportingDocuments: null },
+        { supportingDocuments: ['DOC-002'] }
+      ]);
+      expect(result).toHaveLength(2);
+      expect(result[0].ID.value).toBe('DOC-001');
+      expect(result[1].ID.value).toBe('DOC-002');
+    });
+
+    it('should produce consistent schemeID BK on all returned references', () => {
+      const result = buildSupportingDocumentReferences([
+        { supportingDocuments: ['X1', 'X2'] },
+        { supportingDocuments: ['X3'] }
+      ]);
+      result.forEach((ref: any) => {
+        expect(ref.ID.schemeID).toBe('GB');
       });
     });
   });
