@@ -232,6 +232,41 @@ export const buildTransportDocumentReferences = (transportations: any[]): any[] 
   return references;
 }
 
+export const buildSupportingDocumentReferences = (catches: any[]): any[] => {
+  if (!catches || !Array.isArray(catches)) {
+    return [];
+  }
+
+  const references: any[] = [];
+
+  for (const catchItem of catches) {
+    if (!Array.isArray(catchItem?.supportingDocuments)) {
+      continue;
+    }
+
+    for (const doc of catchItem.supportingDocuments) {
+      if (!doc) {
+        continue;
+      }
+
+      references.push({
+        TypeCode: {
+          value: '890'
+        },
+        RelationshipTypeCode: {
+          name: 'Mutually defined reference number (Supporting document)',
+          value: 'ZZZ'
+        },
+        ID: {
+          schemeID: 'BK',
+          value: doc
+        }
+      });
+    }
+  }
+
+  return references;
+}
 
 export const createUtilizedSPSTransportEquipments = (utilizedSPSTransportEquipments: any, transport: any, delimiter: any = ' ') => {
   // Handle containerNumbers (comma-separated string from multiple containers)
