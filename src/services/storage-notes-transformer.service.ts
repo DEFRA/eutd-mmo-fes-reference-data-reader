@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { createMainCarriageSPSTransportMovement, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
+import { createMainCarriageSPSTransportMovement, createUtilizedSPSTransportEquipments, getApplicationSPSClassification, getSignatorySPSAuthentication, IssuerSPSParty, validateUKPSNumberFormat, validateUKSDNumberFormat } from '../data/euCatch';
 import logger from '../logger';
 import { toSpeciesCode } from '../landings/transformations/dynamicsValidation';
 
@@ -135,6 +135,7 @@ export default class StorageNotesTransformerService {
       };
 
       field.MainCarriageSPSTransportMovement = createMainCarriageSPSTransportMovement(exportData?.arrivalTransport);
+      field.UtilizedSPSTransportEquipment = createUtilizedSPSTransportEquipments([], exportData?.arrivalTransport, ",");
     } else {
       field.ExportExitDateTime = {
         DateTime: {
@@ -176,6 +177,7 @@ export default class StorageNotesTransformerService {
       };
 
       field.MainCarriageSPSTransportMovement = createMainCarriageSPSTransportMovement(exportData?.transport);
+      field.UtilizedSPSTransportEquipment = createUtilizedSPSTransportEquipments([], exportData?.transport, ",");
     }
 
     field.ExportSPSCountry = {
