@@ -255,5 +255,5 @@ export const exportedFromMapping = {
   ['United Kingdom']: 'GB',
   ['Guernsey']: 'GG',
   ['Isle Of Man']: 'IM',
-  ['Jersey']: 'JJ'
+  ['Jersey']: 'JE'
 }
