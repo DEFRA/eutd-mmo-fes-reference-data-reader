@@ -1685,9 +1685,9 @@ describe('buildSupportingDocumentReferences', () => {
       });
     });
 
-    it('should return a reference with schemeID BK', () => {
+    it('should return a reference with schemeID GB', () => {
       const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
-      expect(result[0].ID.schemeID).toBe('BK');
+      expect(result[0].ID.schemeID).toBe('GB');
     });
 
     it('should set ID.value to the document reference string', () => {
@@ -1740,7 +1740,7 @@ describe('buildSupportingDocumentReferences', () => {
         { supportingDocuments: ['X3'] }
       ]);
       result.forEach((ref: any) => {
-        expect(ref.ID.schemeID).toBe('BK');
+        expect(ref.ID.schemeID).toBe('GB');
       });
     });
   });

@@ -258,7 +258,7 @@ export const buildSupportingDocumentReferences = (catches: any[]): any[] => {
           value: 'ZZZ'
         },
         ID: {
-          schemeID: 'BK',
+          schemeID: 'GB',
           value: doc
         }
       });
