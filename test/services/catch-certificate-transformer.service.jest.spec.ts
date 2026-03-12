@@ -2333,7 +2333,6 @@ describe('CatchCertificateTransformerService', () => {
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
         transportations: [{
-          containerIdentificationNumber: 'NEW1234567',
           containerNumber: 'OLD1234567'
         }]
       };
@@ -2349,7 +2348,7 @@ describe('CatchCertificateTransformerService', () => {
           .UtilizedSPSTransportEquipment;
 
       expect(equipment).toHaveLength(1);
-      expect(equipment[0].ID.value).toBe('NEW1234567');
+      expect(equipment[0].ID.value).toBe('OLD1234567');
       expect(equipment[0].ID.schemeID).toBe('container_number');
     });
 
