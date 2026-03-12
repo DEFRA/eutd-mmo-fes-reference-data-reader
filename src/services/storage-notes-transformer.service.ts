@@ -138,7 +138,7 @@ export default class StorageNotesTransformerService {
       };
 
       field.MainCarriageSPSTransportMovement = createMainCarriageSPSTransportMovement(exportData?.arrivalTransport);
-      field.UtilizedSPSTransportEquipment = createUtilizedSPSTransportEquipments([], exportData?.arrivalTransport, ",");
+      field.UtilizedSPSTransportEquipment = createUtilizedSPSTransportEquipments([], exportData?.arrivalTransport);
     } else {
       field.ExportExitDateTime = {
         DateTime: {
@@ -178,7 +178,7 @@ export default class StorageNotesTransformerService {
       };
 
       field.MainCarriageSPSTransportMovement = createMainCarriageSPSTransportMovement(exportData?.transport);
-      field.UtilizedSPSTransportEquipment = createUtilizedSPSTransportEquipments([], exportData?.transport, ",");
+      field.UtilizedSPSTransportEquipment = createUtilizedSPSTransportEquipments([], exportData?.transport);
     }
 
     field.ExportSPSCountry = {
