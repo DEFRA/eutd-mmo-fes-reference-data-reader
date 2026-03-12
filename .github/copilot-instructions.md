@@ -71,10 +71,10 @@ npm run test:watch    # Watch mode for TDD
 ```
 
 **Coverage Requirements** (enforced in CI):
-- Statements: 97%
-- Branches: 92%
-- Functions: 97%
-- Lines: 97%
+- Statements: 90%
+- Branches: 90%
+- Functions: 90%
+- Lines: 90%
 
 Test files mirror `src/` structure in `test/` directory. Use `mongodb-memory-server` for integration tests.
 
@@ -238,7 +238,7 @@ File uploads scanned via `services/antiVirus.service.ts`. Can be disabled with `
    }
    ```
 
-4. **Add test coverage** in `test/landings/transformations/` to maintain 97% threshold.
+4. **Add test coverage** in `test/landings/transformations/` to maintain 90% threshold.
 
 ### Risk Scoring
 
@@ -260,6 +260,10 @@ Risk calculations in `src/landings/query/isHighRisk.ts` combine vessel, species,
 - **MongoDB Memory Server**: Starts slow on first test run. Use `--runInBand` in CI to avoid parallel test collisions.
 - **Mock Service Bus**: Queue integration tests should mock `@azure/service-bus` to avoid external dependencies.
 - **Timezone Issues**: Use `moment.utc()` in tests to avoid local timezone flakiness.
+
+## Skills
+
+Use `/develop` for implementation, coding, and research tasks. Use `/unit-tests` for writing tests, coverage, and SonarQube issues.
 
 ---
 
