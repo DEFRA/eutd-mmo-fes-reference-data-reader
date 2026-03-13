@@ -1674,7 +1674,7 @@ describe('buildSupportingDocumentReferences', () => {
   describe('reference object shape', () => {
     it('should return a reference with the correct TypeCode', () => {
       const result = buildSupportingDocumentReferences([{ supportingDocuments: ['DOC-001'] }]);
-      expect(result[0].TypeCode).toEqual({ value: '890' });
+      expect(result[0].TypeCode).toEqual({ value: '916' });
     });
 
     it('should return a reference with the correct RelationshipTypeCode', () => {
