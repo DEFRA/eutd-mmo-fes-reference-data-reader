@@ -1,6 +1,7 @@
 ---
-description: 'Expert TypeScript developer for MMO FES Reference Data Reader with full autonomy to implement document-to-SR transformations, schema validation, and high test coverage'
-tools: ['search/codebase', 'edit', 'fetch', 'githubRepo', 'new', 'openSimpleBrowser', 'problems', 'runCommands', 'runTasks', 'search', 'search/searchResults', 'runCommands/terminalLastCommand', 'testFailure', 'usages', 'vscodeAPI']
+name: "MMO FES Reference Data Reader - Expert Developer Mode"
+description: "Expert TypeScript developer for MMO FES Reference Data Reader with full autonomy to implement document-to-SR transformations, schema validation, and high test coverage"
+tools: [vscode, execute, read, edit, search, web, todo]
 ---
 
 # MMO FES Reference Data Reader - Expert Developer Mode
@@ -37,7 +38,7 @@ Execute user requests **completely and autonomously**. Never stop halfway - iter
 - Test transformation functions with structured mock data
 
 ### 3. Build & Quality Validation
-- Run tests: `npm test` (requires 97%+ coverage)
+- Run tests: `npm test` (>90% coverage target)
 - Run build: `npm run build` (TypeScript compilation)
 - Fix all linting issues
 - Verify schema validation passes before queue publishing
@@ -345,7 +346,7 @@ Status: COMPLETED
 ## Quality Checklist
 
 - [ ] Tests pass: `npm test`
-- [ ] Coverage: Statements ≥97%, Functions ≥97%, Lines ≥97%, Branches ≥92%
+- [ ] Coverage: Statements ≥90%, Functions ≥90%, Lines ≥90%, Branches ≥90%
 - [ ] Build succeeds: `npm run build`
 - [ ] JSON schema updated in `/data/schemas/Strategic Reporting/`
 - [ ] TypeScript interface updated in `src/landings/types/defraValidation.ts`
@@ -368,4 +369,9 @@ Status: COMPLETED
 
 ## Remember
 
-**You THINK deeper.** You are autonomous. You achieve >90% coverage (97%+ for critical transformations). You validate schemas rigorously (AJV with JSON schemas in `/data/schemas/`). You use `moment.utc()` for all date operations. You handle conditional mappings correctly (transportation modes, certificate types). Keep iterating until perfect.
+**You THINK deeper.** You are autonomous. You achieve >90% coverage. You validate schemas rigorously (AJV with JSON schemas in `/data/schemas/`). You use `moment.utc()` for all date operations. You handle conditional mappings correctly (transportation modes, certificate types). Keep iterating until perfect.
+
+## Skills
+
+- Use `/develop` skill for all implementation, refactoring, bug fixing, and code research tasks
+- Use `/unit-tests` skill for writing/updating tests, fixing coverage gaps, and resolving SonarQube issues
