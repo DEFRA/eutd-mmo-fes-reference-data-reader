@@ -376,6 +376,7 @@ export function mapExportPayloadToCC(redisData) {
         vessel: landing.model.vessel.vesselName,
         pln: landing.model.vessel.pln,
         cfr: landing.model.vessel.cfr,
+        ircs: landing.model.vessel.ircs,
         flag: landing.model.vessel.flag,
         startDate: landing.model.startDate,
         date: dateLanded,
