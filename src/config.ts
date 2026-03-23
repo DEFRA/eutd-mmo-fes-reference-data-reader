@@ -114,7 +114,7 @@ export class ApplicationConfig {
     ApplicationConfig.prototype.allSpeciesFileName = env.ALL_SPECIES_DATA_FILE_NAME;
 
     // blob storage
-    ApplicationConfig.prototype.maximumDefraValidationReportBatchSize = parseInt(env.MAXIMUM_DEFRA_VALIDATION_REPORT_BATCH_SIZE, 10) || 1000;
+    ApplicationConfig.prototype.maximumDefraValidationReportBatchSize = Number.parseInt(env.MAXIMUM_DEFRA_VALIDATION_REPORT_BATCH_SIZE, 10) || 1000;
     ApplicationConfig.prototype.maximumTemporaryDefraValidationReportCollectionBatchUpsert = 10000;
 
     // av api
@@ -123,9 +123,9 @@ export class ApplicationConfig {
 
     // sets eod default rules when going live for the first time
     ApplicationConfig.prototype.eodRulesMigration = env.EOD_RULES_MIGRATION === 'true';
-    ApplicationConfig.prototype.euCatchMaxEEZ = parseInt(env.EU_CATCH_MAX_EEZ, 10) || 5;
-    ApplicationConfig.prototype.maxTotalExportWeight = parseFloat(env.MAX_TOTAL_EXPORT_WEIGHT) || 10_000_000;
-    
+    ApplicationConfig.prototype.euCatchMaxEEZ = Number.parseInt(env.EU_CATCH_MAX_EEZ, 10) || 5;
+    ApplicationConfig.prototype.maxTotalExportWeight = Number.parseFloat(env.MAX_TOTAL_EXPORT_WEIGHT) || 10_000_000;
+
     ApplicationConfig.prototype.boomiCatchSubmissionUrl = env.BOOMI_CATCH_SUBMISSION_URL;
   }
 
