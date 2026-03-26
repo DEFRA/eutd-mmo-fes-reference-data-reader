@@ -15,7 +15,7 @@ interface IGetDocuments {
 export const getAllDocuments = async (
   { fromDate, documentStatus=DocumentStatuses.Complete, fccNumbers, documentNumber, exporter }: IGetDocuments) => {
 
-  if (fccNumbers && fccNumbers.length === 0) return []
+  if (fccNumbers?.length === 0) return []
 
   const query: any = {
     __t: { $in: ['storageDocument', 'processingStatement'] },
