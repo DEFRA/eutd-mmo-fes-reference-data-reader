@@ -777,7 +777,7 @@ describe('ProcessingStatementTransformerService', () => {
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
     });
 
@@ -793,7 +793,7 @@ describe('ProcessingStatementTransformerService', () => {
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('');
     });
 
@@ -813,7 +813,7 @@ describe('ProcessingStatementTransformerService', () => {
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
     });
 
@@ -833,7 +833,7 @@ describe('ProcessingStatementTransformerService', () => {
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
     });
 
     it('should handle product without description', () => {
@@ -874,7 +874,7 @@ describe('ProcessingStatementTransformerService', () => {
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
     });
 
     it('should log error and throw when exception occurs', () => {
@@ -920,7 +920,7 @@ describe('ProcessingStatementTransformerService', () => {
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(item.Description.value).toBe('Frozen Cod Fillets');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
     });
 
     it('should handle decimal weights correctly', () => {
@@ -1165,7 +1165,7 @@ describe('ProcessingStatementTransformerService', () => {
 
       // Verify actual values are used, not defaults
       expect(item.Description.value).toBe('Frozen Cod Fillets');
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
       expect(item.ApplicableSPSClassification.ClassName.value).toBe('Frozen Cod Fillets');
     });
 
@@ -1206,7 +1206,7 @@ describe('ProcessingStatementTransformerService', () => {
       const consignment = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment;
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('030489');
+      expect(item.ApplicableSPSClassification.ClassCode.value).toBe('0304890097');
     });
 
     it('should handle catch with exportWeightAfterProcessing present', () => {

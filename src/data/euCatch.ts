@@ -307,7 +307,7 @@ export const createUtilizedSPSTransportEquipments = (utilizedSPSTransportEquipme
   return utilizedSPSTransportEquipments;
 }
 
-export const getApplicationSPSClassification = (commoditityCode: string | undefined) => ({
+export const getApplicationSPSClassification = (commoditityCode: string = '', truncate: boolean = true) => ({
   SystemID: {
     value: 'CN'
   },
@@ -317,7 +317,7 @@ export const getApplicationSPSClassification = (commoditityCode: string | undefi
     value: 'CN Code'
   },
   ClassCode: {
-    value: commoditityCode ? commoditityCode.substring(0, 6) : ''
+    value: truncate ? commoditityCode.substring(0, 6) : commoditityCode
   },
   ClassName: {
     languageID: 'en',
