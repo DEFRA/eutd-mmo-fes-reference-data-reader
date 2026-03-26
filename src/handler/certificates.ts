@@ -7,10 +7,10 @@ import { DocumentStatuses, Investigation } from '../landings/types/document';
 import { IAuditEvent, AuditEventTypes } from '../landings/types/auditEvent';
 import * as Joi from "joi";
 import { getAllDocuments } from '../landings/persistence/storeDocProcStat';
-import { SSL_OP_LEGACY_SERVER_CONNECT } from "constants";
+import { SSL_OP_LEGACY_SERVER_CONNECT } from "node:constants";
 import { StatusPayload } from './types/certificates';
 
-const https = require('https');
+const https = require('node:https');
 
 const updateBusinessContinuity = (documentNumber) => {
 
