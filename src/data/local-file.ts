@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import csv from 'csvtojson';
 import logger from '../logger';
 import { type IConversionFactor } from 'mmo-shared-reference-data';
