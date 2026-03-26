@@ -372,7 +372,7 @@ export default class ProcessingStatementTransformerService {
           value: ctch.exportWeightAfterProcessing?.toString()
         },
         AdditionalInformationSPSNote: notes,
-        ApplicableSPSClassification: getApplicationSPSClassification(ctch.productCommodityCode)
+        ApplicableSPSClassification: getApplicationSPSClassification(ctch.productCommodityCode, false)
       };
     })
   }
