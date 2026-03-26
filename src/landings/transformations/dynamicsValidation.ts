@@ -615,7 +615,7 @@ export function toDynamicsSd(
 
 export function toSpeciesCode(speciesWithCode: string | undefined): string | undefined {
   if (speciesWithCode) {
-    const regex = /(.*) \((.*)\)/g;
+    const regex = /([^(]*) \(([^)]*)\)/g;
     const matches = regex.exec(speciesWithCode);
     if (matches && matches.length >= 3) {
       return matches[2];
