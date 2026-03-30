@@ -339,9 +339,9 @@ describe('given that timestamps from CEFAS are UTC, and dateLanded within the ca
     expect(res.length).toBe(3)
 
     expect(res.map(r => r.dateTimeLanded.toISOString())).toEqual([
-      moment('2019-07-01T23:00:00Z').toISOString(),
       moment('2019-07-01T00:00:00Z').toISOString(),
       moment('2019-07-01T10:00:00Z').toISOString(),
+      moment('2019-07-01T23:00:00Z').toISOString()
     ]);
     expect(true).toBeTruthy();
 
