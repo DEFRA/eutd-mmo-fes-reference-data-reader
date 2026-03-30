@@ -83,23 +83,22 @@ export const updateLandings = async (landings: ILanding[]) => {
   const isMultipleWithDateOnly = (landings.length > 1) && landings.every(landing =>
       moment.utc(landing.dateTimeLanded).format('HH:mm:ss.SSS ZZ') === '00:00:00.000 +0000')
 
-  // Apply timestamp offsets synchronously first (order matters for uniqueness), then
-  // fire all upserts in parallel to avoid serial DB round-trips.
-  if (isMultipleWithDateOnly) {
-    for (const [i, landing] of landings.entries()) {
+  for (const [i, landing] of landings.entries()) {
+
+    if (isMultipleWithDateOnly) {
+
       logger.info(`[LANDINGS][UPDATE-LANDINGS] landings on the same day all at midnight. Adding ${i} milliseconds to create a key`)
+
       const dateTimeLanded = moment.utc(landing.dateTimeLanded)
       dateTimeLanded.add(i, 'milliseconds')
+
       landing.dateTimeLanded = dateTimeLanded.toISOString()
     }
-  }
 
-  await Promise.all(
-    landings.map(landing =>
-      updateLanding(landing)
-        .catch(e => logger.error(`[LANDINGS][UPDATE-LANDINGS][ERROR][${e}]`))
-    )
-  );
+    await updateLanding(landing)
+      .catch(e => logger.error(`[LANDINGS][UPDATE-LANDINGS][ERROR][${e}]`));
+
+  }
 
 }
 
