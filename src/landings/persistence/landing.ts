@@ -14,7 +14,7 @@ export const getLandings = async (rssNumber: string, dateLanded: string): Promis
       $gte: theDay.startOf('day').toDate(),
       $lte: theDay.endOf('day').toDate()
     }
-  }).lean()
+  }).sort({ dateTimeLanded: 1 }).lean()
 
   return documents
 
