@@ -1,5 +1,4 @@
 const moment = require('moment')
-const { isEqual } = require('lodash')
 import logger from '../../logger'
 import { ILanding, ILandingQuery, LandingModel, LandingSources } from '../types/landing'
 
@@ -11,10 +10,10 @@ export const getLandings = async (rssNumber: string, dateLanded: string): Promis
   const documents: any = await LandingModel.find({
     rssNumber: rssNumber,
     dateTimeLanded: {
-      $gte: theDay.startOf('day').toDate(),
-      $lte: theDay.endOf('day').toDate()
+      $gte: theDay.clone().startOf('day').toDate(),
+      $lte: theDay.clone().endOf('day').toDate()
     }
-  }).sort({ dateTimeLanded: 1 }).lean()
+  }).lean()
 
   return documents
 
@@ -27,33 +26,29 @@ export const getLandingsMultiple =
 
   if (landings.length === 0) return []
 
-  const landingsMultiple:ILanding[] = [];
-
-  for (const landing of landings) {
-
+  const orClauses = landings.map((landing) => {
     const theDay = moment.utc(landing.dateLanded);
-
-    logger.info(`[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING][RSS-NUMBER][${landing.rssNumber}]`);
-
-    const query = {
+    return {
       rssNumber: landing.rssNumber,
       dateTimeLanded: {
-        $gte: theDay.startOf('day').toDate(),
-        $lte: theDay.endOf('day').toDate()
+        $gte: theDay.clone().startOf('day').toDate(),
+        $lte: theDay.clone().endOf('day').toDate()
       }
-    }
+    };
+  });
 
-    logger.info(`[LANDINGS][GET-MULTIPLE-LANDINGS][QUERY][${JSON.stringify(query)}]`);
+  const query = { $or: orClauses };
+  logger.info(`[LANDINGS][GET-MULTIPLE-LANDINGS][QUERY][${JSON.stringify(query)}]`);
 
-    const landings = await LandingModel.find(query).lean();
+  const docs: ILanding[] = await LandingModel.find(query).lean();
+  logger.info(`[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING-FROM-MONGO][${JSON.stringify(docs)}]`);
 
-    logger.info(`[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING-FROM-MONGO][${JSON.stringify(landings)}]`);
-
-    landingsMultiple.push(...landings);
+  const seen = new Map<string, ILanding>();
+  for (const doc of docs) {
+    const key = `${doc.rssNumber}|${doc.dateTimeLanded}`;
+    if (!seen.has(key)) seen.set(key, doc);
   }
-
-  return landingsMultiple.reduce((acc, landing) =>
-    acc.some(l => isEqual(l, landing)) ? acc : [...acc, landing], []);
+  return Array.from(seen.values());
 
 }
 
@@ -83,22 +78,17 @@ export const updateLandings = async (landings: ILanding[]) => {
   const isMultipleWithDateOnly = (landings.length > 1) && landings.every(landing =>
       moment.utc(landing.dateTimeLanded).format('HH:mm:ss.SSS ZZ') === '00:00:00.000 +0000')
 
-  for (const [i, landing] of landings.entries()) {
-
-    if (isMultipleWithDateOnly) {
-
-      logger.info(`[LANDINGS][UPDATE-LANDINGS] landings on the same day all at midnight. Adding ${i} milliseconds to create a key`)
-
-      const dateTimeLanded = moment.utc(landing.dateTimeLanded)
-      dateTimeLanded.add(i, 'milliseconds')
-
-      landing.dateTimeLanded = dateTimeLanded.toISOString()
-    }
-
-    await updateLanding(landing)
-      .catch(e => logger.error(`[LANDINGS][UPDATE-LANDINGS][ERROR][${e}]`));
-
-  }
+  await Promise.all(
+    landings.map((landing, i) => {
+      let landingToUpdate = landing;
+      if (isMultipleWithDateOnly) {
+        logger.info(`[LANDINGS][UPDATE-LANDINGS] landings on the same day all at midnight. Adding ${i} milliseconds to create a key`);
+        landingToUpdate = { ...landing, dateTimeLanded: moment.utc(landing.dateTimeLanded).add(i, 'milliseconds').toISOString() };
+      }
+      return updateLanding(landingToUpdate)
+        .catch(e => logger.error(`[LANDINGS][UPDATE-LANDINGS][ERROR][${e}]`));
+    })
+  );
 
 }
 
