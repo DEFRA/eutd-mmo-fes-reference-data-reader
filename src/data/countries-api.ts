@@ -1,11 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
-import querystring from 'querystring';
+import querystring from 'node:querystring';
 import config from "../config";
 import logger from '../logger';
 import { ICountry } from 'mmo-shared-reference-data';
-import { SSL_OP_LEGACY_SERVER_CONNECT } from "constants";
-
-const https = require('https');
+import { SSL_OP_LEGACY_SERVER_CONNECT } from "node:constants";
+import https from 'node:https';
 
 export type IOAuthRequest = {
   client_id: string,

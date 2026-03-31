@@ -121,7 +121,7 @@ export const validateExportWeightForLanding = (landing: IUploadedLanding): IUplo
 export const validateFaoAreaForLanding = (landing: IUploadedLanding): IUploadedLanding => {
   if (!landing.faoArea) {
     landing.errors.push('error.faoArea.any.missing');
-  } else if (!faoAreas.find((area: string) => area === landing.faoArea)) {
+  } else if (!faoAreas.includes(landing.faoArea)) {
     landing.errors.push('error.faoArea.any.invalid');
   }
 
@@ -135,7 +135,7 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
   }
 
   const knownVessels = getVesselsData();
-  if (!knownVessels.find(v => equalsIgnoreCase(landing.vesselPln, v.registrationNumber) || equalsIgnoreCase(landing.vesselPln, v.fishingVesselName))) {
+  if (!knownVessels.some(v => equalsIgnoreCase(landing.vesselPln, v.registrationNumber) || equalsIgnoreCase(landing.vesselPln, v.fishingVesselName))) {
     landing.errors.push('error.vesselPln.any.exists');
     return landing;
   }
@@ -226,16 +226,16 @@ export const validateGearCodeForLanding = (landing: IUploadedLanding, gearRecord
     landing.errors.push('error.gearCode.any.missing');
     return landing;
   }
-  if (!gearCodeRegex.test(landing.gearCode)) {
-    landing.errors.push('validation.gearCode.string.invalid');
-  } else {
+  if (gearCodeRegex.test(landing.gearCode)) {
     const gearRecord = gearRecords.find(r => equalsIgnoreCase(landing.gearCode, r["Gear code"]));
-    if (!gearRecord) {
-      landing.errors.push('validation.gearCode.string.unknown');
-    } else {
+    if (gearRecord) {
       landing.gearCategory = gearRecord["Gear category"];
       landing.gearName = gearRecord["Gear name"];
+    } else {
+      landing.errors.push('validation.gearCode.string.unknown');
     }
+  } else {
+    landing.errors.push('validation.gearCode.string.invalid');
   }
 
   return landing;
@@ -260,10 +260,10 @@ export const validateHighSeasAreaForLanding = (landing: IUploadedLanding): IUplo
 export const validateRfmoCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {
   if (!landing.rfmoCode) return landing;
   const rfmoRecord = getRfmos()?.find(r => equalsIgnoreCase(landing.rfmoCode, r['Abbreviation']));
-  if (!rfmoRecord) {
-    landing.errors.push('validation.rfmoCode.string.unknown');
-  } else {
+  if (rfmoRecord) {
     landing.rfmoName = rfmoRecord['Full text'];
+  } else {
+    landing.errors.push('validation.rfmoCode.string.unknown');
   }
 
   return landing;
@@ -283,7 +283,7 @@ const parseEezCodes = (eezCode: string): string[] => {
   return eezCode
     .split(';')
     .map(c => c.trim().toUpperCase())
-    .filter(c => c);
+    .filter(Boolean);
 };
 
 /**
@@ -373,7 +373,7 @@ export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedL
 // ========================================
 
 export const isPositiveNumberWithTwoDecimals = (num: number): boolean => {
-  if (isNaN(num) || num < 0) {
+  if (Number.isNaN(num) || num < 0) {
     return false;
   }
   

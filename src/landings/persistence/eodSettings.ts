@@ -24,8 +24,8 @@ const defaultRules: IEodRule[] = [{
 
 const addDefaultRules: (rules: IEodRule[], vesselSize: vesselSizeGroup) => boolean = (rules: IEodRule[], vesselSize) =>
   !Array.isArray(rules) ||
-  rules.find((rule: IEodRule) => rule.ruleType === 'expectedDate' && rule.vesselSize === vesselSize) === undefined ||
-  rules.find((rule: IEodRule) => rule.ruleType === 'endDate' && rule.vesselSize === vesselSize) === undefined
+  !rules.some((rule: IEodRule) => rule.ruleType === 'expectedDate' && rule.vesselSize === vesselSize) ||
+  !rules.some((rule: IEodRule) => rule.ruleType === 'endDate' && rule.vesselSize === vesselSize)
 
 const seedEodRule = async (setting: IEodSetting) => {
   if (Array.isArray(setting.vesselSizes) && setting.vesselSizes.length > 0) {
@@ -118,12 +118,14 @@ export const cleanUpEodRules = async (): Promise<void> => {
   if (config.eodRulesMigration) {
     const eodSettings: IEodSetting[] = await getEodSettings();
     logger.info(`[EOD-SETTINGS][PERSISTENCE][LENGTH][${eodSettings.length}]`);
-    for await (const setting of eodSettings) {
-      if (setting.rule) {
-        logger.info(`[EOD-SETTINGS][DELETING][RULE][${setting.rule}]`);
-        await EodSettingModel.findOneAndDelete({ rule: setting.rule })
-      }
-    }
+    await Promise.all(
+      eodSettings
+        .filter(setting => setting.rule)
+        .map(async setting => {
+          logger.info(`[EOD-SETTINGS][DELETING][RULE][${setting.rule}]`);
+          await EodSettingModel.findOneAndDelete({ rule: setting.rule });
+        })
+    );
   }
 }
 
