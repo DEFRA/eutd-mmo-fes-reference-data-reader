@@ -13,7 +13,7 @@ export const getLandings = async (rssNumber: string, dateLanded: string): Promis
       $gte: theDay.clone().startOf('day').toDate(),
       $lte: theDay.clone().endOf('day').toDate()
     }
-  }).lean()
+  }).sort({ dateTimeLanded: 1 }).lean()
 
   return documents
 
@@ -28,6 +28,7 @@ export const getLandingsMultiple =
 
   const orClauses = landings.map((landing) => {
     const theDay = moment.utc(landing.dateLanded);
+    logger.info(`[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING][RSS-NUMBER][${landing.rssNumber}]`);
     return {
       rssNumber: landing.rssNumber,
       dateTimeLanded: {
