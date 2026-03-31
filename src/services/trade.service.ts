@@ -1,6 +1,6 @@
 import logger from '../logger';
 import axios, { AxiosResponse } from 'axios';
-import querystring from "querystring";
+import querystring from "node:querystring";
 import appConfig from '../config';
 import { IOAuthResponse } from '../data/countries-api';
 

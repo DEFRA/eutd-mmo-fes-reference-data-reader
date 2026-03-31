@@ -98,10 +98,10 @@ export const toDefraTradeCc = (document: IDocument, certificateCase: IDynamicsCa
   const transportation: CertificateTransport = rawTransportation ? Object.fromEntries(Object.entries(rawTransportation).filter(([, v]) => v !== undefined)) as CertificateTransport : undefined;
 
   let status: CertificateStatus;
-  if (!Array.isArray(ccQueryResults)) {
-    status = CertificateStatus.VOID;
-  } else {
+  if (Array.isArray(ccQueryResults)) {
     status = ccQueryResults.some((_: ICcQueryResult) => _.status === "BLOCKED") ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE;
+  } else {
+    status = CertificateStatus.VOID;
   }
   const ccPointOfDestination = (typeof document?.exportData?.pointOfDestination === 'string' ? document.exportData.pointOfDestination : transportation?.pointOfDestination) ?? undefined;
 

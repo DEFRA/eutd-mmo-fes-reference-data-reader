@@ -195,6 +195,7 @@ export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoT
   );
 
   const isDataNeverExpected = validatedLanding.extended.dataEverExpected === false;
+  const isDataEverExpected = !isDataNeverExpected;
   const isRejectedOrVoided = isLandingRejectedOrVoided(case2Type);
   return {
     status: toLandingStatus(validatedLanding, isHighRisk(riskScore)),
@@ -224,12 +225,12 @@ export function toLanding(validatedLanding: ICcQueryResult, case2Type?: CaseTwoT
     numberOfTotalSubmissions: validatedLanding.extended.numberOfSubmissions,
     vesselOverriddenByAdmin: validatedLanding.extended.vesselOverriddenByAdmin === true,
     speciesOverriddenByAdmin: validatedLanding.extended.speciesOverriddenByAdmin === true,
-    dataEverExpected: !isDataNeverExpected,
+    dataEverExpected: isDataEverExpected,
     landingDataExpectedDate: validatedLanding.extended.landingDataExpectedDate,
     landingDataEndDate: validatedLanding.extended.landingDataEndDate,
-    landingDataExpectedAtSubmission: !isDataNeverExpected ? isLandingDataExpectedAtSubmission(validatedLanding.createdAt, validatedLanding.extended.landingDataExpectedDate) : undefined,
+    landingDataExpectedAtSubmission: isDataEverExpected ? isLandingDataExpectedAtSubmission(validatedLanding.createdAt, validatedLanding.extended.landingDataExpectedDate) : undefined,
     landingOutcomeAtSubmission: isRejectedLanding(validatedLanding) ? LandingOutcomeType.Rejected : LandingOutcomeType.Success,
-    isLate: !isDataNeverExpected ? isLandingDataLate(validatedLanding.firstDateTimeLandingDataRetrieved, validatedLanding.extended.landingDataExpectedDate) : undefined,
+    isLate: isDataEverExpected ? isLandingDataLate(validatedLanding.firstDateTimeLandingDataRetrieved, validatedLanding.extended.landingDataExpectedDate) : undefined,
     dateDataReceived: validatedLanding.firstDateTimeLandingDataRetrieved,
     validation: buildValidationSection(
       validatedLanding,
@@ -491,8 +492,8 @@ export function toPsCatch(validatedPsCatches: ISdPsQueryResult): IDynamicsProces
 export function toSdPsCaseTwoType(validatedSdPsCatches: ISdPsQueryResult[]) {
   let output = SdPsCaseTwoType.RealTimeValidation_Success;
 
-  const isMisMatch = validatedSdPsCatches.filter(_ => _.isMismatch).length > 0;
-  const isOverUse = validatedSdPsCatches.filter(_ => _.isOverAllocated).length > 0;
+  const isMisMatch = validatedSdPsCatches.some(_ => _.isMismatch);
+  const isOverUse = validatedSdPsCatches.some(_ => _.isOverAllocated);
 
   if (isMisMatch) output = SdPsCaseTwoType.RealTimeValidation_Weight;
   if (isOverUse) output = SdPsCaseTwoType.RealTimeValidation_Overuse;
@@ -568,10 +569,10 @@ export function toSdProduct(validatedSdProducts: ISdPsQueryResult): IDynamicsSto
     exportedWeight: validatedSdProducts.weightOnDoc,
     productDescription: validatedSdProducts.productDescription,
     supportingDocuments: validatedSdProducts.supportingDocuments,
-    netWeightProductArrival: validatedSdProducts.netWeightProductArrival ? parseInt(validatedSdProducts.netWeightProductArrival, 10) : undefined,
-    netWeightFisheryProductArrival: validatedSdProducts.netWeightFisheryProductArrival ? parseInt(validatedSdProducts.netWeightFisheryProductArrival, 10) : undefined,
-    netWeightProductDeparture: validatedSdProducts.netWeightProductDeparture ? parseInt(validatedSdProducts.netWeightProductDeparture, 10) : undefined,
-    netWeightFisheryProductDeparture: validatedSdProducts.netWeightFisheryProductDeparture ? parseInt(validatedSdProducts.netWeightFisheryProductDeparture, 10) : undefined,
+      netWeightProductArrival: validatedSdProducts.netWeightProductArrival ? Number.parseInt(validatedSdProducts.netWeightProductArrival, 10) : undefined,
+      netWeightFisheryProductArrival: validatedSdProducts.netWeightFisheryProductArrival ? Number.parseInt(validatedSdProducts.netWeightFisheryProductArrival, 10) : undefined,
+      netWeightProductDeparture: validatedSdProducts.netWeightProductDeparture ? Number.parseInt(validatedSdProducts.netWeightProductDeparture, 10) : undefined,
+      netWeightFisheryProductDeparture: validatedSdProducts.netWeightFisheryProductDeparture ? Number.parseInt(validatedSdProducts.netWeightFisheryProductDeparture, 10) : undefined,
     validation: {
       totalWeightExported: validatedSdProducts.weightOnAllDocs,
       status: status,
@@ -614,7 +615,7 @@ export function toDynamicsSd(
 
 export function toSpeciesCode(speciesWithCode: string | undefined): string | undefined {
   if (speciesWithCode) {
-    const regex = /(.*) \((.*)\)/g;
+     const regex = /(.*) \((.*)\)/g;
     const matches = regex.exec(speciesWithCode);
     if (matches && matches.length >= 3) {
       return matches[2];

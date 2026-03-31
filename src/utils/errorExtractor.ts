@@ -4,7 +4,7 @@ export default function errorExtractor(data)  {
 
   details.forEach((detail) => {
     if (detail.path.length > 0) {
-      const errorKey = detail.path.join().replace(/,/gi,'.');
+      const errorKey = detail.path.join().replaceAll(',','.');
       errorObject[errorKey] = `error.${errorKey}.${detail.type}`
     } else if (detail.context.label) {
       errorObject[detail.context.label] = `error.${detail.context.label}.${detail.type}`
