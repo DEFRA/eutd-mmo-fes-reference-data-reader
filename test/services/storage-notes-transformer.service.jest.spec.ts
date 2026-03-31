@@ -1478,7 +1478,7 @@ describe('StorageNotesTransformerService', () => {
         expect(thirdCertNote.SubjectCode.value).toBe('CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE');
       });
 
-      it('should always include CATCH_ISSUING_COUNTRY note with value GB', () => {
+      it('should set CATCH_ISSUING_COUNTRY note to GB when certificateType is not non_uk', () => {
         const result = StorageNotesTransformerService.generateStorageNotesPayload(
           documentNumber,
           createdAt,
@@ -1494,6 +1494,91 @@ describe('StorageNotesTransformerService', () => {
         expect(issuingCountryNote).toBeDefined();
         expect(issuingCountryNote.Content.value).toBe('GB');
         expect(issuingCountryNote.Content.languageID).toBe('en');
+      });
+
+      it('should set CATCH_ISSUING_COUNTRY note to the issuing country ISO code when certificateType is non_uk', () => {
+        const exportDataWithNonUkCatch = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'NOR-2025-CC-001',
+            certificateType: 'non_uk',
+            issuingCountry: { isoCodeAlpha2: 'NO' },
+            product: 'Atlantic cod (COD)',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithNonUkCatch
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const issuingCountryNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'CATCH_ISSUING_COUNTRY'
+        );
+
+        expect(issuingCountryNote).toBeDefined();
+        expect(issuingCountryNote.Content.value).toBe('NO');
+        expect(issuingCountryNote.Content.languageID).toBe('en');
+      });
+
+      it('should set CATCH_ISSUING_COUNTRY note to undefined when certificateType is non_uk and issuingCountry is missing', () => {
+        const exportDataWithNonUkNoCountry = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'NOR-2025-CC-001',
+            certificateType: 'non_uk',
+            product: 'Atlantic cod (COD)',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithNonUkNoCountry
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const issuingCountryNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'CATCH_ISSUING_COUNTRY'
+        );
+
+        expect(issuingCountryNote).toBeDefined();
+        expect(issuingCountryNote.Content.value).toBeUndefined();
+      });
+
+      it('should set CATCH_ISSUING_COUNTRY to GB when certificateType is undefined', () => {
+        const exportDataWithNoCertType = {
+          ...baseExportData,
+          catches: [{
+            certificateNumber: 'GBR-2025-CC-001234',
+            product: 'Atlantic cod (COD)',
+            netWeightProductArrival: 100,
+            netWeightFisheryProductArrival: 105
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithNoCertType
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+        const issuingCountryNote = tradeLineItem.AdditionalInformationSPSNote.find(
+          (note: any) => note.SubjectCode.value === 'CATCH_ISSUING_COUNTRY'
+        );
+
+        expect(issuingCountryNote).toBeDefined();
+        expect(issuingCountryNote.Content.value).toBe('GB');
       });
 
       it('should include SPECIES note when product is present', () => {
