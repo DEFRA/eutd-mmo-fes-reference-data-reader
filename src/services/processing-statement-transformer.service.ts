@@ -314,11 +314,11 @@ export default class ProcessingStatementTransformerService {
         });
       }
 
-      if (ctch.productCommodityCode) {
+      if (ctch.speciesCommodityCode) {
         notes.push({
           Content: {
             languageID: 'en',
-            value: ctch.productCommodityCode.substring(0, 6)
+            value: ctch.speciesCommodityCode.substring(0, 6)
           },
           SubjectCode: {
             value: 'PROCESSED_PRODUCT_CODE'
@@ -334,19 +334,6 @@ export default class ProcessingStatementTransformerService {
           },
           SubjectCode: {
             value: 'PROCESSED_SPECIES'
-          }
-        });
-      }
-
-      // Add processing details
-      if (exportData.consignmentDescription) {
-        notes.push({
-          Content: {
-            languageID: 'en',
-            value: exportData.consignmentDescription
-          },
-          SubjectCode: {
-            value: 'PROCESSING_TYPE'
           }
         });
       }
