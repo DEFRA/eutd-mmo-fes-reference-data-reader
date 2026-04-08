@@ -383,20 +383,20 @@ describe('get EU member states from CSV', () => {
     const filePath = `${__dirname}/../../data/eumemberstates.csv`;
 
     const result = await getEuMemberStatesFromCSV(filePath);
-    
+
     expect(result).toBeInstanceOf(Array);
     expect(result.length).toBeGreaterThan(0);
-    expect(result).toContain('Austria');
-    expect(result).toContain('Belgium');
-    expect(result).toContain('France');
-    expect(result).toContain('Germany');
+    expect(result).toContain('AT');
+    expect(result).toContain('BE');
+    expect(result).toContain('FR');
+    expect(result).toContain('DE');
   });
 
   it('should filter out empty lines and trim whitespace', async () => {
     const filePath = `${__dirname}/../../data/eumemberstates.csv`;
 
     const result = await getEuMemberStatesFromCSV(filePath);
-    
+
     // Check no empty strings in result
     expect(result.every(country => country.length > 0)).toBe(true);
     // Check no whitespace at start/end
