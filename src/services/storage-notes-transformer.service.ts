@@ -357,7 +357,7 @@ export default class StorageNotesTransformerService {
     notes.push({
       Content: {
         languageID: 'en',
-        value: 'GB'
+        value: catchData.certificateType === 'non_uk' ? catchData.issuingCountry?.isoCodeAlpha2 : 'GB'
       },
       SubjectCode: {
         value: 'CATCH_ISSUING_COUNTRY'
