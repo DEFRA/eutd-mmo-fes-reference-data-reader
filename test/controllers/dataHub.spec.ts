@@ -284,9 +284,9 @@ describe("Report Draft", () => {
       await Controllers.reportDraft("GBR-CC-2342342-32423");
 
       expect(mockToCcDefraReport).toHaveBeenCalledWith(
-        'GBR-CC-2342342-32423', 
-        'some-uuid-correlation-id', 
-        'DRAFT', 
+        'GBR-CC-2342342-32423',
+        'some-uuid-correlation-id',
+        'DRAFT',
         false,
         expect.any(Function),
         catchCertificate
@@ -710,9 +710,9 @@ describe("Report Delete", () => {
       await Controllers.reportDelete("GBR-CC-2342342-32423");
 
       expect(mockToCcDefraReport).toHaveBeenCalledWith(
-        'GBR-CC-2342342-32423', 
-        'some-uuid-correlation-id', 
-        'DELETE', 
+        'GBR-CC-2342342-32423',
+        'some-uuid-correlation-id',
+        'DELETE',
         false,
         expect.any(Function),
         catchCertificate
@@ -2400,6 +2400,31 @@ describe("Report Submitted", () => {
         expect(data[0].hasSalesNote).toBe(false);
         expect(data[1].hasSalesNote).toBe(true);
       });
+
+      it('should log an error and not call case management or defra trade when exporterDetails are missing', async () => {
+        const mockMapCcResponse = { documentNumber: documentNumber, status: 'COMPLETE', _correlationId: 'some-uuid-correlation-id' };
+        const getCatchCertificate = {
+          ...mockMapCcResponse, requestByAdmin: false, audit: [], exportData: {
+            products: [{ species: 'Atlantic Herring (HER)' }]
+          }
+        };
+        const toReportResponse = { ...mockMapCcResponse, documentType: 'CatchCertificate', requestedByAdmin: false };
+        const toLandingsResponse = [{ species: 'HER' }];
+        const mockLogError = jest.spyOn(logger, 'error');
+
+        mockInsertCcReport.mockResolvedValue(null);
+        mockRefreshRiskingData.mockResolvedValue(null);
+        mockGetCertificate.mockResolvedValue(getCatchCertificate);
+        mockToCcDefraReport.mockReturnValue(toReportResponse);
+        mockToLandings.mockReturnValue(toLandingsResponse);
+
+        await Controllers.reportCcSubmitted(data);
+
+        expect(mockLogError).toHaveBeenCalledWith(`[REPORT-CC-SUBMITTED][FAIL][${documentNumber}][NO-EXPORTER-DETAILS]`);
+        expect(mockReportCc).not.toHaveBeenCalled();
+        expect(mockToCCDefraTrade).not.toHaveBeenCalled();
+        mockLogError.mockRestore();
+      });
     });
 
     describe('error handling', () => {
@@ -2797,6 +2822,27 @@ describe('Report Cc Landing Update', () => {
 
       await Controllers.reportCcLandingUpdate(data);
       expect(mockLogError).toHaveBeenCalledWith(`[ONLINE-VALIDATION-REPORT][FAIL][${documentNumber}][NO-EXPORTER-DETAILS]`);
+    });
+
+    it('should log an error and not call case management when exporterDetails are missing from the certificate', async () => {
+      const mockMapCcResponse = { documentNumber: documentNumber, status: 'COMPLETE' };
+      const getCatchCertificate = {
+        ...mockMapCcResponse, requestByAdmin: false, audit: [], exportData: {
+          products: [{ species: 'Atlantic Herring (HER)' }]
+        }
+      };
+      const toReportResponse = { ...mockMapCcResponse, documentType: 'CatchCertificate', _correlationId: 'some-uuid-correlation-id', requestedByAdmin: false };
+      const toLandingsResponse = [{ species: 'HER' }];
+
+      mockInsertCcReport.mockResolvedValue(null);
+      mockGetCertificate.mockResolvedValue(getCatchCertificate);
+      mockToCcDefraReport.mockReturnValue(toReportResponse);
+      mockToLandings.mockReturnValue(toLandingsResponse);
+
+      await Controllers.reportCcLandingUpdate(data);
+
+      expect(mockLogError).toHaveBeenCalledWith(`[ONLINE-VALIDATION-REPORT][FAIL][${documentNumber}][NO-EXPORTER-DETAILS]`);
+      expect(mockReportCc).not.toHaveBeenCalled();
     });
 
     it('should not set sales notes if date landed is invalid', async () => {
