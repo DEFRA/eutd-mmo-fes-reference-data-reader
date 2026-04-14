@@ -15,7 +15,7 @@ export const vesselSearch = (searchTerm: string, landedDateISO: string): IVessel
             registrationNumber: { $regex: searchTerm.includes('(') ? searchTerm.substring(searchTerm.indexOf('(') + 1, searchTerm.length).replace(')', '') : searchTerm, $options: 'i' }
           },
           {
-            fishingVesselName: { $regex: searchTerm.includes('(') ? searchTerm.replace(/%20/g, ' ').substring(0, searchTerm.indexOf('(')) : searchTerm.replace(/%20/g, ' ') , $options: 'i' }
+            fishingVesselName: { $regex: searchTerm.includes('(') ? searchTerm.replaceAll('%20', ' ').substring(0, searchTerm.indexOf('(')) : searchTerm.replaceAll('%20', ' ') , $options: 'i' }
           }
         ]
       },
