@@ -79,19 +79,34 @@ const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCerti
 }
 
 
+const sendPayloadAndUpdate = async (
+  documentNumber: string,
+  transformedPayload: any,
+  params: any,
+  resourceType: any,
+  typeLabel: string,
+  operation: 'submit' | 'void'
+) => {
+  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
+  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
+
+  await updateCertificateEuCatchStatus(documentNumber, statusData);
+
+  logger.info(`[POST /v1/catch-submission] type=${typeLabel} documentNumber=${documentNumber} operation=${operation}`);
+}
+
+
 async function handleCatchCertificateSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-CC-TO-UN-CEFACT]`);
   const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelCatchCertificateRequest') : CatchCertificateTransformerService.generateCatchPayload(
-    documentNumber,
-    createdAt,
-    exportData
-  );
+      documentNumber,
+      createdAt,
+      exportData
+    );
 
   const resourceType = getResourceType(operation);
   const params = { documentType: "CATCHCERTIFICATE" };
-  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
-  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
-  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'catchCert', operation);
 }
 
 async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
@@ -116,15 +131,13 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
   };
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-PS-TO-UN-CEFACT]`);
   const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelProcessingStatementRequest') : ProcessingStatementTransformerService.generateProcessingStatementPayload(
-    documentNumber,
-    createdAt,
-    transformedExportData
-  );
+      documentNumber,
+      createdAt,
+      transformedExportData
+    );
   const resourceType = getResourceType(operation);
   const params = { documentType: "PROCESSINGSTATEMENT" };
-  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
-  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
-  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'processingStatement', operation);
 }
 
 async function handleStorageNotesSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
@@ -155,9 +168,7 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
   } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
   const resourceType = getResourceType(operation);
   const params = { documentType: operation === 'void' ? "NMDOCUMENT" : "NONMANIPULATIONDOCUMENT" };
-  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
-  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
-  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'storageDocument', operation);
 }
 
 export const submitDocumentToBoomi = async (
@@ -192,6 +203,8 @@ export const submitDocumentToBoomi = async (
     } else if (docType === 'storageDocument') {
       await handleStorageNotesSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     }
+
+    logger.info(`[POST /v1/catch-submission] documentNumber=${documentNumber} type=${docType} operation=${operation}`);
 
   } catch (error) {
     logger.error(`[DOCUMENT-SUBMISSION][${documentNumber}][TYPE:${docType}][ERROR][${error.message}][OPERATION:${operation}]`);

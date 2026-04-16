@@ -201,7 +201,7 @@ interface IGetCatchCerts {
 export const getCatchCerts = async (
   { fromDate, documentStatus = DocumentStatuses.Complete, landings, documentNumber, exporter, pln, landingStatuses }: IGetCatchCerts) => {
 
-  if (landings && landings.length === 0) return []
+  if (landings?.length === 0) return []
 
   if (landings && pln) return []  // conflicting filters
 

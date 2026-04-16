@@ -1,7 +1,7 @@
 import * as appInsights from 'applicationinsights';
 import config from './config';
 
-export default () => {
+const initializeAppInsights = (): void => {
   const instrumentationKey = config.instrumentationKey;
 
   if (instrumentationKey) {
@@ -20,3 +20,5 @@ export default () => {
     console.info('Application Insights for reference data service disabled');
   }
 };
+
+export default initializeAppInsights;

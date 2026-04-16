@@ -145,7 +145,7 @@ export const vesselRoutes = (server: Hapi.Server) => {
           const vesselCfr = query.cfr;
           const vesselHomePort = query.homePort;
           const vesselNumber = query.licenceNumber;
-          const vesselImoNumber: number = (query.imo === null || query.imo === undefined) ? null : parseInt(query.imo);
+          const vesselImoNumber: number = (query.imo === null || query.imo === undefined) ? null : Number.parseInt(query.imo);
           const vesselLicenceValidTo = query.licenceValidTo;
 
           if (!moment.utc(vesselLicenceValidTo).isValid() || vesselNumber === undefined)

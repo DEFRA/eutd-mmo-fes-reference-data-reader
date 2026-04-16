@@ -1,7 +1,7 @@
 import appInsights from './app-insights';
 import { Boom } from '@hapi/boom';
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import * as Hapi from '@hapi/hapi';
 import * as cron from 'node-cron';
 const mongoose = require('mongoose');
@@ -74,7 +74,7 @@ export class Server {
       }
 
       Server.instance = new Hapi.Server({
-        port: parseInt(config.port)
+        port: Number.parseInt(config.port)
       });
       Server.onRequest();
       Server.onPreResponse();
