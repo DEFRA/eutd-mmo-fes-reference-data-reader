@@ -235,10 +235,10 @@ export default class CatchCertificateTransformerService {
   private static buildLoadingLocation(exportData: any): any {
     const pointsOfDeparture = exportData.transportations
       ? [...new Set(
-          exportData.transportations
-            .map((t: any) => t.departurePlace)
-            .filter(Boolean)
-        )].map(String).join(', ')
+        exportData.transportations
+          .map((t: any) => t.departurePlace)
+          .filter(Boolean)
+      )].map(String).join(', ')
       : '';
 
     return {
@@ -441,16 +441,14 @@ export default class CatchCertificateTransformerService {
       })
     }
 
-    if (vessel.ircs) {
-      additionalInformationSPSNote.push({
-        Content: [{
-          value: vessel.ircs
-        }],
-        SubjectCode: {
-          value: 'CALL_SIGN'
-        }
-      })
-    }
+    additionalInformationSPSNote.push({
+      Content: [{
+        value: vessel.ircs || 'N/A'
+      }],
+      SubjectCode: {
+        value: 'CALL_SIGN'
+      }
+    })
 
     if (vessel.homePort) {
       additionalInformationSPSNote.push({
@@ -462,6 +460,15 @@ export default class CatchCertificateTransformerService {
         }
       })
     }
+
+    additionalInformationSPSNote.push({
+      Content: [{
+        value: 'N/A'
+      }],
+      SubjectCode: {
+        value: 'MMSI'
+      }
+    })
 
     if (vessel.gearCode) {
       const gearTypes: GearRecord[] = getGearTypes();
@@ -517,16 +524,14 @@ export default class CatchCertificateTransformerService {
       })
     }
 
-    if (vessel.imoNumber) {
-      additionalInformationSPSNote.push({
-        Content: [{
-          value: vessel.imoNumber
-        }],
-        SubjectCode: {
-          value: 'IMO'
-        }
-      })
-    }
+    additionalInformationSPSNote.push({
+      Content: [{
+        value: vessel.imoNumber || 'N/A'
+      }],
+      SubjectCode: {
+        value: 'IMO'
+      }
+    })
 
     return additionalInformationSPSNote;
   }
