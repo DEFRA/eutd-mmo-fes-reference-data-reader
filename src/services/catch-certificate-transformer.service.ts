@@ -463,7 +463,7 @@ export default class CatchCertificateTransformerService {
 
     additionalInformationSPSNote.push({
       Content: [{
-        value: 'N/A'
+        value: '000000000'
       }],
       SubjectCode: {
         value: 'MMSI'
