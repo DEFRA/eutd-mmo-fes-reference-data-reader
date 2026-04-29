@@ -1150,6 +1150,37 @@ describe('CatchCertificateTransformerService', () => {
       expect(importCountry.ID.value).toBe('FR');
       expect(importCountry.Name.value).toBe('France');
     });
+
+    it('should return empty strings when exportedTo is null', () => {
+      const mockBuildUnloadingLocation = jest.spyOn(
+        CatchCertificateTransformerService as any,
+        'buildUnloadingLocation'
+      ).mockReturnValue({ ID: { value: '' }, Name: { value: '' } });
+
+      const documentNumber = 'GBR-2025-CC-IMP006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: null,
+        pointOfDestination: 'France',
+        transportations: [{}]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const importCountry =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ImportSPSCountry;
+
+      expect(importCountry.ID.value).toBe('');
+      expect(importCountry.Name.value).toBe('');
+
+      mockBuildUnloadingLocation.mockRestore();
+    });
   });
 
   describe('buildUnloadingLocation', () => {
@@ -2815,6 +2846,44 @@ describe('CatchCertificateTransformerService', () => {
 
       expect(gearNote.Content[0].value).toBe('08.1');
     });
+
+    it('should include IMO note when vessel.imoNumber is provided', () => {
+      const documentNumber = 'GBR-2025-CC-CONS006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        products: [
+          {
+            caughtBy: [
+              {
+                vessel: 'Test Vessel',
+                imoNumber: '1234567'
+              }
+            ]
+          }
+        ],
+        exporterDetails: {},
+        exportedFrom: '',
+        exportedTo: {},
+        pointOfDestination: ''
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const items =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .IncludedSPSConsignmentItem;
+
+      const conservationItem = items[0];
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
+      const imoNote = notes.find((n: any) => n.SubjectCode.value === 'IMO');
+
+      expect(imoNote).toBeDefined();
+      expect(imoNote.Content[0].value).toBe('1234567');
+    });
   });
 
   describe('buildProductItem', () => {
@@ -3109,6 +3178,50 @@ describe('CatchCertificateTransformerService', () => {
 
       const productItem = items[1];
       expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('0');
+    });
+
+    it('should handle rfmo when getRfmos returns null', () => {
+      mockGetRFMO.mockReturnValue(null);
+
+      const documentNumber = 'GBR-2025-CC-PROD008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        products: [
+          {
+            commodityCode: '03026100',
+            scientificName: 'Gadus morhua',
+            caughtBy: [
+              {
+                pln: 'PZ888',
+                weight: 100,
+                rfmo: 'Some Fisheries Organisation',
+                exclusiveEconomicZones: []
+              }
+            ]
+          }
+        ],
+        exporterDetails: {},
+        exportedFrom: '',
+        exportedTo: {},
+        pointOfDestination: ''
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const items =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .IncludedSPSConsignmentItem;
+
+      const productItem = items[1];
+      const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
+      const rfmoNote = notes.find((n: any) => n.SubjectCode.value === 'REGIONAL_FISHERIES_MANAGEMENT_ORGANISATION');
+
+      expect(rfmoNote).toBeDefined();
+      expect(rfmoNote.Content[0].value).toBeUndefined();
     });
   });
 
