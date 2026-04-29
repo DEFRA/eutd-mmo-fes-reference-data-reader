@@ -463,7 +463,7 @@ export default class CatchCertificateTransformerService {
 
     additionalInformationSPSNote.push({
       Content: [{
-        value: 'N/A'
+        value: '000000000'
       }],
       SubjectCode: {
         value: 'MMSI'
@@ -524,14 +524,16 @@ export default class CatchCertificateTransformerService {
       })
     }
 
-    additionalInformationSPSNote.push({
-      Content: [{
-        value: vessel.imoNumber || 'N/A'
-      }],
-      SubjectCode: {
-        value: 'IMO'
-      }
-    })
+    if (vessel.imoNumber) {
+      additionalInformationSPSNote.push({
+        Content: [{
+          value: vessel.imoNumber
+        }],
+        SubjectCode: {
+          value: 'IMO'
+        }
+      })
+    }
 
     return additionalInformationSPSNote;
   }
