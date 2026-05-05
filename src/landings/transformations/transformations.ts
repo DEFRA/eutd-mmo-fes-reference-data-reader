@@ -107,7 +107,7 @@ function getLastAuditEventIfExists(audit, eventType) {
 
 export function getLastAuditEvent(events: IAuditEvent[], eventType: string) {
   const matches = events.filter(_ => _.eventType === eventType);
-  return matches[matches.length - 1];
+  return matches.at(-1);
 }
 
 export function* mapCatchCerts(unwoundCatchCerts, licenceLookup) {
@@ -369,7 +369,7 @@ export function mapExportPayloadToCC(redisData) {
       const dataEverExpected = licence ? getDataEverExpected(licence) : false;
       const landingDataExpectedDate = dataEverExpected ? getLandingDataRuleDate(dateLanded, licence, 'expectedDate') : undefined;
       const landingDataEndDate = dataEverExpected ? getLandingDataRuleDate(dateLanded, licence, 'endDate', landingDataExpectedDate) : undefined;
-      const numberOfSubmissions = parseInt(landing.model.numberOfSubmissions, 10) + 1;
+      const numberOfSubmissions = Number.parseInt(landing.model.numberOfSubmissions, 10) + 1;
 
       return {
         id: landing.model.id,

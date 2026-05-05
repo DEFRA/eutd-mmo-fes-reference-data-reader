@@ -1,7 +1,7 @@
-import path from "path";
+import path from "node:path";
 import Ajv from 'ajv';
 import  addFormats from "ajv-formats";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import { v4 as uuidv4 } from 'uuid';
 import { ServiceBusMessage } from "@azure/service-bus";
 import { MessageLabel, addToReportQueue, ICcQueryResult, IDefraTradeCatchCertificate, CertificateStatus } from "mmo-shared-reference-data";
@@ -88,7 +88,7 @@ export const reportCcToTrade = async (
       PublisherId: 'FES',
       OrganisationId: ccDefraTrade.exporter.accountId ?? null,
       UserId: ccDefraTrade.exporter.contactId ?? null,
-      SchemaVersion: parseInt(validate_cc_defra_trade.schema.properties.version.const, 10),
+      SchemaVersion: Number.parseInt(validate_cc_defra_trade.schema.properties.version.const, 10),
       Type: Type.INTERNAL,
       Status: ccDefraTrade.certStatus,
       TimestampUtc: moment.utc().toISOString()
@@ -148,10 +148,10 @@ export const reportPsToTrade = async (processingStatement: IDocument, caselabel:
   }
 
   let status: CertificateStatus;
-  if (!Array.isArray(psQueryResults)) {
-    status = CertificateStatus.VOID
-  } else {
+  if (Array.isArray(psQueryResults)) {
     status = psQueryResults?.some((_: ISdPsQueryResult) => _.status === CertificateStatus.BLOCKED) ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE
+  } else {
+    status = CertificateStatus.VOID
   }
 
   const messageId = uuidv4();
@@ -165,7 +165,7 @@ export const reportPsToTrade = async (processingStatement: IDocument, caselabel:
       PublisherId: 'FES',
       OrganisationId: psDefraTrade.exporter.accountId ?? null,
       UserId: psDefraTrade.exporter.contactId ?? null,
-      SchemaVersion: parseInt(validate_ps_defra_trade.schema.properties.version.const),
+      SchemaVersion: Number.parseInt(validate_ps_defra_trade.schema.properties.version.const),
       Type: Type.INTERNAL,
       Status: status,
       TimestampUtc: moment.utc().toISOString()
@@ -228,10 +228,10 @@ export const reportSdToTrade = async (storageDocument: IDocument, caselabel: Mes
   }
 
   let status: CertificateStatus;
-  if (!Array.isArray(sdQueryResults)) {
-    status = CertificateStatus.VOID
-  } else {
+  if (Array.isArray(sdQueryResults)) {
     status = sdQueryResults?.some((_: ISdPsQueryResult) => _.status === CertificateStatus.BLOCKED) ? CertificateStatus.BLOCKED : CertificateStatus.COMPLETE
+  } else {
+    status = CertificateStatus.VOID
   }
 
   const messageId = uuidv4();
@@ -245,7 +245,7 @@ export const reportSdToTrade = async (storageDocument: IDocument, caselabel: Mes
       PublisherId: 'FES',
       OrganisationId: sdDefraTrade.exporter.accountId ?? null,
       UserId: sdDefraTrade.exporter.contactId ?? null,
-      SchemaVersion: parseInt(validate_sd_defra_trade.schema.properties.version.const),
+      SchemaVersion: Number.parseInt(validate_sd_defra_trade.schema.properties.version.const),
       Type: Type.INTERNAL,
       Status: status,
       TimestampUtc: moment.utc().toISOString()

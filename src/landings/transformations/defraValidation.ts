@@ -331,9 +331,9 @@ export function toDefraSdProduct(sdCatch): StorageDocumentReportCatch {
    return sdCatch ? {
       species: sdCatch.product,
       scientificName: sdCatch.scientificName,
-      productWeight: parseInt(sdCatch.productWeight, 10),
+      productWeight: Number.parseInt(sdCatch.productWeight, 10),
       certificateNumber: sdCatch.certificateNumber,
-      weightOnCertificate: parseInt(sdCatch.weightOnCC, 10),
+      weightOnCertificate: Number.parseInt(sdCatch.weightOnCC, 10),
       cnCode: sdCatch.commodityCode,
       isDocumentIssuedInUK: sdCatch.certificateType === 'uk',
       ...(issuingCountry ? { issuingCountry } : {}),
@@ -355,12 +355,12 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
          postCode: sdStorageFacility.facilityPostcode
       },
       dateOfUnloading: moment(sdStorageFacility.facilityArrivalDate, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-      approvalNumber: !isEmpty(sdStorageFacility.facilityApprovalNumber) ? sdStorageFacility.facilityApprovalNumber : undefined,
-      productHandling: !isEmpty(sdStorageFacility.facilityStorage) ? sdStorageFacility.facilityStorage : undefined,
+      approvalNumber: isEmpty(sdStorageFacility.facilityApprovalNumber) ? undefined : sdStorageFacility.facilityApprovalNumber,
+      productHandling: isEmpty(sdStorageFacility.facilityStorage) ? undefined : sdStorageFacility.facilityStorage,
    } : undefined;
 }
 
-const handleEmptyValue = (value) => !isEmpty(value) ? value : undefined;
+const handleEmptyValue = (value) => isEmpty(value) ? undefined : value;
 
 export function toTransportation(transportation: any): CertificateTransport | undefined {
    if (transportation === undefined || transportation === null)
@@ -449,6 +449,7 @@ export function toLandings(queryRes: ICcQueryResult[]): CertificateLanding[] {
       const licenceLookup = vesselLookup(getVesselsIdx());
       const licence: ILicence = licenceLookup(rawValidatedLanding.extended.pln, rawValidatedLanding.dateLanded);
       const isDataNeverExpected = rawValidatedLanding.extended.dataEverExpected === false;
+      const isDataEverExpected = !isDataNeverExpected;
       const riskScore = getTotalRiskScore(
          rawValidatedLanding.extended.pln,
          rawValidatedLanding.species,
@@ -504,11 +505,11 @@ export function toLandings(queryRes: ICcQueryResult[]): CertificateLanding[] {
          rawSalesNotesDataUrl: ccBatchReportForLanding.salesNotesUrl.replace('{BASE_URL}', ApplicationConfig.prototype.internalAppUrl),
          isLegallyDue: getIsLegallyDue(rawValidatedLanding),
          vesselAdministration: rawValidatedLanding.da,
-         dataEverExpected: !isDataNeverExpected,
+         dataEverExpected: isDataEverExpected,
          landingDataExpectedDate: rawValidatedLanding.extended.landingDataExpectedDate,
          landingDataEndDate: rawValidatedLanding.extended.landingDataEndDate,
          landingDataExpectedAtSubmission: (rawValidatedLanding.createdAt !== undefined && rawValidatedLanding.extended.landingDataExpectedDate !== undefined) ? moment.utc(rawValidatedLanding.createdAt).isSameOrAfter(moment.utc(rawValidatedLanding.extended.landingDataExpectedDate), 'day') : undefined,
-         isLate: !isDataNeverExpected ? isLandingDataLate(rawValidatedLanding.firstDateTimeLandingDataRetrieved, rawValidatedLanding.extended.landingDataExpectedDate) : undefined,
+         isLate: isDataEverExpected ? isLandingDataLate(rawValidatedLanding.firstDateTimeLandingDataRetrieved, rawValidatedLanding.extended.landingDataExpectedDate) : undefined,
          dateDataReceived: rawValidatedLanding.firstDateTimeLandingDataRetrieved,
          adminSpecies: rawValidatedLanding.extended.speciesAdmin,
          adminPresentation: rawValidatedLanding.extended.presentationAdmin,

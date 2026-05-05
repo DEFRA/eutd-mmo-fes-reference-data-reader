@@ -11,7 +11,14 @@ import { getSpeciesData } from '../data/cache';
 import logger from '../logger';
 import { IAllSpecies } from '../landings/types/appConfig/allSpecies';
 
+interface Presentation {
+  value: string;
+  label: string;
+}
 
+const deduplicatePresentations = (presentations: Presentation[]): Presentation[] =>
+  presentations.reduce((acc: Presentation[], curr: Presentation) =>
+    acc.some(p => p.value === curr.value) ? acc : [...acc, curr], []);
 
 export const speciesRoutes = (server: Hapi.Server) => {
   server.route([
@@ -31,7 +38,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
 
         const query = request.query;
 
-        if (query.uk && (query.uk.toUpperCase() === 'Y')) {
+        if (query.uk?.toUpperCase() === 'Y') {
           const speciesCollection = getSpeciesData('uk');
           useOperators(OperatorType.PIPELINE, { $group });
 
@@ -85,10 +92,6 @@ export const speciesRoutes = (server: Hapi.Server) => {
           }
         ]);
 
-        interface Presentation {
-          value: string,
-          label: string
-        }
         const presentations = agg.run(species);
         const allPresentations: Presentation[] = presentations.map((item: any) => {
           return {
@@ -200,11 +203,6 @@ export const speciesRoutes = (server: Hapi.Server) => {
             }
           ]);
 
-          interface Presentation {
-            value: string,
-            label: string
-          }
-
           interface State {
             value: string,
             label: string
@@ -230,8 +228,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
 
           const stateWithUniquePresentations: IStateWithPresentations[] = stateWithPresentations.map((stateWithPresentation: IStateWithPresentations) => ({
             state: stateWithPresentation.state,
-            presentations: stateWithPresentation.presentations.reduce((acc: Presentation[], curr: Presentation) =>
-              (acc.some((presentation: Presentation) => presentation.value === curr.value)) ? acc : [...acc, curr], []),
+            presentations: deduplicatePresentations(stateWithPresentation.presentations),
             scientificName: stateWithPresentation.scientificName
           }));
 

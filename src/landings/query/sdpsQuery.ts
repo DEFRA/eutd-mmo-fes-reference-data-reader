@@ -61,9 +61,7 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
 
     const fcc = fccIdx[`${item.certificateNumber}${item.species}`]
 
-    if (!fcc) {
-      logger.error(`[FOREIGN-CATCH-CERTS][ERROR]Unable to find [${item.certificateNumber}${item.species}] in fccIdx`)
-    } else {
+    if (fcc) {
 
       r.documentNumber = item.documentNumber
       r.status = item.status
@@ -90,6 +88,8 @@ export function* sdpsQuery (documents: any[], postCodeToDa: any):
       linkedSdPs.push(item.documentNumber);
       yield r
 
+    } else {
+      logger.error(`[FOREIGN-CATCH-CERTS][ERROR]Unable to find [${item.certificateNumber}${item.species}] in fccIdx`)
     }
   }
 }
@@ -135,7 +135,7 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         issuingCountry: cat.issuingCountry,
         species: cat.product,
         commodityCode: cat.commodityCode,
-        weight: parseFloat(cat.productWeight),
+        weight: Number.parseFloat(cat.productWeight),
         weightOnCC: getWeightOnCC(cat.weightOnCC),
         scientificName: cat.scientificName,
         netWeightProductArrival: cat.netWeightProductArrival,
@@ -156,8 +156,8 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         species: cat.species,
         scientificName: cat.scientificName,
         commodityCode: cat.productCommodityCode,
-        weight: parseFloat(cat.exportWeightBeforeProcessing),
-        weightOnCC: parseFloat(cat.totalWeightLanded),
+        weight: Number.parseFloat(cat.exportWeightBeforeProcessing),
+        weightOnCC: Number.parseFloat(cat.totalWeightLanded),
         weightAfterProcessing: getWeightAfterProcess(cat.exportWeightAfterProcessing),
       }
     }
@@ -176,15 +176,15 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
   })
 }
 
-const getDocStatus = (status) => !status ? 'COMPLETE' : status;
+const getDocStatus = (status) => status ?? 'COMPLETE'; // safer (keeps 0, '', false)
 
 const getDALookupDetails = (exporterDetails, daLookup) => exporterDetails ? daLookup(exporterDetails.postcode) : 'England';
 
-const getWeightOnCC = (weightOnCC) => weightOnCC ? parseFloat(weightOnCC) : 0;
+const getWeightOnCC = (weightOnCC) => weightOnCC ? Number.parseFloat(weightOnCC) : 0;
 
-const getWeightAfterProcess = (exportWeightAfterProcessing) => exportWeightAfterProcessing !== undefined ? parseFloat(exportWeightAfterProcessing) : undefined;
+const getWeightAfterProcess = (exportWeightAfterProcessing) => exportWeightAfterProcessing === undefined ? undefined : Number.parseFloat(exportWeightAfterProcessing);
 
-const getValidData = (value) => !value ? undefined : value;
+const getValidData = (value) => value ?? undefined; // safer (keeps 0, '', false)
 
 const getExporterCompanyName = (exporterDetails) => exporterDetails ? exporterDetails.exporterCompanyName : undefined;
 

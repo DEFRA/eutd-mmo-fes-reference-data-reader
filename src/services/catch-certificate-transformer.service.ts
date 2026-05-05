@@ -235,10 +235,10 @@ export default class CatchCertificateTransformerService {
   private static buildLoadingLocation(exportData: any): any {
     const pointsOfDeparture = exportData.transportations
       ? [...new Set(
-          exportData.transportations
-            .map((t: any) => t.departurePlace)
-            .filter(Boolean)
-        )].map(String).join(', ')
+        exportData.transportations
+          .map((t: any) => t.departurePlace)
+          .filter(Boolean)
+      )].map(String).join(', ')
       : '';
 
     return {
@@ -441,16 +441,14 @@ export default class CatchCertificateTransformerService {
       })
     }
 
-    if (vessel.ircs) {
-      additionalInformationSPSNote.push({
-        Content: [{
-          value: vessel.ircs
-        }],
-        SubjectCode: {
-          value: 'CALL_SIGN'
-        }
-      })
-    }
+    additionalInformationSPSNote.push({
+      Content: [{
+        value: vessel.ircs || 'N/A'
+      }],
+      SubjectCode: {
+        value: 'CALL_SIGN'
+      }
+    })
 
     if (vessel.homePort) {
       additionalInformationSPSNote.push({
@@ -462,6 +460,15 @@ export default class CatchCertificateTransformerService {
         }
       })
     }
+
+    additionalInformationSPSNote.push({
+      Content: [{
+        value: '000000000'
+      }],
+      SubjectCode: {
+        value: 'MMSI'
+      }
+    })
 
     if (vessel.gearCode) {
       const gearTypes: GearRecord[] = getGearTypes();

@@ -118,7 +118,7 @@ export async function sdpsVoidInvestigationReport(
 
     const documentsBase: any[] = Array.from(await getAllDocuments(filters))
 
-    const documentsBaseIds: string[] = documentsBase.map(d => d.documentNumber)
+    const documentsBaseIds: Set<string> = new Set(documentsBase.map(d => d.documentNumber))
 
     const fccNumbers = getForeignCatchCertificatesFromDocuments(documentsBase)
 
@@ -131,7 +131,7 @@ export async function sdpsVoidInvestigationReport(
 
     const reportData = sdpsBatchReport(queryData, fromDate, toDate);
 
-    return ifilter(reportData, r => documentsBaseIds.includes(r.documentNumber))
+    return ifilter(reportData, r => documentsBaseIds.has(r.documentNumber))
 
   } catch (e) {
     logger.error({err:e}, `[BATCH-REPORT][SDPD-VOID-INVESTIGATION-REPORT][ERROR] ${e}`)
@@ -196,7 +196,7 @@ export async function catchCertInvestigationReport(
     //
     // Save the ids (docment numbers) so that we can use these to filter down the result set
     // for the report
-    const catchCertsBaseIds: string[] = catchCertsBase.map(c => c.documentNumber)
+    const catchCertsBaseIds: Set<string> = new Set(catchCertsBase.map(c => c.documentNumber))
 
     //
     // Get the list of landings from the base set of catch certificates
@@ -263,7 +263,7 @@ export async function catchCertInvestigationReport(
     //
     // Filter the view back to the base set from the initial filter
     //
-    return ifilter(reportData, r => catchCertsBaseIds.includes(r.documentNumber))
+    return ifilter(reportData, r => catchCertsBaseIds.has(r.documentNumber))
 
   } catch (e) {
     logger.error({err:e}, `[BATCH-REPORT][CATCH-CERT-INVESTIGATION-REPORT][ERROR] ${e}`)
@@ -290,7 +290,7 @@ export async function sdpsInvestigationReport(
 
     const documentsBase: any[] = Array.from(await getAllDocuments(filters))
 
-    const documentsBaseIds: string[] = documentsBase.map(d => d.documentNumber)
+    const documentsBaseIds: Set<string> = new Set(documentsBase.map(d => d.documentNumber))
 
     const fccNumbers = getForeignCatchCertificatesFromDocuments(documentsBase)
 
@@ -300,7 +300,7 @@ export async function sdpsInvestigationReport(
 
     const reportData = sdpsBatchReport(queryData, fromDate, toDate);
 
-    return ifilter(reportData, r => documentsBaseIds.includes(r.documentNumber))
+    return ifilter(reportData, r => documentsBaseIds.has(r.documentNumber))
 
   } catch (e) {
     logger.error({err:e}, `[BATCH-REPORT][SDPS-INVESTIGATION-REPORT][ERROR] ${e}`)

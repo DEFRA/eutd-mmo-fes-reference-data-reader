@@ -78,7 +78,7 @@ export const reportDraft = async (certificateId: string) => {
  */
 export const reportDelete = async (certificateId: string) => {
   const correlationId = uuidv4();
-  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId,  getDocumentType(certificateId));
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
 
   if (certificate) {
     if (certificateId.toUpperCase().includes('-PS-')) {
@@ -116,7 +116,7 @@ export const reportDelete = async (certificateId: string) => {
 
 export const reportVoid = async (certificateId: string, isFromExporter = false) => {
   const correlationId = uuidv4();
-  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId,  getDocumentType(certificateId));
+  const certificate = await getCertificateByDocumentNumberWithNumberOfFailedAttempts(certificateId, getDocumentType(certificateId));
 
   if (certificate) {
     if (certificateId.toUpperCase().includes('-PS-')) {
@@ -251,7 +251,7 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
       const requestByAdmin = catchCertificate.requestByAdmin;
 
       try {
-        ccReport = toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin,  getVesselsIdx(), catchCertificate);
+        ccReport = toCcDefraReport(certificateId, correlationId, ccValidationData[0].status, requestByAdmin, getVesselsIdx(), catchCertificate);
         logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][toCcDefraReport][${certificateId}]`);
       }
       catch (e) {
@@ -277,18 +277,17 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
         throw e;
       }
 
-      if (catchCertificate.exportData?.exporterDetails !== undefined) {
-
+      if (catchCertificate.exportData?.exporterDetails === undefined) {
+        logger.error(`[REPORT-CC-SUBMITTED][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
+      } else {
         for (const landing of ccValidationData) {
-          landing.hasSalesNote= await updateLandings(landing);
+          landing.hasSalesNote = await updateLandings(landing);
         }
 
         const result: IDynamicsCatchCertificateCase = await CaseManagement.reportCc(ccValidationData, catchCertificate, correlationId, MessageLabel.CATCH_CERTIFICATE_SUBMITTED);
         logger.info(`[REPORT-CC-SUBMITTED][SUCCESS][${certificateId}]`);
 
         await DefraTrade.reportCcToTrade(catchCertificate, MessageLabel.CATCH_CERTIFICATE_SUBMITTED, result, ccValidationData);
-      } else {
-        logger.error(`[REPORT-CC-SUBMITTED][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
       }
     }
   } catch (e) {
@@ -371,13 +370,13 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
       const correlationId = uuidv4();
 
       logger.info(`[ONLINE-VALIDATION-REPORT][REPORTING-CC][${certificateId}][REPORT-ID][${correlationId}]`);
-     const catchCertificate = await getCatchCertificate(certificateId)
-     const ccReport: IDefraValidationCatchCertificate = await buildCcReport(
-      catchCertificate,
-      certificateId,
-      correlationId,
-      ccValidationData,
-    );
+      const catchCertificate = await getCatchCertificate(certificateId)
+      const ccReport: IDefraValidationCatchCertificate = await buildCcReport(
+        catchCertificate,
+        certificateId,
+        correlationId,
+        ccValidationData,
+      );
       try {
         await insertCcDefraValidationReport(ccReport);
         logger.info(`[ONLINE-VALIDATION-REPORT][insertCcDefraValidationReport][${certificateId}][SUCCESS]`);
@@ -387,12 +386,12 @@ export const reportCcLandingUpdate = async (ccValidationData: ICcQueryResult[]):
         throw e;
       }
 
-      if (catchCertificate.exportData?.exporterDetails !== undefined) {
+      if (catchCertificate.exportData?.exporterDetails === undefined) {
+        logger.error(`[ONLINE-VALIDATION-REPORT][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
+      } else {
         await enrichWithSalesNotes(ccValidationData);
         await CaseManagement.reportCcLandingUpdate(ccValidationData, catchCertificate, correlationId, MessageLabel.NEW_LANDING);
         logger.info(`[ONLINE-VALIDATION-REPORT][SUCCESS][${certificateId}]`);
-      } else {
-        logger.error(`[ONLINE-VALIDATION-REPORT][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
       }
     }
   } catch (e) {
@@ -412,7 +411,7 @@ const getCatchCertificate = async (certificateId: string) => {
 }
 const getLandings = async (ccValidationData: ICcQueryResult[], certificateId: string) => {
   try {
-    const landings=DefraMapper.toLandings(ccValidationData);
+    const landings = DefraMapper.toLandings(ccValidationData);
     logger.info(`[ONLINE-VALIDATION-REPORT][toLandings][${certificateId}][SUCCESS]`);
     return landings
   }

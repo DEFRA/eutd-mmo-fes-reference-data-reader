@@ -41,8 +41,8 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
           if (!(moment.utc(qparams.asofdate).isValid()))
             return h.response('asofdate must be valid date').code(400)
           
-          const allDas = ['Northern Ireland', 'Isle of Man', 'Channel Islands', 'Guernsey', 'Jersey', 'England', 'Wales', 'Scotland', 'Isle of Man']
-          const invalids = areas.filter(_ => (!allDas.includes(_)));
+          const allDas = new Set(['Northern Ireland', 'Isle of Man', 'Channel Islands', 'Guernsey', 'Jersey', 'England', 'Wales', 'Scotland', 'Isle of Man'])
+          const invalids = areas.filter(_ => !allDas.has(_));
           if (invalids.length > 0)
             return h.response(`invalid areas ${invalids}`).code(400)
 
@@ -117,7 +117,7 @@ const getReponseData = (reportData, ext, h) => {
 
 const getAreaData = (qparams) => qparams.area && qparams.area !== 'all' ? qparams.area.split(',').map(s => s.trim()) : [];
 
-const getAsOfDate = (asofdate) => !asofdate ? moment.utc() : moment.utc(asofdate)
+const getAsOfDate = (asofdate) => asofdate ? moment.utc(asofdate) : moment.utc()
 
 const verifyCatchcertInvestigationParams = (documentNumber, exporter, pln) => !documentNumber && !exporter && !pln;
 
@@ -134,7 +134,7 @@ const isValidFromAndTodateDate = (fromDate, toDate) => fromDate?.isValid() && to
 function withNoUndefineds(reportData){
   reportData.forEach(reportLine=>{
     Object.keys(reportLine).forEach(function(key){
-       if (reportLine[key] === null || reportLine[key] === undefined) reportLine[key] = ''
+       reportLine[key] ??= '';
     });
   });
 }

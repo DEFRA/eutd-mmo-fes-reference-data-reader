@@ -190,7 +190,7 @@ export const getCountries = () => COUNTRIES;
 export const getSpeciesAliases = (speciesCode: string): string[] => SPECIES_ALIASES[speciesCode] ?? [];
 
 export const getVesselRiskScore = (pln: string) =>
-  VESSELS_OF_INTEREST.find(v => v && v.registrationNumber === pln) ?
+  VESSELS_OF_INTEREST.some(v => v?.registrationNumber === pln) ?
     1 : 0.5;
 
 export const getSpeciesRiskScore = (speciesCode: string) => {
@@ -236,7 +236,7 @@ export const getExporterRiskScore = (
   accountId: string | null,
   contactId: string | null,
 ) => {
-  const defaultScore = 1.0;
+  const defaultScore = 1;
 
   if ((!accountId && !contactId) || !EXPORTER_BEHAVIOUR.length) {
     return defaultScore;
@@ -271,9 +271,9 @@ const mapConversionFactors = (factors: IConversionFactor[]): IConversionFactor[]
       species: factorData.species,
       state: factorData.state,
       presentation: factorData.presentation,
-      toLiveWeightFactor: isNaN(factorData.toLiveWeightFactor) ? undefined : Number(factorData.toLiveWeightFactor),
+      toLiveWeightFactor: Number.isNaN(Number(factorData.toLiveWeightFactor)) ? undefined : Number(factorData.toLiveWeightFactor),
       quotaStatus: factorData.quotaStatus,
-      riskScore: isNaN(factorData.riskScore) ? undefined : Number(factorData.riskScore)
+      riskScore: Number.isNaN(Number(factorData.riskScore)) ? undefined : Number(factorData.riskScore)
     }
   });
 };
