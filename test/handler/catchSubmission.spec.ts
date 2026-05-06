@@ -7,6 +7,7 @@ import * as CatchCertPersistence from '../../src/landings/persistence/catchCert'
 import * as DataHub from '../../src/controllers/dataHub';
 import CatchCertificateTransformerService from '../../src/services/catch-certificate-transformer.service';
 import ProcessingStatementTransformerService from '../../src/services/processing-statement-transformer.service';
+import StorageNotesTransformerService from '../../src/services/storage-notes-transformer.service';
 import { DocumentModel } from '../../src/landings/types/document';
 
 jest.mock('mmo-shared-reference-data');
@@ -15,6 +16,7 @@ jest.mock('../../src/landings/types/document');
 jest.mock('../../src/controllers/dataHub');
 jest.mock('../../src/services/catch-certificate-transformer.service');
 jest.mock('../../src/services/processing-statement-transformer.service');
+jest.mock('../../src/services/storage-notes-transformer.service');
 jest.mock('../../src/logger');
 
 describe('CATCH Submission Handler (FI0-10312)', () => {
@@ -994,5 +996,244 @@ describe('Error Handling', () => {
         faultString: "PS Boomi error",
       }
     );
+  });
+});
+
+describe('GET /v1/catch-submission/payload', () => {
+  let server: Hapi.Server;
+
+  beforeAll(async () => {
+    server = Hapi.server({ port: 9012, host: 'localhost' });
+    CatchSubmission.catchSubmissionRoutes(server);
+    server.validator(Joi);
+    await server.initialize();
+    await server.start();
+  });
+
+  afterAll(async () => {
+    await server.stop();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return 200 with the transformed catch certificate payload', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-CC-PAYLOAD01',
+      createdAt: new Date('2025-01-01'),
+      catchSubmission: { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000001' },
+      exportData: { products: [{ product: 'Cod' }], exporterDetails: { name: 'Exporter' } }
+    };
+    const mockPayload = { CreateCatchCertificateRequest: { SPSCertificate: { id: 'abc' } } };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock).mockReturnValue(mockPayload);
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-CC-PAYLOAD01',
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(JSON.parse(response.payload)).toEqual(mockPayload);
+    expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalled();
+    expect(DataHub.getDocumentType).toHaveBeenCalledWith('GBR-2025-CC-PAYLOAD01');
+  });
+
+  it('should return 200 with the transformed processing statement payload', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-PS-PAYLOAD01',
+      createdAt: new Date('2025-01-01'),
+      catchSubmission: { status: 'SUCCESS', reference: 'CATCH.PS.GB.2026.0000001' },
+      exportData: {
+        products: [{ product: 'Processed Cod' }],
+        catches: [{ species: 'Cod' }],
+        exporterDetails: { name: 'Processor' }
+      }
+    };
+    const mockPayload = { CreateCatchProcessingStatementRequest: { SPSCertificate: {} } };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('processingStatement');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+    (ProcessingStatementTransformerService.generateProcessingStatementPayload as jest.Mock).mockReturnValue(mockPayload);
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-PS-PAYLOAD01',
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(JSON.parse(response.payload)).toEqual(mockPayload);
+    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalled();
+  });
+
+  it('should return 200 with the transformed storage notes payload', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-SD-PAYLOAD01',
+      createdAt: new Date('2025-01-01'),
+      catchSubmission: { status: 'SUCCESS', reference: 'CATCH.SD.GB.2026.0000001' },
+      exportData: {
+        catches: [{ species: 'Cod' }],
+        exporterDetails: { name: 'Storer' }
+      }
+    };
+    const mockPayload = { CreateCatchNonManipulationDocumentRequest: { CatchNonManipulationDocument: {} } };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('storageDocument');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+    (StorageNotesTransformerService.generateStorageNotesPayload as jest.Mock).mockReturnValue(mockPayload);
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-SD-PAYLOAD01',
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(JSON.parse(response.payload)).toEqual(mockPayload);
+    expect(StorageNotesTransformerService.generateStorageNotesPayload).toHaveBeenCalled();
+  });
+
+  it('should return 400 when documentNumber is missing', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload',
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it('should return 404 when document is not found', async () => {
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(null)
+    });
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-CC-NOTFOUND',
+    });
+
+    expect(response.statusCode).toBe(404);
+    expect(JSON.parse(response.payload)).toEqual({
+      error: 'Document not found for document number: GBR-2025-CC-NOTFOUND'
+    });
+  });
+
+  it('should return 500 when transformer throws', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-CC-ERR01',
+      createdAt: new Date('2025-01-01'),
+      catchSubmission: { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000002' },
+      exportData: { products: [], exporterDetails: {} }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+    (CatchCertificateTransformerService.generateCatchPayload as jest.Mock).mockImplementation(() => {
+      throw new Error('Transformation failed');
+    });
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-CC-ERR01',
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(JSON.parse(response.payload)).toEqual({ error: 'Transformation failed' });
+  });
+
+  it('should return 500 when document fetch fails', async () => {
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockRejectedValue(new Error('DB connection lost'))
+    });
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-CC-DBERR',
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(JSON.parse(response.payload)).toEqual({ error: 'DB connection lost' });
+  });
+
+  it('should return 500 when document has no exportData', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-CC-NOEXPORT',
+      createdAt: new Date('2025-01-01'),
+      catchSubmission: { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000003' },
+      exportData: null
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-CC-NOEXPORT',
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(JSON.parse(response.payload)).toEqual({
+      error: 'No exportData found for document number: GBR-2025-CC-NOEXPORT'
+    });
+  });
+
+  it('should return 500 for an unsupported document type', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-XX-UNKNOWN',
+      createdAt: new Date('2025-01-01'),
+      catchSubmission: { status: 'SUCCESS', reference: 'CATCH.XX.GB.2026.0000001' },
+      exportData: { products: [] }
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('unknownType');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-XX-UNKNOWN',
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(JSON.parse(response.payload)).toEqual({ error: 'Unsupported document type: unknownType' });
+  });
+
+  it('should return 422 when document has no catchSubmission', async () => {
+    const mockDocument = {
+      documentNumber: 'GBR-2025-CC-NOCATCH',
+      createdAt: new Date('2025-01-01'),
+      exportData: { products: [], exporterDetails: {} }
+      // catchSubmission intentionally absent
+    };
+
+    (DataHub.getDocumentType as jest.Mock).mockReturnValue('catchCert');
+    (DocumentModel.findOne as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockDocument)
+    });
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/catch-submission/payload?documentNumber=GBR-2025-CC-NOCATCH',
+    });
+
+    expect(response.statusCode).toBe(422);
+    expect(JSON.parse(response.payload)).toEqual({
+      error: 'Document not valid for EU Catch: GBR-2025-CC-NOCATCH'
+    });
   });
 });
