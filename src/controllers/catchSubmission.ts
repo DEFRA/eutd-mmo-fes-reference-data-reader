@@ -171,6 +171,71 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
   await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'storageDocument', operation);
 }
 
+export const buildDocumentPayload = async (documentNumber: string): Promise<any> => {
+  const docType = getDocumentType(documentNumber);
+
+  logger.info(`[DOCUMENT-SUBMISSION][PAYLOAD-INSPECT][${documentNumber}][TYPE:${docType}][START]`);
+
+  const document = await fetchDocumentData(documentNumber, docType);
+
+  const { exportData, createdAt, catchSubmission } = document;
+
+  if (!catchSubmission) {
+    throw new Error(`Document not valid for EU Catch: ${documentNumber}`);
+  }
+
+  if (!exportData) {
+    throw new Error(`No exportData found for document number: ${documentNumber}`);
+  }
+
+  if (docType === 'catchCert') {
+    return CatchCertificateTransformerService.generateCatchPayload(documentNumber, createdAt, exportData);
+  }
+
+  if (docType === 'processingStatement') {
+    const products = Array.isArray(exportData.products) ? exportData.products : [];
+    const transformedExportData = {
+      products,
+      catches: exportData.catches || [],
+      exporterDetails: exportData.exporterDetails,
+      exportedTo: exportData.exportedTo,
+      plantName: exportData.plantName,
+      plantApprovalNumber: exportData.plantApprovalNumber,
+      plantAddressOne: exportData.plantAddressOne,
+      plantTownCity: exportData.plantTownCity,
+      plantPostcode: exportData.plantPostcode,
+      healthCertificateNumber: exportData.healthCertificateNumber,
+      healthCertificateDate: exportData.healthCertificateDate,
+      dateOfAcceptance: exportData.dateOfAcceptance,
+      consignmentDescription: exportData.consignmentDescription,
+      personResponsibleForConsignment: exportData.personResponsibleForConsignment,
+      pointOfDestination: exportData.pointOfDestination,
+    };
+    return ProcessingStatementTransformerService.generateProcessingStatementPayload(documentNumber, createdAt, transformedExportData);
+  }
+
+  if (docType === 'storageDocument') {
+    const transformedExportData = {
+      catches: exportData.catches || [],
+      exporterDetails: exportData.exporterDetails,
+      exportedTo: exportData.exportedTo,
+      exportLocation: exportData.exportLocation,
+      facilityName: exportData.facilityName,
+      facilityApprovalNumber: exportData.facilityApprovalNumber,
+      facilityAddressOne: exportData.facilityAddressOne,
+      facilityTownCity: exportData.facilityTownCity,
+      facilityPostcode: exportData.facilityPostcode,
+      facilityArrivalDate: exportData.facilityArrivalDate,
+      facilityStorage: exportData.facilityStorage,
+      transport: exportData.transportation,
+      arrivalTransport: exportData.arrivalTransportation
+    };
+    return StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
+  }
+
+  throw new Error(`Unsupported document type: ${docType}`);
+};
+
 export const submitDocumentToBoomi = async (
   rawPayload: IRawDocumentSubmissionPayload
 ): Promise<void> => {
