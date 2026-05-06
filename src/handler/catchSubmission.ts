@@ -13,6 +13,47 @@ interface IRawDocumentSubmissionPayload {
 export const catchSubmissionRoutes = (server: Hapi.Server) => {
   server.route([
     {
+      method: 'GET',
+      path: '/v1/catch-submission/payload',
+      handler: async (req: Hapi.Request, h: ResponseToolkit) => {
+        const { documentNumber } = req.query as { documentNumber: string };
+
+        logger.info(`[DOCUMENT-SUBMISSION][PAYLOAD-INSPECT][ENDPOINT][RECEIVED][DOCUMENT:${documentNumber}]`);
+
+        try {
+          const payload = await Controller.buildDocumentPayload(documentNumber);
+
+          logger.info(`[DOCUMENT-SUBMISSION][PAYLOAD-INSPECT][ENDPOINT][SUCCESS][DOCUMENT:${documentNumber}]`);
+
+          return h.response(payload).code(200);
+        } catch (e) {
+          if (e.message?.startsWith('Document not found')) {
+            logger.warn(`[DOCUMENT-SUBMISSION][PAYLOAD-INSPECT][ENDPOINT][NOT-FOUND][DOCUMENT:${documentNumber}][${e.message}]`);
+            return h.response({ error: e.message }).code(404);
+          }
+
+          if (e.message?.startsWith('Document not valid for EU Catch')) {
+            logger.warn(`[DOCUMENT-SUBMISSION][PAYLOAD-INSPECT][ENDPOINT][INVALID][DOCUMENT:${documentNumber}][${e.message}]`);
+            return h.response({ error: e.message }).code(422);
+          }
+
+          logger.error(`[DOCUMENT-SUBMISSION][PAYLOAD-INSPECT][ENDPOINT][ERROR][DOCUMENT:${documentNumber}][${e.message}][${e.stack}]`);
+
+          return h.response({ error: e.message }).code(500);
+        }
+      },
+      options: {
+        auth: false,
+        description: 'Fetch and transform a document to its Boomi payload without forwarding to Boomi',
+        tags: ['api', 'catch-submission', 'payload-inspector'],
+        validate: {
+          query: Joi.object({
+            documentNumber: Joi.string().required()
+          })
+        },
+      },
+    },
+    {
       method: 'POST',
       path: '/v1/catch-submission',
       handler: async (req: Hapi.Request, h: ResponseToolkit) => {
