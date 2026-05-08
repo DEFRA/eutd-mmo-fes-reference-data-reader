@@ -77,34 +77,39 @@ export const modeMap = {
   'truck': '3',
   'train': '2',
   'plane': '4',
-  'containerVessel': '1'
+  'containerVessel': '1',
+  'directLanding': '1'
 };
 
 export const modeName = {
   'truck': 'Road transport',
   'train': 'Rail transport',
   'plane': 'Air transport',
-  'containerVessel': 'Maritime transport'
+  'containerVessel': 'Maritime transport',
+  'directLanding': 'Maritime transport'
 };
 
 export const schemeID = {
   'truck': 'road_vehicle_registration_before_bcp',
   'train': 'train_identifier_before_bcp',
   'plane': 'airplane_flight_number_before_bcp',
-  'containerVessel': 'ship_imo_number_before_bcp'
+  'containerVessel': 'ship_imo_number_before_bcp',
+  'directLanding': 'ship_imo_number_before_bcp'
 };
 
 export const schemeName = {
   'truck': 'Road vehicle registration (before BCP)',
   'train': 'Rail Identifier (before BCP)',
   'plane': 'Flight number (before BCP)',
-  'containerVessel': 'Ship IMO Number (before BCP)'
+  'containerVessel': 'Ship IMO Number (before BCP)',
+  'directLanding': 'Ship IMO Number (before BCP)'
 }
 
 const TRANSPORT_VEHICLE_TRUCK = 'truck';
 const TRANSPORT_VEHICLE_TRAIN = 'train';
 const TRANSPORT_VEHICLE_PLANE = 'plane';
 export const TRANSPORT_VEHICLE_CONTAINER_VESSEL = 'containerVessel';
+export const TRANSPORT_VEHICLE_DIRECT_LANDING = 'directLanding';
 
 export const getTransportId: (transport: any) => string = (transport: any) => {
   switch (transport?.vehicle) {
@@ -152,7 +157,7 @@ export const createMainCarriageSPSTransportMovement = (transport: any) => {
     }
   };
 
-  return (transport?.vehicle === TRANSPORT_VEHICLE_CONTAINER_VESSEL) ? {
+  return (transport?.vehicle === TRANSPORT_VEHICLE_CONTAINER_VESSEL || transport?.vehicle === TRANSPORT_VEHICLE_DIRECT_LANDING) ? {
     ...commonTransportInformation,
     UsedSPSTransportMeans: {
       Name: {
