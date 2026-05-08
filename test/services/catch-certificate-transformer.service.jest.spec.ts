@@ -2158,6 +2158,215 @@ describe('CatchCertificateTransformerService', () => {
     });
   });
 
+  describe('buildTransportMovement directLanding', () => {
+    it('should use exportData.transportation when landingsEntryOption is directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{
+          caughtBy: [{ vessel: 'Felicity Ace', cfr: 'GBR123' }]
+        }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport).toHaveLength(1);
+      expect(transport[0].ModeCode.value).toBe('1');
+      expect(transport[0].ModeCode.name).toBe('Maritime transport');
+    });
+
+    it('should use vessel name from first caughtBy of first product for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{
+          caughtBy: [
+            { vessel: 'Sea Warrior', cfr: 'GBR001' },
+            { vessel: 'Other Vessel', cfr: 'GBR002' }
+          ]
+        }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBe('Sea Warrior');
+    });
+
+    it('should use vessel name from first product only, not subsequent products, for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL003';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [
+          { caughtBy: [{ vessel: 'First Product Vessel', cfr: 'GBR001' }] },
+          { caughtBy: [{ vessel: 'Second Product Vessel', cfr: 'GBR002' }] }
+        ],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBe('First Product Vessel');
+    });
+
+    it('should produce UsedSPSTransportMeans with undefined vesselName when products have no caughtBy for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL004';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{ caughtBy: [] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBeUndefined();
+    });
+
+    it('should produce UsedSPSTransportMeans with undefined vesselName when products is empty for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBeUndefined();
+    });
+
+    it('should fall back to transportations when landingsEntryOption is not directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'manualEntry',
+        transportation: { vehicle: 'directLanding' },
+        transportations: [{ vehicle: 'truck', registrationNumber: 'ABC123' }],
+        products: [{ caughtBy: [{ vessel: 'Should Not Appear', cfr: 'GBR001' }] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ModeCode.value).toBe('3');
+      expect(transport[0].UsedSPSTransportMeans).toBeUndefined();
+    });
+
+    it('should return undefined when landingsEntryOption is directLanding but transportation is missing', () => {
+      const documentNumber = 'GBR-2025-CC-DL007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        products: [{ caughtBy: [{ vessel: 'Sea Warrior', cfr: 'GBR001' }] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport).toBeUndefined();
+    });
+
+    it('should preserve schemeID and schemeName from directLanding mapping', () => {
+      const documentNumber = 'GBR-2025-CC-DL008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{ caughtBy: [{ vessel: 'Daybreak', cfr: 'GBR001' }] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeID).toBe('ship_imo_number_before_bcp');
+      expect(transport[0].ID.schemeName).toBe('Ship IMO Number (before BCP)');
+      expect(transport[0].ID.value).toBe('');
+    });
+  });
+
   describe('buildTransportEquipment', () => {
     it('should include container number when provided', () => {
       const documentNumber = 'GBR-2025-CC-EQUIP001';

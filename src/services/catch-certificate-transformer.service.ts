@@ -191,7 +191,7 @@ export default class CatchCertificateTransformerService {
           }
         }
       },
-      MainCarriageSPSTransportMovement: this.buildTransportMovement(exportData.transportations),
+      MainCarriageSPSTransportMovement: this.buildTransportMovement(exportData),
       UtilizedSPSTransportEquipment: this.buildTransportEquipment(exportData.transportations),
       IncludedSPSConsignmentItem: this.buildConsignmentItems(exportData)
     };
@@ -280,11 +280,16 @@ export default class CatchCertificateTransformerService {
     };
   }
 
-  private static buildTransportMovement(transportations: any[]): any {
-    return transportations?.map(createMainCarriageSPSTransportMovement);
+  private static buildTransportMovement(exportData: any): any {
+    if (exportData?.landingsEntryOption === 'directLanding' && exportData?.transportation) {
+      const vesselName = exportData.products?.[0]?.caughtBy?.[0]?.vessel;
+      const transport = { ...exportData.transportation, vesselName };
+      return [createMainCarriageSPSTransportMovement(transport)];
+    }
+    return exportData?.transportations?.map(createMainCarriageSPSTransportMovement);
   }
 
-  private static buildTransportEquipment(transportations: any[]): any {
+  private static buildTransportEquipment(transportations: any[] = []): any {
     return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => createUtilizedSPSTransportEquipments(utilizedSPSTransportEquipments, transport), []);
   }
 
