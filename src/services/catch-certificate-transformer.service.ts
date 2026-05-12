@@ -154,6 +154,14 @@ export default class CatchCertificateTransformerService {
           SubjectCode: {
             value: 'EXPORTER_SIGNATURE_DATE'
           }
+        },
+        {
+          Content: {
+            value: exportData.landingsEntryOption === 'directLanding' ? 'true' : 'false'
+          },
+          SubjectCode: {
+            value: 'DIRECT_LANDING'
+          }
         }
       ]
     };
