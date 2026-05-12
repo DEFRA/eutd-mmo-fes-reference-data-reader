@@ -539,6 +539,226 @@ describe('CatchCertificateTransformerService', () => {
       // Should only have the 2 default references
       expect(references).toHaveLength(2);
     });
+
+    it('should set DIRECT_LANDING to true when landingsEntryOption is directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('true');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is not directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'manualLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is absent', () => {
+      const documentNumber = 'GBR-2025-CC-DL003';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is null', () => {
+      const documentNumber = 'GBR-2025-CC-DL004';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: null,
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is an empty string', () => {
+      const documentNumber = 'GBR-2025-CC-DL005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: '',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should always include DIRECT_LANDING as the third entry in IncludedSPSNote', () => {
+      const documentNumber = 'GBR-2025-CC-DL006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+
+      expect(includedSPSNote).toHaveLength(3);
+      expect(includedSPSNote[0].SubjectCode.value).toBe('TRANSPORT_DETAILS_EXPORTER_SIGNATURE_PRESENT');
+      expect(includedSPSNote[1].SubjectCode.value).toBe('EXPORTER_SIGNATURE_DATE');
+      expect(includedSPSNote[2].SubjectCode.value).toBe('DIRECT_LANDING');
+    });
+
+    it('should include DIRECT_LANDING note with correct structure', () => {
+      const documentNumber = 'GBR-2025-CC-DL007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const directLandingNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote[2];
+
+      expect(directLandingNote).toEqual({
+        Content: { value: 'true' },
+        SubjectCode: { value: 'DIRECT_LANDING' }
+      });
+    });
+
+    it('should not affect other IncludedSPSNote entries when DIRECT_LANDING is set', () => {
+      const documentNumber = 'GBR-2025-CC-DL008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+
+      expect(includedSPSNote[0].Content.value).toBe('true');
+      expect(includedSPSNote[0].SubjectCode.value).toBe('TRANSPORT_DETAILS_EXPORTER_SIGNATURE_PRESENT');
+      expect(includedSPSNote[1].SubjectCode.value).toBe('EXPORTER_SIGNATURE_DATE');
+      expect(includedSPSNote[1].Content.value).toBeDefined();
+    });
   });
 
   describe('buildConsignment', () => {
