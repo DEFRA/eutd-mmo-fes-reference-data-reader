@@ -715,8 +715,92 @@ describe('CatchCertificateTransformerService', () => {
         exportedFrom: 'UK',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
-        transportations: []
+        transportation: {
+          vehicle: "directLanding",
+          exportDate: ""
+        },
+        products: [
+          {
+            speciesId: "GBR-2026-CC-D649EDC9D-0f9f917d-f8bd-46ef-9ff8-1730e7102a02",
+            species: "Atlantic cod (COD)",
+            speciesCode: "COD",
+            commodityCode: "03044410",
+            commodityCodeDescription: "Fresh or chilled fillets of cod \"Gadus morhua, Gadus ogac, Gadus macrocephalus\" and of Boreogadus saida",
+            scientificName: "Gadus morhua",
+            state: {
+              code: "FRE",
+              name: "Fresh"
+            },
+            presentation: {
+              code: "FIL",
+              name: "Filleted"
+            },
+            caughtBy: [
+              {
+                vessel: "WIRON 5",
+                pln: "H1100",
+                homePort: "PLYMOUTH",
+                flag: "GBR",
+                cfr: "NLD200202641",
+                ircs: "2HGD8",
+                imoNumber: 9249556,
+                licenceNumber: "12480",
+                licenceValidTo: "2030-12-31",
+                licenceHolder: "INTERFISH WIRONS LIMITED",
+                id: "GBR-2026-CC-D649EDC9D-4394577068",
+                date: "2026-05-08",
+                startDate: "2026-05-08",
+                faoArea: "FAO27",
+                highSeasArea: "No",
+                exclusiveEconomicZones: [
+                  {
+                    officialCountryName: "Algeria",
+                    isoCodeAlpha2: "DZ",
+                    isoCodeAlpha3: "DZA",
+                    isoNumericCode: "012"
+                  }
+                ],
+                weight: 10,
+                gearCategory: "Trawls",
+                gearType: "Beam trawls (TBB)",
+                gearCode: "TBB",
+                numberOfSubmissions: 2,
+                rfmo: "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+                isLegallyDue: false,
+                vesselRiskScore: 1,
+                speciesRiskScore: 1,
+                exporterRiskScore: 1,
+                threshold: 1,
+                riskScore: 1,
+                isSpeciesRiskEnabled: true,
+                dataEverExpected: false,
+                _status: "LANDING_DATA_NEVER_EXPECTED"
+              }
+            ],
+            "factor": 2.6
+          }
+        ]
       };
+      const expectedMainCarriageSPSTransportMovement = {
+        "ID": {
+          "schemeAgencyID": "GB",
+          "schemeAgencyName": "United Kingdom of Great Britain and Northern Ireland (the)",
+          "schemeID": "ship_imo_number_before_bcp",
+          "schemeName": "Ship IMO Number (before BCP)",
+          "value": "9249556"
+        },
+        "ModeCode": {
+          "name": "Maritime transport",
+          "value": "1"
+        },
+        "UsedSPSTransportMeans": {
+          "Name": {
+            "languageID": "en",
+            "languageLocaleID": "en-nz",
+            "value": "WIRON 5"
+          }
+        }
+      }
 
       const result = CatchCertificateTransformerService.generateCatchPayload(
         documentNumber,
@@ -726,11 +810,15 @@ describe('CatchCertificateTransformerService', () => {
 
       const directLandingNote =
         result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote[2];
+      const mainCarriageSPSTransportMovement = result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+        .MainCarriageSPSTransportMovement;
 
       expect(directLandingNote).toEqual({
         Content: { value: 'true' },
         SubjectCode: { value: 'DIRECT_LANDING' }
       });
+      expect(mainCarriageSPSTransportMovement).toHaveLength(1);
+      expect(mainCarriageSPSTransportMovement[0]).toEqual(expectedMainCarriageSPSTransportMovement);
     });
 
     it('should not affect other IncludedSPSNote entries when DIRECT_LANDING is set', () => {
@@ -742,8 +830,92 @@ describe('CatchCertificateTransformerService', () => {
         exportedFrom: 'UK',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
-        transportations: []
+        transportation: {
+          vehicle: "directLanding",
+          exportDate: ""
+        },
+        products: [
+          {
+            speciesId: "GBR-2026-CC-D649EDC9D-0f9f917d-f8bd-46ef-9ff8-1730e7102a02",
+            species: "Atlantic cod (COD)",
+            speciesCode: "COD",
+            commodityCode: "03044410",
+            commodityCodeDescription: "Fresh or chilled fillets of cod \"Gadus morhua, Gadus ogac, Gadus macrocephalus\" and of Boreogadus saida",
+            scientificName: "Gadus morhua",
+            state: {
+              code: "FRE",
+              name: "Fresh"
+            },
+            presentation: {
+              code: "FIL",
+              name: "Filleted"
+            },
+            caughtBy: [
+              {
+                vessel: "ABBA-CAT",
+                pln: "AB170",
+                homePort: "ABERAERON",
+                flag: "GBR",
+                cfr: "GBR000C18121",
+                ircs: null,
+                imoNumber: null,
+                licenceNumber: "27543",
+                licenceValidTo: "2030-12-31",
+                licenceHolder: "MR E G JENKINS",
+                id: "GBR-2026-CC-D649EDC9D-4394577068",
+                date: "2026-05-08",
+                startDate: "2026-05-08",
+                faoArea: "FAO27",
+                highSeasArea: "No",
+                exclusiveEconomicZones: [
+                  {
+                    officialCountryName: "Algeria",
+                    isoCodeAlpha2: "DZ",
+                    isoCodeAlpha3: "DZA",
+                    isoNumericCode: "012"
+                  }
+                ],
+                weight: 10,
+                gearCategory: "Trawls",
+                gearType: "Beam trawls (TBB)",
+                gearCode: "TBB",
+                numberOfSubmissions: 2,
+                rfmo: "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+                isLegallyDue: false,
+                vesselRiskScore: 1,
+                speciesRiskScore: 1,
+                exporterRiskScore: 1,
+                threshold: 1,
+                riskScore: 1,
+                isSpeciesRiskEnabled: true,
+                dataEverExpected: false,
+                _status: "LANDING_DATA_NEVER_EXPECTED"
+              }
+            ],
+            "factor": 2.6
+          }
+        ]
       };
+      const expectedMainCarriageSPSTransportMovement = {
+        "ID": {
+          "schemeAgencyID": "GB",
+          "schemeAgencyName": "United Kingdom of Great Britain and Northern Ireland (the)",
+          "schemeID": "ship_imo_number_before_bcp",
+          "schemeName": "Ship IMO Number (before BCP)",
+          "value": ""
+        },
+        "ModeCode": {
+          "name": "Maritime transport",
+          "value": "1"
+        },
+        "UsedSPSTransportMeans": {
+          "Name": {
+            "languageID": "en",
+            "languageLocaleID": "en-nz",
+            "value": "ABBA-CAT"
+          }
+        }
+      }
 
       const result = CatchCertificateTransformerService.generateCatchPayload(
         documentNumber,
@@ -753,11 +925,15 @@ describe('CatchCertificateTransformerService', () => {
 
       const includedSPSNote =
         result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const mainCarriageSPSTransportMovement = result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+        .MainCarriageSPSTransportMovement;
 
       expect(includedSPSNote[0].Content.value).toBe('true');
       expect(includedSPSNote[0].SubjectCode.value).toBe('TRANSPORT_DETAILS_EXPORTER_SIGNATURE_PRESENT');
       expect(includedSPSNote[1].SubjectCode.value).toBe('EXPORTER_SIGNATURE_DATE');
       expect(includedSPSNote[1].Content.value).toBeDefined();
+      expect(mainCarriageSPSTransportMovement).toHaveLength(1);
+      expect(mainCarriageSPSTransportMovement[0]).toEqual(expectedMainCarriageSPSTransportMovement);
     });
   });
 

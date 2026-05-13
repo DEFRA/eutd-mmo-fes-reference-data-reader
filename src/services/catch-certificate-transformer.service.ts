@@ -290,8 +290,11 @@ export default class CatchCertificateTransformerService {
 
   private static buildTransportMovement(exportData: any): any {
     if (exportData?.landingsEntryOption === 'directLanding' && exportData?.transportation) {
-      const vesselName = exportData.products?.[0]?.caughtBy?.[0]?.vessel;
-      const transport = { ...exportData.transportation, vesselName };
+      const caughtBy = exportData.products?.[0]?.caughtBy?.[0];
+      const vesselName = caughtBy?.vessel;
+      const imoNumber = caughtBy?.imoNumber;
+      const flag = caughtBy?.flag;
+      const transport = { ...exportData.transportation, vesselName, imoNumber, flag };
       return [createMainCarriageSPSTransportMovement(transport)];
     }
     return exportData?.transportations?.map(createMainCarriageSPSTransportMovement);
