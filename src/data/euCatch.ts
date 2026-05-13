@@ -122,6 +122,9 @@ export const getTransportId: (transport: any) => string = (transport: any) => {
     case TRANSPORT_VEHICLE_PLANE: {
       return transport.flightNumber;
     }
+    case TRANSPORT_VEHICLE_DIRECT_LANDING: {
+      return transport.imoNumber?.toString() ?? '';
+    }
     default: {
       return ''
     }
@@ -134,9 +137,17 @@ export const getSchemeAgencyID: (transport: any) => string = (transport: any) =>
     const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
     return countryID?.isoCodeAlpha2 ?? 'GB';
   }
+
+  if (transport?.vehicle === TRANSPORT_VEHICLE_DIRECT_LANDING) {
+    return countryISOMapping[transport.flag];
+  }
 }
 
-export const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : undefined;
+export const getSchemeAgencyName: (transport: any) => string = (transport: any) => {
+  if (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) return transport.nationalityOfVehicle;
+  if (transport?.vehicle === TRANSPORT_VEHICLE_DIRECT_LANDING) return countryFlagNameMapping[transport.flag];
+  return undefined;
+};
 
 export const createMainCarriageSPSTransportMovement = (transport: any) => {
   const vehicle = transport?.vehicle;
@@ -349,11 +360,18 @@ export const validateUKSDNumberFormat = (str: string) => {
 // GGY - Guernsey
 // IMN - Isle of Man
 // JEY - Jersey
-const countryISOMapping = {
+const countryISOMapping: { [key: string]: string } = {
   GBR: "GB",
   GGY: "GB",
   IMN: "GB",
   JEY: "GB",
+}
+
+const countryFlagNameMapping: { [key: string]: string } = {
+  GBR: "United Kingdom of Great Britain and Northern Ireland (the)",
+  GGY: "United Kingdom of Great Britain and Northern Ireland (the)",
+  IMN: "United Kingdom of Great Britain and Northern Ireland (the)",
+  JEY: "United Kingdom of Great Britain and Northern Ireland (the)",
 }
 
 export function getCountryISO2(countryCode: string) {
