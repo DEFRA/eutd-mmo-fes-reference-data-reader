@@ -496,6 +496,16 @@ export default class CatchCertificateTransformerService {
           value: 'FISHING_GEAR'
         }
       })
+    } else if (vessel.gearType && vessel.gearCategory) {
+      const gearTypes: GearRecord[] = getGearTypes();
+      additionalInformationSPSNote.push({
+        Content: [{
+          value: gearTypes.find((gearType: GearRecord) => gearType['Gear category'] === vessel.gearCategory && gearType['Gear name (code)'] === vessel.gearType)?.['ISSCFG code'] || '99.9'
+        }],
+        SubjectCode: {
+          value: 'FISHING_GEAR'
+        }
+      })
     }
 
     if (vessel.licenceNumber) {
