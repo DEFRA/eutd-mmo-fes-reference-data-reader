@@ -3408,7 +3408,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(items.length).toBe(0); // No items when caughtBy is undefined
     });
 
-    it('should handle landing without gearCode', () => {
+    it('should handle landing with gearCode', () => {
       mockGetGearCodes.mockReturnValue([{
         'Gear code': 'FPN',
         'ISSCFG code': '08.1'
@@ -3450,6 +3450,54 @@ describe('CatchCertificateTransformerService', () => {
       const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
 
       expect(gearNote.Content[0].value).toBe('08.1');
+    });
+
+    it('should handle landing without gearCode', () => {
+      mockGetGearCodes.mockReturnValue([{
+        'Gear category': 'Trawls',
+        'Gear name (code)': 'Bottom trawls (nei) (TB)',
+        'Gear name': 'Bottom trawls (nei)',
+        'Gear code': 'TB',
+        'ISSCFG code': '03.19'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-CONS005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        products: [
+          {
+            caughtBy: [
+              {
+                vessel: 'Test Vessel',
+                pln: 'TEST123',
+                gearCategory: 'Trawls',
+                gearType: 'Bottom trawls (nei) (TB)',
+                exclusiveEconomicZones: []
+              }
+            ]
+          }
+        ],
+        exporterDetails: {},
+        exportedFrom: '',
+        exportedTo: {},
+        pointOfDestination: ''
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const items =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .IncludedSPSConsignmentItem;
+
+      const conservationItem = items[0];
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
+      const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
+
+      expect(gearNote.Content[0].value).toBe('03.19');
     });
 
     it('should include IMO note when vessel.imoNumber is provided', () => {
