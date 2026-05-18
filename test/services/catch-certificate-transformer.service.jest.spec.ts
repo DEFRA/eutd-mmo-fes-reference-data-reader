@@ -3500,6 +3500,54 @@ describe('CatchCertificateTransformerService', () => {
       expect(gearNote.Content[0].value).toBe('03.19');
     });
 
+    it('should handle landing without gearCode and an unrecognised gear category', () => {
+      mockGetGearCodes.mockReturnValue([{
+        'Gear category': 'Invalid',
+        'Gear name (code)': 'Invalid',
+        'Gear name': 'Bottom trawls (nei)',
+        'Gear code': 'Invalid',
+        'ISSCFG code': '-1'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-CONS005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        products: [
+          {
+            caughtBy: [
+              {
+                vessel: 'Test Vessel',
+                pln: 'TEST123',
+                gearCategory: 'Trawls',
+                gearType: 'Bottom trawls (nei) (TB)',
+                exclusiveEconomicZones: []
+              }
+            ]
+          }
+        ],
+        exporterDetails: {},
+        exportedFrom: '',
+        exportedTo: {},
+        pointOfDestination: ''
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const items =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .IncludedSPSConsignmentItem;
+
+      const conservationItem = items[0];
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
+      const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
+
+      expect(gearNote.Content[0].value).toBe('99.9');
+    });
+
     it('should include IMO note when vessel.imoNumber is provided', () => {
       const documentNumber = 'GBR-2025-CC-CONS006';
       const createdAt = new Date('2025-12-01');
