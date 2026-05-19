@@ -77,34 +77,39 @@ export const modeMap = {
   'truck': '3',
   'train': '2',
   'plane': '4',
-  'containerVessel': '1'
+  'containerVessel': '1',
+  'directLanding': '1'
 };
 
 export const modeName = {
   'truck': 'Road transport',
   'train': 'Rail transport',
   'plane': 'Air transport',
-  'containerVessel': 'Maritime transport'
+  'containerVessel': 'Maritime transport',
+  'directLanding': 'Maritime transport'
 };
 
 export const schemeID = {
   'truck': 'road_vehicle_registration_before_bcp',
   'train': 'train_identifier_before_bcp',
   'plane': 'airplane_flight_number_before_bcp',
-  'containerVessel': 'ship_imo_number_before_bcp'
+  'containerVessel': 'ship_imo_number_before_bcp',
+  'directLanding': 'ship_imo_number_before_bcp'
 };
 
 export const schemeName = {
   'truck': 'Road vehicle registration (before BCP)',
   'train': 'Rail Identifier (before BCP)',
   'plane': 'Flight number (before BCP)',
-  'containerVessel': 'Ship IMO Number (before BCP)'
+  'containerVessel': 'Ship IMO Number (before BCP)',
+  'directLanding': 'Ship IMO Number (before BCP)'
 }
 
 const TRANSPORT_VEHICLE_TRUCK = 'truck';
 const TRANSPORT_VEHICLE_TRAIN = 'train';
 const TRANSPORT_VEHICLE_PLANE = 'plane';
 export const TRANSPORT_VEHICLE_CONTAINER_VESSEL = 'containerVessel';
+export const TRANSPORT_VEHICLE_DIRECT_LANDING = 'directLanding';
 
 export const getTransportId: (transport: any) => string = (transport: any) => {
   switch (transport?.vehicle) {
@@ -116,6 +121,9 @@ export const getTransportId: (transport: any) => string = (transport: any) => {
     }
     case TRANSPORT_VEHICLE_PLANE: {
       return transport.flightNumber;
+    }
+    case TRANSPORT_VEHICLE_DIRECT_LANDING: {
+      return transport.imoNumber?.toString() ?? '';
     }
     default: {
       return ''
@@ -129,9 +137,17 @@ export const getSchemeAgencyID: (transport: any) => string = (transport: any) =>
     const countryID: ICountry | undefined = countries.find((country: ICountry) => country.officialCountryName.includes(transport.nationalityOfVehicle));
     return countryID?.isoCodeAlpha2 ?? 'GB';
   }
+
+  if (transport?.vehicle === TRANSPORT_VEHICLE_DIRECT_LANDING) {
+    return countryISOMapping[transport.flag];
+  }
 }
 
-export const getSchemeAgencyName: (transport: any) => string = (transport: any) => (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) ? transport.nationalityOfVehicle : undefined;
+export const getSchemeAgencyName: (transport: any) => string = (transport: any) => {
+  if (transport?.vehicle === TRANSPORT_VEHICLE_TRUCK) return transport.nationalityOfVehicle;
+  if (transport?.vehicle === TRANSPORT_VEHICLE_DIRECT_LANDING) return countryFlagNameMapping[transport.flag];
+  return undefined;
+};
 
 export const createMainCarriageSPSTransportMovement = (transport: any) => {
   const vehicle = transport?.vehicle;
@@ -152,7 +168,7 @@ export const createMainCarriageSPSTransportMovement = (transport: any) => {
     }
   };
 
-  return (transport?.vehicle === TRANSPORT_VEHICLE_CONTAINER_VESSEL) ? {
+  return (transport?.vehicle === TRANSPORT_VEHICLE_CONTAINER_VESSEL || transport?.vehicle === TRANSPORT_VEHICLE_DIRECT_LANDING) ? {
     ...commonTransportInformation,
     UsedSPSTransportMeans: {
       Name: {
@@ -344,11 +360,18 @@ export const validateUKSDNumberFormat = (str: string) => {
 // GGY - Guernsey
 // IMN - Isle of Man
 // JEY - Jersey
-const countryISOMapping = {
+const countryISOMapping: { [key: string]: string } = {
   GBR: "GB",
   GGY: "GB",
   IMN: "GB",
   JEY: "GB",
+}
+
+const countryFlagNameMapping: { [key: string]: string } = {
+  GBR: "United Kingdom of Great Britain and Northern Ireland (the)",
+  GGY: "United Kingdom of Great Britain and Northern Ireland (the)",
+  IMN: "United Kingdom of Great Britain and Northern Ireland (the)",
+  JEY: "United Kingdom of Great Britain and Northern Ireland (the)",
 }
 
 export function getCountryISO2(countryCode: string) {

@@ -154,6 +154,14 @@ export default class CatchCertificateTransformerService {
           SubjectCode: {
             value: 'EXPORTER_SIGNATURE_DATE'
           }
+        },
+        {
+          Content: {
+            value: exportData.landingsEntryOption === 'directLanding' ? 'true' : 'false'
+          },
+          SubjectCode: {
+            value: 'DIRECT_LANDING'
+          }
         }
       ]
     };
@@ -191,7 +199,7 @@ export default class CatchCertificateTransformerService {
           }
         }
       },
-      MainCarriageSPSTransportMovement: this.buildTransportMovement(exportData.transportations),
+      MainCarriageSPSTransportMovement: this.buildTransportMovement(exportData),
       UtilizedSPSTransportEquipment: this.buildTransportEquipment(exportData.transportations),
       IncludedSPSConsignmentItem: this.buildConsignmentItems(exportData)
     };
@@ -280,11 +288,19 @@ export default class CatchCertificateTransformerService {
     };
   }
 
-  private static buildTransportMovement(transportations: any[]): any {
-    return transportations?.map(createMainCarriageSPSTransportMovement);
+  private static buildTransportMovement(exportData: any): any {
+    if (exportData?.landingsEntryOption === 'directLanding' && exportData?.transportation) {
+      const caughtBy = exportData.products?.[0]?.caughtBy?.[0];
+      const vesselName = caughtBy?.vessel;
+      const imoNumber = caughtBy?.imoNumber;
+      const flag = caughtBy?.flag;
+      const transport = { ...exportData.transportation, vesselName, imoNumber, flag };
+      return [createMainCarriageSPSTransportMovement(transport)];
+    }
+    return exportData?.transportations?.map(createMainCarriageSPSTransportMovement);
   }
 
-  private static buildTransportEquipment(transportations: any[]): any {
+  private static buildTransportEquipment(transportations: any[] = []): any {
     return transportations?.reduce((utilizedSPSTransportEquipments: any, transport: any) => createUtilizedSPSTransportEquipments(utilizedSPSTransportEquipments, transport), []);
   }
 
@@ -475,6 +491,16 @@ export default class CatchCertificateTransformerService {
       additionalInformationSPSNote.push({
         Content: [{
           value: gearTypes.find((gearType: GearRecord) => gearType['Gear code'] === vessel.gearCode)?.['ISSCFG code'] || '99.9'
+        }],
+        SubjectCode: {
+          value: 'FISHING_GEAR'
+        }
+      })
+    } else if (vessel.gearType && vessel.gearCategory) {
+      const gearTypes: GearRecord[] = getGearTypes();
+      additionalInformationSPSNote.push({
+        Content: [{
+          value: gearTypes.find((gearType: GearRecord) => gearType['Gear category'] === vessel.gearCategory && gearType['Gear name (code)'] === vessel.gearType)?.['ISSCFG code'] || '99.9'
         }],
         SubjectCode: {
           value: 'FISHING_GEAR'

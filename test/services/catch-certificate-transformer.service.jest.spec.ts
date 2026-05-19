@@ -539,6 +539,402 @@ describe('CatchCertificateTransformerService', () => {
       // Should only have the 2 default references
       expect(references).toHaveLength(2);
     });
+
+    it('should set DIRECT_LANDING to true when landingsEntryOption is directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('true');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is not directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'manualLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is absent', () => {
+      const documentNumber = 'GBR-2025-CC-DL003';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is null', () => {
+      const documentNumber = 'GBR-2025-CC-DL004';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: null,
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should set DIRECT_LANDING to false when landingsEntryOption is an empty string', () => {
+      const documentNumber = 'GBR-2025-CC-DL005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: '',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const directLandingNote = includedSPSNote.find(
+        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
+      );
+
+      expect(directLandingNote).toBeDefined();
+      expect(directLandingNote.Content.value).toBe('false');
+    });
+
+    it('should always include DIRECT_LANDING as the third entry in IncludedSPSNote', () => {
+      const documentNumber = 'GBR-2025-CC-DL006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+
+      expect(includedSPSNote).toHaveLength(3);
+      expect(includedSPSNote[0].SubjectCode.value).toBe('TRANSPORT_DETAILS_EXPORTER_SIGNATURE_PRESENT');
+      expect(includedSPSNote[1].SubjectCode.value).toBe('EXPORTER_SIGNATURE_DATE');
+      expect(includedSPSNote[2].SubjectCode.value).toBe('DIRECT_LANDING');
+    });
+
+    it('should include DIRECT_LANDING note with correct structure', () => {
+      const documentNumber = 'GBR-2025-CC-DL007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportation: {
+          vehicle: "directLanding",
+          exportDate: ""
+        },
+        products: [
+          {
+            speciesId: "GBR-2026-CC-D649EDC9D-0f9f917d-f8bd-46ef-9ff8-1730e7102a02",
+            species: "Atlantic cod (COD)",
+            speciesCode: "COD",
+            commodityCode: "03044410",
+            commodityCodeDescription: "Fresh or chilled fillets of cod \"Gadus morhua, Gadus ogac, Gadus macrocephalus\" and of Boreogadus saida",
+            scientificName: "Gadus morhua",
+            state: {
+              code: "FRE",
+              name: "Fresh"
+            },
+            presentation: {
+              code: "FIL",
+              name: "Filleted"
+            },
+            caughtBy: [
+              {
+                vessel: "WIRON 5",
+                pln: "H1100",
+                homePort: "PLYMOUTH",
+                flag: "GBR",
+                cfr: "NLD200202641",
+                ircs: "2HGD8",
+                imoNumber: 9249556,
+                licenceNumber: "12480",
+                licenceValidTo: "2030-12-31",
+                licenceHolder: "INTERFISH WIRONS LIMITED",
+                id: "GBR-2026-CC-D649EDC9D-4394577068",
+                date: "2026-05-08",
+                startDate: "2026-05-08",
+                faoArea: "FAO27",
+                highSeasArea: "No",
+                exclusiveEconomicZones: [
+                  {
+                    officialCountryName: "Algeria",
+                    isoCodeAlpha2: "DZ",
+                    isoCodeAlpha3: "DZA",
+                    isoNumericCode: "012"
+                  }
+                ],
+                weight: 10,
+                gearCategory: "Trawls",
+                gearType: "Beam trawls (TBB)",
+                gearCode: "TBB",
+                numberOfSubmissions: 2,
+                rfmo: "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+                isLegallyDue: false,
+                vesselRiskScore: 1,
+                speciesRiskScore: 1,
+                exporterRiskScore: 1,
+                threshold: 1,
+                riskScore: 1,
+                isSpeciesRiskEnabled: true,
+                dataEverExpected: false,
+                _status: "LANDING_DATA_NEVER_EXPECTED"
+              }
+            ],
+            "factor": 2.6
+          }
+        ]
+      };
+      const expectedMainCarriageSPSTransportMovement = {
+        "ID": {
+          "schemeAgencyID": "GB",
+          "schemeAgencyName": "United Kingdom of Great Britain and Northern Ireland (the)",
+          "schemeID": "ship_imo_number_before_bcp",
+          "schemeName": "Ship IMO Number (before BCP)",
+          "value": "9249556"
+        },
+        "ModeCode": {
+          "name": "Maritime transport",
+          "value": "1"
+        },
+        "UsedSPSTransportMeans": {
+          "Name": {
+            "languageID": "en",
+            "languageLocaleID": "en-nz",
+            "value": "WIRON 5"
+          }
+        }
+      }
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const directLandingNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote[2];
+      const mainCarriageSPSTransportMovement = result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+        .MainCarriageSPSTransportMovement;
+
+      expect(directLandingNote).toEqual({
+        Content: { value: 'true' },
+        SubjectCode: { value: 'DIRECT_LANDING' }
+      });
+      expect(mainCarriageSPSTransportMovement).toHaveLength(1);
+      expect(mainCarriageSPSTransportMovement[0]).toEqual(expectedMainCarriageSPSTransportMovement);
+    });
+
+    it('should not affect other IncludedSPSNote entries when DIRECT_LANDING is set', () => {
+      const documentNumber = 'GBR-2025-CC-DL008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportation: {
+          vehicle: "directLanding",
+          exportDate: ""
+        },
+        products: [
+          {
+            speciesId: "GBR-2026-CC-D649EDC9D-0f9f917d-f8bd-46ef-9ff8-1730e7102a02",
+            species: "Atlantic cod (COD)",
+            speciesCode: "COD",
+            commodityCode: "03044410",
+            commodityCodeDescription: "Fresh or chilled fillets of cod \"Gadus morhua, Gadus ogac, Gadus macrocephalus\" and of Boreogadus saida",
+            scientificName: "Gadus morhua",
+            state: {
+              code: "FRE",
+              name: "Fresh"
+            },
+            presentation: {
+              code: "FIL",
+              name: "Filleted"
+            },
+            caughtBy: [
+              {
+                vessel: "ABBA-CAT",
+                pln: "AB170",
+                homePort: "ABERAERON",
+                flag: "GBR",
+                cfr: "GBR000C18121",
+                ircs: null,
+                imoNumber: null,
+                licenceNumber: "27543",
+                licenceValidTo: "2030-12-31",
+                licenceHolder: "MR E G JENKINS",
+                id: "GBR-2026-CC-D649EDC9D-4394577068",
+                date: "2026-05-08",
+                startDate: "2026-05-08",
+                faoArea: "FAO27",
+                highSeasArea: "No",
+                exclusiveEconomicZones: [
+                  {
+                    officialCountryName: "Algeria",
+                    isoCodeAlpha2: "DZ",
+                    isoCodeAlpha3: "DZA",
+                    isoNumericCode: "012"
+                  }
+                ],
+                weight: 10,
+                gearCategory: "Trawls",
+                gearType: "Beam trawls (TBB)",
+                gearCode: "TBB",
+                numberOfSubmissions: 2,
+                rfmo: "Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)",
+                isLegallyDue: false,
+                vesselRiskScore: 1,
+                speciesRiskScore: 1,
+                exporterRiskScore: 1,
+                threshold: 1,
+                riskScore: 1,
+                isSpeciesRiskEnabled: true,
+                dataEverExpected: false,
+                _status: "LANDING_DATA_NEVER_EXPECTED"
+              }
+            ],
+            "factor": 2.6
+          }
+        ]
+      };
+      const expectedMainCarriageSPSTransportMovement = {
+        "ID": {
+          "schemeAgencyID": "GB",
+          "schemeAgencyName": "United Kingdom of Great Britain and Northern Ireland (the)",
+          "schemeID": "ship_imo_number_before_bcp",
+          "schemeName": "Ship IMO Number (before BCP)",
+          "value": ""
+        },
+        "ModeCode": {
+          "name": "Maritime transport",
+          "value": "1"
+        },
+        "UsedSPSTransportMeans": {
+          "Name": {
+            "languageID": "en",
+            "languageLocaleID": "en-nz",
+            "value": "ABBA-CAT"
+          }
+        }
+      }
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const includedSPSNote =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
+      const mainCarriageSPSTransportMovement = result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+        .MainCarriageSPSTransportMovement;
+
+      expect(includedSPSNote[0].Content.value).toBe('true');
+      expect(includedSPSNote[0].SubjectCode.value).toBe('TRANSPORT_DETAILS_EXPORTER_SIGNATURE_PRESENT');
+      expect(includedSPSNote[1].SubjectCode.value).toBe('EXPORTER_SIGNATURE_DATE');
+      expect(includedSPSNote[1].Content.value).toBeDefined();
+      expect(mainCarriageSPSTransportMovement).toHaveLength(1);
+      expect(mainCarriageSPSTransportMovement[0]).toEqual(expectedMainCarriageSPSTransportMovement);
+    });
   });
 
   describe('buildConsignment', () => {
@@ -2158,6 +2554,215 @@ describe('CatchCertificateTransformerService', () => {
     });
   });
 
+  describe('buildTransportMovement directLanding', () => {
+    it('should use exportData.transportation when landingsEntryOption is directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL001';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{
+          caughtBy: [{ vessel: 'Felicity Ace', cfr: 'GBR123' }]
+        }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport).toHaveLength(1);
+      expect(transport[0].ModeCode.value).toBe('1');
+      expect(transport[0].ModeCode.name).toBe('Maritime transport');
+    });
+
+    it('should use vessel name from first caughtBy of first product for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{
+          caughtBy: [
+            { vessel: 'Sea Warrior', cfr: 'GBR001' },
+            { vessel: 'Other Vessel', cfr: 'GBR002' }
+          ]
+        }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBe('Sea Warrior');
+    });
+
+    it('should use vessel name from first product only, not subsequent products, for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL003';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [
+          { caughtBy: [{ vessel: 'First Product Vessel', cfr: 'GBR001' }] },
+          { caughtBy: [{ vessel: 'Second Product Vessel', cfr: 'GBR002' }] }
+        ],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBe('First Product Vessel');
+    });
+
+    it('should produce UsedSPSTransportMeans with undefined vesselName when products have no caughtBy for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL004';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{ caughtBy: [] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBeUndefined();
+    });
+
+    it('should produce UsedSPSTransportMeans with undefined vesselName when products is empty for directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].UsedSPSTransportMeans.Name.value).toBeUndefined();
+    });
+
+    it('should fall back to transportations when landingsEntryOption is not directLanding', () => {
+      const documentNumber = 'GBR-2025-CC-DL006';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'manualEntry',
+        transportation: { vehicle: 'directLanding' },
+        transportations: [{ vehicle: 'truck', registrationNumber: 'ABC123' }],
+        products: [{ caughtBy: [{ vessel: 'Should Not Appear', cfr: 'GBR001' }] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ModeCode.value).toBe('3');
+      expect(transport[0].UsedSPSTransportMeans).toBeUndefined();
+    });
+
+    it('should return undefined when landingsEntryOption is directLanding but transportation is missing', () => {
+      const documentNumber = 'GBR-2025-CC-DL007';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        products: [{ caughtBy: [{ vessel: 'Sea Warrior', cfr: 'GBR001' }] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport).toBeUndefined();
+    });
+
+    it('should preserve schemeID and schemeName from directLanding mapping', () => {
+      const documentNumber = 'GBR-2025-CC-DL008';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        landingsEntryOption: 'directLanding',
+        transportation: { vehicle: 'directLanding' },
+        products: [{ caughtBy: [{ vessel: 'Daybreak', cfr: 'GBR001' }] }],
+        exporterDetails: {},
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France'
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber, createdAt, exportData
+      );
+
+      const transport =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .MainCarriageSPSTransportMovement;
+
+      expect(transport[0].ID.schemeID).toBe('ship_imo_number_before_bcp');
+      expect(transport[0].ID.schemeName).toBe('Ship IMO Number (before BCP)');
+      expect(transport[0].ID.value).toBe('');
+    });
+  });
+
   describe('buildTransportEquipment', () => {
     it('should include container number when provided', () => {
       const documentNumber = 'GBR-2025-CC-EQUIP001';
@@ -2803,7 +3408,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(items.length).toBe(0); // No items when caughtBy is undefined
     });
 
-    it('should handle landing without gearCode', () => {
+    it('should handle landing with gearCode', () => {
       mockGetGearCodes.mockReturnValue([{
         'Gear code': 'FPN',
         'ISSCFG code': '08.1'
@@ -2845,6 +3450,102 @@ describe('CatchCertificateTransformerService', () => {
       const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
 
       expect(gearNote.Content[0].value).toBe('08.1');
+    });
+
+    it('should handle landing without gearCode', () => {
+      mockGetGearCodes.mockReturnValue([{
+        'Gear category': 'Trawls',
+        'Gear name (code)': 'Bottom trawls (nei) (TB)',
+        'Gear name': 'Bottom trawls (nei)',
+        'Gear code': 'TB',
+        'ISSCFG code': '03.19'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-CONS005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        products: [
+          {
+            caughtBy: [
+              {
+                vessel: 'Test Vessel',
+                pln: 'TEST123',
+                gearCategory: 'Trawls',
+                gearType: 'Bottom trawls (nei) (TB)',
+                exclusiveEconomicZones: []
+              }
+            ]
+          }
+        ],
+        exporterDetails: {},
+        exportedFrom: '',
+        exportedTo: {},
+        pointOfDestination: ''
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const items =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .IncludedSPSConsignmentItem;
+
+      const conservationItem = items[0];
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
+      const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
+
+      expect(gearNote.Content[0].value).toBe('03.19');
+    });
+
+    it('should handle landing without gearCode and an unrecognised gear category', () => {
+      mockGetGearCodes.mockReturnValue([{
+        'Gear category': 'Invalid',
+        'Gear name (code)': 'Invalid',
+        'Gear name': 'Bottom trawls (nei)',
+        'Gear code': 'Invalid',
+        'ISSCFG code': '-1'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-CONS005';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        products: [
+          {
+            caughtBy: [
+              {
+                vessel: 'Test Vessel',
+                pln: 'TEST123',
+                gearCategory: 'Trawls',
+                gearType: 'Bottom trawls (nei) (TB)',
+                exclusiveEconomicZones: []
+              }
+            ]
+          }
+        ],
+        exporterDetails: {},
+        exportedFrom: '',
+        exportedTo: {},
+        pointOfDestination: ''
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      const items =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
+          .IncludedSPSConsignmentItem;
+
+      const conservationItem = items[0];
+      const notes = conservationItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
+      const gearNote = notes.find((n: any) => n.SubjectCode.value === 'FISHING_GEAR');
+
+      expect(gearNote.Content[0].value).toBe('99.9');
     });
 
     it('should include IMO note when vessel.imoNumber is provided', () => {
