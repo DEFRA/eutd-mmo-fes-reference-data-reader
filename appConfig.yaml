@@ -35,6 +35,18 @@ appSettings:
     value: '#{{ boomiUrl }}'
     type: config
 
+  - key: BOOMI_APIM_TENANT_ID
+    value: '#{{ boomiApimTenantId }}'
+    type: config
+
+  - key: BOOMI_APIM_CLIENT_ID
+    value: '#{{ boomiApimClientId }}'
+    type: config
+
+  - key: BOOMI_APIM_AUTH_SCOPE
+    value: '#{{ boomiApimAuthScope }}'
+    type: config
+
   - key: BUSINESS_CONTINUITY_KEY
     value: '#{{ businessContinuityKey }}'
     type: config

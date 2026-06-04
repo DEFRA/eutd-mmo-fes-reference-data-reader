@@ -1,4 +1,8 @@
 #!/bin/sh
 #. "$(dirname "$0")/_/husky.sh"
 
-npm run commitLint
+if [ -s "$HOME/.nvm/nvm.sh" ]; then
+	bash -lc 'source "$HOME/.nvm/nvm.sh"; nvm use --silent default >/dev/null 2>&1 || true; npm run commitLint'
+else
+	npm run commitLint
+fi
