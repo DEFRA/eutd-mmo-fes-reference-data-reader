@@ -125,6 +125,10 @@ appSettings:
     stagingValue: '#{{ internalAdminFrontendStgBaseUrl }}'
     slotSetting: true
 
+  - key: MANAGED_IDENTITY_CLIENT_ID
+    value: ''
+    type: config
+
   - key: MAXIMUM_DEFRA_VALIDATION_REPORT_BATCH_SIZE
     value: '1000'
     type: config
