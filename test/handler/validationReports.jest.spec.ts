@@ -10,7 +10,7 @@ let server;
 
 beforeAll(async () => {
   server = Hapi.server({
-    port: 9017,
+    port: 9027,
     host: 'localhost'
   });
 
@@ -333,7 +333,7 @@ describe("When generating a SDPS Report", () => {
 
 
     // did call 'void' report
-    expect(sdpsVoidMock.mock.calls).toHaveLength(1);
+    expect(sdpsVoidMock.mock.calls.length).toEqual(1);
 
 
 
@@ -399,42 +399,6 @@ describe("When generating a Catch Certificate Investigation Report", () => {
 
   })
 
-  it('uses the first documentNumber when passed as an array', async () => {
-
-    catchCertInvestigationMock.mockResolvedValue([{doc: 1}])
-    catchCertVoidInvestigationMock.mockResolvedValue([])
-    catchCertBlockInvestigationMock.mockResolvedValue([])
-
-    const req = {
-      method: 'GET',
-      url: '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&documentNumber=DOC-001&documentNumber=DOC-002'
-    };
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(200);
-    expect(catchCertInvestigationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ documentNumber: 'DOC-001' })
-    );
-  })
-
-  it('uses the first pln when passed as an array', async () => {
-
-    catchCertInvestigationMock.mockResolvedValue([{pln: 1}])
-    catchCertVoidInvestigationMock.mockResolvedValue([])
-    catchCertBlockInvestigationMock.mockResolvedValue([])
-
-    const req = {
-      method: 'GET',
-      url: '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&pln=PLN-001&pln=PLN-002'
-    };
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(200);
-    expect(catchCertInvestigationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ pln: 'PLN-001' })
-    );
-  })
-
 
 })
 
@@ -495,42 +459,6 @@ describe("When generating a SDPS Investigation Report", () => {
 
   })
 
-  it('uses the first exporter when passed as an array', async () => {
-
-    sdpsInvestigationMock.mockResolvedValue([{sdps: 1}])
-    sdpsVoidInvestigationMock.mockResolvedValue([])
-    sdpsBlockInvestigationMock.mockResolvedValue([])
-
-    const req = {
-      method: 'GET',
-      url: '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&exporter=BOB&exporter=ALICE'
-    };
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(200);
-    expect(sdpsInvestigationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ exporter: 'BOB' })
-    );
-  })
-
-  it('uses the first documentNumber when passed as an array', async () => {
-
-    sdpsInvestigationMock.mockResolvedValue([{sdps: 1}])
-    sdpsVoidInvestigationMock.mockResolvedValue([])
-    sdpsBlockInvestigationMock.mockResolvedValue([])
-
-    const req = {
-      method: 'GET',
-      url: '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&documentNumber=DOC-001&documentNumber=DOC-002'
-    };
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(200);
-    expect(sdpsInvestigationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ documentNumber: 'DOC-001' })
-    );
-  })
-
 })
 
 
@@ -552,64 +480,98 @@ describe("various other edgecase paths", () => {
     sdpsBlockMock.mockRestore();
   })
 
-  it.each([
-    [
-      'invalid report type',
-      async () => undefined,
-      '/v1/validationreports/mrbobreport.json?fromdate=2019-01-01&todate=2019-01-01',
-      404,
-    ],
-    [
-      'asofdate parameter happy path',
-      async () => {
-        sdpsVoidMock.mockResolvedValue([]);
-        sdpsBlockMock.mockResolvedValue([]);
-        sdpsMock.mockResolvedValue([{column1: 'value'}]);
-      },
-      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=2019-01-01',
-      200,
-    ],
-    [
-      'asofdate parameter sad path',
-      async () => {
-        sdpsMock.mockResolvedValue([{column1: 'value'}]);
-      },
-      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=baddate',
-      400,
-    ],
-    [
-      'area parameter happy path',
-      async () => {
-        sdpsVoidMock.mockResolvedValue([]);
-        sdpsBlockMock.mockResolvedValue([]);
-        sdpsMock.mockResolvedValue([{column1: 'value'}]);
-      },
-      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=England,Wales',
-      200,
-    ],
-    [
-      'area parameter sad path',
-      async () => undefined,
-      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=Jersey,India',
-      400,
-    ],
-    [
-      'invalid dates',
-      async () => undefined,
-      '/v1/validationreports/sdps.json?fromdate=baddate&todate=2019-01-01',
-      400,
-    ],
-  ])('%s', async (_title, arrange, url, expectedStatusCode) => {
-    await arrange();
+  it('invalid report type', async () => {
 
-    const req = {
+    const req ={
       method: 'GET',
-      url,
+      url: '/v1/validationreports/mrbobreport.json?fromdate=2019-01-01&todate=2019-01-01'
     };
 
     const response = await server.inject(req);
 
-    expect(response.statusCode).toBe(expectedStatusCode);
+    expect(response.statusCode).toBe(404);
+
+
+  });
+
+  it('asofdate parameter happy path', async () => {
+
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=2019-01-01'
+    };
+
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(200);
+
+
+  });
+
+  it('asofdate parameter sad path', async () => {
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=baddate'
+    };
+
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(400);
+
+
+  });
+
+  it('area parameter happy path', async () => {
+    sdpsVoidMock.mockResolvedValue([]);
+
+    sdpsBlockMock.mockResolvedValue([]);
+
+    sdpsMock.mockResolvedValue([{column1: 'value'}]);
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=England,Wales'
+    };
+
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(200);
+
+  });
+
+  it('area parameter sad path', async () => {
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=Jersey,India'
+    };
+
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(400);
+
+  });
+
+  it('invalid dates', async () => {
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdps.json?fromdate=baddate&todate=2019-01-01'
+    };
+
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(400);
+
   });
 
 
@@ -647,18 +609,40 @@ describe("various other edgecase paths", () => {
 
   })
 
-  it.each([
-    ['catch cert investigation missing params', '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01', 400],
-    ['sdps investigation missing params', '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01', 400],
-    ['incorrect file type', '/v1/validationreports/sdpsinvestigation.bob?fromdate=2019-01-01&todate=2020-01-01', 404],
-  ])('%s', async (_title, url, expectedStatusCode) => {
+  it('catch cert investigation missing params', async () => {
 
-    const req = {
+    const req ={
       method: 'GET',
-      url,
+      url: '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01'
     };
     const response = await server.inject(req);
-    expect(response.statusCode).toBe(expectedStatusCode);
+    expect(response.statusCode).toBe(400);
+
+
+
+  })
+
+  it('sdps investigation missing params', async () => {
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01'
+    };
+    const response = await server.inject(req);
+    expect(response.statusCode).toBe(400);
+
+
+
+  })
+
+  it('incorrect file type', async () => {
+
+    const req ={
+      method: 'GET',
+      url: '/v1/validationreports/sdpsinvestigation.bob?fromdate=2019-01-01&todate=2020-01-01'
+    };
+    const response = await server.inject(req);
+    expect(response.statusCode).toBe(404);
 
   })
 

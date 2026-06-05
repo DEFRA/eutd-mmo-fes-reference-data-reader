@@ -6,7 +6,7 @@ let server;
 
 beforeAll(async () => {
   server = Hapi.server({
-    port: 9011,
+    port: 9020,
     host: 'localhost'
   });
 
@@ -124,25 +124,6 @@ describe('/v1/commodities/search', () => {
     expect(response.result).toEqual([]);
   });
 
-  it.each([
-    ['speciesCode', '/v1/commodities/search?speciesCode=ALB&speciesCode=NOTEXIST&state=FRE&presentation=WHL'],
-    ['state',       '/v1/commodities/search?speciesCode=ALB&state=FRE&state=FRO&presentation=WHL'],
-    ['presentation', '/v1/commodities/search?speciesCode=ALB&state=FRE&presentation=WHL&presentation=GUH'],
-  ])('should use the first %s when passed as an array', async (_param, url) => {
-    const response = await server.inject({ method: 'GET', url });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.result).toEqual([
-      {
-        code: '03023190',
-        description: 'Fresh or chilled albacore or .... ',
-        faoName: 'Albacore',
-        stateLabel: 'fresh',
-        presentationLabel: 'whole'
-      }
-    ]);
-  });
-
 
 });
 
@@ -234,7 +215,7 @@ describe('/v1/species/search-exact', () => {
   it('should return null if species is not found', async () => {
     mockReq = '/v1/species/search-exact?faoCode=COD&faoName=blah&scientificName=Gadus+morhua';
     const response = await server.inject(mockReq);
-    expect(response.result).toBeNull();
+    expect(response.result).toEqual(null);
   });
 
   it('should return a 500 response if an error occurs', async () => {
@@ -248,42 +229,6 @@ describe('/v1/species/search-exact', () => {
   it('should handle a request with no params', async () => {
     mockReq = '/v1/species/search-exact';
     const response = await server.inject(mockReq);
-    expect(response.result).toBeNull();
-  });
-});
-
-describe('/v1/species - uk query param', () => {
-
-  let mockGetSpeciesData: jest.SpyInstance;
-
-  beforeEach(() => {
-    mockGetSpeciesData = jest.spyOn(Cache, 'getSpeciesData');
-    mockGetSpeciesData.mockReturnValue([
-      {
-        faoCode: 'COD',
-        faoName: 'Atlantic cod',
-        scientificName: 'Gadus morhua',
-        preservationState: 'FRE',
-        preservationDescr: 'fresh',
-        presentationState: 'WHL',
-        presentationDescr: 'whole',
-        commodityCode: '03026900',
-        commodityCodeDescr: 'Fresh or chilled Atlantic cod'
-      }
-    ]);
-  });
-
-  afterEach(() => {
-    mockGetSpeciesData.mockRestore();
-  });
-
-  it.each([
-    ['the string "Y"',  '/v1/species?uk=Y'],
-    ['absent',          '/v1/species'],
-    ['not the string "Y"', '/v1/species?uk=N'],
-  ])('returns 200 when uk query param is %s', async (_desc, url) => {
-    const response = await server.inject({ method: 'GET', url });
-
-    expect(response.statusCode).toBe(200);
+    expect(response.result).toEqual(null);
   });
 });

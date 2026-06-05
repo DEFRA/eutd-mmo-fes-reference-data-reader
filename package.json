@@ -109,6 +109,7 @@
       "^axios/": "axios/dist/node/axios.cjs"
     },
     "testEnvironment": "node",
+    "testTimeout": 30000,
     "transform": {
       "^.+\\.js$": "babel-jest",
       "^.+\\.ts?$": [

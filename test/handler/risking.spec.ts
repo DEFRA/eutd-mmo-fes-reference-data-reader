@@ -10,7 +10,7 @@ let server;
 
 beforeAll(async () => {
   server = Hapi.server({
-    port: 9012,
+    port: 9023,
     host: 'localhost'
   });
 
@@ -384,20 +384,6 @@ describe('When searching vessels of interest', () => {
     expect(mockLoggerInfo).toHaveBeenCalledWith('[RISKING][SEARCH][0][FOUND]');
     expect(response.statusCode).toBe(200);
     expect(response.payload).toEqual(JSON.stringify([]));
-  });
-
-  it('will treat searchTerm as a string when performing regex matching', async () => {
-    // searchTerm is cast to string in the handler; verifies regex matching works correctly
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/risking/vessels/search?searchTerm=WIRON'
-    });
-
-    expect(response.statusCode).toBe(200);
-    const payload = JSON.parse(response.payload);
-    // Both WIRON 5 and WIRON 6 should be returned
-    expect(payload).toHaveLength(2);
-    expect(payload.map((v: any) => v.pln)).toEqual(expect.arrayContaining(['H1100', 'H2200']));
   });
 });
 

@@ -1003,7 +1003,7 @@ describe('GET /v1/catch-submission/payload', () => {
   let server: Hapi.Server;
 
   beforeAll(async () => {
-    server = Hapi.server({ port: 9012, host: 'localhost' });
+    server = Hapi.server({ port: 9024, host: 'localhost' });
     CatchSubmission.catchSubmissionRoutes(server);
     server.validator(Joi);
     await server.initialize();
