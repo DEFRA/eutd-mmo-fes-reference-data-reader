@@ -126,7 +126,7 @@ appSettings:
     slotSetting: true
 
   - key: MANAGED_IDENTITY_CLIENT_ID
-    value: ''
+    value: '#{{ managedIdentityClientId }}'
     type: config
 
   - key: MAXIMUM_DEFRA_VALIDATION_REPORT_BATCH_SIZE
