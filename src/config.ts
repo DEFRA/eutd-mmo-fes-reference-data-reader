@@ -134,7 +134,7 @@ export class ApplicationConfig {
     ApplicationConfig.prototype.maxTotalExportWeight = Number.parseFloat(env.MAX_TOTAL_EXPORT_WEIGHT) || 10_000_000;
 
     ApplicationConfig.prototype.boomiCatchSubmissionUrl = env.BOOMI_CATCH_SUBMISSION_URL;
-    ApplicationConfig.prototype.getCatchCertsMaxTimeMs = Number(env.GET_CATCH_CERTS_MAX_TIME_MS) || 60000;
+    ApplicationConfig.prototype.getCatchCertsMaxTimeMs = Number(env.GET_CATCH_CERTS_MAX_TIME_MS) || 300000;
   }
 
 }
