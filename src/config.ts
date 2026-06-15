@@ -66,6 +66,13 @@ export class ApplicationConfig {
   // Boomi CATCH submission URL
   public boomiCatchSubmissionUrl: string;
 
+  /**
+    * Server-side time limit (ms) for the getCatchCerts query.
+    * Raised above the default to avoid premature termination when MongoDB is
+    * processing concurrent transactions on the same documents.
+  */
+  public getCatchCertsMaxTimeMs: number;
+
   public static loadEnv(env: any): void {
     ApplicationConfig.prototype.basicAuthUser = env.REF_SERVICE_BASIC_AUTH_USER;
     ApplicationConfig.prototype.basicAuthPassword = env.REF_SERVICE_BASIC_AUTH_PASSWORD;
@@ -127,6 +134,7 @@ export class ApplicationConfig {
     ApplicationConfig.prototype.maxTotalExportWeight = Number.parseFloat(env.MAX_TOTAL_EXPORT_WEIGHT) || 10_000_000;
 
     ApplicationConfig.prototype.boomiCatchSubmissionUrl = env.BOOMI_CATCH_SUBMISSION_URL;
+    ApplicationConfig.prototype.getCatchCertsMaxTimeMs = Number(env.GET_CATCH_CERTS_MAX_TIME_MS) || 60000;
   }
 
 }
