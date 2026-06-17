@@ -3622,10 +3622,11 @@ describe('CatchCertificateTransformerService', () => {
       const exportData = {
         products: [
           {
+            species: "Atlantic cod (COD)",
+            speciesCode: "COD",
             commodityCode: '03044100',
             commodityCodeDescription: 'Fresh hake',
             scientificName: 'Merluccius merluccius',
-            species: { label: 'European Hake' },
             caughtBy: [
               {
                 cfr: 'GBR123',
@@ -3666,7 +3667,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(productItem.IncludedSPSTradeLineItem[0].Description.value).toBe('Fresh hake');
       expect(productItem.IncludedSPSTradeLineItem[0].CommonName.value).toBe('Merluccius merluccius');
       expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('750');
-      expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification.ClassCode.value).toBe('030441');
+      expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification.ClassCode.value).toBe('COD');
     });
 
     it('should calculate total weight from multiple landings', () => {

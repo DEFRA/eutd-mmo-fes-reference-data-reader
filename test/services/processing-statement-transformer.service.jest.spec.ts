@@ -49,6 +49,7 @@ describe('ProcessingStatementTransformerService', () => {
       ],
       catches: [
         {
+          speciesCode: "COD",
           productDescription: 'Frozen Cod Fillets',
           productCommodityCode: '0304890097',
           speciesCommodityCode: '0304890097',
@@ -508,6 +509,7 @@ describe('ProcessingStatementTransformerService', () => {
         ...baseExportData,
         catches: [
           {
+            speciesCode: "COD",
             productDescription: 'Frozen Cod Fillets',
             productCommodityCode: '0304890097',
             speciesCommodityCode: '0304890097',
@@ -545,6 +547,7 @@ describe('ProcessingStatementTransformerService', () => {
         ...baseExportData,
         catches: [
           {
+            speciesCode: "COD",
             productDescription: 'Frozen Cod Fillets',
             productCommodityCode: '0304890097',
             speciesCommodityCode: '0304890097',
@@ -578,6 +581,7 @@ describe('ProcessingStatementTransformerService', () => {
         ...baseExportData,
         catches: [
           {
+            speciesCode: "COD",
             productDescription: 'Frozen Cod Fillets',
             productCommodityCode: '0304890097',
             speciesCommodityCode: '0304890097',
@@ -616,6 +620,7 @@ describe('ProcessingStatementTransformerService', () => {
         ...baseExportData,
         catches: [
           {
+            speciesCode: "COD",
             productDescription: 'Frozen Cod Fillets',
             productCommodityCode: '0304890097',
             speciesCommodityCode: '0304890097',
@@ -650,6 +655,7 @@ describe('ProcessingStatementTransformerService', () => {
         ...baseExportData,
         catches: [
           {
+            speciesCode: "COD",
             productDescription: 'Frozen Cod Fillets',
             productCommodityCode: '0304890097',
             speciesCommodityCode: '0304890097',
