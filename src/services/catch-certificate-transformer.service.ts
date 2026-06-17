@@ -376,18 +376,20 @@ export default class CatchCertificateTransformerService {
           AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
           ApplicableSPSClassification: {
             SystemID: {
-              value: 'CN'
+              value: 'FAO_ASFIS'
             },
             SystemName: {
               languageID: 'en',
-              value: 'CN Code'
+              languageLocaleID: 'en',
+              value: 'FAO Aquatic Sciences and Fisheries Information System Code (ASFIS)'
             },
             ClassCode: {
-              value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
+              value: product.speciesCode
             },
             ClassName: {
               languageID: 'en',
-              value: product.commodityCodeDescription || ''
+              languageLocaleID: 'en',
+              value: product.scientificName
             }
           }
         });
