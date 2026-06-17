@@ -326,11 +326,11 @@ export default class ProcessingStatementTransformerService {
         });
       }
 
-      if (ctch.scientificName) {
+      if (ctch.speciesCode) {
         notes.push({
           Content: {
             languageID: 'en',
-            value: ctch.scientificName
+            value: ctch.speciesCode
           },
           SubjectCode: {
             value: 'PROCESSED_SPECIES'
