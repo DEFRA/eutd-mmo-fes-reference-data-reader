@@ -3667,7 +3667,8 @@ describe('CatchCertificateTransformerService', () => {
       expect(productItem.IncludedSPSTradeLineItem[0].Description.value).toBe('Fresh hake');
       expect(productItem.IncludedSPSTradeLineItem[0].CommonName.value).toBe('Merluccius merluccius');
       expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('750');
-      expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification.ClassCode.value).toBe('COD');
+      expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification[0].ClassCode.value).toBe('030441');
+      expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification[1].ClassCode.value).toBe('COD');
     });
 
     it('should calculate total weight from multiple landings', () => {
