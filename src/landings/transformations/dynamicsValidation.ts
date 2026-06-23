@@ -617,7 +617,7 @@ export function toSpeciesCode(
   speciesWithCode: string | undefined
 ): string | undefined {
   if (!speciesWithCode) return undefined;
-  const matches = /^([^()]*)\(([^()]*)\)$/.exec(speciesWithCode);
+  const matches = /^(.*)\(([^()]*)\)$/.exec(speciesWithCode);
   if (matches && matches.length >= 3) {
     return matches[2];
   }
