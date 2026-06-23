@@ -613,14 +613,15 @@ export function toDynamicsSd(
   };
 }
 
-export function toSpeciesCode(speciesWithCode: string | undefined): string | undefined {
-  if (speciesWithCode) {
-     const regex = /(.*) \((.*)\)/g;
-    const matches = regex.exec(speciesWithCode);
-    if (matches && matches.length >= 3) {
-      return matches[2];
-    }
+export function toSpeciesCode(
+  speciesWithCode: string | undefined
+): string | undefined {
+  if (!speciesWithCode) return undefined;
+  const matches = /^([^()]*)\(([^()]*)\)$/.exec(speciesWithCode);
+  if (matches && matches.length >= 3) {
+    return matches[2];
   }
+  return undefined;
 }
 
 export function toAudit(systemAudit: IAuditEvent): CertificateAudit {
