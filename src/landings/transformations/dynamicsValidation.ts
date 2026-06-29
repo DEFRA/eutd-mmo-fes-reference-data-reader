@@ -613,14 +613,16 @@ export function toDynamicsSd(
   };
 }
 
-export function toSpeciesCode(speciesWithCode: string | undefined): string | undefined {
-  if (speciesWithCode) {
-     const regex = /(.*) \((.*)\)/g;
-    const matches = regex.exec(speciesWithCode);
-    if (matches && matches.length >= 3) {
-      return matches[2];
-    }
+export function toSpeciesCode(
+  speciesWithCode: string | undefined
+): string | undefined {
+  if (!speciesWithCode) return undefined;
+  const start = speciesWithCode.lastIndexOf("(");
+  const end = speciesWithCode.lastIndexOf(")");
+  if (start === -1 || end === -1 || end <= start) {
+    return undefined;
   }
+  return speciesWithCode.substring(start + 1, end);
 }
 
 export function toAudit(systemAudit: IAuditEvent): CertificateAudit {

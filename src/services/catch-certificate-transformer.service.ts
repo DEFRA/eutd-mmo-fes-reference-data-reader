@@ -374,22 +374,41 @@ export default class CatchCertificateTransformerService {
             value: catchItem.weight?.toString() || '0'
           },
           AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
-          ApplicableSPSClassification: {
-            SystemID: {
-              value: 'CN'
+          ApplicableSPSClassification: [
+            {
+              SystemID: {
+                value: 'CN'
+              },
+              SystemName: {
+                languageID: 'en',
+                value: 'CN Code'
+              },
+              ClassCode: {
+                value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
+              },
+              ClassName: {
+                languageID: 'en',
+                value: product.commodityCodeDescription || ''
+              }
             },
-            SystemName: {
-              languageID: 'en',
-              value: 'CN Code'
-            },
-            ClassCode: {
-              value: product.commodityCode ? product.commodityCode.substring(0, 6) : ''
-            },
-            ClassName: {
-              languageID: 'en',
-              value: product.commodityCodeDescription || ''
-            }
-          }
+            {
+              SystemID: {
+                value: 'FAO_ASFIS'
+              },
+              SystemName: {
+                languageID: 'en',
+                languageLocaleID: 'en',
+                value: 'FAO Aquatic Sciences and Fisheries Information System Code (ASFIS)'
+              },
+              ClassCode: {
+                value: product.speciesCode
+              },
+              ClassName: {
+                languageID: 'en',
+                languageLocaleID: 'en',
+                value: product.scientificName
+              }
+            }]
         });
       });
     });
