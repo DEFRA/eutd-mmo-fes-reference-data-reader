@@ -72,6 +72,7 @@ export interface ProcessingStatementReportCatch {
     hasWeightMismatch?: boolean;
     importWeightExceededAmount?: number;
     cnCode?: string;
+    speciesCommodityCode?: string;
 }
 export interface StorageDocumentReportCatch {
     species: string;

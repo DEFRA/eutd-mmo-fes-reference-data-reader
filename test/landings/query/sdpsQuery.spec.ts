@@ -86,6 +86,81 @@ describe('low level transformations', () => {
 
   })
 
+  it('will include speciesCommodityCode when set on a processing statement catch', () => {
+
+    const document = createDocument('12345',
+      'processingStatement',
+      [
+        { catchCertificateNumber: 'FCC051', catchCertificateType: 'uk', species: 'cats',
+          scientificName: 'some scientific name', totalWeightLanded: 500, exportWeightBeforeProcessing: 100,
+          exportWeightAfterProcessing: 90, speciesCommodityCode: '030240' }
+      ]
+    )
+
+    const res = Query.unwindAndMapCatches(document, identity)
+    const actual = Array.from(res)
+
+    expect((actual[0] as any).speciesCommodityCode).toBe('030240')
+
+  })
+
+  it('will return undefined for supportingDocuments when given an empty array on a storage document', () => {
+
+    const document = createDocument('12345',
+      'storageDocument',
+      [
+        { certificateNumber: 'FCC051', certificateType: 'uk', product: 'cats',
+          weightOnCC: 500, productWeight: 100, supportingDocuments: [] }
+      ]
+    )
+
+    const res = Query.unwindAndMapCatches(document, identity)
+    const actual = Array.from(res)
+
+    expect((actual[0] as any).supportingDocuments).toBeUndefined()
+
+  })
+
+  it('will include voidedBy and preApprovedBy from audit events in extended', () => {
+
+    const document: any = createDocument('12345',
+      'processingStatement',
+      [
+        { catchCertificateNumber: 'FCC051', catchCertificateType: 'uk', species: 'cats',
+          totalWeightLanded: 500, exportWeightBeforeProcessing: 100 }
+      ]
+    )
+    document.audit = [
+      { eventType: 'VOIDED',      triggeredBy: 'voider@test.com',   timestamp: new Date() },
+      { eventType: 'PREAPPROVED', triggeredBy: 'approver@test.com', timestamp: new Date() }
+    ]
+
+    const res = Query.unwindAndMapCatches(document, identity)
+    const actual = Array.from(res)
+
+    expect((actual[0] as any).extended.voidedBy).toBe('voider@test.com')
+    expect((actual[0] as any).extended.preApprovedBy).toBe('approver@test.com')
+
+  })
+
+  it('will default document status to COMPLETE when document status is null', () => {
+
+    const document: any = createDocument('12345',
+      'processingStatement',
+      [
+        { catchCertificateNumber: 'FCC051', catchCertificateType: 'uk', species: 'cats',
+          totalWeightLanded: 500, exportWeightBeforeProcessing: 100 }
+      ]
+    )
+    document.status = null
+
+    const res = Query.unwindAndMapCatches(document, identity)
+    const actual = Array.from(res)
+
+    expect((actual[0] as any).status).toBe('COMPLETE')
+
+  })
+
   it('will get unique certificates from a set of documents', () => {
 
     const documents = [
@@ -128,6 +203,23 @@ describe('low level transformations', () => {
     const res = Query.getForeignCatchCertificatesFromDocuments(documents);
 
     expect(res).toEqual(['FCC051', 'FCC052', 'FCC053'])
+  });
+
+  it('will invoke the daLookup when exporterDetails are present in getForeignCatchCertificatesFromDocuments', () => {
+
+    const document: any = createDocument('12345',
+      'processingStatement',
+      [
+        { catchCertificateNumber: 'FCC091', catchCertificateType: 'uk', species: 'tuna',
+          totalWeightLanded: 100, exportWeightBeforeProcessing: 50 }
+      ]
+    )
+    document.exportData.exporterDetails = { postcode: 'NE1 1AA' }
+
+    const res = Query.getForeignCatchCertificatesFromDocuments([document])
+
+    expect(res).toEqual(['FCC091'])
+
   });
 
   describe('With data coming from Redis', () => {
@@ -512,6 +604,22 @@ describe('tests at the query level', () => {
 
     expect(res.map(_ => [_.documentNumber, _.commodityCode]))
       .toEqual([ ['12345', 'COMMODITYCODE123'], ['52345', undefined] ])
+
+  })
+
+  it('speciesCommodityCode will appear in the query output when set on a PS catch', () => {
+
+    const documents = [
+      createDocument('12345', 'processingStatement', [
+        { catchCertificateNumber: 'FCC071', catchCertificateType: 'uk', species: 'herring',
+          scientificName: 'Clupea harengus', totalWeightLanded: 500,
+          exportWeightBeforeProcessing: 100, speciesCommodityCode: '030240' }
+      ])
+    ]
+
+    const res: any[] = Array.from(Query.sdpsQuery(documents))
+
+    expect(res[0].speciesCommodityCode).toBe('030240')
 
   })
 

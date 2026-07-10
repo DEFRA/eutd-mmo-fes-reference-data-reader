@@ -825,7 +825,8 @@ describe('when mapping from a mongo processing statement to domain PS', () => {
             exportWeightAfterProcessing: "2",
             issuingCountry: undefined,
             productDescription: "Battered Cod",
-            productCommodityCode: "03301661"
+            productCommodityCode: "03301661",
+            speciesCommodityCode: undefined
           },
           {
             catchCertificateNumber: '343243242321',
@@ -838,7 +839,8 @@ describe('when mapping from a mongo processing statement to domain PS', () => {
             exportWeightAfterProcessing: "5",
             issuingCountry: undefined,
             productDescription: "Battered Cod",
-            productCommodityCode: "03301661"
+            productCommodityCode: "03301661",
+            speciesCommodityCode: undefined
           }
         ],
         exporterDetails: {
@@ -852,6 +854,35 @@ describe('when mapping from a mongo processing statement to domain PS', () => {
     const result = Transformations.mapProcessingStatementToPS(mockedMongoPS);
 
     expect(result).toStrictEqual(expectedOutput);
+  });
+
+  it('should include speciesCommodityCode when present on a catch', () => {
+    const mockedMongoPS = {
+      "catches": [
+        {
+          "species": "Atlantic herring (HER)",
+          "scientificName": "Clupea harengus",
+          "catchCertificateNumber": "GBR-2024-CC-11111",
+          "catchCertificateType": "uk",
+          "id": 'GBR-2024-CC-11111-1610018839',
+          "totalWeightLanded": "500",
+          "exportWeightBeforeProcessing": "500",
+          "exportWeightAfterProcessing": "450",
+          "productDescription": "Fresh herring fillets",
+          "productCommodityCode": "03024000",
+          "speciesCommodityCode": "030240"
+        }
+      ],
+      "exporter": {
+        "exporterCompanyName": "Test Co",
+        "postcode": "NE1 1AA"
+      },
+      "documentNumber": "GBR-2024-PS-TESTSPEC01"
+    };
+
+    const result = Transformations.mapProcessingStatementToPS(mockedMongoPS);
+
+    expect(result.exportData.catches[0].speciesCommodityCode).toBe('030240');
   });
 });
 
