@@ -44,6 +44,7 @@ export interface ISdPsQueryResult {
   netWeightFisheryProductDeparture?: string,
   supportingDocuments?: string,
   productDescription?: string,
+  speciesCommodityCode?: string,
 }
 
 export interface ISdPsQueryResultModel extends ISdPsQueryResult, Document {}

@@ -396,6 +396,10 @@
         "cnCode": {
           "type": "string"
         },
+        "speciesCommodityCode": {
+          "type": "string",
+          "description": "The commodity code for the species returned from EU CATCH"
+        },
         "isDocumentIssuedInUK": {
           "type": "boolean",
           "description": "Flag to identify whether the certificate was issued in the UK"

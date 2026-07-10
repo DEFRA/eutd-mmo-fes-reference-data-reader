@@ -2958,6 +2958,67 @@ describe('toCatches', () => {
     expect(result[0].species).toBe('Atlantic halibut (HAL)');
   });
 
+  it('should include speciesCommodityCode in result when present', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "GBR-2024-CC-11111",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic Herring (HER)",
+      scientificName: "Clupea harengus",
+      commodityCode: "03024000",
+      weightOnDoc: 1000,
+      weightOnAllDocs: 1000,
+      weightOnFCC: 1200,
+      weightAfterProcessing: 900,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018855',
+      },
+      catchCertificateType: 'uk',
+      speciesCommodityCode: '030240'
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0]).toHaveProperty('speciesCommodityCode', '030240');
+  });
+
+  it('should exclude speciesCommodityCode from result when absent', () => {
+    const input: ISdPsQueryResult = {
+      documentNumber: "PS1",
+      catchCertificateNumber: "GBR-2024-CC-22222",
+      documentType: "PS",
+      createdAt: "2020-01-01",
+      status: "COMPLETE",
+      species: "Atlantic Cod (COD)",
+      scientificName: "Gadus morhua",
+      commodityCode: "03024000",
+      weightOnDoc: 500,
+      weightOnAllDocs: 500,
+      weightOnFCC: 600,
+      weightAfterProcessing: 450,
+      isOverAllocated: false,
+      overUsedInfo: [],
+      isMismatch: false,
+      overAllocatedByWeight: 0,
+      da: null,
+      extended: {
+        id: 'PS1-1610018856',
+      },
+      catchCertificateType: 'uk'
+    };
+
+    const result = toCatches([input]);
+
+    expect(result[0]).not.toHaveProperty('speciesCommodityCode');
+  });
+
 });
 
 describe('toProduct', () => {
@@ -2989,7 +3050,7 @@ describe('toProduct', () => {
       netWeightFisheryProductArrival: "110",
       netWeightProductDeparture: "90",
       netWeightFisheryProductDeparture: "95",
-      issuingCountry: { 
+      issuingCountry: {
         officialCountryName: "Spain",
         isoCodeAlpha2: "GB",
         isoCodeAlpha3: "GBR",
