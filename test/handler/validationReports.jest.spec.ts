@@ -575,40 +575,18 @@ describe("various other edgecase paths", () => {
 
   })
 
-  it('catch cert investigation missing params', async () => {
+  it.each([
+    ['catch cert investigation missing params', '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01', 400],
+    ['sdps investigation missing params', '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01', 400],
+    ['incorrect file type', '/v1/validationreports/sdpsinvestigation.bob?fromdate=2019-01-01&todate=2020-01-01', 404],
+  ])('%s', async (_title, url, expectedStatusCode) => {
 
-    const req ={
+    const req = {
       method: 'GET',
-      url: '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01'
+      url,
     };
     const response = await server.inject(req);
-    expect(response.statusCode).toBe(400);
-
-
-
-  })
-
-  it('sdps investigation missing params', async () => {
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01'
-    };
-    const response = await server.inject(req);
-    expect(response.statusCode).toBe(400);
-
-
-
-  })
-
-  it('incorrect file type', async () => {
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdpsinvestigation.bob?fromdate=2019-01-01&todate=2020-01-01'
-    };
-    const response = await server.inject(req);
-    expect(response.statusCode).toBe(404);
+    expect(response.statusCode).toBe(expectedStatusCode);
 
   })
 
