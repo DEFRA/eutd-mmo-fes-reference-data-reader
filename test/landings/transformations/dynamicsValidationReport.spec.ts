@@ -1506,254 +1506,90 @@ describe('Dynamics Validation', () => {
             mockGetTotalRiskScore.mockReturnValue(riskScore);
           });
 
-          it('will flag as `Real Time Validation - Successful` if there are no failures', () => {
-            const input: Shared.ICcQueryResult[] = [{
-              documentNumber: "CC1",
-              documentType: "catchCertificate",
-              createdAt: moment.utc("2019-07-13T08:26:06.939Z").toISOString(),
-              status: "COMPLETE",
-              rssNumber: "rssWA1",
-              da: "Guernsey",
-              dateLanded: "2019-07-10",
-              species: "LBE",
-              weightOnCert: 121,
-              rawWeightOnCert: 122,
-              weightOnAllCerts: 200,
-              weightOnAllCertsBefore: 0,
-              weightOnAllCertsAfter: 100,
-              weightFactor: 5,
-              isLandingExists: true,
-              isSpeciesExists: true,
-              numberOfLandingsOnDay: 1,
-              weightOnLanding: 30,
-              weightOnLandingAllSpecies: 30,
-              landingTotalBreakdown: [
-                {
-                  factor: 1.7,
-                  isEstimate: true,
-                  weight: 30,
-                  liveWeight: 51,
-                  source: LandingSources.ELog
-                },
-              ],
-              source: LandingSources.ELog,
-              isOverusedThisCert: false,
-              isOverusedAllCerts: false,
-              isExceeding14DayLimit: false,
-              overUsedInfo: [],
-              durationSinceCertCreation: moment
-                .duration(queryTime.diff(moment.utc("2019-07-13T08:26:06.939Z")))
-                .toISOString(),
-              durationBetweenCertCreationAndFirstLandingRetrieved: moment
-                .duration(
-                  moment
-                    .utc("2019-07-11T09:00:00.000Z")
-                    .diff(moment.utc("2019-07-13T08:26:06.939Z"))
-                )
-                .toISOString(),
-              durationBetweenCertCreationAndLastLandingRetrieved: moment
-                .duration(
-                  moment
-                    .utc("2019-07-11T09:00:00.000Z")
-                    .diff(moment.utc("2019-07-13T08:26:06.939Z"))
-                )
-                .toISOString(),
-              extended: {
-                landingId: "rssWA12019-07-10",
-                exporterContactId: "some-contact-id",
-                exporterAccountId: "some-account-id",
-                exporterName: "Mr Bob",
-                presentation: "SLC",
-                documentUrl: "_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf",
-                presentationName: "sliced",
-                vessel: "DAYBREAK",
-                fao: "FAO27",
-                pln: "WA1",
-                species: "Lobster",
-                state: "FRE",
-                stateName: "fresh",
-                commodityCode: "1234",
-                investigation: {
-                  investigator: "Investigator Gadget",
-                  status: InvestigationStatus.Open,
-                },
-                transportationVehicle: "directLanding",
-                licenceHolder: "Mr Bob",
-                dataEverExpected: true,
-                landingDataExpectedDate: '2019-07-13',
-                landingDataEndDate: '2019-07-14',
+          const buildLogbookInput = (isOverusedThisCert: boolean, isOverusedAllCerts: boolean): Shared.ICcQueryResult[] => [{
+            documentNumber: "CC1",
+            documentType: "catchCertificate",
+            createdAt: moment.utc("2019-07-13T08:26:06.939Z").toISOString(),
+            status: "COMPLETE",
+            rssNumber: "rssWA1",
+            da: "Guernsey",
+            dateLanded: "2019-07-10",
+            species: "LBE",
+            weightOnCert: 121,
+            rawWeightOnCert: 122,
+            weightOnAllCerts: 200,
+            weightOnAllCertsBefore: 0,
+            weightOnAllCertsAfter: 100,
+            weightFactor: 5,
+            isLandingExists: true,
+            isSpeciesExists: true,
+            numberOfLandingsOnDay: 1,
+            weightOnLanding: 30,
+            weightOnLandingAllSpecies: 30,
+            landingTotalBreakdown: [
+              {
+                factor: 1.7,
+                isEstimate: true,
+                weight: 30,
+                liveWeight: 51,
+                source: LandingSources.ELog
               },
-            }];
-
-            const result = SUT.toDynamicsCase2(input);
-            expect(result).toEqual(CaseTwoType.Success);
-            expect(mockGetTotalRiskScore).toHaveBeenCalledWith('WA1', 'LBE', 'some-account-id', 'some-contact-id');
-            expect(mockIsHighRisk).toHaveBeenCalledWith(riskScore);
-          });
-
-          it('will flag as `Real Time Validation - Successful` when species and weight check PASS but over-use FAIL', () => {
-            const input: Shared.ICcQueryResult[] = [{
-              documentNumber: "CC1",
-              documentType: "catchCertificate",
-              createdAt: moment.utc("2019-07-13T08:26:06.939Z").toISOString(),
-              status: "COMPLETE",
-              rssNumber: "rssWA1",
-              da: "Guernsey",
-              dateLanded: "2019-07-10",
-              species: "LBE",
-              weightOnCert: 121,
-              rawWeightOnCert: 122,
-              weightOnAllCerts: 200,
-              weightOnAllCertsBefore: 0,
-              weightOnAllCertsAfter: 100,
-              weightFactor: 5,
-              isLandingExists: true,
-              isSpeciesExists: true,
-              numberOfLandingsOnDay: 1,
-              weightOnLanding: 30,
-              weightOnLandingAllSpecies: 30,
-              landingTotalBreakdown: [
-                {
-                  factor: 1.7,
-                  isEstimate: true,
-                  weight: 30,
-                  liveWeight: 51,
-                  source: LandingSources.ELog
-                },
-              ],
-              source: LandingSources.ELog,
-              isOverusedThisCert: false,
-              isOverusedAllCerts: true,
-              isExceeding14DayLimit: false,
-              overUsedInfo: [],
-              durationSinceCertCreation: moment
-                .duration(queryTime.diff(moment.utc("2019-07-13T08:26:06.939Z")))
-                .toISOString(),
-              durationBetweenCertCreationAndFirstLandingRetrieved: moment
-                .duration(
-                  moment
-                    .utc("2019-07-11T09:00:00.000Z")
-                    .diff(moment.utc("2019-07-13T08:26:06.939Z"))
-                )
-                .toISOString(),
-              durationBetweenCertCreationAndLastLandingRetrieved: moment
-                .duration(
-                  moment
-                    .utc("2019-07-11T09:00:00.000Z")
-                    .diff(moment.utc("2019-07-13T08:26:06.939Z"))
-                )
-                .toISOString(),
-              extended: {
-                landingId: "rssWA12019-07-10",
-                exporterContactId: "some-contact-id",
-                exporterAccountId: "some-account-id",
-                exporterName: "Mr Bob",
-                presentation: "SLC",
-                documentUrl: "_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf",
-                presentationName: "sliced",
-                vessel: "DAYBREAK",
-                fao: "FAO27",
-                pln: "WA1",
-                species: "Lobster",
-                state: "FRE",
-                stateName: "fresh",
-                commodityCode: "1234",
-                investigation: {
-                  investigator: "Investigator Gadget",
-                  status: InvestigationStatus.Open,
-                },
-                transportationVehicle: "directLanding",
-                licenceHolder: "Mr Bob",
-                dataEverExpected: true,
-                landingDataExpectedDate: '2019-07-13',
-                landingDataEndDate: '2019-07-14',
+            ],
+            source: LandingSources.ELog,
+            isOverusedThisCert,
+            isOverusedAllCerts,
+            isExceeding14DayLimit: false,
+            overUsedInfo: [],
+            durationSinceCertCreation: moment
+              .duration(queryTime.diff(moment.utc("2019-07-13T08:26:06.939Z")))
+              .toISOString(),
+            durationBetweenCertCreationAndFirstLandingRetrieved: moment
+              .duration(
+                moment
+                  .utc("2019-07-11T09:00:00.000Z")
+                  .diff(moment.utc("2019-07-13T08:26:06.939Z"))
+              )
+              .toISOString(),
+            durationBetweenCertCreationAndLastLandingRetrieved: moment
+              .duration(
+                moment
+                  .utc("2019-07-11T09:00:00.000Z")
+                  .diff(moment.utc("2019-07-13T08:26:06.939Z"))
+              )
+              .toISOString(),
+            extended: {
+              landingId: "rssWA12019-07-10",
+              exporterContactId: "some-contact-id",
+              exporterAccountId: "some-account-id",
+              exporterName: "Mr Bob",
+              presentation: "SLC",
+              documentUrl: "_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf",
+              presentationName: "sliced",
+              vessel: "DAYBREAK",
+              fao: "FAO27",
+              pln: "WA1",
+              species: "Lobster",
+              state: "FRE",
+              stateName: "fresh",
+              commodityCode: "1234",
+              investigation: {
+                investigator: "Investigator Gadget",
+                status: InvestigationStatus.Open,
               },
-            }];
+              transportationVehicle: "directLanding",
+              licenceHolder: "Mr Bob",
+              dataEverExpected: true,
+              landingDataExpectedDate: '2019-07-13',
+              landingDataEndDate: '2019-07-14',
+            },
+          }];
 
-            const result = SUT.toDynamicsCase2(input);
-            expect(result).toEqual(CaseTwoType.Success);
-            expect(mockGetTotalRiskScore).toHaveBeenCalledWith('WA1', 'LBE', 'some-account-id', 'some-contact-id');
-            expect(mockIsHighRisk).toHaveBeenCalledWith(riskScore);
-          });
-
-          it('will flag as `Real Time Validation - Successful` when species PASS but weight check and over-use FAIL', () => {
-            const input: Shared.ICcQueryResult[] = [{
-              documentNumber: "CC1",
-              documentType: "catchCertificate",
-              createdAt: moment.utc("2019-07-13T08:26:06.939Z").toISOString(),
-              status: "COMPLETE",
-              rssNumber: "rssWA1",
-              da: "Guernsey",
-              dateLanded: "2019-07-10",
-              species: "LBE",
-              weightOnCert: 121,
-              rawWeightOnCert: 122,
-              weightOnAllCerts: 200,
-              weightOnAllCertsBefore: 0,
-              weightOnAllCertsAfter: 100,
-              weightFactor: 5,
-              isLandingExists: true,
-              isSpeciesExists: true,
-              numberOfLandingsOnDay: 1,
-              weightOnLanding: 30,
-              weightOnLandingAllSpecies: 30,
-              landingTotalBreakdown: [
-                {
-                  factor: 1.7,
-                  isEstimate: true,
-                  weight: 30,
-                  liveWeight: 51,
-                  source: LandingSources.ELog
-                },
-              ],
-              source: LandingSources.ELog,
-              isOverusedThisCert: true,
-              isOverusedAllCerts: true,
-              isExceeding14DayLimit: false,
-              overUsedInfo: [],
-              durationSinceCertCreation: moment
-                .duration(queryTime.diff(moment.utc("2019-07-13T08:26:06.939Z")))
-                .toISOString(),
-              durationBetweenCertCreationAndFirstLandingRetrieved: moment
-                .duration(
-                  moment
-                    .utc("2019-07-11T09:00:00.000Z")
-                    .diff(moment.utc("2019-07-13T08:26:06.939Z"))
-                )
-                .toISOString(),
-              durationBetweenCertCreationAndLastLandingRetrieved: moment
-                .duration(
-                  moment
-                    .utc("2019-07-11T09:00:00.000Z")
-                    .diff(moment.utc("2019-07-13T08:26:06.939Z"))
-                )
-                .toISOString(),
-              extended: {
-                landingId: "rssWA12019-07-10",
-                exporterContactId: "some-contact-id",
-                exporterAccountId: "some-account-id",
-                exporterName: "Mr Bob",
-                presentation: "SLC",
-                documentUrl: "_887ce0e0-9ab1-4f4d-9524-572a9762e021.pdf",
-                presentationName: "sliced",
-                vessel: "DAYBREAK",
-                fao: "FAO27",
-                pln: "WA1",
-                species: "Lobster",
-                state: "FRE",
-                stateName: "fresh",
-                commodityCode: "1234",
-                investigation: {
-                  investigator: "Investigator Gadget",
-                  status: InvestigationStatus.Open,
-                },
-                transportationVehicle: "directLanding",
-                licenceHolder: "Mr Bob",
-                dataEverExpected: true,
-                landingDataExpectedDate: '2019-07-13',
-                landingDataEndDate: '2019-07-14',
-              },
-            }];
+          it.each([
+            ['will flag as `Real Time Validation - Successful` if there are no failures', false, false],
+            ['will flag as `Real Time Validation - Successful` when species and weight check PASS but over-use FAIL', false, true],
+            ['will flag as `Real Time Validation - Successful` when species PASS but weight check and over-use FAIL', true, true],
+          ])('%s', (_title, isOverusedThisCert, isOverusedAllCerts) => {
+            const input = buildLogbookInput(isOverusedThisCert, isOverusedAllCerts);
 
             const result = SUT.toDynamicsCase2(input);
             expect(result).toEqual(CaseTwoType.Success);

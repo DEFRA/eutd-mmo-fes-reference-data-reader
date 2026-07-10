@@ -579,133 +579,135 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
       })
 
       describe('on exporter', () => {
-
-        it('can find a single document', async () => {
-
-          const catchCert = new DocumentModel({
-            status: "COMPLETE",
-            __t: "catchCert",
-            documentNumber: "CC1",
-            createdAt: "2019-10-19T00:00:00.000Z",
-            createdBy: "Bob",
-            createdByEmail: "foo@foo.com",
-            exportData: {
-              products: [
-                {
-                  speciesCode: "LBE",
-                  caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
+        it.each([
+          [
+            'can find a single document',
+            async () => {
+              const catchCert = new DocumentModel({
+                status: "COMPLETE",
+                __t: "catchCert",
+                documentNumber: "CC1",
+                createdAt: "2019-10-19T00:00:00.000Z",
+                createdBy: "Bob",
+                createdByEmail: "foo@foo.com",
+                exportData: {
+                  products: [
+                    {
+                      speciesCode: "LBE",
+                      caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
+                    },
+                  ],
+                  exporterDetails: { exporterCompanyName: "BOB" }
                 },
-              ],
-              exporterDetails: { exporterCompanyName: "BOB" }
+              });
+              await catchCert.save();
             },
-          })
-          await catchCert.save()
-
-          const res = await getCatchCerts({ exporter: 'BOB' })
-
-          expect(res).toHaveLength(1)
-
-        })
-
-        it('will not find document that does not exist', async () => {
-
-          const catchCert = new DocumentModel({
-            status: "COMPLETE",
-            __t: "catchCert",
-            documentNumber: "CC1",
-            createdAt: "2019-10-19T00:00:00.000Z",
-            createdBy: "Bob",
-            createdByEmail: "foo@foo.com",
-            exportData: {
-              products: [
-                {
-                  speciesCode: "LBE",
-                  caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
+            'BOB',
+            1,
+          ],
+          [
+            'will not find document that does not exist',
+            async () => {
+              const catchCert = new DocumentModel({
+                status: "COMPLETE",
+                __t: "catchCert",
+                documentNumber: "CC1",
+                createdAt: "2019-10-19T00:00:00.000Z",
+                createdBy: "Bob",
+                createdByEmail: "foo@foo.com",
+                exportData: {
+                  products: [
+                    {
+                      speciesCode: "LBE",
+                      caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
+                    },
+                  ],
+                  exporterDetails: { exporterCompanyName: "BOB" }
                 },
-              ],
-              exporterDetails: { exporterCompanyName: "BOB" }
+              });
+              await catchCert.save();
             },
-          })
-          await catchCert.save()
-
-          const res = await getCatchCerts({ exporter: 'NO WAY' })
-
-          expect(res).toHaveLength(0)
-
-        })
-
-        it('will find multiple documents', async () => {
-
-          let catchCert = new DocumentModel({
-            status: "COMPLETE",
-            __t: "catchCert",
-            documentNumber: "CC1",
-            createdAt: "2019-10-19T00:00:00.000Z",
-            createdBy: "Bob",
-            createdByEmail: "foo@foo.com",
-            exportData: {
-              products: [
-                {
-                  speciesCode: "LBE",
-                  caughtBy: [
-                    { vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 },
-                  ]
+            'NO WAY',
+            0,
+          ],
+          [
+            'will find multiple documents',
+            async () => {
+              let catchCert = new DocumentModel({
+                status: "COMPLETE",
+                __t: "catchCert",
+                documentNumber: "CC1",
+                createdAt: "2019-10-19T00:00:00.000Z",
+                createdBy: "Bob",
+                createdByEmail: "foo@foo.com",
+                exportData: {
+                  products: [
+                    {
+                      speciesCode: "LBE",
+                      caughtBy: [
+                        { vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 },
+                      ]
+                    },
+                    {
+                      speciesCode: "BOB",
+                      caughtBy: [
+                        { vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 },
+                      ]
+                    },
+                  ],
+                  exporterDetails: { exporterCompanyName: "BOB" }
                 },
-                {
-                  speciesCode: "BOB",
-                  caughtBy: [
-                    { vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 },
-                  ]
+              });
+              await catchCert.save();
+
+              catchCert = new DocumentModel({
+                status: "COMPLETE",
+                __t: "catchCert",
+                documentNumber: "CC2",
+                createdAt: "2019-10-19T00:00:00.000Z",
+                createdBy: "Bob",
+                createdByEmail: "foo@foo.com",
+                exportData: {
+                  products: [
+                    {
+                      speciesCode: "LBE",
+                      caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
+                    },
+                  ],
+                  exporterDetails: { exporterCompanyName: "BOB" }
                 },
-              ],
-              exporterDetails: { exporterCompanyName: "BOB" }
+              });
+              await catchCert.save();
+
+              catchCert = new DocumentModel({
+                status: "COMPLETE",
+                __t: "catchCert",
+                documentNumber: "CC2",
+                createdAt: "2019-10-19T00:00:00.000Z",
+                createdBy: "Bob",
+                createdByEmail: "foo@foo.com",
+                exportData: {
+                  products: [
+                    {
+                      speciesCode: "LBE",
+                      caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
+                    },
+                  ],
+                  exporterDetails: { exporterCompanyName: "FRED" }
+                },
+              });
+              await catchCert.save();
             },
-          })
-          await catchCert.save()
+            'BOB',
+            2,
+          ],
+        ])('%s', async (_title, seedDocs, exporter, expectedLength) => {
+          await seedDocs();
 
-          catchCert = new DocumentModel({
-            status: "COMPLETE",
-            __t: "catchCert",
-            documentNumber: "CC2",
-            createdAt: "2019-10-19T00:00:00.000Z",
-            createdBy: "Bob",
-            createdByEmail: "foo@foo.com",
-            exportData: {
-              products: [
-                {
-                  speciesCode: "LBE",
-                  caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
-                },
-              ],
-              exporterDetails: { exporterCompanyName: "BOB" }
-            },
-          })
-          await catchCert.save()
+          const res = await getCatchCerts({ exporter });
 
-          catchCert = new DocumentModel({
-            status: "COMPLETE",
-            __t: "catchCert",
-            documentNumber: "CC2",
-            createdAt: "2019-10-19T00:00:00.000Z",
-            createdBy: "Bob",
-            createdByEmail: "foo@foo.com",
-            exportData: {
-              products: [
-                {
-                  speciesCode: "LBE",
-                  caughtBy: [{ vessel: "DAYBREAK", pln: "WA1", date: "2019-07-10", weight: 100 }]
-                },
-              ],
-              exporterDetails: { exporterCompanyName: "FRED" }
-            },
-          })
-          await catchCert.save()
-
-          const res = await getCatchCerts({ exporter: 'BOB' })
-
-          expect(res).toHaveLength(2)
-
-        })
+          expect(res).toHaveLength(expectedLength);
+        });
 
         it('will ignore case', async () => {
           const catchCert = new DocumentModel({

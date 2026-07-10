@@ -132,32 +132,14 @@ describe("To Support Vessels Autocomplete", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('GET /v1/vessels/search with vessel name having spaces', async () => {
+  it.each([
+    ['GET /v1/vessels/search with vessel name having spaces', '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II&landedDate=2024-6-18'],
+    ['GET /v1/vessels/search with vessel name having spaces with an open parenthsis', '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II%20(E576&landedDate=2024-6-18'],
+    ['GET /v1/vessels/search with vessel name having spaces with a close parenthsis', '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II%20(E576)&landedDate=2024-6-18'],
+  ])('%s', async (_title, url) => {
 
     const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II&landedDate=2024-6-18'
-    });
-
-    const result = JSON.parse(response.payload);
-    expect(response.statusCode).toBe(200);
-    expect(result[0].vesselName).toEqual("ANOTHER LADY II");
-  });
-
-  it('GET /v1/vessels/search with vessel name having spaces with an open parenthsis', async () => {
-
-    const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II%20(E576&landedDate=2024-6-18'
-    });
-
-    const result = JSON.parse(response.payload);
-    expect(response.statusCode).toBe(200);
-    expect(result[0].vesselName).toEqual("ANOTHER LADY II");
-  });
-
-  it('GET /v1/vessels/search with vessel name having spaces with a close parenthsis', async () => {
-
-    const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=ANOTHER%20LADY%20II%20(E576)&landedDate=2024-6-18'
+      url
     });
 
     const result = JSON.parse(response.payload);
@@ -203,34 +185,18 @@ describe("To Support Vessels Autocomplete- without mocking", () => {
     await cache.loadVessels();
   })
 
-  it('should return valid vessels if the landed date is the same as the licenseFrom date', async () => {
+  it.each([
+    ['should return valid vessels if the landed date is the same as the licenseFrom date', '/v1/vessels/search?searchTerm=STRIKER&landedDate=2014-07-01', (payload: string) => expect(payload).not.toEqual("[]")],
+    ['should return valid vessels if the landed date is the same as the licenseTo date', '/v1/vessels/search?searchTerm=STRIKER&landedDate=2030-12-31', (payload: string) => expect(payload).not.toEqual("[]")],
+    ['should not return anything when calling /v1/vessels/search outside licenseFrom date', '/v1/vessels/search?searchTerm=JOLA&landedDate=2437-12-19', (payload: string) => expect(payload).toEqual("[]")],
+  ])('%s', async (_title, url, assertPayload) => {
 
     const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=STRIKER&landedDate=2014-07-01'
+      url
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.payload).not.toEqual("[]");
-  });
-
-  it('should return valid vessels if the landed date is the same as the licenseTo date', async () => {
-
-    const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=STRIKER&landedDate=2030-12-31'
-    });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.payload).not.toEqual("[]");
-  });
-
-  it('should not return anything when calling /v1/vessels/search outside licenseFrom date', async () => {
-
-    const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=JOLA&landedDate=2437-12-19'
-    });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.payload).toEqual("[]");
+    assertPayload(response.payload);
   });
 
   it('should GET /v1/vessels/search for multiple parameters with date in range should return data', async () => {
@@ -291,28 +257,27 @@ describe("Routes", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('should GET /v1/states', async () => {
+  it.each([
+    ['should GET /v1/states', '/v1/states', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/presentations', '/v1/presentations', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=E163&vesselName=STRIKER&landedDate=2016-09-01&flag=GBR&cfr=GBR000B10811&ircs=&homePort=EXMOUTH&licenceNumber=22548&licenceValidTo=2030-12-31', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/vessels/hasLicense with a 00:01:00 valid to', '/v1/vessels/hasLicense?vesselPln=INS146&vesselName=STROMA&landedDate=2018-09-01&flag=GBR&cfr=GBR000C16096&homePort=BUCKIE&licenceNumber=30468&licenceValidTo=2027-12-31', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should return valid licence with full data / time GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2016-09-01&flag=GBR&cfr=GBR000C18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2027-12-31T00:01:00', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/speciesStateLookup', '/v1/speciesStateLookup?faoCode=COD', (payload: string) => expect(JSON.parse(payload).length).toBeGreaterThan(0)],
+    ['should GET UK Species', '/v1/species?uk=Y', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET All Species', '/v1/species', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/commodities/search', '/v1/commodities/search?speciesCode=COD&state=FRE&presentation=FIL', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/commodities', '/v1/commodities', (payload: string) => expect(JSON.parse(payload).length).toBeGreaterThan(0)],
+    ['should GET /v1/vessels/search', '/v1/vessels/search?searchTerm=EX', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/vessels/search-exact', '/v1/vessels/search-exact?vesselPln=SY854&vesselName=ALINE', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+    ['should GET /v1/vessels', '/v1/vessels', (payload: string) => expect(payload.length).toBeGreaterThan(0)],
+  ])('%s', async (_title, url, assertPayload) => {
     const response = await Server.inject({
-      url: '/v1/states'
+      url
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
 
-  it('should GET /v1/presentations', async () => {
-    const response = await Server.inject({
-      url: '/v1/presentations'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
-  it('should GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=E163&vesselName=STRIKER&landedDate=2016-09-01&flag=GBR&cfr=GBR000B10811&ircs=&homePort=EXMOUTH&licenceNumber=22548&licenceValidTo=2030-12-31'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
+    assertPayload(response.payload);
   });
 
   it('should GET /v1/vessels/hasLicense with licence holder', async () => {
@@ -326,70 +291,6 @@ describe("Routes", () => {
     expect(data.licenceHolderName).toEqual("MR J GOSLING ");
   });
 
-  it('should GET /v1/vessels/hasLicense with a 00:01:00 valid to', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=INS146&vesselName=STROMA&landedDate=2018-09-01&flag=GBR&cfr=GBR000C16096&homePort=BUCKIE&licenceNumber=30468&licenceValidTo=2027-12-31'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
-  it('should return valid licence with full data / time GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2016-09-01&flag=GBR&cfr=GBR000C18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2027-12-31T00:01:00'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
-  it('should not get any results from GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=OMN&vesselName=YIKES&landedDate=2049-01-01'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
-  it('should not get any results with fake flag GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=FAKE&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
-  it('should not get any results with fake cfr GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=FAKE&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
-  it('should not get any results with fake homePort GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=FAKE&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
-  it('should not get any results with no licenceNumber GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceValidTo=2012-06-30T00:00:00'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
-  it('should not get any results with fake licenceTo GET /v1/vessels/hasLicense', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=fake'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
   it('should get all results with correct imo number GET /v1/vessels/hasLicense', async () => {
     const response = await Server.inject({
       url: '/v1/vessels/hasLicense?vesselPln=H1100&vesselName=WIRON%205&landedDate=2020-09-01&flag=GBR&cfr=NLD200202641&homePort=PLYMOUTH&licenceNumber=12480&licenceValidTo=2021-08-09T00:00:00&imo=9249556'
@@ -398,32 +299,21 @@ describe("Routes", () => {
     expect(response.payload.length).toBeGreaterThan(0);
   });
 
-  it('should not get any results with fake imo number GET /v1/vessels/hasLicense', async () => {
+  it.each([
+    ['should not get any results from GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=OMN&vesselName=YIKES&landedDate=2049-01-01'],
+    ['should not get any results with fake flag GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=FAKE&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'],
+    ['should not get any results with fake cfr GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=FAKE&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'],
+    ['should not get any results with fake homePort GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=FAKE&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'],
+    ['should not get any results with no licenceNumber GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceValidTo=2012-06-30T00:00:00'],
+    ['should not get any results with fake licenceTo GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=fake'],
+    ['should not get any results with fake imo number GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?vesselPln=H1100&vesselName=WIRON%205&landedDate=2020-09-01&flag=GBR&cfr=GBRC20514&homePort=PLYMOUTH&licenceNumber=12480&licenceValidTo=2382-12-31T00:00:00&imo=00000000'],
+    ['should not GET results for /v1/vessels/search-exact', '/v1/vessels/search-exact?vesselPln=OMN&vesselName=YIKES'],
+  ])('%s', async (_title, url) => {
     const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?vesselPln=H1100&vesselName=WIRON%205&landedDate=2020-09-01&flag=GBR&cfr=GBRC20514&homePort=PLYMOUTH&licenceNumber=12480&licenceValidTo=2382-12-31T00:00:00&imo=00000000'
+      url
     });
     expect(response.statusCode).toBe(404);
     expect(response.payload).toHaveLength(0);
-  });
-
-  it('should return 500 from GET /v1/vessels/hasLicense', async () => {
-    getVesselsDataMock.mockImplementation(() => {throw error});
-
-    const response = await Server.inject({
-      url: '/v1/vessels/hasLicense?licenceNumber=30435'
-    });
-    expect(response.statusCode).toBe(500);
-  });
-
-  it('should GET /v1/speciesStateLookup', async () => {
-    const response = await Server.inject({
-      url: '/v1/speciesStateLookup?faoCode=COD'
-    });
-
-    const data = JSON.parse(response.payload);
-
-    expect(response.statusCode).toBe(200);
-    expect(data.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/speciesStateLookup with unique presentations', async () => {
@@ -438,48 +328,6 @@ describe("Routes", () => {
     expect(data.every((_: any) => isArrayUnique(_.presentations.map((p: any) => p.value)))).toBe(true);
   });
 
-  it('should GET UK Species', async () => {
-    const response = await Server.inject({
-      url: '/v1/species?uk=Y'
-    });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
-  it('should GET All Species', async () => {
-    const response = await Server.inject({
-      url: '/v1/species'
-    });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
-  it('should GET /v1/commodities/search', async () => {
-    const response = await Server.inject({
-      url: '/v1/commodities/search?speciesCode=COD&state=FRE&presentation=FIL'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
-  it('should GET /v1/commodities', async () => {
-    const response = await Server.inject({
-      url: '/v1/commodities'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.payload).length).toBeGreaterThan(0);
-  });
-
-  it('should GET /v1/vessels/search', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/search?searchTerm=EX'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
-  });
-
   it('should GET /v1/vessels/search with licence holder', async () => {
     const response = await Server.inject({
       url: '/v1/vessels/search?searchTerm=MARLENA&landedDate=2016-08-15'
@@ -489,14 +337,6 @@ describe("Routes", () => {
 
     expect(response.statusCode).toBe(200);
     expect(data[0].licenceHolder).toEqual("MR K RYRIE ");
-  });
-
-  it('should GET /v1/vessels/search-exact', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/search-exact?vesselPln=SY854&vesselName=ALINE'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels/search-exact with licence holder', async () => {
@@ -510,29 +350,17 @@ describe("Routes", () => {
     expect(data.licenceHolder).toEqual("MR K RYRIE ");
   });
 
-  it('should not GET results for /v1/vessels/search-exact', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels/search-exact?vesselPln=OMN&vesselName=YIKES'
-    });
-    expect(response.statusCode).toBe(404);
-    expect(response.payload).toHaveLength(0);
-  });
-
-  it('should return 500 error from /v1/vessels/search-exact', async () => {
+  it.each([
+    ['should return 500 from GET /v1/vessels/hasLicense', '/v1/vessels/hasLicense?licenceNumber=30435'],
+    ['should return 500 error from /v1/vessels/search-exact', '/v1/vessels/search-exact?vesselPln=OMN&vesselName=YIKES'],
+    ['should return 500 error from /v1/vessels', '/v1/vessels'],
+  ])('%s', async (_title, url) => {
     getVesselsDataMock.mockImplementation(() => {throw error});
 
     const response = await Server.inject({
-      url: '/v1/vessels/search-exact?vesselPln=OMN&vesselName=YIKES'
+      url
     });
     expect(response.statusCode).toBe(500);
-  });
-
-  it('should GET /v1/vessels', async () => {
-    const response = await Server.inject({
-      url: '/v1/vessels'
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels with licence holder', async () => {
@@ -544,15 +372,6 @@ describe("Routes", () => {
 
     expect(response.statusCode).toBe(200);
     expect(data[0].licenceHolder).toEqual("MR  KEVIN MCMILLEN ");
-  });
-
-  it('should return 500 error from /v1/vessels', async () => {
-    getVesselsDataMock.mockImplementation(() => {throw error});
-
-    const response = await Server.inject({
-      url: '/v1/vessels'
-    });
-    expect(response.statusCode).toBe(500);
   });
 
   it('should GET All Countries', async () => {

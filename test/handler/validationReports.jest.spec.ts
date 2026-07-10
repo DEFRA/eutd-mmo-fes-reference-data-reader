@@ -480,98 +480,64 @@ describe("various other edgecase paths", () => {
     sdpsBlockMock.mockRestore();
   })
 
-  it('invalid report type', async () => {
+  it.each([
+    [
+      'invalid report type',
+      async () => undefined,
+      '/v1/validationreports/mrbobreport.json?fromdate=2019-01-01&todate=2019-01-01',
+      404,
+    ],
+    [
+      'asofdate parameter happy path',
+      async () => {
+        sdpsVoidMock.mockResolvedValue([]);
+        sdpsBlockMock.mockResolvedValue([]);
+        sdpsMock.mockResolvedValue([{column1: 'value'}]);
+      },
+      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=2019-01-01',
+      200,
+    ],
+    [
+      'asofdate parameter sad path',
+      async () => {
+        sdpsMock.mockResolvedValue([{column1: 'value'}]);
+      },
+      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=baddate',
+      400,
+    ],
+    [
+      'area parameter happy path',
+      async () => {
+        sdpsVoidMock.mockResolvedValue([]);
+        sdpsBlockMock.mockResolvedValue([]);
+        sdpsMock.mockResolvedValue([{column1: 'value'}]);
+      },
+      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=England,Wales',
+      200,
+    ],
+    [
+      'area parameter sad path',
+      async () => undefined,
+      '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=Jersey,India',
+      400,
+    ],
+    [
+      'invalid dates',
+      async () => undefined,
+      '/v1/validationreports/sdps.json?fromdate=baddate&todate=2019-01-01',
+      400,
+    ],
+  ])('%s', async (_title, arrange, url, expectedStatusCode) => {
+    await arrange();
 
-    const req ={
+    const req = {
       method: 'GET',
-      url: '/v1/validationreports/mrbobreport.json?fromdate=2019-01-01&todate=2019-01-01'
+      url,
     };
 
     const response = await server.inject(req);
 
-    expect(response.statusCode).toBe(404);
-
-
-  });
-
-  it('asofdate parameter happy path', async () => {
-
-    sdpsVoidMock.mockResolvedValue([]);
-
-    sdpsBlockMock.mockResolvedValue([]);
-
-    sdpsMock.mockResolvedValue([{column1: 'value'}]);
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=2019-01-01'
-    };
-
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(200);
-
-
-  });
-
-  it('asofdate parameter sad path', async () => {
-
-    sdpsMock.mockResolvedValue([{column1: 'value'}]);
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&asofdate=baddate'
-    };
-
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(400);
-
-
-  });
-
-  it('area parameter happy path', async () => {
-    sdpsVoidMock.mockResolvedValue([]);
-
-    sdpsBlockMock.mockResolvedValue([]);
-
-    sdpsMock.mockResolvedValue([{column1: 'value'}]);
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=England,Wales'
-    };
-
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(200);
-
-  });
-
-  it('area parameter sad path', async () => {
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdps.json?fromdate=2019-01-01&todate=2019-01-01&area=Jersey,India'
-    };
-
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(400);
-
-  });
-
-  it('invalid dates', async () => {
-
-    const req ={
-      method: 'GET',
-      url: '/v1/validationreports/sdps.json?fromdate=baddate&todate=2019-01-01'
-    };
-
-    const response = await server.inject(req);
-
-    expect(response.statusCode).toBe(400);
-
+    expect(response.statusCode).toBe(expectedStatusCode);
   });
 
 
