@@ -72,7 +72,7 @@ describe('When creating a Catch Ceritficate report, the CSV generator', () => {
 
     const lines = output.split('\n')
 
-    expect(lines.length).toBe(results.length + 1)
+    expect(lines).toHaveLength(results.length + 1)
 
     const expecteCSVdHeaders = Object.keys(results[0]).map(key => `"${key}"`).join(',')
     const generatedHeaders = lines[0];

@@ -251,27 +251,27 @@ describe('tests on the report output', () => {
     const rawValidationResult =  sdpsQuery(documents,undefined);
 
     res = Array.from(Report.sdpsBatchReport(rawValidationResult));
-    expect(res.length).toBe(2);
+    expect(res).toHaveLength(2);
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,postCodeToDa), moment.utc('2019-01-01T00:00:00Z')));
-    expect(res.length).toBe(1);
+    expect(res).toHaveLength(1);
     expect(res[0].documentNumber).toBe('22345');
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,postCodeToDa), null, moment.utc('2018-12-31T00:00:00Z')));
-    expect(res.length).toBe(1);
+    expect(res).toHaveLength(1);
 
     // Boundary
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,postCodeToDa), null, moment.utc('2018-12-31T00:00:00Z')));
-    expect(res.length).toBe(1);
+    expect(res).toHaveLength(1);
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,postCodeToDa), null, moment.utc('2019-01-02T00:00:00Z')));
-    expect(res.length).toBe(2);
+    expect(res).toHaveLength(2);
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,postCodeToDa), moment.utc('2020-01-01T00:00:00Z')));
-    expect(res.length).toBe(0);
+    expect(res).toHaveLength(0);
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,postCodeToDa), null, moment.utc('2001-01-01T00:00:00Z')));
-    expect(res.length).toBe(0);
+    expect(res).toHaveLength(0);
 
   });
 
@@ -297,12 +297,12 @@ describe('tests on the report output', () => {
     let res;
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,undefined), moment.utc('2001-01-01T00:00:00Z'), moment.utc('2020-01-01')))
-    expect(res.length).toBe(2);
+    expect(res).toHaveLength(2);
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,undefined), moment.utc('2018-06-01'), moment.utc('2018-07-01')))
-    expect(res.length).toBe(0);
+    expect(res).toHaveLength(0);
 
     res = Array.from(Report.sdpsBatchReport(sdpsQuery(documents,undefined), moment.utc('2018-06-01'), moment.utc('2019-01-01')))
-    expect(res.length).toBe(1);
+    expect(res).toHaveLength(1);
   });
 })

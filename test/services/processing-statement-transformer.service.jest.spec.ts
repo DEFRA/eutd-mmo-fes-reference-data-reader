@@ -718,7 +718,7 @@ describe('ProcessingStatementTransformerService', () => {
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       expect(consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem).toHaveLength(3);
-      expect(item.AdditionalInformationSPSNote.length).toBe(2); // 3 catch certs + 1 processing type
+      expect(item.AdditionalInformationSPSNote).toHaveLength(2); // 3 catch certs + 1 processing type
       expect(item.AdditionalInformationSPSNote[0].Content.value).toBe('GBR-2025-CC-0123456789');
       expect(item.AdditionalInformationSPSNote[1].Content.value).toBe('GB');
     });
@@ -741,7 +741,7 @@ describe('ProcessingStatementTransformerService', () => {
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Should only have processing type note, no catch certificate references
-      expect(item.AdditionalInformationSPSNote.length).toBe(2);
+      expect(item.AdditionalInformationSPSNote).toHaveLength(2);
       expect(item.AdditionalInformationSPSNote[1].SubjectCode.value).toBe('CATCH_CERTIFICATE_ISSUING_COUNTRY');
     });
 
@@ -761,7 +761,7 @@ describe('ProcessingStatementTransformerService', () => {
       const item = consignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
       // Should only have catch certificate reference, no processing type
-      expect(item.AdditionalInformationSPSNote.length).toBe(4);
+      expect(item.AdditionalInformationSPSNote).toHaveLength(4);
       expect(item.AdditionalInformationSPSNote[0].SubjectCode.value).toBe('CATCH_CERTIFICATE_LOCAL_REFERENCE');
     });
 
