@@ -66,7 +66,7 @@ describe('When retrieving conversion factors from mongo', () => {
         expect(getConversionFactorsStub).toHaveBeenNthCalledWith(1, testQueryData);
         expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTORS][2 CONVERSION FACTORS FOUND][SUCCESS]');
         expect(response.statusCode).toBe(200);
-        expect(payload.length).toEqual(2);
+        expect(payload).toHaveLength(2);
     });
 
     it('will return a 200 OK if only some factors are found', async () => {
@@ -97,7 +97,7 @@ describe('When retrieving conversion factors from mongo', () => {
         expect(getConversionFactorsStub).toHaveBeenNthCalledWith(1, testQueryData);
         expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTORS][1 CONVERSION FACTORS FOUND][SUCCESS]');
         expect(response.statusCode).toBe(200);
-        expect(payload.length).toEqual(1);
+        expect(payload).toHaveLength(1);
     });
 
     it('will return a 200 OK if no factors are found', async () => {

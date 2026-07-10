@@ -105,7 +105,7 @@ describe('Pre approved documents', () => {
             it('returns null if there is no preApprovedDocument', async () => {
                 const insertedDoc = await getPreApprovedDocumentByDocumentNumber(testData.documentNumber);
 
-                expect(insertedDoc).toBe(null);
+                expect(insertedDoc).toBeNull();
             });
 
             it('can get an existing preApprovedDocument if it exists', async () => {

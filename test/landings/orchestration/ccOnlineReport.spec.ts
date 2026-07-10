@@ -992,7 +992,7 @@ describe('When validating an online Catch Certificate', () => {
 
 
       expect(redisCert?.documentNumber).toEqual("FAILING 3C CERTIFICATE");
-      expect(relatedCert).toEqual(null);
+      expect(relatedCert).toBeNull();
     });
 
     it('will save the failed certificate if we fail on Licence Holder', async () => {
@@ -1308,7 +1308,7 @@ describe('When validating an online Catch Certificate', () => {
 
           const result = await FailedOnlineCertificates.find({ documentNumber: "FAILING 3C CERTIFICATE" }).lean();
 
-          expect(result.length).toEqual(1);
+          expect(result).toHaveLength(1);
         });
 
         it('will not save the certificate if we do not fail on 3C', async () => {
@@ -1423,7 +1423,7 @@ describe('When validating an online Catch Certificate', () => {
           await generateOnlineValidationReport(payload);
           const result = await FailedOnlineCertificates.findOne({ documentNumber: "FAILING 4A CERTIFICATE" }).lean();
 
-          expect(result).toEqual(null);
+          expect(result).toBeNull();
         })
       });
 
@@ -1686,7 +1686,7 @@ describe('When validating an online Catch Certificate', () => {
           await generateOnlineValidationReport(payload);
           const result = await FailedOnlineCertificates.findOne({ documentNumber: "FAILING 4A CERTIFICATE" }).lean();
 
-          expect(result).toEqual(null);
+          expect(result).toBeNull();
         })
       });
 
@@ -2134,7 +2134,7 @@ describe('When validating an online Catch Certificate', () => {
 
           const result = await FailedOnlineCertificates.findOne({ documentNumber: "FAILING 3C CERTIFICATE" }).lean();
 
-          expect(result).toEqual(null);
+          expect(result).toBeNull();
         });
       });
 
@@ -2616,7 +2616,7 @@ describe('When validating an online Catch Certificate', () => {
 
         const result = await FailedOnlineCertificates.findOne({ documentNumber: "ONLINE CERTIFICATE" }).lean();
 
-        expect(result).toEqual(null);
+        expect(result).toBeNull();
         expect(response.rawData.every(queryRes => queryRes.status === "COMPLETE")).toBeTruthy();
       });
     });
@@ -2749,7 +2749,7 @@ describe('When validating an online Catch Certificate', () => {
 
         const result = await FailedOnlineCertificates.findOne({ documentNumber: "ONLINE CERTIFICATE" }).lean();
 
-        expect(result).toEqual(null);
+        expect(result).toBeNull();
         expect(response.rawData.every(queryRes => queryRes.status === "COMPLETE")).toBeTruthy();
       });
 
@@ -2853,7 +2853,7 @@ describe('When validating an online Catch Certificate', () => {
 
         const result = await FailedOnlineCertificates.findOne({ documentNumber: "ONLINE CERTIFICATE" }).lean();
 
-        expect(result).toEqual(null);
+        expect(result).toBeNull();
         expect(response.rawData.every(queryRes => queryRes.status === "COMPLETE")).toBeTruthy();
       });
     });

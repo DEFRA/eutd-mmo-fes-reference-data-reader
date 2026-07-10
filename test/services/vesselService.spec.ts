@@ -45,7 +45,7 @@ describe("When retrieving rssNumber", () => {
 
     const output = vesselService.getRssNumber("OB956", "tarara");
 
-    expect(output).toEqual(undefined);
+    expect(output).toBeUndefined();
   })
 
   it('search by registrationNumber and date', () => {
@@ -79,7 +79,7 @@ describe("When retrieving rssNumber", () => {
   it('should return undefined if vessel does not exist', () => {
     const output = vesselService.getRssNumber("OB956", "2020-12-02");
 
-    expect(output).toEqual(undefined);
+    expect(output).toBeUndefined();
     expect(loggerMock).toHaveBeenNthCalledWith(1, '[VESSEL-SERVICE][RSS-NUMBER][NOT-FOUND]OB956:2020-12-02')
   });
 
@@ -156,7 +156,7 @@ describe("When retrieving vessel details for landings refresh", () => {
 
     const output = vesselService.getVesselDetails("test");
 
-    expect(output).toEqual(undefined);
+    expect(output).toBeUndefined();
   });
 
   it('should do an exact search on rssNumber and not pick up another rssNumber that happens to start with the rssNumber we are searching for', () => {

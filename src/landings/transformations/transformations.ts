@@ -287,7 +287,7 @@ export function rawForeignCatchCertToOnlineReport(rawOnlineValidation: ISdPsQuer
 
 function _getUniqueCertificatesBySpeciesPresentationAndState(failedCatchCerts, uniqueSpeciesAndPresentations) {
   return failedCatchCerts.forEach(cert => {
-    const elementIsAlreadyThere = uniqueSpeciesAndPresentations.find(element =>
+    const elementIsAlreadyThere = uniqueSpeciesAndPresentations.some(element =>
       element.species === cert.species
       && element.presentation === cert.extended.presentation
       && element.state === cert.extended.state

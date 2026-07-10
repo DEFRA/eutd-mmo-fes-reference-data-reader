@@ -311,7 +311,7 @@ describe('Dynamics Validation', () => {
 
       const result = SUT.toDynamicsCcCase([input], uncompleteCc, correlationId);
 
-      expect(result.documentUrl).toEqual(undefined);
+      expect(result.documentUrl).toBeUndefined();
     });
 
     it('will map the number of failed submissions', () => {
@@ -5849,7 +5849,7 @@ describe('Dynamics Validation', () => {
 
       const result: Shared.IDynamicsLanding = SUT.toLanding(input);
 
-      expect(result.source).toEqual(undefined)
+      expect(result.source).toBeUndefined()
     });
 
     it('will include a vessel overridden flag if the vessel has been overridden', () => {

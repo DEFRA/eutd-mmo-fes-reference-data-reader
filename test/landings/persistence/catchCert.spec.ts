@@ -200,9 +200,9 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
         const res = await getCatchCerts({})
 
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
         const first: any = res[0]
-        expect(first.exportData.products.length).toBe(2)
+        expect(first.exportData.products).toHaveLength(2)
 
       })
 
@@ -249,7 +249,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
         const res = await getCatchCerts({})
 
-        expect(res.length).toBe(2)
+        expect(res).toHaveLength(2)
 
       })
 
@@ -275,7 +275,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
         })
         await catchCert.save()
         const res = await getCatchCerts({})
-        expect(res.length).toBe(0)
+        expect(res).toHaveLength(0)
       })
 
       it('will only return certs after fromDate when fromDate is specified', async () => {
@@ -304,10 +304,10 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
         let res
 
         res = await getCatchCerts({})
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
 
         res = await getCatchCerts({ fromDate: moment.utc('2019-10-19').startOf('day') })
-        expect(res.length).toBe(0)
+        expect(res).toHaveLength(0)
 
       })
 
@@ -335,7 +335,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
         await catchCert.save()
 
         const res = await getCatchCerts({ fromDate: moment.utc('2019-10-19').startOf('day') })
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
 
       })
 
@@ -367,7 +367,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ documentNumber: 'CC1' })
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
           expect(res[0].documentNumber).toBe('CC1')
 
@@ -395,7 +395,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ documentNumber: 'CC2' })
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -439,7 +439,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ documentNumber: 'CC1' })
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
         })
 
@@ -470,7 +470,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ pln: 'WA1' })
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
         })
 
@@ -496,7 +496,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ pln: 'NO WAY' })
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -568,7 +568,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ pln: 'WA1' })
 
-          expect(res.length).toBe(2)
+          expect(res).toHaveLength(2)
 
           expect(res[0].documentNumber).toBe('CC1')
           expect(res[1].documentNumber).toBe('CC2')
@@ -603,7 +603,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ exporter: 'BOB' })
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
         })
 
@@ -630,7 +630,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ exporter: 'NO WAY' })
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -703,7 +703,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ exporter: 'BOB' })
 
-          expect(res.length).toBe(2)
+          expect(res).toHaveLength(2)
 
         })
 
@@ -729,7 +729,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ exporter: 'the quick brown fox' })
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
         });
 
       });
@@ -784,7 +784,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ landingStatuses });
 
-          expect(res.length).toBe(1);
+          expect(res).toHaveLength(1);
 
         });
 
@@ -835,7 +835,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ landingStatuses });
 
-          expect(res.length).toBe(0);
+          expect(res).toHaveLength(0);
         });
 
         it('will find all documents that have at least one landing that is pending landing data', async () => {
@@ -888,7 +888,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ landingStatuses });
 
-          expect(res.length).toBe(1);
+          expect(res).toHaveLength(1);
 
         });
 
@@ -942,7 +942,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ landingStatuses });
 
-          expect(res.length).toBe(2);
+          expect(res).toHaveLength(2);
 
         });
 
@@ -1016,7 +1016,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ landingStatuses });
 
-          expect(res.length).toBe(2);
+          expect(res).toHaveLength(2);
         });
 
         it('will find all documents that have at least one landing that is pending landing OR has landing data', async () => {
@@ -1090,7 +1090,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
           const res = await getCatchCerts({ landingStatuses });
 
-          expect(res.length).toBe(2);
+          expect(res).toHaveLength(2);
         });
 
       });
@@ -1151,13 +1151,13 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
       let res
 
       res = await getCatchCerts({})
-      expect(res.length).toBe(0)
+      expect(res).toHaveLength(0)
 
       res = await getCatchCerts({ documentStatus: 'COMPLETE' })
-      expect(res.length).toBe(0)
+      expect(res).toHaveLength(0)
 
       res = await getCatchCerts({ documentStatus: 'VOID' })
-      expect(res.length).toBe(2)
+      expect(res).toHaveLength(2)
 
     })
 
@@ -1776,7 +1776,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const results: any = await DocumentModel.find();
 
-      expect(results.length).toBe(1);
+      expect(results).toHaveLength(1);
       expect(results[0].catchSubmission).toBeDefined();
       expect(results[0].catchSubmission.status).toBe('SUCCESS');
       expect(results[0].catchSubmission.reference).toBe('EU.CATCH.CC.0123456789');
@@ -1819,7 +1819,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const results: any = await DocumentModel.find();
 
-      expect(results.length).toBe(1);
+      expect(results).toHaveLength(1);
       expect(results[0].catchSubmission).toBeDefined();
       expect(results[0].catchSubmission.status).toBe('ERROR');
       expect(results[0].catchSubmission.message).toBe('Validation failed');
@@ -1851,7 +1851,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const results: any = await DocumentModel.find();
 
-      expect(results.length).toBe(1);
+      expect(results).toHaveLength(1);
       expect(results[0].catchSubmission).toBeDefined();
       expect(results[0].catchSubmission.status).toBe('PENDING');
       expect(results[0].catchSubmission.message).toBe('Processing in progress');
@@ -1921,7 +1921,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const results: any = await DocumentModel.find();
 
-      expect(results.length).toBe(1);
+      expect(results).toHaveLength(1);
       expect(results[0].catchSubmission).toBeDefined();
       expect(results[0].catchSubmission.status).toBe('ERROR');
       expect(results[0].catchSubmission.faultCode).toBe('SOAP-ENV:Server');
@@ -1960,7 +1960,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const results: any = await DocumentModel.find();
 
-      expect(results.length).toBe(1);
+      expect(results).toHaveLength(1);
       expect(results[0].catchSubmission.status).toBe('SUCCESS');
       expect(results[0].catchSubmission.reference).toBe('EU.CATCH.CC.9999999999');
       expect(results[0].catchSubmission.code).toBe('70');
@@ -1997,7 +1997,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const res = await getCatchCerts({ landings: [] })
 
-      expect(res.length).toBe(0)
+      expect(res).toHaveLength(0)
 
     })
 
@@ -2024,7 +2024,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const res = await getCatchCerts({ landings: [{ pln: 'WA2', dateLanded: '2019-07-10' }, { pln: 'WA1', dateLanded: '2019-07-11' }] })
 
-      expect(res.length).toBe(0)
+      expect(res).toHaveLength(0)
 
     })
 
@@ -2051,7 +2051,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const res = await getCatchCerts({ landings: [{ pln: 'WA1', dateLanded: '2019-07-10' }] })
 
-      expect(res.length).toBe(1)
+      expect(res).toHaveLength(1)
 
     })
 
@@ -2099,7 +2099,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const res = await getCatchCerts({ landings: [{ pln: 'WA1', dateLanded: '2019-07-10' }] })
 
-      expect(res.length).toBe(2)
+      expect(res).toHaveLength(2)
 
     })
 
@@ -2168,7 +2168,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
         ]
       })
 
-      expect(res.length).toBe(2)
+      expect(res).toHaveLength(2)
 
     })
 
@@ -2216,7 +2216,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const res = await getCatchCerts({ landings: [{ pln: 'WA1', dateLanded: '2019-07-10' }] })
 
-      expect(res.length).toBe(1)
+      expect(res).toHaveLength(1)
 
     })
 
@@ -2265,7 +2265,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
       const res = await getCatchCerts({ landings: [{ pln: 'WA1', dateLanded: '2019-07-10' }, { pln: 'WA1', dateLanded: '2019-07-10' }] })
 
-      expect(res.length).toBe(1)
+      expect(res).toHaveLength(1)
 
     })
 
@@ -2345,7 +2345,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
       await catchCert.save()
 
       const res = await getAllCatchCertsWithProducts();
-      expect(res.length).toBe(2);
+      expect(res).toHaveLength(2);
     })
 
     it('should not return anything if exportData is empty', async () => {
@@ -2361,7 +2361,7 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
       await catchCert.save()
 
       const res = await getAllCatchCertsWithProducts();
-      expect(res.length).toBe(0);
+      expect(res).toHaveLength(0);
     })
   })
 

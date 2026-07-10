@@ -296,7 +296,7 @@ describe("Routes", () => {
       url: '/v1/states'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/presentations', async () => {
@@ -304,7 +304,7 @@ describe("Routes", () => {
       url: '/v1/presentations'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels/hasLicense', async () => {
@@ -312,7 +312,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=E163&vesselName=STRIKER&landedDate=2016-09-01&flag=GBR&cfr=GBR000B10811&ircs=&homePort=EXMOUTH&licenceNumber=22548&licenceValidTo=2030-12-31'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels/hasLicense with licence holder', async () => {
@@ -331,7 +331,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=INS146&vesselName=STROMA&landedDate=2018-09-01&flag=GBR&cfr=GBR000C16096&homePort=BUCKIE&licenceNumber=30468&licenceValidTo=2027-12-31'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should return valid licence with full data / time GET /v1/vessels/hasLicense', async () => {
@@ -339,7 +339,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2016-09-01&flag=GBR&cfr=GBR000C18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2027-12-31T00:01:00'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should not get any results from GET /v1/vessels/hasLicense', async () => {
@@ -347,7 +347,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=OMN&vesselName=YIKES&landedDate=2049-01-01'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should not get any results with fake flag GET /v1/vessels/hasLicense', async () => {
@@ -355,7 +355,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=FAKE&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should not get any results with fake cfr GET /v1/vessels/hasLicense', async () => {
@@ -363,7 +363,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=FAKE&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should not get any results with fake homePort GET /v1/vessels/hasLicense', async () => {
@@ -371,7 +371,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=FAKE&licenceNumber=30435&licenceValidTo=2012-06-30T00:00:00'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should not get any results with no licenceNumber GET /v1/vessels/hasLicense', async () => {
@@ -379,7 +379,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceValidTo=2012-06-30T00:00:00'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should not get any results with fake licenceTo GET /v1/vessels/hasLicense', async () => {
@@ -387,7 +387,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=SY854&vesselName=ALINE&landedDate=2019-01-01&flag=GBR&cfr=GBRC18030&homePort=BERNERA%20(LEWIS)&licenceNumber=30435&licenceValidTo=fake'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should get all results with correct imo number GET /v1/vessels/hasLicense', async () => {
@@ -395,7 +395,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=H1100&vesselName=WIRON%205&landedDate=2020-09-01&flag=GBR&cfr=NLD200202641&homePort=PLYMOUTH&licenceNumber=12480&licenceValidTo=2021-08-09T00:00:00&imo=9249556'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should not get any results with fake imo number GET /v1/vessels/hasLicense', async () => {
@@ -403,7 +403,7 @@ describe("Routes", () => {
       url: '/v1/vessels/hasLicense?vesselPln=H1100&vesselName=WIRON%205&landedDate=2020-09-01&flag=GBR&cfr=GBRC20514&homePort=PLYMOUTH&licenceNumber=12480&licenceValidTo=2382-12-31T00:00:00&imo=00000000'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should return 500 from GET /v1/vessels/hasLicense', async () => {
@@ -423,7 +423,7 @@ describe("Routes", () => {
     const data = JSON.parse(response.payload);
 
     expect(response.statusCode).toBe(200);
-    expect(data.length > 0).toBe(true);
+    expect(data.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/speciesStateLookup with unique presentations', async () => {
@@ -444,7 +444,7 @@ describe("Routes", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET All Species', async () => {
@@ -453,7 +453,7 @@ describe("Routes", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/commodities/search', async () => {
@@ -461,7 +461,7 @@ describe("Routes", () => {
       url: '/v1/commodities/search?speciesCode=COD&state=FRE&presentation=FIL'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/commodities', async () => {
@@ -469,7 +469,7 @@ describe("Routes", () => {
       url: '/v1/commodities'
     });
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.payload).length > 0).toBe(true);
+    expect(JSON.parse(response.payload).length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels/search', async () => {
@@ -477,7 +477,7 @@ describe("Routes", () => {
       url: '/v1/vessels/search?searchTerm=EX'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels/search with licence holder', async () => {
@@ -496,7 +496,7 @@ describe("Routes", () => {
       url: '/v1/vessels/search-exact?vesselPln=SY854&vesselName=ALINE'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels/search-exact with licence holder', async () => {
@@ -515,7 +515,7 @@ describe("Routes", () => {
       url: '/v1/vessels/search-exact?vesselPln=OMN&vesselName=YIKES'
     });
     expect(response.statusCode).toBe(404);
-    expect(response.payload.length === 0).toBe(true);
+    expect(response.payload).toHaveLength(0);
   });
 
   it('should return 500 error from /v1/vessels/search-exact', async () => {
@@ -532,7 +532,7 @@ describe("Routes", () => {
       url: '/v1/vessels'
     });
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
   it('should GET /v1/vessels with licence holder', async () => {
@@ -592,7 +592,7 @@ describe("Routes", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.payload.length > 0).toBe(true);
+    expect(response.payload.length).toBeGreaterThan(0);
     expect(response.payload).toEqual(JSON.stringify(data));
   });
 

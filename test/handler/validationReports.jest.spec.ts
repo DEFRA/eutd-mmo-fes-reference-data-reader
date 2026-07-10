@@ -333,7 +333,7 @@ describe("When generating a SDPS Report", () => {
 
 
     // did call 'void' report
-    expect(sdpsVoidMock.mock.calls.length).toEqual(1);
+    expect(sdpsVoidMock.mock.calls).toHaveLength(1);
 
 
 
