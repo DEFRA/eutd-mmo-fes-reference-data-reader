@@ -544,6 +544,7 @@ export function toCatches(queryRes: ISdPsQueryResult[]): ProcessingStatementRepo
          ...(row.productDescription && row.productDescription.trim() !== '' ? { productDescription: row.productDescription } : {}),
          importWeightExceededAmount: row.overAllocatedByWeight,
          cnCode: row.commodityCode,
+         ...(row.speciesCommodityCode ? { speciesCommodityCode: row.speciesCommodityCode } : {}),
          isDocumentIssuedInUK: row.catchCertificateType === 'uk',
          issuingCountry: row.catchCertificateType === 'uk'
             ? 'United Kingdom'

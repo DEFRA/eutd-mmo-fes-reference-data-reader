@@ -23,6 +23,7 @@ interface IFlattenedCatch {
   weight: number;
   weightOnCC: number;
   weightAfterProcessing?: number;
+  speciesCommodityCode?: string;
   extended: any;
 }
 
@@ -103,6 +104,7 @@ const getExtentedObject = (item) => {
   if (item.netWeightFisheryProductDeparture !== undefined) newObj.netWeightFisheryProductDeparture = item.netWeightFisheryProductDeparture;
   if (item.productDescription !== undefined) newObj.productDescription = item.productDescription;
   if (item.supportingDocuments !== undefined) newObj.supportingDocuments = item.supportingDocuments;
+  if (item.speciesCommodityCode !== undefined) newObj.speciesCommodityCode = item.speciesCommodityCode;
   return newObj;
 }
 
@@ -156,6 +158,7 @@ export const unwindAndMapCatches = (doc: any, daLookup): IFlattenedCatch[] => {
         species: cat.species,
         scientificName: cat.scientificName,
         commodityCode: cat.productCommodityCode,
+        speciesCommodityCode: cat.speciesCommodityCode,
         weight: Number.parseFloat(cat.exportWeightBeforeProcessing),
         weightOnCC: Number.parseFloat(cat.totalWeightLanded),
         weightAfterProcessing: getWeightAfterProcess(cat.exportWeightAfterProcessing),

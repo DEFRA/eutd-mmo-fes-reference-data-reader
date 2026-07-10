@@ -448,7 +448,8 @@ export function mapProcessingStatementToPS(redisPS) {
       exportWeightBeforeProcessing: _.exportWeightBeforeProcessing,
       exportWeightAfterProcessing: _.exportWeightAfterProcessing,
       productDescription: _.productDescription,
-      productCommodityCode: _.productCommodityCode
+      productCommodityCode: _.productCommodityCode,
+      speciesCommodityCode: _.speciesCommodityCode
     })));
 }
 
