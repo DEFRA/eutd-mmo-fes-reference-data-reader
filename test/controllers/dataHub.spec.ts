@@ -135,7 +135,7 @@ describe("Report Draft", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToPsDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
 
   });
@@ -213,7 +213,7 @@ describe("Report Draft", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToSdDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
   });
 
@@ -314,7 +314,7 @@ describe("Report Draft", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToCcDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
   });
 });
@@ -469,7 +469,7 @@ describe("Report Delete", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToPsDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
   });
 
@@ -602,7 +602,7 @@ describe("Report Delete", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToSdDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
   });
 
@@ -751,7 +751,7 @@ describe("Report Delete", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToCcDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
   });
 });
@@ -935,7 +935,7 @@ describe("Report Void", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToPsDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
 
     it('will trigger a case management report if request is from external app', async () => {
@@ -1164,7 +1164,7 @@ describe("Report Void", () => {
       const result = await DefraPersistance.getAllDefraValidationReports();
 
       expect(mockToSdDefraReport).not.toHaveBeenCalled();
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
   });
 
@@ -1367,7 +1367,7 @@ describe("Report Void", () => {
 
       const result = await DefraPersistance.getAllDefraValidationReports();
 
-      expect(result.length).toBe(0);
+      expect(result).toHaveLength(0);
     });
 
     it('will include the exporter address in the format required by Strategic Reporting', async () => {

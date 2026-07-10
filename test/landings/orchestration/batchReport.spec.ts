@@ -225,11 +225,11 @@ describe('all reporting functions', () => {
 
           const res = Array.from(await Report.catchCertInvestigationReport({documentNumber: 'CC1'}))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
           expect(res[0].documentNumber).toBe('CC1')
           expect(res[0].FI0_136_numberOfFailedValidations).toBe(0)   // cc created < 14 days.. so no failed validation
-          expect(res[0].FI0_288_numberOfLandings).toBe(undefined)
+          expect(res[0].FI0_288_numberOfLandings).toBeUndefined()
 
         })
 
@@ -274,7 +274,7 @@ describe('all reporting functions', () => {
 
           Array.from(await Report.catchCertInvestigationReport({documentNumber: 'CC3'}))
 
-          expect(getLandingDataMock.mock.calls.length).toBe(3);
+          expect(getLandingDataMock.mock.calls).toHaveLength(3);
           expect(getLandingDataMock.mock.calls[0][2]).toBe('landing');
           expect(getLandingDataMock.mock.calls[1][2]).toBe('eLogs');
           expect(getLandingDataMock.mock.calls[2][2]).toBe('salesNotes');
@@ -354,9 +354,9 @@ describe('all reporting functions', () => {
             documentNumber: 'CC2',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('CC2')
-          expect(res[0].FI0_41_unavailabilityDuration).toBe(undefined)
+          expect(res[0].FI0_41_unavailabilityDuration).toBeUndefined()
 
         })
 
@@ -368,7 +368,7 @@ describe('all reporting functions', () => {
             pln: 'WA1',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('CC3')
 
         })
@@ -381,7 +381,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('CC3')
 
         })
@@ -394,7 +394,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -406,7 +406,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -506,7 +506,7 @@ describe('all reporting functions', () => {
             documentNumber: 'CC Bob',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('CC Bob')
           expect(res[0].FI0_288_numberOfLandings).toBe(1)
 
@@ -520,7 +520,7 @@ describe('all reporting functions', () => {
             pln: 'PLN Bob',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('CC Bob')
           expect(res[0].dateLanded).toBe('2019-07-08')
 
@@ -534,7 +534,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('CC Fred')
           expect(res[0].FI0_291_totalExportWeights).toBe(100)
 
@@ -548,7 +548,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -560,7 +560,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -651,7 +651,7 @@ describe('all reporting functions', () => {
 
           const res: any[] = Array.from(await Report.sdpsInvestigationReport({documentNumber: 'D1'}))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
           expect(res[0].documentNumber).toBe('D1')
           expect(res[0].exportWeightExceeded).toBe(100)
@@ -662,7 +662,7 @@ describe('all reporting functions', () => {
 
           const res: any[] = Array.from(await Report.sdpsInvestigationReport({documentNumber: 'D3'}))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
 
           expect(res[0].documentNumber).toBe('D3')
           expect(res[0].inputWeightMismatch).toBe('fail')
@@ -673,7 +673,7 @@ describe('all reporting functions', () => {
 
           const res: any[] = Array.from(await Report.sdpsInvestigationReport({exporter: 'BOB'}))
 
-          expect(res.length).toBe(2)
+          expect(res).toHaveLength(2)
 
           expect(res[0].documentNumber).toBe('D2')
           expect(res[1].documentNumber).toBe('D2')
@@ -766,9 +766,9 @@ describe('all reporting functions', () => {
             documentNumber: 'SD BOB',
           } ))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('SD BOB')
-          expect(res[0].FI0_41_unavailabilityDuration).toBe(undefined)
+          expect(res[0].FI0_41_unavailabilityDuration).toBeUndefined()
 
         })
 
@@ -780,7 +780,7 @@ describe('all reporting functions', () => {
             documentNumber: 'SD COMPLETE',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -792,7 +792,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Bob',
           } ))
 
-          expect(res.length).toBe(2)
+          expect(res).toHaveLength(2)
           expect(res[0].documentNumber).toBe('SD BOB')
           expect(res[1].documentNumber).toBe('PS BOB')
 
@@ -806,7 +806,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Bob',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -818,7 +818,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Bob',
           } ))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -888,7 +888,7 @@ describe('all reporting functions', () => {
             documentNumber: 'SD001',
           }))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('SD001')
 
         })
@@ -901,7 +901,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           }))
 
-          expect(res.length).toBe(1)
+          expect(res).toHaveLength(1)
           expect(res[0].documentNumber).toBe('PS001')
 
         })
@@ -914,7 +914,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           }))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -926,7 +926,7 @@ describe('all reporting functions', () => {
             exporter: 'Exporter Fred',
           }))
 
-          expect(res.length).toBe(0)
+          expect(res).toHaveLength(0)
 
         })
 
@@ -973,7 +973,7 @@ describe('all reporting functions', () => {
 
         const reportData = Array.from(await Report.catchCertReport(moment.utc('2017-01-01').startOf('day'), moment.utc('2020-01-01').endOf('day'), moment.utc('2019-09-10'), []))
 
-        expect(reportData.length).toBe(3)
+        expect(reportData).toHaveLength(3)
 
         // should HAVE validation properties
         expect(reportData[0].FI0_41_unavailabilityDuration).toBeDefined()
@@ -1013,15 +1013,15 @@ describe('all reporting functions', () => {
         // check they won't be found by the 'normal' report
         reportData = Array.from(await Report.catchCertReport(moment.utc('2017-01-01').startOf('day'), moment.utc('2020-01-01').endOf('day'), moment.utc('2019-09-10'), []))
 
-        expect(reportData.length).toBe(0)
+        expect(reportData).toHaveLength(0)
 
         reportData = Array.from(await Report.catchCertVoidReport(moment.utc('2017-01-01').startOf('day'), moment.utc('2020-01-01').endOf('day'), moment.utc('2019-09-10'), []))
 
-        expect(reportData.length).toBe(3)
+        expect(reportData).toHaveLength(3)
 
         // should NOT have validation properties
-        expect(reportData[0].FI0_41_unavailabilityDuration).toBe(undefined)
-        expect(reportData[0].salesNotesUrl).toBe(undefined)
+        expect(reportData[0].FI0_41_unavailabilityDuration).toBeUndefined()
+        expect(reportData[0].salesNotesUrl).toBeUndefined()
 
       })
 
@@ -1085,7 +1085,7 @@ describe('all reporting functions', () => {
 
         const reportDataArray: any[] = Array.from(reportData)
 
-        expect(reportDataArray.length).toBe(1)
+        expect(reportDataArray).toHaveLength(1)
 
         expect(reportDataArray[0].authority).toEqual('Scotland')
 
@@ -1141,12 +1141,12 @@ describe('all reporting functions', () => {
         // should not show up in the 'normal' report
         reportData = Array.from(await Report.sdpsReport(moment.utc('2017-01-01').startOf('day'), moment.utc('2020-01-01').endOf('day'), []))
 
-        expect(reportData.length).toBe(0)
+        expect(reportData).toHaveLength(0)
 
         // does appear in the VOID report
         reportData = Array.from(await Report.sdpsVoidReport(moment.utc('2017-01-01').startOf('day'), moment.utc('2020-01-01').endOf('day'), []))
 
-        expect(reportData.length).toBe(1)
+        expect(reportData).toHaveLength(1)
 
       })
 
@@ -1284,13 +1284,13 @@ describe('all reporting functions', () => {
         const reportData = Array.from(await Report.catchCertBlockedReport(moment.utc("2019-10-04").startOf('day'), moment.utc("2019-12-25").endOf('day'), ["Guernsey", "England", "Wales", "Spain"]));
 
         expect(mock).toHaveBeenCalled();
-        expect(reportData.length).toBe(1)
+        expect(reportData).toHaveLength(1)
         expect(reportData[0].documentNumber).toBe("GBR-2019-CC-D822EDD19")
 
         //try to get a report when dates are out of range => should return 0 docs back
         const reportDataAgain = Array.from(await Report.catchCertBlockedReport(moment.utc("2019-12-08").startOf('day'), moment.utc("2019-12-25").endOf('day'), ["Guernsey", "England", "Wales", "Spain"]));
 
-        expect(reportDataAgain.length).toBe(0);
+        expect(reportDataAgain).toHaveLength(0);
 
         mock.mockRestore();
       });
@@ -1304,13 +1304,13 @@ describe('all reporting functions', () => {
         const reportData = Array.from(await Report.catchCertBlockedReport(moment.utc("2019-10-04").startOf('day'), moment.utc("2019-12-25").endOf('day'), []));
 
         expect(mock).toHaveBeenCalled();
-        expect(reportData.length).toBe(1)
+        expect(reportData).toHaveLength(1)
         expect(reportData[0].documentNumber).toBe("GBR-2019-CC-D822EDD19")
 
         //try to get a report when dates are out of range => should return 0 docs back
         const reportDataAgain = Array.from(await Report.catchCertBlockedReport(moment.utc("2019-12-08").startOf('day'), moment.utc("2019-12-25").endOf('day'), []));
 
-        expect(reportDataAgain.length).toBe(0);
+        expect(reportDataAgain).toHaveLength(0);
 
         mock.mockRestore();
       });
@@ -1377,7 +1377,7 @@ describe('all reporting functions', () => {
 
         const res = Array.from(await Report.sdpsBlockedReport(moment('2017-01-01'), moment('2049-12-31'), []))
 
-        expect(res.length).toBe(2)
+        expect(res).toHaveLength(2)
 
       })
 
@@ -1385,7 +1385,7 @@ describe('all reporting functions', () => {
 
         const res = Array.from(await Report.sdpsBlockedReport(moment('2019-02-01'), moment('2049-12-31'), []))
 
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
 
       })
 

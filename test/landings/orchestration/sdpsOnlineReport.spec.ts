@@ -704,7 +704,7 @@ describe('When validating an online ps or sd', () => {
             const relatedCert = await FailedOnlineCertificates.findOne({ documentNumber: "32345" }).lean();
 
             expect(redisCert.documentNumber).toEqual("GBR-2019-SD-DED9F3FE6");
-            expect(relatedCert).toEqual(null);
+            expect(relatedCert).toBeNull();
 
 
         });
@@ -980,7 +980,7 @@ describe('When validating an online ps or sd', () => {
 
                     const redisCert = await FailedOnlineCertificates.findOne({documentNumber: "GBR-2019-SD-DED9F3FE6"}).lean();
 
-                    expect(redisCert).toEqual(null);
+                    expect(redisCert).toBeNull();
 
                 });
             });
@@ -1444,7 +1444,7 @@ describe('When validating an online ps or sd', () => {
 
             const result = await FailedOnlineCertificates.findOne({ documentNumber: "GBR-2019-SD-DED9F3FE6" }).lean();
 
-            expect(result).toEqual(null);
+            expect(result).toBeNull();
 
         });
 

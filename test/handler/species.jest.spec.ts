@@ -215,7 +215,7 @@ describe('/v1/species/search-exact', () => {
   it('should return null if species is not found', async () => {
     mockReq = '/v1/species/search-exact?faoCode=COD&faoName=blah&scientificName=Gadus+morhua';
     const response = await server.inject(mockReq);
-    expect(response.result).toEqual(null);
+    expect(response.result).toBeNull();
   });
 
   it('should return a 500 response if an error occurs', async () => {
@@ -229,6 +229,6 @@ describe('/v1/species/search-exact', () => {
   it('should handle a request with no params', async () => {
     mockReq = '/v1/species/search-exact';
     const response = await server.inject(mockReq);
-    expect(response.result).toEqual(null);
+    expect(response.result).toBeNull();
   });
 });

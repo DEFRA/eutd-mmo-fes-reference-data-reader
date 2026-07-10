@@ -53,7 +53,7 @@ describe('get conversion factors', () => {
 
         const result = conversionFactorService.getConversionFactors(products);
 
-        expect(result.length).toEqual(1);
+        expect(result).toHaveLength(1);
         expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
     });
 
@@ -75,7 +75,7 @@ describe('get conversion factors', () => {
 
         const result = conversionFactorService.getConversionFactors(products);
 
-        expect(result.length).toEqual(2);
+        expect(result).toHaveLength(2);
         expect(mockLoggerInfo).toHaveBeenNthCalledWith(1, '[GET-CONVERSION-FACTOR][species:ANE state:FRE presentation:GUT][SUCCESS]');
         expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, '[GET-CONVERSION-FACTOR][species:BSF state:FRO presentation:GUT][SUCCESS]');
 
@@ -94,7 +94,7 @@ describe('get conversion factors', () => {
 
         const result = conversionFactorService.getConversionFactors(products);
 
-        expect(result.length).toEqual(1);
+        expect(result).toHaveLength(1);
         expect(result).toEqual([{
             species: 'ANE',
             state: 'FRE',

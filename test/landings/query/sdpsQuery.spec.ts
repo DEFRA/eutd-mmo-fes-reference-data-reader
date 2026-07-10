@@ -800,7 +800,7 @@ describe('tests at the query level', () => {
 
     const res: any[] = Array.from(Query.sdpsQuery(documents, postCodeToDa))
 
-    expect(res.length).toBe(5)
+    expect(res).toHaveLength(5)
 
   })
 
@@ -818,7 +818,7 @@ describe('tests at the query level', () => {
 
     const res: any[] = Array.from(Query.sdpsQuery(documents, postCodeToDa))
 
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
   })
 

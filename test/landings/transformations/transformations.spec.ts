@@ -598,7 +598,7 @@ describe('licence map', () => {
     const vesselsIdx = generateIndex(vessels);
     const lookup = Transformations.vesselLookup(vesselsIdx);
 
-    expect(lookup('K529', '2001-01-01')).toBe(undefined)
+    expect(lookup('K529', '2001-01-01')).toBeUndefined()
 
   })
 
@@ -658,7 +658,7 @@ describe('licence map', () => {
     const vesselsIdx = generateIndex(vessels);
     const lookup = Transformations.vesselLookup(vesselsIdx);
 
-    expect(lookup('K529', '2006-06-06')).toBe(undefined)
+    expect(lookup('K529', '2006-06-06')).toBeUndefined()
 
     expect(lookup('K529', '2006-06-07'))
       .toStrictEqual({
@@ -735,7 +735,7 @@ describe('licence map', () => {
         vesselLength: 9.4
       })
 
-    expect(lookup('K529', '2006-07-01')).toBe(undefined)
+    expect(lookup('K529', '2006-07-01')).toBeUndefined()
 
   })
 

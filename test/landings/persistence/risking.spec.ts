@@ -244,7 +244,7 @@ describe('getWeightingRisk', () => {
         expect(count).toBe(0);
 
         const result = await SUT.getWeightingRisk();
-        expect(result).toEqual(null);
+        expect(result).toBeNull();
     });
 
 });
@@ -276,7 +276,7 @@ describe('setWeightingRisk', () => {
 
     const result = await SUT.getWeightingRisk();
 
-    expect(result).toEqual(null);
+    expect(result).toBeNull();
   });
 
 });
@@ -308,7 +308,7 @@ describe('setThresholdRisk', () => {
 
     const result = await SUT.getWeightingRisk();
 
-    expect(result).toEqual(null);
+    expect(result).toBeNull();
   });
 
 });

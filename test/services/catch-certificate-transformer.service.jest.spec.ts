@@ -3174,7 +3174,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(2); // 1 conservation + 1 product
+      expect(items).toHaveLength(2); // 1 conservation + 1 product
     });
 
     it('should handle null exportPayload', () => {
@@ -3255,7 +3255,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(0); // No items when caughtBy is empty
+      expect(items).toHaveLength(0); // No items when caughtBy is empty
     });
 
     it('should build conservation item with all vessel details', () => {
@@ -3405,7 +3405,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(0); // No items when caughtBy is undefined
+      expect(items).toHaveLength(0); // No items when caughtBy is undefined
     });
 
     it('should handle landing with gearCode', () => {
@@ -3613,7 +3613,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(0);
+      expect(items).toHaveLength(0);
     });
 
     it('should build product item with complete landing details', () => {
@@ -3661,7 +3661,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(2); // 1 vessel + 1 product
+      expect(items).toHaveLength(2); // 1 vessel + 1 product
       const productItem = items[1];
       expect(productItem.NatureIdentificationSPSCargo.TypeCode.value).toBe('12');
       expect(productItem.IncludedSPSTradeLineItem[0].Description.value).toBe('Fresh hake');
@@ -3717,7 +3717,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(2); // 1 vessel + 3 products
+      expect(items).toHaveLength(2); // 1 vessel + 3 products
       const productsIncludedSPSConsignmentItem = items[1];
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].SequenceNumeric.format).toBe("1");
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
@@ -3809,7 +3809,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(2); // 1 vessel + 1 product
+      expect(items).toHaveLength(2); // 1 vessel + 1 product
       const productItem = items[1];
       const notes = productItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
 
@@ -3844,7 +3844,7 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(0); // No items when caughtBy is empty
+      expect(items).toHaveLength(0); // No items when caughtBy is empty
     });
 
     it('should handle missing exportWeight gracefully', () => {
@@ -4114,14 +4114,14 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
           .IncludedSPSConsignmentItem;
 
-      expect(items.length).toBe(2);
-      expect(items[0].IncludedSPSTradeLineItem.length).toBe(2); // 2 vessels
+      expect(items).toHaveLength(2);
+      expect(items[0].IncludedSPSTradeLineItem).toHaveLength(2); // 2 vessels
       expect(items[0].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
       expect(items[0].IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote[0].Content[0].value).toBe('Vessel 1');
       expect(items[0].IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
       expect(items[0].IncludedSPSTradeLineItem[1].AdditionalInformationSPSNote[0].Content[0].value).toBe('Vessel 2');
 
-      expect(items[1].IncludedSPSTradeLineItem.length).toBe(2); // 2 products
+      expect(items[1].IncludedSPSTradeLineItem).toHaveLength(2); // 2 products
       expect(items[1].IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
       expect(items[1].IncludedSPSTradeLineItem[0].CommonName.value).toBe('Gadus morhua');
       expect(items[1].IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
@@ -4197,7 +4197,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(consignment.MainCarriageSPSTransportMovement[0].ModeCode.value).toBe('1');
 
       const items = consignment.IncludedSPSConsignmentItem;
-      expect(items.length).toBe(2); // 1 vessel + 1 product
+      expect(items).toHaveLength(2); // 1 vessel + 1 product
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         `[CATCH-TRANSFORMER][GENERATING-PAYLOAD][${documentNumber}]`
