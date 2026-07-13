@@ -1049,6 +1049,51 @@ describe('uploadValidation.service', () => {
     expect(result.errors).toStrictEqual(['error.vesselPln.any.invalid']); 
   });
 
+  it('should return error when start date does not match vessel license period', () => {
+    mockGetVesselData.mockReturnValue([
+      { registrationNumber: 'PD110', fishingVesselName: 'TEST' }
+    ]);
+
+    mockVesselSearch
+      .mockReturnValueOnce([{ pln: 'PD110', vesselLength: 10 }])
+      .mockReturnValueOnce([{ pln: 'DIFFERENT_PLN', vesselLength: 10 }]);
+
+    const result = SUT.validateVesselForLanding({
+      ...uploadedLanding,
+      vesselPln: 'PD110',
+      landingDate: '01/01/2020',
+      startDate: '01/01/2010',
+      errors: []
+    });
+
+    expect(result.vessel).toStrictEqual({ pln: 'PD110', vesselLength: 10 });
+    expect(result.errors).toStrictEqual(['error.startDate.vesselPln.any.invalid']);
+  });
+
+  it('should return both vessel license errors when both landing and start dates are outside license period', () => {
+    mockGetVesselData.mockReturnValue([
+      { registrationNumber: 'PD110', fishingVesselName: 'TEST' }
+    ]);
+
+    mockVesselSearch
+      .mockReturnValueOnce([{ pln: 'DIFFERENT_PLN', vesselLength: 10 }])
+      .mockReturnValueOnce([{ pln: 'DIFFERENT_PLN', vesselLength: 10 }]);
+
+    const result = SUT.validateVesselForLanding({
+      ...uploadedLanding,
+      vesselPln: 'PD110',
+      landingDate: '01/01/2020',
+      startDate: '01/01/2010',
+      errors: []
+    });
+
+    expect(result.vessel).toBeUndefined();
+    expect(result.errors).toStrictEqual([
+      'error.vesselPln.any.invalid',
+      'error.startDate.vesselPln.any.invalid'
+    ]);
+  });
+
     it('should populate the vessel information if validation is successful', () => {
 
       const result = SUT.validateVesselForLanding(

@@ -141,16 +141,23 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
   }
 
   const landingDate = moment(landing.landingDate, 'DD/MM/YYYY', true);
-
   if (landingDate.isValid()) {
-    const vessels: IVessel[] = vesselSearch(landing.vesselPln, landingDate.toISOString());
-    const vessel = vessels.find(v => v.pln === landing.vesselPln);
+    const vesselsForLandingDate: IVessel[] = vesselSearch(landing.vesselPln, landingDate.toISOString());
+    const vesselForLandingDate = vesselsForLandingDate.find(v => v.pln === landing.vesselPln);
 
-    if (vessel) {
-      landing.vessel = vessel;
+    if (vesselForLandingDate) {
+      landing.vessel = vesselForLandingDate;
+    } else {
+      landing.errors.push('error.vesselPln.any.invalid');
     }
-    else {
-      landing.errors.push('error.vesselPln.any.invalid')
+  }
+
+  const startDate = moment(landing.startDate, 'DD/MM/YYYY', true);
+  if (startDate.isValid()) {
+    const vesselsForStartDate: IVessel[] = vesselSearch(landing.vesselPln, startDate.toISOString());
+    const vesselForStartDate = vesselsForStartDate.find(v => v.pln === landing.vesselPln);
+    if (!vesselForStartDate) {
+      landing.errors.push('error.startDate.vesselPln.any.invalid');
     }
   }
 
