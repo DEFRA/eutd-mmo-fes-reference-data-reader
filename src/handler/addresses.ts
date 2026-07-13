@@ -25,16 +25,18 @@ export const addressesRoutes = (server: Hapi.Server) => {
           }
         }
       },
-      handler: async (request: Hapi.Request, h: ResponseToolkit) =>
-        await BoomiService.getAddresses(request.query.postcode)
+      handler: async (request: Hapi.Request, h: ResponseToolkit) => {
+        const postcode = Array.isArray(request.query.postcode) ? request.query.postcode[0] : request.query.postcode;
+        return await BoomiService.getAddresses(postcode)
           .then(data => {
             logger.info(`[GET-ADDRESS][${JSON.stringify(data)}]`);
             return h.response(data)
           })
           .catch(e => {
-            logger.error(`[GET-ADDRESS][${request.query.postcode}][ERROR][${e.stack ?? e}]`);
+            logger.error(`[GET-ADDRESS][${postcode}][ERROR][${e.stack ?? e}]`);
             return h.response([]);
           })
+      }
     },
   ]);
 }

@@ -124,6 +124,62 @@ describe('/v1/commodities/search', () => {
     expect(response.result).toEqual([]);
   });
 
+  it('should use the first speciesCode when passed as an array', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/commodities/search?speciesCode=ALB&speciesCode=NOTEXIST&state=FRE&presentation=WHL'
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.result).toEqual([
+      {
+        code: '03023190',
+        description: 'Fresh or chilled albacore or .... ',
+        faoName: 'Albacore',
+        stateLabel: 'fresh',
+        presentationLabel: 'whole'
+      }
+    ]);
+  });
+
+  it('should use the first state when passed as an array', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/commodities/search?speciesCode=ALB&state=FRE&state=FRO&presentation=WHL'
+    });
+
+    expect(response.statusCode).toBe(200);
+    // FRE (first) matches fresh/WHL combination
+    expect(response.result).toEqual([
+      {
+        code: '03023190',
+        description: 'Fresh or chilled albacore or .... ',
+        faoName: 'Albacore',
+        stateLabel: 'fresh',
+        presentationLabel: 'whole'
+      }
+    ]);
+  });
+
+  it('should use the first presentation when passed as an array', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/commodities/search?speciesCode=ALB&state=FRE&presentation=WHL&presentation=GUH'
+    });
+
+    expect(response.statusCode).toBe(200);
+    // WHL (first) should match
+    expect(response.result).toEqual([
+      {
+        code: '03023190',
+        description: 'Fresh or chilled albacore or .... ',
+        faoName: 'Albacore',
+        stateLabel: 'fresh',
+        presentationLabel: 'whole'
+      }
+    ]);
+  });
+
 
 });
 
@@ -230,5 +286,58 @@ describe('/v1/species/search-exact', () => {
     mockReq = '/v1/species/search-exact';
     const response = await server.inject(mockReq);
     expect(response.result).toBeNull();
+  });
+});
+
+describe('/v1/species - uk query param', () => {
+
+  let mockGetSpeciesData: jest.SpyInstance;
+
+  beforeEach(() => {
+    mockGetSpeciesData = jest.spyOn(Cache, 'getSpeciesData');
+    mockGetSpeciesData.mockReturnValue([
+      {
+        faoCode: 'COD',
+        faoName: 'Atlantic cod',
+        scientificName: 'Gadus morhua',
+        preservationState: 'FRE',
+        preservationDescr: 'fresh',
+        presentationState: 'WHL',
+        presentationDescr: 'whole',
+        commodityCode: '03026900',
+        commodityCodeDescr: 'Fresh or chilled Atlantic cod'
+      }
+    ]);
+  });
+
+  afterEach(() => {
+    mockGetSpeciesData.mockRestore();
+  });
+
+  it('returns UK species when uk query param is the string "Y"', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/species?uk=Y'
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('returns all species when uk query param is absent', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/species'
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('returns all species when uk query param is not the string "Y"', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/v1/species?uk=N'
+    });
+
+    expect(response.statusCode).toBe(200);
   });
 });

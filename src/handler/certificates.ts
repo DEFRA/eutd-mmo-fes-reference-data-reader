@@ -52,7 +52,8 @@ export const certificateRoutes = (server: Hapi.Server) => server.route([
 
       if (pdfReference) {
         try {
-          const certificate = await getCertificateByPdfReference(pdfReference)
+          const pdfRef = Array.isArray(pdfReference) ? pdfReference[0] : pdfReference;
+          const certificate = await getCertificateByPdfReference(pdfRef)
           if (certificate) {
             logger.info(`[GET-CERTIFICATE][${pdfReference}][SUCCESS]`)
             return h.response(certificate).type('application/json')
