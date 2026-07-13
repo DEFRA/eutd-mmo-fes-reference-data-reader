@@ -277,29 +277,12 @@ describe('/v1/species - uk query param', () => {
     mockGetSpeciesData.mockRestore();
   });
 
-  it('returns UK species when uk query param is the string "Y"', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/species?uk=Y'
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-  it('returns all species when uk query param is absent', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/species'
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-  it('returns all species when uk query param is not the string "Y"', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/species?uk=N'
-    });
+  it.each([
+    ['the string "Y"',  '/v1/species?uk=Y'],
+    ['absent',          '/v1/species'],
+    ['not the string "Y"', '/v1/species?uk=N'],
+  ])('returns 200 when uk query param is %s', async (_desc, url) => {
+    const response = await server.inject({ method: 'GET', url });
 
     expect(response.statusCode).toBe(200);
   });
