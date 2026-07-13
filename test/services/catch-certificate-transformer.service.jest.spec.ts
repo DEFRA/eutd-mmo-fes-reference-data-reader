@@ -540,11 +540,14 @@ describe('CatchCertificateTransformerService', () => {
       expect(references).toHaveLength(2);
     });
 
-    it('should set DIRECT_LANDING to true when landingsEntryOption is directLanding', () => {
-      const documentNumber = 'GBR-2025-CC-DL001';
+    it.each([
+      ['should set DIRECT_LANDING to true when landingsEntryOption is directLanding', 'GBR-2025-CC-DL001', 'directLanding', 'true'],
+      ['should set DIRECT_LANDING to false when landingsEntryOption is not directLanding', 'GBR-2025-CC-DL002', 'manualLanding', 'false'],
+      ['should set DIRECT_LANDING to false when landingsEntryOption is absent', 'GBR-2025-CC-DL003', undefined, 'false']
+    ])('%s', (_description, documentNumber, landingsEntryOption, expectedValue) => {
       const createdAt = new Date('2025-12-01');
       const exportData = {
-        landingsEntryOption: 'directLanding',
+        ...(landingsEntryOption ? { landingsEntryOption } : {}),
         exporterDetails: {},
         exportedFrom: 'UK',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
@@ -565,62 +568,7 @@ describe('CatchCertificateTransformerService', () => {
       );
 
       expect(directLandingNote).toBeDefined();
-      expect(directLandingNote.Content.value).toBe('true');
-    });
-
-    it('should set DIRECT_LANDING to false when landingsEntryOption is not directLanding', () => {
-      const documentNumber = 'GBR-2025-CC-DL002';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        landingsEntryOption: 'manualLanding',
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: []
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const includedSPSNote =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
-      const directLandingNote = includedSPSNote.find(
-        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
-      );
-
-      expect(directLandingNote).toBeDefined();
-      expect(directLandingNote.Content.value).toBe('false');
-    });
-
-    it('should set DIRECT_LANDING to false when landingsEntryOption is absent', () => {
-      const documentNumber = 'GBR-2025-CC-DL003';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: []
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const includedSPSNote =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSExchangedDocument.IncludedSPSNote;
-      const directLandingNote = includedSPSNote.find(
-        (note: any) => note.SubjectCode.value === 'DIRECT_LANDING'
-      );
-
-      expect(directLandingNote).toBeDefined();
-      expect(directLandingNote.Content.value).toBe('false');
+      expect(directLandingNote.Content.value).toBe(expectedValue);
     });
 
     it('should set DIRECT_LANDING to false when landingsEntryOption is null', () => {
@@ -1475,60 +1423,15 @@ describe('CatchCertificateTransformerService', () => {
       expect(importCountry.Name.value).toBe('Italy');
     });
 
-    it('should default to FR when no import country provided', () => {
-      const documentNumber = 'GBR-2025-CC-IMP003';
+    it.each([
+      ['should default to FR when no import country provided', 'GBR-2025-CC-IMP003', 'UK'],
+      ['should handle null transport object', 'GBR-2025-CC-IMP004', 'UK'],
+      ['should handle missing exportedTo with null transport', 'GBR-2025-CC-IMP005', 'Dover']
+    ])('%s', (_description, documentNumber, exportedFrom) => {
       const createdAt = new Date('2025-12-01');
       const exportData = {
         exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{}]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const importCountry =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ImportSPSCountry;
-
-      expect(importCountry.ID.value).toBe('FR');
-      expect(importCountry.Name.value).toBe('France');
-    });
-
-    it('should handle null transport object', () => {
-      const documentNumber = 'GBR-2025-CC-IMP004';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{}]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const importCountry =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ImportSPSCountry;
-
-      expect(importCountry.ID.value).toBe('FR');
-      expect(importCountry.Name.value).toBe('France');
-    });
-
-    it('should handle missing exportedTo with null transport', () => {
-      const documentNumber = 'GBR-2025-CC-IMP005';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'Dover',
+        exportedFrom,
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
         transportations: [{}]
@@ -2209,69 +2112,18 @@ describe('CatchCertificateTransformerService', () => {
       expect(transport[0].UsedSPSTransportMeans.Name.value).toBe('MV Maersk Viking');
     });
 
-    it('should return empty string for truck when registrationNumber is missing', () => {
-      const documentNumber = 'GBR-2025-CC-TRANS-MEANS005';
+    it.each([
+      ['should return empty string for truck when registrationNumber is missing', 'GBR-2025-CC-TRANS-MEANS005', 'truck'],
+      ['should return empty string for train when railwayBillNumber is missing', 'GBR-2025-CC-TRANS-MEANS006', 'train'],
+      ['should return empty string for plane when flightNumber is missing', 'GBR-2025-CC-TRANS-MEANS007', 'plane']
+    ])('%s', (_description, documentNumber, vehicle) => {
       const createdAt = new Date('2025-12-01');
       const exportData = {
         exporterDetails: {},
         exportedFrom: 'UK',
         exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
         pointOfDestination: 'France',
-        transportations: [{
-          vehicle: 'truck'
-        }]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const transport =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .MainCarriageSPSTransportMovement;
-
-      expect(transport[0].UsedSPSTransportMeans).toBeUndefined();
-    });
-
-    it('should return empty string for train when railwayBillNumber is missing', () => {
-      const documentNumber = 'GBR-2025-CC-TRANS-MEANS006';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{
-          vehicle: 'train'
-        }]
-      };
-
-      const result = CatchCertificateTransformerService.generateCatchPayload(
-        documentNumber,
-        createdAt,
-        exportData
-      );
-
-      const transport =
-        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment
-          .MainCarriageSPSTransportMovement;
-
-      expect(transport[0].UsedSPSTransportMeans).toBeUndefined();
-    });
-
-    it('should return empty string for plane when flightNumber is missing', () => {
-      const documentNumber = 'GBR-2025-CC-TRANS-MEANS007';
-      const createdAt = new Date('2025-12-01');
-      const exportData = {
-        exporterDetails: {},
-        exportedFrom: 'UK',
-        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
-        pointOfDestination: 'France',
-        transportations: [{
-          vehicle: 'plane'
-        }]
+        transportations: [{ vehicle }]
       };
 
       const result = CatchCertificateTransformerService.generateCatchPayload(

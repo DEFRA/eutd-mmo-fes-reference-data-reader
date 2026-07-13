@@ -920,24 +920,16 @@ describe('getSpeciesRiskScore', () => {
     });
   })
 
-  it('should return defaultvalue when undefined riskScore ', () => {
-    const speciesRisk = SUT.getSpeciesRiskScore('COD');
-    expect(speciesRisk).toBe(0.5);
-  });
+  it.each([
+    ['COD', 0.5, 'should return defaultvalue when undefined riskScore '],
+    ['WHO', 0.5, 'should return defaultvalue when missing riskScore '],
+    ['LBE', 1, 'should return riskScore value when riskScore is a number '],
+    ['HER', 1, 'should return riskScore value when riskScore is a string valid number ']
+  ])('%s', (speciesCode, expectedRiskScore, description) => {
+    const speciesRisk = SUT.getSpeciesRiskScore(speciesCode);
 
-  it('should return defaultvalue when missing riskScore ', () => {
-    const speciesRisk = SUT.getSpeciesRiskScore('WHO');
-    expect(speciesRisk).toBe(0.5);
-  });
-
-  it('should return riskScore value when riskScore is a number ', () => {
-    const speciesRisk = SUT.getSpeciesRiskScore('LBE');
-    expect(speciesRisk).toBe(1);
-  });
-
-  it('should return riskScore value when riskScore is a string valid number ', () => {
-    const speciesRisk = SUT.getSpeciesRiskScore('HER');
-    expect(speciesRisk).toBe(1);
+    expect(description).toBeTruthy();
+    expect(speciesRisk).toBe(expectedRiskScore);
   });
 
   it('should return defaultvalue when riskScore string is a string not valid number', () => {
