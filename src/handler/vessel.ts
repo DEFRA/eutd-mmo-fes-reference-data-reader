@@ -19,7 +19,7 @@ export const vesselRoutes = (server: Hapi.Server) => {
       handler: async (request, h) => {
         try {
           const query = request.query;
-          const searchTerm = query.searchTerm;
+          const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
 
           const allVessels: IVessel[] = [];
 
@@ -137,15 +137,16 @@ export const vesselRoutes = (server: Hapi.Server) => {
       handler: async (request, h) => {
         try {
           const query = request.query;
-          const vesselPln = query.vesselPln;
-          const vesselName = query.vesselName;
-          const landedDate = moment.utc(query.landedDate);
+          const vesselPln = Array.isArray(query.vesselPln) ? query.vesselPln[0] : query.vesselPln;
+          const vesselName = Array.isArray(query.vesselName) ? query.vesselName[0] : query.vesselName;
+          const landedDate = moment.utc(Array.isArray(query.landedDate) ? query.landedDate[0] : query.landedDate);
           const landedDateISO = landedDate.toISOString();
-          const vesselFlag = query.flag;
-          const vesselCfr = query.cfr;
-          const vesselHomePort = query.homePort;
-          const vesselNumber = query.licenceNumber;
-          const vesselImoNumber: number = (query.imo === null || query.imo === undefined) ? null : Number.parseInt(query.imo);
+          const vesselFlag = Array.isArray(query.flag) ? query.flag[0] : query.flag;
+          const vesselCfr = Array.isArray(query.cfr) ? query.cfr[0] : query.cfr;
+          const vesselHomePort = Array.isArray(query.homePort) ? query.homePort[0] : query.homePort;
+          const vesselNumber = Array.isArray(query.licenceNumber) ? query.licenceNumber[0] : query.licenceNumber;
+          const imoValue = Array.isArray(query.imo) ? query.imo[0] : query.imo;
+          const vesselImoNumber: number | null = (imoValue === null || imoValue === undefined) ? null : Number.parseInt(imoValue);
           const vesselLicenceValidTo = query.licenceValidTo;
 
           if (!moment.utc(vesselLicenceValidTo).isValid() || vesselNumber === undefined)

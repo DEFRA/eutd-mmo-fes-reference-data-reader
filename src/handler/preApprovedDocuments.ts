@@ -35,7 +35,8 @@ export const preApprovalDocumentRoutes = (server: Hapi.Server) =>
         try {
           const user = req.headers["x-admin-user"];
           if (user) {
-            await preApproveDocumentFromMongo(req.params.documentNumber, user);
+            const userString = Array.isArray(user) ? user[0] : user;
+            await preApproveDocumentFromMongo(req.params.documentNumber, userString);
             logger.info(`[PREAPPROVE-DOCUMENT][${req.params.documentNumber}][SUCCESS]`);
             return h.response().code(204);
           }

@@ -117,6 +117,21 @@ describe('When getting a certificate', () => {
 
   })
 
+  it('will use the first pdfReference when passed as an array', async () => {
+    getMock.mockReset()
+    getMock.mockResolvedValueOnce({ a: 'certificate' })
+
+    const req = {
+      method: 'GET',
+      url: '/v1/certificates?pdfReference=GBR-AZR-FIRST&pdfReference=GBR-AZR-SECOND'
+    }
+
+    const response = await server.inject(req)
+
+    expect(response.statusCode).toBe(200)
+    expect(getMock).toHaveBeenCalledWith('GBR-AZR-FIRST')
+  })
+
 })
 
 describe("When requesting to update a certificate", () => {

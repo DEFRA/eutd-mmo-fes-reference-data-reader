@@ -38,7 +38,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
 
         const query = request.query;
 
-        if (query.uk?.toUpperCase() === 'Y') {
+        if (typeof query.uk === 'string' && query.uk.toUpperCase() === 'Y') {
           const speciesCollection = getSpeciesData('uk');
           useOperators(OperatorType.PIPELINE, { $group });
 
@@ -250,9 +250,9 @@ export const speciesRoutes = (server: Hapi.Server) => {
         const query = request.query;
 
         if (query && Object.keys(query).length) {
-          const code = query.speciesCode;
-          const state = query.state;
-          const pres = query.presentation;
+          const code = Array.isArray(query.speciesCode) ? query.speciesCode[0] : query.speciesCode;
+          const state = Array.isArray(query.state) ? query.state[0] : query.state;
+          const pres = Array.isArray(query.presentation) ? query.presentation[0] : query.presentation;
 
           logger.info('Running commodities search', code, state, pres);
 
