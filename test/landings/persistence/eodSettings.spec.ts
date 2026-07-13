@@ -876,22 +876,27 @@ describe('Eod Rules: isLandingDataAvailable', () => {
     expect(result).toBe(false);
   });
 
-  it('will return false when the expected date is after the current date', async () => {
+  it.each([
+    ['will return false when the expected date is after the current date', 2, 'expectedDate', landingDate, false],
+    ['will return true when the expected date is before the current date', 0, 'expectedDate', landingDate, true],
+    ['will return true when the expected date is on the current date', 1, 'expectedDate', landingDate, true],
+    ['will return true when the expected date is undefined', 14, 'endDate', landingDate, true]
+  ])('%s', async (_description, numberOfDays, ruleType, landedDate, expectedResult) => {
     const setting_1 = new EodSettingModel({
       da: "England",
       vesselSizes: ['12m+'],
       rules: [{
-        numberOfDays: 2,
-        ruleType: 'expectedDate',
+        numberOfDays,
+        ruleType,
         vesselSize: '12m+'
       }]
     });
 
     await setting_1.save();
 
-    const result = await SUT.isLandingDataAvailable(licence, landingDate);
+    const result = await SUT.isLandingDataAvailable(licence, landedDate);
 
-    expect(result).toBe(false);
+    expect(result).toBe(expectedResult);
   });
 
   it('will return true when the expected date is after the current date but the landing is legally due', async () => {
@@ -950,59 +955,6 @@ describe('Eod Rules: isLandingDataAvailable', () => {
     expect(result).toBe(true);
   });
 
-  it('will return true when the expected date is before the current date', async () => {
-    const setting_1 = new EodSettingModel({
-      da: "England",
-      vesselSizes: ['12m+'],
-      rules: [{
-        numberOfDays: 0,
-        ruleType: 'expectedDate',
-        vesselSize: '12m+'
-      }]
-    });
-
-    await setting_1.save();
-
-    const result = await SUT.isLandingDataAvailable(licence, landingDate);
-
-    expect(result).toBe(true);
-  });
-
-  it('will return true when the expected date is on the current date', async () => {
-    const setting_1 = new EodSettingModel({
-      da: "England",
-      vesselSizes: ['12m+'],
-      rules: [{
-        numberOfDays: 1,
-        ruleType: 'expectedDate',
-        vesselSize: '12m+'
-      }]
-    });
-
-    await setting_1.save();
-
-    const result = await SUT.isLandingDataAvailable(licence, landingDate);
-
-    expect(result).toBe(true);
-  });
-
-  it('will return true when the expected date is undefined', async () => {
-    const setting_1 = new EodSettingModel({
-      da: "England",
-      vesselSizes: ['12m+'],
-      rules: [{
-        numberOfDays: 14,
-        ruleType: 'endDate',
-        vesselSize: '12m+'
-      }]
-    });
-
-    await setting_1.save();
-
-    const result = await SUT.isLandingDataAvailable(licence, landingDate);
-
-    expect(result).toBe(true);
-  });
 
 });
 

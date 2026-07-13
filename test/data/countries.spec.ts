@@ -50,7 +50,7 @@ describe('When getting countries data', () => {
     describe('When getting countries from a local file', () => {
       it('will return the data for export countries from file', () => {
             const countries = getCountriesDataFromFile(path);
-            expect(countries.length).toBe(249);
+            expect(countries).toHaveLength(249);
       });
 
       it('will return an error if getCountriesFromLocalFile throws a parse error', () => {
@@ -62,7 +62,7 @@ describe('When getting countries data', () => {
         expect(mockLoggerError).toHaveBeenCalledWith('Could not load countries data from file', expect.anything());
       });
 
-      it('will return an error if getCountriesFromLocalFile throws a parse error', () => {
+      it('will return an error if getCountriesFromLocalFile throws a parse error on malformed content', () => {
           expect(() => getCountriesDataFromFile('/incorrectFilename.json')).toThrow('Error: ENOENT: no such file or directory, open');
           expect(mockLoggerError).toHaveBeenCalledWith('Could not load countries data from file', expect.anything());
       });

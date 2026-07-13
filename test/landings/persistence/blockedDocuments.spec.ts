@@ -72,7 +72,7 @@ describe('when getting blocked catch certificates', () => {
 
     const res = await getBlockedCatchCerts({})
 
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
   });
 
@@ -100,7 +100,7 @@ describe('when getting blocked catch certificates', () => {
 
     const res = await getBlockedCatchCerts({})
 
-    expect(res.length).toBe(2)
+    expect(res).toHaveLength(2)
 
     expect(res[0].documentNumber).toBe('001')
     expect(res[1].documentNumber).toBe('002')
@@ -127,7 +127,7 @@ describe('when getting blocked catch certificates', () => {
 
         const res = await getBlockedCatchCerts({ documentNumber: '001' })
 
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
 
         expect(res[0].documentNumber).toBe('001')
 
@@ -157,7 +157,7 @@ describe('when getting blocked catch certificates', () => {
 
         const res = await getBlockedCatchCerts({ pln: 'BOB' });
 
-        expect(res.length).toBe(1);
+        expect(res).toHaveLength(1);
 
         expect(res[0].documentNumber).toBe('002');
 
@@ -187,7 +187,7 @@ describe('when getting blocked catch certificates', () => {
 
         const res = await getBlockedCatchCerts({ exporter: 'BOB' });
 
-        expect(res.length).toBe(1);
+        expect(res).toHaveLength(1);
 
         expect(res[0].documentNumber).toBe('002');
 
@@ -214,7 +214,7 @@ describe('when getting blocked catch certificates', () => {
 
         const res = await getBlockedCatchCerts({ exporter: 'the quick brown fox' });
 
-        expect(res.length).toBe(1);
+        expect(res).toHaveLength(1);
 
         expect(res[0].documentNumber).toBe('002');
       });
@@ -240,7 +240,7 @@ describe("when getting blocked storage documents and processing statements", () 
   it('can get storage documents and processing statements', async () => {
     const res = await getBlockedSdPs({});
 
-    expect(res.length).toBe(3);
+    expect(res).toHaveLength(3);
     expect(res[0].documentType).toBe('storageDocument');
     expect(res[1].documentType).toBe('processingStatement');
     expect(res[2].documentType).toBe('processingStatement');
@@ -254,7 +254,7 @@ describe("when getting blocked storage documents and processing statements", () 
           toDate: moment.utc('2019-12-15T00:00:00.000Z')
         });
 
-        expect(res.length).toBe(1);
+        expect(res).toHaveLength(1);
         expect(res[0].documentNumber).toBe('001');
       });
     });
@@ -265,7 +265,7 @@ describe("when getting blocked storage documents and processing statements", () 
           areas: ["England", "N. Ireland"]
         });
 
-        expect(res.length).toBe(2);
+        expect(res).toHaveLength(2);
         expect(res[0].documentNumber).toBe('001');
         expect(res[1].documentNumber).toBe('003');
       });
@@ -277,7 +277,7 @@ describe("when getting blocked storage documents and processing statements", () 
           documentNumber: '002'
         });
 
-        expect(res.length).toBe(1);
+        expect(res).toHaveLength(1);
         expect(res[0].documentNumber).toBe('002');
       });
     });
@@ -288,7 +288,7 @@ describe("when getting blocked storage documents and processing statements", () 
           exporter: 'Exporter 2'
         });
 
-        expect(res.length).toBe(2);
+        expect(res).toHaveLength(2);
         expect(res[0].documentNumber).toBe('002');
         expect(res[1].documentNumber).toBe('003');
       });
@@ -302,7 +302,7 @@ describe("when getting blocked storage documents and processing statements", () 
           exporter: 'THE quick brown fox'
         });
 
-        expect(res.length).toBe(1);
+        expect(res).toHaveLength(1);
       });
     });
   });

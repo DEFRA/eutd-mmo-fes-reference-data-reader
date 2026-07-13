@@ -68,7 +68,7 @@ describe('that we can read documents from mongo', () => {
 
     const docs =  await getAllDocuments({})
 
-    expect(docs.length).toEqual(1)
+    expect(docs).toHaveLength(1)
     expect(docs[0].documentNumber).toEqual('GBR-2019-SD-8C3267BFB')
 
   })
@@ -116,7 +116,7 @@ describe('that we can read documents from mongo', () => {
 
     const docs =  await getAllDocuments({})
 
-    expect(docs.length).toEqual(1)
+    expect(docs).toHaveLength(1)
     expect(docs[0].documentNumber).toEqual('GBR-2019-PS-8FACE6274')
 
   })
@@ -160,7 +160,7 @@ describe('that we can read documents from mongo', () => {
 
     const docs =  await getAllDocuments({})
 
-    expect(docs.length).toEqual(2)
+    expect(docs).toHaveLength(2)
     expect(docs[0].documentNumber).toEqual('COMPLETE')
     expect(docs[1].documentNumber).toEqual('OLD')
 
@@ -204,7 +204,7 @@ describe('that we can read documents from mongo', () => {
 
     const docs =  await getAllDocuments({})
 
-    expect(docs.length).toEqual(1)
+    expect(docs).toHaveLength(1)
     expect(docs[0].documentNumber).toEqual('GOOD')
 
   })
@@ -225,10 +225,10 @@ describe('that we can read documents from mongo', () => {
     let res
 
     res = await getAllDocuments({})
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
     res = await getAllDocuments({ fromDate: moment.utc('2019-10-19').startOf('day') })
-    expect(res.length).toBe(0)
+    expect(res).toHaveLength(0)
 
   })
 
@@ -246,7 +246,7 @@ describe('that we can read documents from mongo', () => {
     await doc.save()
 
     const res = await getAllDocuments({ fromDate: moment.utc('2019-10-27').startOf('day') })
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
   })
 
@@ -264,7 +264,7 @@ describe('that we can read documents from mongo', () => {
     await doc.save()
 
     const res = await getAllDocuments({})
-    expect(res.length).toBe(0)
+    expect(res).toHaveLength(0)
 
   })
 
@@ -282,7 +282,7 @@ describe('that we can read documents from mongo', () => {
     await doc.save()
 
     const res = await getAllDocuments({ documentStatus: 'VOID', documentNumber: 'GBR-ERAERAS-FASDFAS-FASDASF' })
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
   })
 
@@ -315,7 +315,7 @@ describe('that we can read documents from mongo', () => {
         await doc.save()
 
         const res = await getAllDocuments({ documentNumber: 'HELLO' })
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
 
       });
     });
@@ -366,7 +366,7 @@ describe('that we can read documents from mongo', () => {
         await doc.save()
 
         const res = await getAllDocuments({ exporter: 'FRED' })
-        expect(res.length).toBe(2)
+        expect(res).toHaveLength(2)
 
       });
 
@@ -387,7 +387,7 @@ describe('that we can read documents from mongo', () => {
         await doc.save()
 
         const res = await getAllDocuments({ exporter: 'the quick brown fox' })
-        expect(res.length).toBe(1)
+        expect(res).toHaveLength(1)
 
       });
     });
@@ -444,7 +444,7 @@ describe('that we can read documents from mongo', () => {
     await doc.save()
 
     const res = await getAllDocuments({ fccNumbers: ['BOB22', 'BOB24'] })
-    expect(res.length).toBe(3)
+    expect(res).toHaveLength(3)
 
     expect(res[0].documentNumber).toBe('D1')
     expect(res[1].documentNumber).toBe('D3')

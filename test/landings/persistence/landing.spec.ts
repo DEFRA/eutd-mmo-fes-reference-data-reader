@@ -65,7 +65,7 @@ describe('persisting landings', () => {
     })
 
     const results = await Service.getLandings('101', '2019-01-01')
-    expect(results.length).toBe(1)
+    expect(results).toHaveLength(1)
     expect(results[0].rssNumber).toBe('101')
 
   })
@@ -81,9 +81,9 @@ describe('persisting landings', () => {
     })
 
     const results = await Service.getLandings('101', '2019-01-01')
-    expect(results.length).toBe(1)
+    expect(results).toHaveLength(1)
     expect(results[0].rssNumber).toBe('101')
-    expect(results[0].items.length).toBe(1);
+    expect(results[0].items).toHaveLength(1);
     expect(results[0].items[0]).toMatchObject(fullLanding);
   });
 
@@ -120,16 +120,16 @@ describe('persisting landings', () => {
     let results
 
     results = await Service.getLandings('101', '2019-01-01')
-    expect(results.length).toBe(2)
+    expect(results).toHaveLength(2)
 
     results = await Service.getLandings('102', '2019-01-01')
-    expect(results.length).toBe(1)
+    expect(results).toHaveLength(1)
 
     results = await Service.getLandings('101', '2019-01-02')
-    expect(results.length).toBe(1)
+    expect(results).toHaveLength(1)
 
     results = await Service.getLandings('101', '2019-01-03')
-    expect(results.length).toBe(0)
+    expect(results).toHaveLength(0)
 
   })
 
@@ -153,7 +153,7 @@ describe('persisting landings', () => {
     let results
     results = await Service.getLandings(rssNumber, theDay)
 
-    expect(results.length).toBe(1)
+    expect(results).toHaveLength(1)
 
     // Save the dateTimeRetrived so we can check that it is not overwritten
     // after replacing these landings with a new set
@@ -172,7 +172,7 @@ describe('persisting landings', () => {
 
     results = await Service.getLandings(rssNumber, theDay)
 
-    expect(results.length).toBe(2)
+    expect(results).toHaveLength(2)
 
     const firstRecordedLanding = results.find( _ => (_.dateTimeLanded.toISOString() == '2019-01-01T10:00:00.000Z'))
 
@@ -186,7 +186,7 @@ describe('persisting landings', () => {
 
     results = await Service.getLandings(rssNumber, theDay)
 
-    expect(results.length).toBe(2)
+    expect(results).toHaveLength(2)
 
     expect(timesRetrieved.sort()).toEqual(results.map( _ => [_.dateTimeLanded, _.dateTimeRetrieved]).sort())
 
@@ -223,7 +223,7 @@ describe('persisting landings', () => {
     })
 
     const results = await Service.getAllLandings()
-    expect(results.length).toBe(4)
+    expect(results).toHaveLength(4)
 
   })
 
@@ -251,7 +251,7 @@ describe('persisting landings', () => {
     })
 
     const results = await Service.getAllLandings()
-    expect(results.length).toBe(3)
+    expect(results).toHaveLength(3)
 
   })
 
@@ -279,7 +279,7 @@ describe('persisting landings', () => {
 
     const results = await Service.getLandings(rssNumber, theDay)
 
-    expect(results.length).toBe(2)
+    expect(results).toHaveLength(2)
 
   })
 
@@ -336,14 +336,14 @@ describe('given that timestamps from CEFAS are UTC, and dateLanded within the ca
 
     const res = await Service.getLandings('rssNumber', '2019-07-01')
 
-    expect(res.length).toBe(3)
+    expect(res).toHaveLength(3)
 
     expect(res.map(r => r.dateTimeLanded.toISOString())).toEqual([
       moment('2019-07-01T00:00:00Z').toISOString(),
       moment('2019-07-01T10:00:00Z').toISOString(),
       moment('2019-07-01T23:00:00Z').toISOString()
     ]);
-    expect(true).toBeTruthy();
+
 
   })
 
@@ -384,7 +384,7 @@ describe('get multiple landings', () => {
 
     expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, '[LANDINGS][GET-MULTIPLE-LANDINGS][LANDING][RSS-NUMBER][100]');
 
-    expect(res.length).toBe(2)
+    expect(res).toHaveLength(2)
   })
 
   it('will match correctly on both attributes', async() => {
@@ -414,7 +414,7 @@ describe('get multiple landings', () => {
 
     const res = await Service.getLandingsMultiple( [{ rssNumber: '100', dateLanded: '2019-08-01' }] )
 
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
   })
 
@@ -448,7 +448,7 @@ describe('get multiple landings', () => {
       { rssNumber: '200', dateLanded: '2019-08-01' },
     ] )
 
-    expect(res.length).toBe(2)
+    expect(res).toHaveLength(2)
 
   })
 
@@ -482,7 +482,7 @@ describe('get multiple landings', () => {
       { rssNumber: '100', dateLanded: '2019-08-01' },
     ] )
 
-    expect(res.length).toBe(1)
+    expect(res).toHaveLength(1)
 
   })
 
@@ -513,7 +513,7 @@ describe('get multiple landings', () => {
 
     const res = await Service.getLandingsMultiple( [] )
 
-    expect(res.length).toBe(0)
+    expect(res).toHaveLength(0)
 
   })
 

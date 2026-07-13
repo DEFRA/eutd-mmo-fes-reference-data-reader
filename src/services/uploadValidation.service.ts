@@ -140,7 +140,7 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
     return landing;
   }
 
-  const landingDate = moment(landing.landingDate, 'DD/MM/YYYY', true);
+  const landingDate = moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
 
   if (landingDate.isValid()) {
     const vessels: IVessel[] = vesselSearch(landing.vesselPln, landingDate.toISOString());
@@ -248,7 +248,7 @@ export const validateHighSeasAreaForLanding = (landing: IUploadedLanding): IUplo
   }
 
   const normalizedValue = landing.highSeasArea.toLowerCase();
-  
+
   if (!["yes", "no"].includes(normalizedValue)) {
     landing.errors.push('error.highSeasArea.any.invalid');
   }
@@ -316,7 +316,7 @@ const hasDuplicateCountries = (eezDataArr: Array<ICountry | undefined>): boolean
   const countryNames = eezDataArr
     .map(eezData => eezData?.officialCountryName)
     .filter((name): name is string => name !== undefined);
-  
+
   return new Set(countryNames).size !== countryNames.length;
 };
 
@@ -326,7 +326,7 @@ const hasDuplicateCountries = (eezDataArr: Array<ICountry | undefined>): boolean
  * @param landing - Uploaded landing data
  * @returns Landing with enriched eezData or validation errors
  */
-export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {  
+export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedLanding => {
   // EEZ code is now required only if high seas is "no"
   if(!landing.eezCode && landing.highSeasArea === 'yes') return landing;
   if ((!landing.eezCode || landing.eezCode.trim() === '') && landing.highSeasArea === 'no') {
@@ -356,7 +356,7 @@ export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedL
 
   // Check all codes resolve to valid countries
   const eezNames = eezDataArr.filter((data): data is ICountry => data !== undefined);
-  
+
   if (validCodes.length !== eezNames.length) {
     landing.errors.push('validation.eezCode.string.unknown');
     return landing;
@@ -376,15 +376,15 @@ export const isPositiveNumberWithTwoDecimals = (num: number): boolean => {
   if (Number.isNaN(num) || num < 0) {
     return false;
   }
-  
+
   // Safer: Check decimal places by converting to string
   const numStr = num.toString();
   const decimalIndex = numStr.indexOf('.');
-  
+
   if (decimalIndex === -1) {
     return true; // No decimals
   }
-  
+
   return numStr.length - decimalIndex - 1 <= 2; // Max 2 decimal places
 };
 

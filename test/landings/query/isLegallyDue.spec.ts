@@ -59,45 +59,22 @@ describe('isLegallyDue', () => {
 
     describe('when the da is England', () => {
 
-      it('will return true for quota species', () => {
-        const applicationDate = moment.utc('2020-01-01');
-        const landedDate = moment.utc('2020-01-01');
-        const isQuotaSpecies = true;
+      it.each([
+        ['2020-01-01', '2020-01-01', true, true],
+        ['2020-01-03', '2020-01-01', false, true],
+        ['2020-01-01', '2020-01-01', false, false],
+        ['2020-01-01', '2020-01-02', false, false]
+      ])(
+        'will return %s for applicationDate=%s landedDate=%s quota=%s',
+        (applicationDateValue, landedDateValue, isQuotaSpecies, expectedResult) => {
+          const applicationDate = moment.utc(applicationDateValue);
+          const landedDate = moment.utc(landedDateValue);
 
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.ENGLAND, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
+          const result = isLegallyDue(9, DEVOLVED_AUTHORITY.ENGLAND, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
 
-        expect(result).toBe(true);
-      });
-
-      it('will return true for non-quota species if the date of application is 2 days greater than the landed date', () => {
-        const applicationDate = moment.utc('2020-01-03');
-        const landedDate = moment.utc('2020-01-01');
-        const isQuotaSpecies = false;
-
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.ENGLAND, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
-
-        expect(result).toBe(true);
-      });
-
-      it('will return false for non-quota species if the date of application is the same as the landed date', () => {
-        const applicationDate = moment.utc('2020-01-01');
-        const landedDate = moment.utc('2020-01-01');
-        const isQuotaSpecies = false;
-
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.ENGLAND, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
-
-        expect(result).toBe(false);
-      });
-
-      it('will return false for non-quota species if the date of application is 1 day greater than the landed date', () => {
-        const applicationDate = moment.utc('2020-01-01');
-        const landedDate = moment.utc('2020-01-02');
-        const isQuotaSpecies = false;
-
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.ENGLAND, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
-
-        expect(result).toBe(false);
-      });
+          expect(result).toBe(expectedResult);
+        }
+      );
 
     });
 
@@ -145,35 +122,21 @@ describe('isLegallyDue', () => {
 
     describe('when the da is Isle of Man', () => {
 
-      it('will return true for quota species', () => {
-        const applicationDate = moment.utc('2020-01-01');
-        const landedDate = moment.utc('2020-01-01');
-        const isQuotaSpecies = true;
+      it.each([
+        ['2020-01-01', '2020-01-01', true, true],
+        ['2020-01-03', '2020-01-01', false, true],
+        ['2020-01-01', '2020-01-01', false, false]
+      ])(
+        'will return %s for applicationDate=%s landedDate=%s quota=%s',
+        (applicationDateValue, landedDateValue, isQuotaSpecies, expectedResult) => {
+          const applicationDate = moment.utc(applicationDateValue);
+          const landedDate = moment.utc(landedDateValue);
 
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.IOM, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
+          const result = isLegallyDue(9, DEVOLVED_AUTHORITY.IOM, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
 
-        expect(result).toBe(true);
-      });
-
-      it('will return true for non-quota species if the date of application is 2 days greater than the landed date', () => {
-        const applicationDate = moment.utc('2020-01-03');
-        const landedDate = moment.utc('2020-01-01');
-        const isQuotaSpecies = false;
-
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.IOM, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
-
-        expect(result).toBe(true);
-      });
-
-      it('will return false for non-quota species if the date of application is the same or 1 day greater than the landed date', () => {
-        const applicationDate = moment.utc('2020-01-01');
-        const landedDate = moment.utc('2020-01-01');
-        const isQuotaSpecies = false;
-
-        const result = isLegallyDue(9, DEVOLVED_AUTHORITY.IOM, applicationDate, landedDate, isQuotaSpecies, defaultWeightOnCert);
-
-        expect(result).toBe(false);
-      });
+          expect(result).toBe(expectedResult);
+        }
+      );
 
     });
 

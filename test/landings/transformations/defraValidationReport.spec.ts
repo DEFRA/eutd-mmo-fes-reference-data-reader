@@ -243,7 +243,7 @@ describe('For processing statements', () => {
       const result = toDefraPsCatch(psCatch);
 
       expect(result.isDocumentIssuedInUK).toBe(false);
-      expect(result.issuingCountry).toBe(null);
+      expect(result.issuingCountry).toBeNull();
       expect(result.species).toBe("Atlantic salmon (SAL)");
     });
 
@@ -3285,7 +3285,7 @@ describe('For transportation', () => {
   it('will include all the required transportation properties when provided', () => {
     const result = toTransportation(undefined);
 
-    expect(result).toEqual(undefined);
+    expect(result).toBeUndefined();
   });
 
   describe('For Truck', () => {
@@ -3435,7 +3435,7 @@ describe('For transportations', () => {
   it('will include all the required transportations properties when provided', () => {
     const result = toTransportations(undefined);
 
-    expect(result).toEqual(undefined);
+    expect(result).toBeUndefined();
   });
 
   describe('For Truck', () => {
