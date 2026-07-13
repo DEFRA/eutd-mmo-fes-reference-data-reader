@@ -120,43 +120,20 @@ describe("Refreshing landings", () => {
     expect(response.statusCode).toBe(400);
   });
 
-  it('will fail if date landed is wrong', async () => {
+  it.each([
+    ['test', 'will fail if date landed is wrong'],
+    ['2019-02-3', 'will fail if date landed is of the incorrect length'],
+    ['2019-02-31', 'will fail if date landed is invalid']
+  ])('%s', async (dateLanded, description) => {
     const req = {
       method: 'POST',
       url: '/v1/landings/queue',
-      payload: JSON.stringify({ pln: 'B13509', dateLanded: 'test' })
+      payload: JSON.stringify({ pln: 'B13509', dateLanded })
     };
 
     const response = await server.inject(req);
 
-    expect(fetchLandingsMock).not.toHaveBeenCalled();
-    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
-    expect(response.statusCode).toBe(400);
-  });
-
-  it('will fail if date landed is of the incorrect length', async () => {
-    const req = {
-      method: 'POST',
-      url: '/v1/landings/queue',
-      payload: JSON.stringify({ pln: 'B13509', dateLanded: '2019-02-3' })
-    };
-
-    const response = await server.inject(req);
-
-    expect(fetchLandingsMock).not.toHaveBeenCalled();
-    expect(fetchSalesNoteMock).not.toHaveBeenCalled();
-    expect(response.statusCode).toBe(400);
-  });
-
-  it('will fail if date landed is invalid', async () => {
-    const req = {
-      method: 'POST',
-      url: '/v1/landings/queue',
-      payload: JSON.stringify({ pln: 'B13509', dateLanded: '2019-02-31' })
-    };
-
-    const response = await server.inject(req);
-
+    expect(description).toBeTruthy();
     expect(fetchLandingsMock).not.toHaveBeenCalled();
     expect(fetchSalesNoteMock).not.toHaveBeenCalled();
     expect(response.statusCode).toBe(400);

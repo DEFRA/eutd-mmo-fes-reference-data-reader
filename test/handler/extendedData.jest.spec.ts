@@ -30,56 +30,20 @@ afterAll(async () => {
 describe("When retrieving raw landings", () => {
 
   describe('we will throw a bad request when',() => {
-    it('there is no dateLanded', async () => {
-        const req = {
-            method: 'GET',
-            url: '/v1/extendedData/rawLandings'
-          };
+    it.each([
+      ['there is no dateLanded', '/v1/extendedData/rawLandings'],
+      ['dateLanded is invalid', '/v1/extendedData/rawLandings?dateLanded=test'],
+      ['there is no rssNumber', '/v1/extendedData/rawLandings?dateLanded=2019-01-01'],
+      ['rssNumber is empty', '/v1/extendedData/rawLandings?dateLanded=2019-01-01&rssNumber=']
+    ])('%s', async (_description, url) => {
+      const req = {
+        method: 'GET',
+        url
+      };
 
-        const response = await server.inject(req);
+      const response = await server.inject(req);
 
-        expect(response.statusCode).toBe(400);
-
-
-      });
-
-    it('dateLanded is invalid', async () => {
-        const req = {
-            method: 'GET',
-            url: '/v1/extendedData/rawLandings?dateLanded=test'
-          };
-
-        const response = await server.inject(req);
-
-        expect(response.statusCode).toBe(400);
-
-
-    });
-
-    it('there is no rssNumber', async () => {
-        const req = {
-            method: 'GET',
-            url: '/v1/extendedData/rawLandings?dateLanded=2019-01-01'
-          };
-
-        const response = await server.inject(req);
-
-        expect(response.statusCode).toBe(400);
-
-
-      });
-
-    it('rssNumber is empty', async () => {
-        const req = {
-            method: 'GET',
-            url: '/v1/extendedData/rawLandings?dateLanded=2019-01-01&rssNumber='
-          };
-
-        const response = await server.inject(req);
-
-        expect(response.statusCode).toBe(400);
-
-
+      expect(response.statusCode).toBe(400);
     });
   });
 
@@ -156,57 +120,21 @@ describe("When retrieving raw landings", () => {
 describe("When retrieving sales notes", () => {
 
     describe('we will throw a bad request when',() => {
-        it('there is no dateLanded', async () => {
-            const req = {
-                method: 'GET',
-                url: '/v1/extendedData/salesNotes'
-            };
+    it.each([
+      ['there is no dateLanded', '/v1/extendedData/salesNotes'],
+      ['dateLanded is invalid', '/v1/extendedData/salesNotes?dateLanded=test'],
+      ['there is no rssNumber', '/v1/extendedData/salesNotes?dateLanded=2019-01-01'],
+      ['rssNumber is empty', '/v1/extendedData/salesNotes?dateLanded=2019-01-01&rssNumber=']
+    ])('%s', async (_description, url) => {
+      const req = {
+        method: 'GET',
+        url
+      };
 
-            const response = await server.inject(req);
+      const response = await server.inject(req);
 
-            expect(response.statusCode).toBe(400);
-
-
-        });
-
-        it('dateLanded is invalid', async () => {
-            const req = {
-                method: 'GET',
-                url: '/v1/extendedData/salesNotes?dateLanded=test'
-            };
-
-            const response = await server.inject(req);
-
-            expect(response.statusCode).toBe(400);
-
-
-        });
-
-        it('there is no rssNumber', async () => {
-            const req = {
-                method: 'GET',
-                url: '/v1/extendedData/salesNotes?dateLanded=2019-01-01'
-            };
-
-            const response = await server.inject(req);
-
-            expect(response.statusCode).toBe(400);
-
-
-        });
-
-        it('rssNumber is empty', async () => {
-            const req = {
-                method: 'GET',
-                url: '/v1/extendedData/salesNotes?dateLanded=2019-01-01&rssNumber='
-            };
-
-            const response = await server.inject(req);
-
-            expect(response.statusCode).toBe(400);
-
-
-        });
+      expect(response.statusCode).toBe(400);
+    });
     });
 
     describe('we will throw an internal server error when', () => {
