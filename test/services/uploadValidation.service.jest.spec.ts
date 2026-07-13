@@ -1452,13 +1452,6 @@ describe('uploadValidation.service', () => {
       jest.restoreAllMocks();
     })
 
-    it('should enrich the landing with the RFMO name when RFMO code exists', () => {
-      const result = SUT.validateRfmoCodeForLanding({ errors: [], rfmoCode: 'NEAFC' });
-
-      expect(result.rfmoName).toEqual('North East Atlantic Fisheries Commission (NEAFC)');
-      expect(result.errors).toStrictEqual([]);
-    });
-
     it('should return an error when RFMO code does not exist', () => {
       const result = SUT.validateRfmoCodeForLanding({ errors: [], rfmoCode: 'ABC' });
 
@@ -1466,43 +1459,19 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toStrictEqual(['validation.rfmoCode.string.unknown']);
     });
 
-    it('should enrich landing with RFMO full text when valid code provided', () => {
-      const result = SUT.validateRfmoCodeForLanding({ 
-        errors: [], 
-        rfmoCode: 'NEAFC' 
+    it.each([
+      ['should enrich the landing with the RFMO name when RFMO code exists', 'NEAFC', 'North East Atlantic Fisheries Commission (NEAFC)'],
+      ['should enrich landing with RFMO full text when valid code provided', 'NEAFC', 'North East Atlantic Fisheries Commission (NEAFC)'],
+      ['should enrich landing with RFMO name when code is lowercase', 'gfcm', 'General Fisheries Commission for the Mediterranean (GFCM)'],
+      ['should enrich landing with CCAMLR when code is valid', 'CCAMLR', 'Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)'],
+      ['should handle mixed case RFMO codes', 'NeAfC', 'North East Atlantic Fisheries Commission (NEAFC)']
+    ])('%s', (_description, rfmoCode, expectedName) => {
+      const result = SUT.validateRfmoCodeForLanding({
+        errors: [],
+        rfmoCode
       });
 
-      expect(result.rfmoName).toEqual('North East Atlantic Fisheries Commission (NEAFC)');
-      expect(result.errors).toStrictEqual([]);
-    });
-
-    it('should enrich landing with RFMO name when code is lowercase', () => {
-      const result = SUT.validateRfmoCodeForLanding({ 
-        errors: [], 
-        rfmoCode: 'gfcm' 
-      });
-
-      expect(result.rfmoName).toEqual('General Fisheries Commission for the Mediterranean (GFCM)');
-      expect(result.errors).toStrictEqual([]);
-    });
-
-    it('should enrich landing with CCAMLR when code is valid', () => {
-      const result = SUT.validateRfmoCodeForLanding({ 
-        errors: [], 
-        rfmoCode: 'CCAMLR' 
-      });
-
-      expect(result.rfmoName).toEqual('Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR)');
-      expect(result.errors).toStrictEqual([]);
-    });
-
-    it('should handle mixed case RFMO codes', () => {
-      const result = SUT.validateRfmoCodeForLanding({ 
-        errors: [], 
-        rfmoCode: 'NeAfC' 
-      });
-
-      expect(result.rfmoName).toEqual('North East Atlantic Fisheries Commission (NEAFC)');
+      expect(result.rfmoName).toEqual(expectedName);
       expect(result.errors).toStrictEqual([]);
     });
 
@@ -1614,28 +1583,15 @@ describe('uploadValidation.service', () => {
       expect(twoSemiCommas.errors).toStrictEqual(['validation.eezCode.string.invalid']);
     });
 
-    it('should return an error when multiple EEZ codes are provided and one or more are invalid', () => {
-      // SCOT is not a valid ISO code (2-3 chars)
-      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA;SCOT;DEU' });
+    it.each([
+      ['should return an error when multiple EEZ codes are provided and one or more are invalid', 'FRA;SCOT;DEU', 'validation.eezCode.string.invalid'],
+      ['should return an error when multiple EEZ codes are provided and one or more dont exist', 'FRA;UK;GER', 'validation.eezCode.string.unknown'],
+      ['should return an error when multiple EEZ codes are provided with duplicate codes', 'FRA;GB;FR', 'validation.eezCode.string.invalid']
+    ])('%s', (_description, eezCode, expectedError) => {
+      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode });
 
       expect(result.eezName).toBeUndefined();
-      expect(result.errors).toStrictEqual(['validation.eezCode.string.invalid']);
-    });
-
-    it('should return an error when multiple EEZ codes are provided and one or more dont exist', () => {
-      // UK/GER are not correct ISO codes
-      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA;UK;GER' });
-
-      expect(result.eezName).toBeUndefined();
-      expect(result.errors).toStrictEqual(['validation.eezCode.string.unknown']);
-    });
-
-    it('should return an error when multiple EEZ codes are provided with duplicate codes', () => {
-      // FRA/FR are the same country
-      const result = SUT.validateEezCodeForLanding({ errors: [], eezCode: 'FRA;GB;FR' });
-
-      expect(result.eezName).toBeUndefined();
-      expect(result.errors).toStrictEqual(['validation.eezCode.string.invalid']);
+      expect(result.errors).toStrictEqual([expectedError]);
     });
   });
 
@@ -1643,33 +1599,25 @@ describe('uploadValidation.service', () => {
 
     describe('returns true when given', () => {
 
-      it('zero', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(0);
-        expect(result).toBe(true);
-      });
-
-      it('a integer', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(1);
-        expect(result).toBe(true);
-      });
-
       it('a minus integer', () => {
         const result = SUT.isPositiveNumberWithTwoDecimals(-1);
         expect(result).toBe(false);
       });
 
-      it('a float with less than two dp', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(1.1);
-        expect(result).toBe(true);
-      });
-
-      it('a float with exactly two dp', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(1.11);
-        expect(result).toBe(true);
-      });
-
-      it('a float with more than two dp - IF - there are only two significant figures after the decimal point', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(1.110);
+      it.each([
+        ['zero', 0],
+        ['a integer', 1],
+        ['a float with less than two dp', 1.1],
+        ['a float with exactly two dp', 1.11],
+        ['a float with more than two dp - IF - there are only two significant figures after the decimal point', 1.110],
+        ['zero (edge case for num >= 0)', 0],
+        ['a very small positive number', 0.01],
+        ['a large positive integer', 999999],
+        ['a positive float with one decimal place', 5.5],
+        ['a positive float with exactly two decimal places', 10.99],
+        ['a positive float with trailing zeros (2.50)', 2.50]
+      ])('%s', (_description, value) => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(value);
         expect(result).toBe(true);
       });
 
@@ -1686,53 +1634,9 @@ describe('uploadValidation.service', () => {
       });
 
   
-      it('zero (edge case for num >= 0)', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(0);
-        expect(result).toBe(true);
-      });
-
-      it('a very small positive number', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(0.01);
-        expect(result).toBe(true);
-      });
-
-      it('a large positive integer', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(999999);
-        expect(result).toBe(true);
-      });
-
-      it('a positive float with one decimal place', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(5.5);
-        expect(result).toBe(true);
-      });
-
-      it('a positive float with exactly two decimal places', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(10.99);
-        expect(result).toBe(true);
-      });
-
-      it('a positive float with trailing zeros (2.50)', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(2.50);
-        expect(result).toBe(true);
-      });
     });
 
     describe('returns false when given', () => {
-
-      it('a negative integer', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(-1);
-        expect(result).toBe(false);
-      });
-
-      it('a negative float', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(-0.1);
-        expect(result).toBe(false);
-      });
-
-      it('a float with more than two dp', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(1.111);
-        expect(result).toBe(false);
-      });
 
       it('negative zero (JavaScript quirk)', () => {
         const result = SUT.isPositiveNumberWithTwoDecimals(-0);
@@ -1740,18 +1644,15 @@ describe('uploadValidation.service', () => {
         expect(result).toBe(true);
       });
 
-      it('a very small negative number (-0.01)', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(-0.01);
-        expect(result).toBe(false);
-      });
-
-      it('a large negative number', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(-999999);
-        expect(result).toBe(false);
-      });
-
-      it('a negative number with two valid decimals (-5.99)', () => {
-        const result = SUT.isPositiveNumberWithTwoDecimals(-5.99);
+      it.each([
+        ['a negative integer', -1],
+        ['a negative float', -0.1],
+        ['a float with more than two dp', 1.111],
+        ['a very small negative number (-0.01)', -0.01],
+        ['a large negative number', -999999],
+        ['a negative number with two valid decimals (-5.99)', -5.99]
+      ])('%s', (_description, value) => {
+        const result = SUT.isPositiveNumberWithTwoDecimals(value);
         expect(result).toBe(false);
       });
 

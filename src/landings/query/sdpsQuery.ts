@@ -253,8 +253,8 @@ export function* unwoundCatchesToForeignCatchCerts(unwoundCatches: IFlattenedCat
 
 
 export const getForeignCatchCertificatesFromDocuments = (documents: any[]) =>
-  _.uniq(
+  [...new Set(
     Array.from(unwindDocumentsToCatches(documents, () => true))
       .map( ({ certificateNumber }) => certificateNumber.toUpperCase() )
-  );
+  )];
 
