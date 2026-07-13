@@ -104,6 +104,23 @@ describe('When pre approving a document in MONGO', () => {
     expect(response.statusCode).toBe(500);
 
   });
+
+  it('will call preApproveDocumentFromMongo with the user as a string value', async () => {
+    preApproveMongoStub.mockResolvedValue({});
+
+    const request = {
+      method: 'POST',
+      url: '/v1/certificates/GBR-AZR-TEST/preApprove',
+      headers: {
+        "X-ADMIN-USER": "Bob"
+      }
+    };
+
+    await server.inject(request);
+
+    expect(preApproveMongoStub).toHaveBeenCalledWith('GBR-AZR-TEST', 'Bob');
+    expect(typeof preApproveMongoStub.mock.calls[0][1]).toBe('string');
+  });
 });
 
 describe('When getting a pre approved document', () => {

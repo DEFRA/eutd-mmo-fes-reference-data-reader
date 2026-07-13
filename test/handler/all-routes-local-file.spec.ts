@@ -174,6 +174,18 @@ describe("To Support Vessels Autocomplete", () => {
     expect(response.statusCode).toBe(200);
     expect(response.payload).not.toEqual("[]");
   });
+
+  it('GET /v1/vessels/search should use the first searchTerm when passed as an array', async () => {
+
+    const response = await Server.inject({
+      url: '/v1/vessels/search?searchTerm=CA&searchTerm=NOTEXIST&landedDate=2019-01-01'
+    });
+
+    const result = JSON.parse(response.payload);
+    expect(response.statusCode).toBe(200);
+    // First searchTerm 'CA' is used, matching CARALISA
+    expect(result[0].licenceNumber).toEqual('1234');
+  });
 });
 
 
@@ -511,6 +523,27 @@ describe("Routes", () => {
       expect(mockLogError).toHaveBeenCalledWith(`[GET-ADDRESS][${postcode}][ERROR][${error.stack}]`);
     });
 
+    it('will call getAddresses with a string postcode value', async () => {
+      mockGetAddresses.mockResolvedValue([]);
+
+      await Server.inject({
+        url: '/v1/addresses/search?postcode=NE1%201NE'
+      });
+
+      expect(mockGetAddresses).toHaveBeenCalledWith('NE1 1NE');
+      expect(typeof mockGetAddresses.mock.calls[0][0]).toBe('string');
+    });
+
+  });
+
+  it('GET /v1/vessels/hasLicense should use the first value when params are passed as arrays', async () => {
+    const response = await Server.inject({
+      url: '/v1/vessels/hasLicense?vesselPln=E163&vesselPln=FAKE&vesselName=STRIKER&vesselName=FAKE&landedDate=2016-09-01&landedDate=2050-01-01&flag=GBR&flag=FAKE&cfr=GBR000B10811&cfr=FAKE&homePort=EXMOUTH&homePort=FAKE&licenceNumber=22548&licenceNumber=FAKE&licenceValidTo=2030-12-31'
+    });
+
+    // Uses first values: PLN=E163, name=STRIKER, date=2016-09-01, flag=GBR, cfr=GBR000B10811, homePort=EXMOUTH, licence=22548
+    expect(response.statusCode).toBe(200);
+    expect(response.payload.length).toBeGreaterThan(0);
   });
 
 });
