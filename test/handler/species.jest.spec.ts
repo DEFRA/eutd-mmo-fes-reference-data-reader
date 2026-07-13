@@ -124,51 +124,14 @@ describe('/v1/commodities/search', () => {
     expect(response.result).toEqual([]);
   });
 
-  it('should use the first speciesCode when passed as an array', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/commodities/search?speciesCode=ALB&speciesCode=NOTEXIST&state=FRE&presentation=WHL'
-    });
+  it.each([
+    ['speciesCode', '/v1/commodities/search?speciesCode=ALB&speciesCode=NOTEXIST&state=FRE&presentation=WHL'],
+    ['state',       '/v1/commodities/search?speciesCode=ALB&state=FRE&state=FRO&presentation=WHL'],
+    ['presentation', '/v1/commodities/search?speciesCode=ALB&state=FRE&presentation=WHL&presentation=GUH'],
+  ])('should use the first %s when passed as an array', async (_param, url) => {
+    const response = await server.inject({ method: 'GET', url });
 
     expect(response.statusCode).toBe(200);
-    expect(response.result).toEqual([
-      {
-        code: '03023190',
-        description: 'Fresh or chilled albacore or .... ',
-        faoName: 'Albacore',
-        stateLabel: 'fresh',
-        presentationLabel: 'whole'
-      }
-    ]);
-  });
-
-  it('should use the first state when passed as an array', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/commodities/search?speciesCode=ALB&state=FRE&state=FRO&presentation=WHL'
-    });
-
-    expect(response.statusCode).toBe(200);
-    // FRE (first) matches fresh/WHL combination
-    expect(response.result).toEqual([
-      {
-        code: '03023190',
-        description: 'Fresh or chilled albacore or .... ',
-        faoName: 'Albacore',
-        stateLabel: 'fresh',
-        presentationLabel: 'whole'
-      }
-    ]);
-  });
-
-  it('should use the first presentation when passed as an array', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/v1/commodities/search?speciesCode=ALB&state=FRE&presentation=WHL&presentation=GUH'
-    });
-
-    expect(response.statusCode).toBe(200);
-    // WHL (first) should match
     expect(response.result).toEqual([
       {
         code: '03023190',

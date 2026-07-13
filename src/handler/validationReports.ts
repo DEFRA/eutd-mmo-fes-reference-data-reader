@@ -28,9 +28,9 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
           const asOfDate: moment.Moment = getAsOfDate(qparams.asofdate);
           const areas: string[] = getAreaData(qparams);
           const ext: string = params.ext;
-          const documentNumber: string = Array.isArray(qparams.documentNumber) ? qparams.documentNumber[0] : qparams.documentNumber;
-          const exporter: string = Array.isArray(qparams.exporter) ? qparams.exporter[0] : qparams.exporter;
-          const pln: string = Array.isArray(qparams.pln) ? qparams.pln[0] : qparams.pln;
+          const documentNumber: string = getScalarParam(qparams.documentNumber);
+          const exporter: string = getScalarParam(qparams.exporter);
+          const pln: string = getScalarParam(qparams.pln);
 
           if (!isValidReportType(reportType))
             return h.response('invalid report').code(404)
@@ -114,6 +114,8 @@ const getReponseData = (reportData, ext, h) => {
     return h.response(reportData).type('application/json')
   }
 }
+
+const getScalarParam = (value: string | string[]): string => Array.isArray(value) ? value[0] : value;
 
 const getAreaData = (qparams) => qparams.area && qparams.area !== 'all' ? qparams.area.split(',').map(s => s.trim()) : [];
 
