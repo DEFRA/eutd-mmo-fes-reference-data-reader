@@ -1,6 +1,10 @@
 ---
 name: develop
 description: 'Expert TypeScript developer for MMO FES Reference Data Reader. Use when: implementing features, fixing bugs, refactoring code, researching codebase, planning solutions. Covers document-to-SR transformations, AJV schema validation, transportation mode mapping, cron jobs.'
+license: OGL-UK-3.0
+metadata:
+  author: mmo-fes
+  version: "1.0"
 ---
 
 # Reference Data Reader — Developer Skill
