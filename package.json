@@ -51,7 +51,7 @@
     "@azure/storage-blob": "12.18.0",
     "@hapi/basic": "^7.0.2",
     "@hapi/hapi": "^21.4.9",
-    "ajv": "8.13.0",
+    "ajv": "8.20.0",
     "ajv-formats": "^3.0.1",
     "ajv-keywords": "^5.1.0",
     "applicationinsights": "2.9.7",
@@ -59,7 +59,7 @@
     "axios": "^1.15.0",
     "bunyan": "1.8.15",
     "cryptr": "6.3.0",
-    "csvtojson": "2.0.10",
+    "csvtojson": "2.0.14",
     "dotenv": "^16.4.5",
     "joi": "^17.13.1",
     "json2csv": "^5.0.7",
@@ -70,14 +70,17 @@
     "moment": "^2.30.1",
     "mongodb": "6.6.1",
     "mongoose": "^8.3.4",
-    "node-cron": "^3.0.3",
+    "node-cron": "4.2.1",
     "qs": "^6.14.1",
     "utf8-bytes": "0.0.1"
   },
   "overrides": {
     "brace-expansion": "^2.0.1",
     "jws": "^4.0.0",
-    "tar": "^7.5.4"
+    "tar": "^7.5.4",
+    "minimatch@<=3.1.3": "3.1.4",
+    "minimatch@>=5.0.0 <5.1.8": "5.1.8",
+    "minimatch@>=9.0.0 <9.0.7": "9.0.7"
   },
   "jest": {
     "moduleNameMapper": {
