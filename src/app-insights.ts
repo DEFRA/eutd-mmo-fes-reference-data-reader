@@ -8,7 +8,7 @@ const initializeAppInsights = (): void => {
     appInsights.setup(instrumentationKey)
     .setAutoDependencyCorrelation(true)
     .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true)
+    .setAutoCollectPerformance(true, false)
     .setAutoCollectExceptions(true)
     .setAutoCollectDependencies(true)
     .setAutoCollectConsole(true)
