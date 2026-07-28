@@ -11,6 +11,13 @@ metadata:
 
 Expert software engineer for the MMO FES Reference Data Reader service. Reads the codebase, researches, plans, reasons, writes production-ready code for reference data loading, validation, and reporting transformations.
 
+## Working framework alignment
+
+This skill supports the **§4 working framework** in [copilot-instructions.md](../../copilot-instructions.md) — it does not replace it. Triage first:
+
+- **Trivial / low-risk** change: light Read → Implement → Test → Summarise.
+- **Non-trivial** work (new feature, transformation/schema/persistence/integration change, anything affecting data correctness): it must go through planning and user approval before implementation — normally coordinated by the [Orchestrator](../../agents/reference-data-reader-orchestrator.agent.md) and [Planner](../../agents/reference-data-reader-planner.agent.md) agents. Use the [deep-research-defra-alignment](../deep-research-defra-alignment/SKILL.md) skill for the Research (§4.2) stage when something is genuinely uncertain.
+
 ## When to Use
 
 - Implementing document-to-SR (Strategic Reporting) transformations
@@ -51,7 +58,7 @@ Expert software engineer for the MMO FES Reference Data Reader service. Reads th
 export function toSdDefraReport(document: IDocument): IStrategicReport {
   return {
     documentNumber: document.documentNumber,
-    certificateType: document.certificateType === 'uk' ? true : false,
+    // map certificateType === 'uk' to the boolean isDocumentIssuedInUK
     isDocumentIssuedInUK: document.certificateType === 'uk',
     transportation: toTransportation(document.transportation),
     ...(document.exporterCompany && {
@@ -64,21 +71,37 @@ export function toSdDefraReport(document: IDocument): IStrategicReport {
 ### Transportation Mode Mapping
 
 ```typescript
-// containerVessel → vessel normalization
+// modeofTransport preserved; containerVessel normalised to 'vessel'
 export function toTransportation(transport: ITransportation): ITransportationReport {
   switch (transport.vehicle) {
     case 'truck':
-      return { mode: 'road', registration: transport.registration };
+      return {
+        modeofTransport: 'truck',
+        hasRoadTransportDocument: transport.cmr === 'true',
+        registration: transport.registrationNumber,
+        exportLocation: transport.departurePlace,
+      };
     case 'plane':
-      return { mode: 'air', flightNumber: transport.flightNumber };
-    case 'containerVessel':
+      return {
+        modeofTransport: 'plane',
+        flightNumber: transport.flightNumber,
+        containerId: transport.containerNumber,
+        exportLocation: transport.departurePlace,
+      };
     case 'vessel':
-      return { mode: 'sea', vesselName: transport.name, flag: transport.flag };
-    case 'train':
-      return { mode: 'rail', billOfLading: transport.billOfLadingNumber };
+    case 'containerVessel':
+      return {
+        modeofTransport: 'vessel', // normalise containerVessel → vessel
+        name: transport.name,
+        flag: transport.flagState,
+        exportLocation: transport.departurePlace,
+        ...(transport.placeOfUnloading && { placeOfUnloading: transport.placeOfUnloading }),
+      };
     default:
-      const _exhaustive: never = transport;
-      return _exhaustive;
+      return {
+        modeofTransport: transport.vehicle,
+        exportLocation: transport.departurePlace,
+      };
   }
 }
 ```
