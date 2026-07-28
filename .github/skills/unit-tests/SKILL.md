@@ -20,10 +20,11 @@ Expert in writing and maintaining unit tests for the MMO FES Reference Data Read
 
 ## Coverage Requirements
 
-- **Statements**: 90%
-- **Functions**: 90%
-- **Lines**: 90%
-- **Branches**: 90%
+Tiered targets (aligned with copilot-instructions §2 quality gates) — never drop below the SonarCloud baseline:
+
+- **≥90% global** — Statements, Functions, Lines, Branches
+- **≥95%** — core business logic (transformation functions, validation queries, risk scoring, report orchestration)
+- **100%** — error-handling and security-critical paths (schema-validation failures, queue-publish failures, input validation)
 - Run tests: `npm test` (single run with coverage report)
 - Watch mode: `npm run test:watch`
 
