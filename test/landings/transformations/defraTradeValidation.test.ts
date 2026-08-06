@@ -38,7 +38,7 @@ describe('toDefraTradeCc transportation selection', () => {
 
     const result = toDefraTradeCc(document, mockCertificateCase, []);
     expect(result.transportation).toBeDefined();
-    expect(['truck','plane']).toContain(result.transportation?.vehicle);
+    expect(result.transportation?.vehicle).toBe('plane');
   });
 
   it('handles no transportation gracefully', () => {

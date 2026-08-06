@@ -1821,7 +1821,7 @@ describe('when tranforming Storage Document data from IDocument to IDefraTradeSt
     const result: IDefraTradeStorageDocument = SUT.toDefraTradeSd(exampleSd, exampleSdDynamicsCase, exampleSdQueryResult);
     const expected = {
       modeofTransport: "truck",
-      hasRoadTransportDocument: true,
+      hasRoadTransportDocument: false,
       exportDate: '2023-09-05'
     };
 

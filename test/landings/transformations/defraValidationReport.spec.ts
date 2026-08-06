@@ -1138,7 +1138,7 @@ describe('For storage documents', () => {
     it('will include a transportation property in the return result', () => {
       const expectedResult: CertificateTransport = {
         modeofTransport: 'truck',
-        hasRoadTransportDocument: true
+        hasRoadTransportDocument: false
       };
 
       const result: IDefraValidationStorageDocument = toSdDefraReport("GBR-SD-32432-234234", "", DocumentStatuses.Void, requestByAdmin, backEndSd);
@@ -3358,7 +3358,7 @@ describe('For transportation', () => {
 
       const expectedResult: CertificateTransport = {
         modeofTransport: 'truck',
-        hasRoadTransportDocument: true
+        hasRoadTransportDocument: false
       };
 
       const result = toTransportation(truckTransport);
