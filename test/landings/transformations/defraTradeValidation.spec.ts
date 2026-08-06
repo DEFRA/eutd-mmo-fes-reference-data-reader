@@ -1596,6 +1596,20 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
     const result: any = SUT.toDefraTradeCc(ccWithBothPods, dynamicsCatchCertificateCase, ccQueryResults);
     expect(result.pointOfDestination).toEqual('Doc Port');
   });
+
+  it('will return undefined transportation when transportations array has no item with departurePlace', () => {
+    const ccNoDeparturePlace: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportation: undefined,
+        transportations: [{ vehicle: 'truck' }],
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccNoDeparturePlace, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.transportation).toBeUndefined();
+  });
 });
 
 describe('when tranforming Storage Document data from IDocument to IDefraTradeStorageDocument', () => {
