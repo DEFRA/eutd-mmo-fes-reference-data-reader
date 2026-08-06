@@ -370,7 +370,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
       case TRANSPORT_VEHICLE_TRUCK:
          return {
             modeofTransport: transportation.vehicle,
-            hasRoadTransportDocument: transportation.cmr === undefined ? false : transportation.cmr,
+            hasRoadTransportDocument: false,
             nationality: transportation.nationalityOfVehicle,
             registration: transportation.registrationNumber,
             exportLocation: transportation.departurePlace,

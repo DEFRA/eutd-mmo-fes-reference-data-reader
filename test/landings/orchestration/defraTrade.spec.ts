@@ -621,7 +621,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       "certStatus": Shared.CertificateStatus.COMPLETE,
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true
+        "hasRoadTransportDocument": false
       },
       "multiVesselSchedule": false
     };
@@ -1105,7 +1105,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       "certStatus": Shared.CertificateStatus.COMPLETE,
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true
+        "hasRoadTransportDocument": false
       },
       "multiVesselSchedule": false
     };
@@ -1398,7 +1398,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       "certStatus": Shared.CertificateStatus.VOID,
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true
+        "hasRoadTransportDocument": false
       },
       "multiVesselSchedule": false
     };
@@ -1621,7 +1621,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       "certStatus": Shared.CertificateStatus.VOID,
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true
+        "hasRoadTransportDocument": false
       },
       "multiVesselSchedule": false
     };
@@ -1655,7 +1655,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
     expect(dynamicsCatchCertificateCase).not.toHaveProperty('parentDocumentVoid');
   });
 
-  it('will add CC payload to the the report queue for transportation with CMR', async () => {
+  it('will add CC payload to the report queue for transportation with CMR', async () => {
     const cc: IDocument = {
       "createdAt": new Date("2020-06-24T10:39:32.000Z"),
       "__t": "catchCert",
@@ -1731,7 +1731,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         "transportations": [{
           "id": 0,
           "vehicle": "truck",
-          "cmr": true
+          "departurePlace": "Dover"
         }],
         "conservation": {
           "conservationReference": "UK Fisheries Policy"
@@ -2102,7 +2102,8 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       "certStatus": Shared.CertificateStatus.COMPLETE,
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true
+        "hasRoadTransportDocument": false,
+        "exportLocation": "Dover"
       },
       "multiVesselSchedule": false
     };
@@ -3672,7 +3673,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       },
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true,
+        "hasRoadTransportDocument": false,
         "exportDate": "2023-09-05"
       },
       "arrivalTransportation": {
@@ -4074,7 +4075,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       },
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true,
+        "hasRoadTransportDocument": false,
         "exportDate": "2023-09-05"
       },
       "arrivalTransportation": {
@@ -4762,7 +4763,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
       "certStatus": Shared.CertificateStatus.COMPLETE,
       "transportation": {
         "modeofTransport": "truck",
-        "hasRoadTransportDocument": true
+        "hasRoadTransportDocument": false
       },
       "multiVesselSchedule": false
     };
