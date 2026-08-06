@@ -1610,6 +1610,66 @@ describe('when transforming Catch Certificate data from IDocument, ICcQuery to I
     const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccNoDeparturePlace, dynamicsCatchCertificateCase, ccQueryResults);
     expect(result.transportation).toBeUndefined();
   });
+
+  it('will return undefined transportation when transportations is not an array (object)', () => {
+    const ccTransportationsNotArray: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportation: undefined,
+        transportations: { vehicle: 'truck', departurePlace: 'TestPort' } as any,
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccTransportationsNotArray, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.transportation).toBeUndefined();
+  });
+
+  it('will return undefined transportation when transportations is an empty array', () => {
+    const ccEmptyTransportations: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportation: undefined,
+        transportations: [],
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccEmptyTransportations, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.transportation).toBeUndefined();
+  });
+
+  it('will return undefined transportation when transportations is null', () => {
+    const ccNullTransportations: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportation: undefined,
+        transportations: null,
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccNullTransportations, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.transportation).toBeUndefined();
+  });
+
+  it('will use transportations array when transportation is undefined and array has valid item', () => {
+    const ccWithTransportationsArray: IDocument = {
+      ...exampleCc,
+      exportData: {
+        ...exampleCc.exportData,
+        transportation: undefined,
+        transportations: [
+          { vehicle: 'train' },
+          { vehicle: 'truck', departurePlace: 'Liverpool', exportedTo: { officialCountryName: 'France', isoCodeAlpha2: 'FR' } }
+        ],
+      }
+    } as IDocument;
+
+    const result: IDefraTradeCatchCertificate = SUT.toDefraTradeCc(ccWithTransportationsArray, dynamicsCatchCertificateCase, ccQueryResults);
+    expect(result.transportation).toBeDefined();
+    expect(result.transportation.modeofTransport).toEqual('truck');
+  });
 });
 
 describe('when tranforming Storage Document data from IDocument to IDefraTradeStorageDocument', () => {
