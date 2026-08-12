@@ -612,7 +612,7 @@ describe('uploadValidation.service', () => {
     describe('should only validate landing date separate to start date', () => {
       it('should validate future landing date when start date is provided', () => {
         const futureDate = moment.utc().add(14, 'days').format('DD/MM/YYYY');
-        
+
         const result = SUT.validateDateForLanding(
           {
             ...uploadedLanding,
@@ -634,7 +634,7 @@ describe('uploadValidation.service', () => {
 
     it('should not return error when landing date is within future limit', () => {
       const validFutureDate = moment.utc().add(landingLimitDaysInFuture - 1, 'days').format('DD/MM/YYYY');
-      
+
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -650,7 +650,7 @@ describe('uploadValidation.service', () => {
 
     it('should not return error when landing date is exactly at future limit', () => {
       const limitDate = moment.utc().add(landingLimitDaysInFuture, 'days').format('DD/MM/YYYY');
-      
+
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -666,7 +666,7 @@ describe('uploadValidation.service', () => {
 
     it('should not return error when landing date is today', () => {
       const today = moment.utc().format('DD/MM/YYYY');
-      
+
       const result = SUT.validateDateForLanding(
         {
           ...uploadedLanding,
@@ -681,7 +681,7 @@ describe('uploadValidation.service', () => {
     });
 
     it('should not validate future date when landing date format is invalid', () => {
-      // This test verifies the else-if behavior: future date check only runs 
+      // This test verifies the else-if behavior: future date check only runs
       // when landing date exists AND has valid format
       const result = SUT.validateDateForLanding(
         {
@@ -774,7 +774,7 @@ describe('uploadValidation.service', () => {
 
       it('should return dateLanded error when startDate is valid but dateLanded is too far in future', () => {
         const futureDate = moment.utc().add(landingLimitDaysInFuture + 1, 'days').format('DD/MM/YYYY');
-        
+
         const result = SUT.validateDateForLanding(
           {
             ...uploadedLanding,
@@ -853,6 +853,39 @@ describe('uploadValidation.service', () => {
 
     });
 
+    it('should return an error if the export weight is comma-formatted (thousands separator)', () => {
+
+      const result = SUT.validateExportWeightForLanding(
+        {
+          ...uploadedLanding,
+          exportWeight: '1,045.20' as unknown as number,
+          errors: []
+        }
+      );
+
+      expect(result.errors).toStrictEqual(['error.exportWeight.number.base']);
+
+    });
+
+    it.each([
+      ['a comma thousands separator', '1,045.20'],
+      ['non-numeric text', 'abc'],
+      ['a number with trailing units', '10kg'],
+      ['multiple decimal points', '10.0.0']
+    ])('should return a base error when the export weight is %s', (_description, value) => {
+
+      const result = SUT.validateExportWeightForLanding(
+        {
+          ...uploadedLanding,
+          exportWeight: value as unknown as number,
+          errors: []
+        }
+      );
+
+      expect(result.errors).toStrictEqual(['error.exportWeight.number.base']);
+
+    });
+
     it('should return no errors if the export weight is valid', () => {
 
       const result = SUT.validateExportWeightForLanding(
@@ -864,6 +897,31 @@ describe('uploadValidation.service', () => {
 
       expect(result.errors).toStrictEqual([]);
 
+    });
+
+  });
+
+  describe('isNumericExportWeight', () => {
+
+    it.each([
+      ['a positive integer', 5],
+      ['a positive float', 10.55],
+      ['a negative number', -1],
+      ['zero', 0],
+      ['a numeric string', '5'],
+      ['a numeric string with decimals', '10.55'],
+      ['a numeric string with surrounding whitespace', ' 10.55 ']
+    ])('should return true for %s', (_description, value) => {
+      expect(SUT.isNumericExportWeight(value as unknown as number)).toBe(true);
+    });
+
+    it.each([
+      ['a comma thousands separator', '1,045.20'],
+      ['non-numeric text', 'abc'],
+      ['a number with trailing units', '10kg'],
+      ['multiple decimal points', '10.0.0']
+    ])('should return false for %s', (_description, value) => {
+      expect(SUT.isNumericExportWeight(value as unknown as number)).toBe(false);
     });
 
   });
@@ -1033,7 +1091,7 @@ describe('uploadValidation.service', () => {
     mockGetVesselData.mockReturnValue([
       { registrationNumber: 'PD110', fishingVesselName: 'TEST' }
     ]);
-    
+
     mockVesselSearch.mockReturnValue([
       { pln: 'DIFFERENT_PLN', vesselLength: 10 }
     ]);
@@ -1046,7 +1104,7 @@ describe('uploadValidation.service', () => {
     });
 
     expect(result.vessel).toBeUndefined();
-    expect(result.errors).toStrictEqual(['error.vesselPln.any.invalid']); 
+    expect(result.errors).toStrictEqual(['error.vesselPln.any.invalid']);
   });
 
     it('should populate the vessel information if validation is successful', () => {
@@ -1633,7 +1691,7 @@ describe('uploadValidation.service', () => {
         expect(result.errors).toContain('validation.eezCode.string.max');
       });
 
-  
+
     });
 
     describe('returns false when given', () => {

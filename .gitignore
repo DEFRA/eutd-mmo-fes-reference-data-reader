@@ -11,4 +11,4 @@ githash
 junit.xml
 service_bus
 /.env
-/.vscode
+.vscode/mcp.json

@@ -108,6 +108,9 @@ export const validateExportWeightForLanding = (landing: IUploadedLanding): IUplo
   if (!landing.exportWeight) {
     landing.errors.push('error.exportWeight.any.missing');
   }
+  else if (!isNumericExportWeight(landing.exportWeight)) {
+    landing.errors.push('error.exportWeight.number.base');
+  }
   else if (landing.exportWeight <= 0){
     landing.errors.push('error.exportWeight.number.greater');
   }
@@ -371,6 +374,11 @@ export const validateEezCodeForLanding = (landing: IUploadedLanding): IUploadedL
 // ========================================
 // Utility Functions
 // ========================================
+
+// Guards against non-numeric values (e.g. comma thousands-separators such as '1,045.20')
+// that pass the checks below yet cast to NaN when persisted to a Mongoose Number field.
+export const isNumericExportWeight = (exportWeight: number | string): boolean =>
+  !Number.isNaN(Number(String(exportWeight).trim()));
 
 export const isPositiveNumberWithTwoDecimals = (num: number): boolean => {
   if (Number.isNaN(num) || num < 0) {

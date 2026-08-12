@@ -28,19 +28,19 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
           const asOfDate: moment.Moment = getAsOfDate(qparams.asofdate);
           const areas: string[] = getAreaData(qparams);
           const ext: string = params.ext;
-          const documentNumber: string = qparams.documentNumber;
-          const exporter: string = qparams.exporter;
-          const pln: string = qparams.pln;
+          const documentNumber: string = getScalarParam(qparams.documentNumber);
+          const exporter: string = getScalarParam(qparams.exporter);
+          const pln: string = getScalarParam(qparams.pln);
 
           if (!isValidReportType(reportType))
             return h.response('invalid report').code(404)
-            
+
           if (!isValidExtension(params))
             return h.response('missing or invalid extension suffix').code(404)
-          
+
           if (!(moment.utc(qparams.asofdate).isValid()))
             return h.response('asofdate must be valid date').code(400)
-          
+
           const allDas = new Set(['Northern Ireland', 'Isle of Man', 'Channel Islands', 'Guernsey', 'Jersey', 'England', 'Wales', 'Scotland', 'Isle of Man'])
           const invalids = areas.filter(_ => !allDas.has(_));
           if (invalids.length > 0)
@@ -114,6 +114,8 @@ const getReponseData = (reportData, ext, h) => {
     return h.response(reportData).type('application/json')
   }
 }
+
+const getScalarParam = (value: string | string[]): string => Array.isArray(value) ? value[0] : value;
 
 const getAreaData = (qparams) => qparams.area && qparams.area !== 'all' ? qparams.area.split(',').map(s => s.trim()) : [];
 

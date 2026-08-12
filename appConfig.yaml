@@ -2,231 +2,235 @@ appSettings:
   - key: ALL_SPECIES_DATA_CONTAINER_NAME
     value: 'allspecies'
     type: config
-  
+
   - key: ALL_SPECIES_DATA_FILE_NAME
     value: 'allSpecies.csv'
     type: config
-  
+
   - key: AV_BASE_URL
     value: '#{{ AV_BASE_URL }}'
     type: config
-  
+
   - key: AZURE_BLOB_CONTAINER
     value: 't1-catchcerts'
     type: config
-  
+
   - key: AZURE_BLOB_URL
     value: '#{{ SR_AZURE_BLOB_URL }}'
     type: config
-  
+
   - key: AZURE_QUEUE_CONNECTION_STRING
     value: 'SERVICEBUS-CONNECTION-STRING'
     type: secret
-  
+
   - key: AZURE_QUEUE_TRADE_CONNECTION_STRING
     value: 'TRADE-QUEUE-CONNECTION-STRING'
     type: secret
-  
+
   - key: AZURE_SAS
     value: 'SR-AZURE-BLOB-SAS'
     type: secret
-  
+
   - key: BOOMI_URL
     value: '#{{ boomiUrl }}'
     type: config
-  
+
   - key: BUSINESS_CONTINUITY_KEY
     value: '#{{ businessContinuityKey }}'
     type: config
-  
+
   - key: BUSINESS_CONTINUITY_URL
     value: '#{{ businessContinuityUrl }}'
     type: config
-  
+
   - key: COSMOS_DB_RW_CONNECTION_URI
     value: 'COSMOS-DB-RW-CONNECTION-URI'
     type: secret
-  
+
   - key: DB_CONNECTION_POOL
     value: '25'
     type: config
-  
+
   - key: DB_NAME
     value: 'mmo_exportcert'
     type: config
-  
+
   - key: DEFRA_TRADE_API_APIM_HEADER_NAME
     value: '#{{ apimHeaderName }}'
     type: config
-  
+
   - key: DEFRA_TRADE_API_APIM_HEADER_VALUE
     value: 'DEFRA-TRADE-API-APIM-HEADER-VALUE'
     type: secret
-  
+
   - key: DEFRA_TRADE_API_BASE_URL
     value: '#{{ DEFRA-TRADE-API-BASE-URL }}'
     type: config
-  
+
   - key: DEFRA_TRADE_API_GET_COUNTRIES_URI
     value: '#{{ tradeApimGetCountriesUri }}'
     type: config
-  
+
   - key: DEFRA_TRADE_API_OAUTH_CLIENT_ID
     value: 'DEFRA-TRADE-API-OAUTH-CLIENT-ID'
     type: secret
-  
+
   - key: DEFRA_TRADE_API_OAUTH_CLIENT_SECRET
     value: 'DEFRA-TRADE-API-OAUTH-CLIENT-SECRET'
     type: secret
-  
+
   - key: DEFRA_TRADE_API_OAUTH_SCOPE
     value: '#{{ DEFRA-TRADE-API-OAUTH-SCOPE }}'
     type: config
-  
+
   - key: DEFRA_TRADE_API_OAUTH_TOKEN_URL
     value: '#{{ DEFRA-TRADE-API-OAUTH-TOKEN-URL }}'
     type: config
-  
+
   - key: ENABLE_CHIP_REPORTING
     value: 'true'
     type: config
-  
+
   - key: EOD_RULES_MIGRATION
     value: 'true'
     type: config
-  
+
   - key: EXTERNAL_APP_URL
     value: '#{{ externalFrontendBaseUrl }}'
     type: config
     stagingValue: '#{{ externalFrontendStgBaseUrl }}'
     slotSetting: true
-  
+
   - key: INSTRUMENTATION_CLOUD_ROLE
     value: '#{{ repoName6 }}'
     type: config
     stagingValue: '#{{ repoName6 }}-staging'
     slotSetting: true
-  
+
   - key: INTERNAL_ADMIN_URL
     value: '#{{ internalAdminFrontendBaseUrl }}'
     type: config
     stagingValue: '#{{ internalAdminFrontendStgBaseUrl }}'
     slotSetting: true
-  
+
   - key: MAXIMUM_DEFRA_VALIDATION_REPORT_BATCH_SIZE
     value: '1000'
     type: config
-  
+
   - key: NODE_ENV
     value: 'production'
     type: config
-  
+
   - key: PORT
     value: '9000'
     type: config
-  
+
   - key: REF_BOOMI_CERTIFICATE
     value: 'REF-BOOMI-CERTIFICATE'
     type: secret
-  
+
   - key: REF_BOOMI_PASSPHRASE
     value: 'REF-BOOMI-PASSPHRASE'
     type: secret
-  
+
   - key: REF_BOOMI_USER
     value: 'REF-BOOMI-USER'
     type: secret
-  
+
   - key: REF_BOOMI_API_OAUTH_CLIENT_ID
     value: 'REF-BOOMI-API-OAUTH-CLIENT-ID'
     type: secret
-  
+
   - key: REF_BOOMI_API_OAUTH_CLIENT_SECRET
     value: 'REF-BOOMI-API-OAUTH-CLIENT-SECRET'
     type: secret
-  
+
   - key: REF_BOOMI_API_OAUTH_TOKEN_URL
     value: '#{{ REF-BOOMI-API-OAUTH-TOKEN-URL }}'
     type: config
-  
+
   - key: REF_BOOMI_API_OAUTH_AL_SCOPE
     value: '#{{ REF-BOOMI-API-OAUTH-AL-SCOPE }}'
     type: config
-  
+
   - key: REF_BOOMI_API_OAUTH_MMO_SCOPE
     value: '#{{ REF-BOOMI-API-OAUTH-MMO-SCOPE }}'
     type: config
-  
+
   - key: REF_BOOMI_CATCH_API_OAUTH_SCOPE
     value: '#{{ REF-BOOMI-CATCH-API-OAUTH-SCOPE }}'
     type: config
-  
+
+  - key: REF_BOOMI_CATCH_API_TIMEOUT_MS
+    value: '90000'
+    type: config
+
   - key: REF_SERVICE_BASIC_AUTH_PASSWORD
     value: 'REF-SERVICE-BASIC-AUTH-PASSWORD'
     type: secret
-  
+
   - key: REF_SERVICE_BASIC_AUTH_USER
     value: 'REF-SERVICE-BASIC-AUTH-USER'
     type: secret
-  
+
   - key: REFERENCE_DATA_AZURE_STORAGE
     value: 'REFDATA-STORAGE-CONNECTION-STRING'
     type: secret
-  
+
   - key: REFRESH_SPECIES_JOB
     value: '#{{ REF_DATA_READER_REFRESH_SPECIES_JOB }}'
     type: config
-  
+
   - key: REFRESH_VESSEL_JOB
     value: '#{{ REF_DATA_READER_REFRESH_VESSEL_JOB }}'
     type: config
-  
+
   - key: REPORT_QUEUE_TRADE
     value: 'defra.trade.catch.create'
     type: config
-  
+
   - key: REPORT_QUEUE
     value: 'mmo-ecc-dyn-req-queue'
     type: config
-  
+
   - key: SKIP_AV_SCAN
     value: '#{{ SKIP_AV_SCAN }}'
     type: config
-  
+
   - key: VESSEL_NOT_FOUND_ENABLE
     value: 'true'
     type: config
-  
+
   - key: VESSEL_NOT_FOUND_NAME
     value: 'Vessel not found'
     type: config
-  
+
   - key: VESSEL_NOT_FOUND_PLN
     value: 'N/A'
     type: config
-  
+
   - key: WEBSITE_HEALTHCHECK_MAXPINGFAILURES
     value: '5'
     type: config
-  
+
   - key: WEBSITE_HEALTHCHECK_MAXUNHEALTHYWORKERPERCENT
     value: '50'
     type: config
-  
+
   - key: WEBSITE_NAME
     value: '#{{ environment }}-#{{ repoName6 }}-#{{ nc-resource-webapp }}'
     type: config
     stagingValue: '#{{ environment }}-#{{ repoName6 }}-#{{ nc-resource-webapp }}-staging'
     slotSetting: true
-  
+
   - key: WEBSITE_WARMUP_PATH
     value: '/health'
     type: config
-  
+
   - key: WEBSITES_CONTAINER_START_TIME_LIMIT
     value: '300'
     type: config
-  
+
   - key: WEBSITES_PORT
     value: '9000'
     type: config

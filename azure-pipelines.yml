@@ -16,8 +16,8 @@ parameters:
   - name: deployAppConfigOnly
     displayName: "Deploy App Settings Only"
     type: boolean
-    default: false 
-    
+    default: false
+
 trigger:
   branches:
     include:
@@ -26,6 +26,10 @@ trigger:
       - 'hotfix/*'
       - 'feature/*'
       - 'epic/*'
+      - 'gh-readonly-queue/*'
+  paths:
+    exclude:
+      - '.github/**'
 pr:
   branches:
     include:

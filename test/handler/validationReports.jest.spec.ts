@@ -399,6 +399,42 @@ describe("When generating a Catch Certificate Investigation Report", () => {
 
   })
 
+  it('uses the first documentNumber when passed as an array', async () => {
+
+    catchCertInvestigationMock.mockResolvedValue([{doc: 1}])
+    catchCertVoidInvestigationMock.mockResolvedValue([])
+    catchCertBlockInvestigationMock.mockResolvedValue([])
+
+    const req = {
+      method: 'GET',
+      url: '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&documentNumber=DOC-001&documentNumber=DOC-002'
+    };
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(200);
+    expect(catchCertInvestigationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ documentNumber: 'DOC-001' })
+    );
+  })
+
+  it('uses the first pln when passed as an array', async () => {
+
+    catchCertInvestigationMock.mockResolvedValue([{pln: 1}])
+    catchCertVoidInvestigationMock.mockResolvedValue([])
+    catchCertBlockInvestigationMock.mockResolvedValue([])
+
+    const req = {
+      method: 'GET',
+      url: '/v1/validationreports/catchcertinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&pln=PLN-001&pln=PLN-002'
+    };
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(200);
+    expect(catchCertInvestigationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pln: 'PLN-001' })
+    );
+  })
+
 
 })
 
@@ -457,6 +493,42 @@ describe("When generating a SDPS Investigation Report", () => {
 
 
 
+  })
+
+  it('uses the first exporter when passed as an array', async () => {
+
+    sdpsInvestigationMock.mockResolvedValue([{sdps: 1}])
+    sdpsVoidInvestigationMock.mockResolvedValue([])
+    sdpsBlockInvestigationMock.mockResolvedValue([])
+
+    const req = {
+      method: 'GET',
+      url: '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&exporter=BOB&exporter=ALICE'
+    };
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(200);
+    expect(sdpsInvestigationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ exporter: 'BOB' })
+    );
+  })
+
+  it('uses the first documentNumber when passed as an array', async () => {
+
+    sdpsInvestigationMock.mockResolvedValue([{sdps: 1}])
+    sdpsVoidInvestigationMock.mockResolvedValue([])
+    sdpsBlockInvestigationMock.mockResolvedValue([])
+
+    const req = {
+      method: 'GET',
+      url: '/v1/validationreports/sdpsinvestigation.json?fromdate=2019-01-01&todate=2020-01-01&documentNumber=DOC-001&documentNumber=DOC-002'
+    };
+    const response = await server.inject(req);
+
+    expect(response.statusCode).toBe(200);
+    expect(sdpsInvestigationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ documentNumber: 'DOC-001' })
+    );
   })
 
 })
