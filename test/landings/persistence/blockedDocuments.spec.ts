@@ -1,8 +1,6 @@
 import moment = require("moment");
 
-const mongoose = require('mongoose');
-
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 
 import { getBlockedCatchCerts, getBlockedSdPs } from '../../../src/landings/persistence/blockedDocuments';
 import { ICcQueryResult } from 'mmo-shared-reference-data';
@@ -40,18 +38,12 @@ const createFailedCertificate = ({ documentNumber, documentType, createdAt, da, 
 
 describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
-  let mongoServer;
-  const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
-
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+    await connectTestMongo();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
   });
 
 
@@ -225,6 +217,7 @@ describe('when getting blocked catch certificates', () => {
 describe("when getting blocked storage documents and processing statements", () => {
 
   beforeAll(async () => {
+    await connectTestMongo();
     await FailedOnlineCertificates.insertMany([
       createFailedCertificate({ documentNumber: '001', documentType: 'storageDocument', createdAt: '2019-12-10T00:00:00.000Z', da: 'England', extended: { exporterCompanyName: 'Exporter 1' }}),
       createFailedCertificate({ documentNumber: '002', documentType: 'processingStatement', createdAt: '2019-12-01T00:00:00.000Z', da: 'Jersey', extended: { exporterCompanyName: 'Exporter 2' }}),
@@ -233,8 +226,7 @@ describe("when getting blocked storage documents and processing statements", () 
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
   });
 
   it('can get storage documents and processing statements', async () => {

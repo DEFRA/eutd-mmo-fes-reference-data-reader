@@ -1,5 +1,5 @@
 import moment from "moment";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { connectTestMongo, disconnectTestMongo } from '../helpers/mongoTestConnection';
 import { ICcQueryResult } from "mmo-shared-reference-data";
 import { DefraValidationReportData } from "../../src/landings/types/defraValidation";
 import * as Controllers from "../../src/controllers/dataHub"
@@ -32,19 +32,11 @@ const mockVesselIdxWithPln: jest.Mock = jest.fn();
 jest.mock('uuid');
 
 const { v4: uuid } = require('uuid');
-const mongoose = require('mongoose');
-
-
-let mongoServer: MongoMemoryServer;
-const opts = { connectTimeoutMS: 60000, socketTimeoutMS: 600000, serverSelectionTimeoutMS: 60000 }
-
 let mockInsertSdDefraValidationReport: jest.SpyInstance;
 let mockInsertCcDefraValidationReport: jest.SpyInstance;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-  await mongoose.connect(mongoUri, opts).catch((err: Error) => { console.log(err) });
+  await connectTestMongo();
 });
 
 beforeEach(() => {
@@ -60,8 +52,7 @@ afterEach(async () => {
 })
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  await disconnectTestMongo();
 });
 
 describe("Report Draft", () => {

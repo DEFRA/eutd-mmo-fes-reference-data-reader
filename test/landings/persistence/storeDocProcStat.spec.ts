@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 const moment = require('moment');
 
 import { getAllDocuments } from '../../../src/landings/persistence/storeDocProcStat';
@@ -8,19 +6,12 @@ import { DocumentModel } from '../../../src/landings/types/document'
 
 describe('that we can read documents from mongo', () => {
 
-  let mongoServer;
-
-  const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
-
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+    await connectTestMongo();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
   });
 
   beforeEach(async () => {

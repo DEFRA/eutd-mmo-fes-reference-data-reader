@@ -49,7 +49,6 @@ export class Server {
       if (!inTest) {
         logger.info(`[DBNAME] ${ApplicationConfig.prototype.dbName}`);
         const options = {
-          useNewUrlParser: true,
           dbName: ApplicationConfig.prototype.dbName,
           connectTimeoutMS: 60000,
           socketTimeoutMS: 600000,

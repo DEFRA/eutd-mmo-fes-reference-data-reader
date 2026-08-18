@@ -1,23 +1,17 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 import { ApplicationConfig } from '../../../src/config';
 import { IEodAdminAudit, IEodAudit, IEodRule, IEodSetting, EodSettingModel } from '../../../src/landings/types/appConfig/eodSettings';
 import { ILicence, IVessel } from '../../../src/landings/types/appConfig/vessels';
 import * as SUT from '../../../src/landings/persistence/eodSettings';
 import * as Cache from '../../../src/data/cache';
 
-const mongoose = require('mongoose');
 
-let mongoServer;
-
-const opts = { connectTimeoutMS: 60000, socketTimeoutMS: 600000, serverSelectionTimeoutMS: 60000 }
 
 ApplicationConfig.prototype.eodRulesMigration = true;
 ApplicationConfig.prototype.cloudRoleName = 'mmo-cc-reference-data-reader-svc';
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-  await mongoose.connect(mongoUri, opts).catch(err => { console.log(err) });
+  await connectTestMongo();
 });
 
 afterEach(async () => {
@@ -25,8 +19,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  await disconnectTestMongo();
 });
 
 describe('Eod Rules: createEodRules', () => {
