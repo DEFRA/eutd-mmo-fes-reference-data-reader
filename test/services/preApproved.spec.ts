@@ -1,4 +1,4 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../helpers/mongoTestConnection';
 import { PreApprovedDocuments as preApprovedMongooseDoc } from '../../src/landings/types/preApprovedDocument';
 import {
     getPreApprovedDocumentByDocumentNumber,
@@ -10,14 +10,8 @@ import { DocumentModel } from "../../src/landings/types/document";
 import { DocumentStatuses } from "../../src/landings/types/document"
 import { AuditEventTypes } from "../../src/landings/types/auditEvent";
 
-const mongoose = require('mongoose');
-
 
 describe('Pre approved documents', () => {
-
-    let mongoServer;
-
-    const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
 
     const testData = {
         documentNumber: "CC1",
@@ -26,14 +20,11 @@ describe('Pre approved documents', () => {
     };
 
     beforeAll(async () => {
-        mongoServer = await MongoMemoryServer.create();
-        const mongoUri = mongoServer.getUri();
-        await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+        await connectTestMongo();
     });
 
     afterAll(async () => {
-        await mongoose.disconnect();
-        await mongoServer.stop();
+        await disconnectTestMongo();
     });
 
     beforeEach(async () => {

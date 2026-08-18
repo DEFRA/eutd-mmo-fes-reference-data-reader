@@ -1,9 +1,8 @@
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats')
-const mongoose = require('mongoose');
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 
 const moment = require('moment');
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { LandingStatus } from 'mmo-shared-reference-data';
 import { minimalSchema } from '../../../src/landings/types/catchCert';
 import { DocumentModel } from '../../../src/landings/types/document';
@@ -146,20 +145,12 @@ describe('that we can read catch certificates in bulk', () => {
 
 describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
 
-  let mongoServer: MongoMemoryServer;
-  const opts = {}
-
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, opts).catch(err => { console.log(err) });
+    await connectTestMongo();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-
-    await mongoServer.stop();
-
+    await disconnectTestMongo();
   });
 
   describe('fetching catch certificates', () => {

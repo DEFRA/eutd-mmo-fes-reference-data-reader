@@ -19,8 +19,7 @@ import * as isHighRisk from '../../../src/landings/query/isHighRisk';
 import * as isLegallyDue from '../../../src/landings/query/isLegallyDue';
 import * as ccQuery from '../../../src/landings/query/ccQuery';
 import * as dataHub from '../../../src/controllers/dataHub';
-import { MongoMemoryServer } from "mongodb-memory-server";
-const mongoose = require('mongoose');
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 
 import { FailedOnlineCertificates } from "../../../src/landings/types/query";
 import { BlockingStatusModel } from "../../../src/landings/types/systemBlock";
@@ -74,19 +73,13 @@ const vesselData = [
 const vesselIdx = generateIndex(vesselData);
 
 describe('When validating an online Catch Certificate', () => {
-  let mongoServer;
-
-  const opts = { connectTimeoutMS: 60000, socketTimeoutMS: 600000, serverSelectionTimeoutMS: 60000 }
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, opts).catch(err => { console.log(err) });
+    await connectTestMongo();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
   });
 
   beforeEach(async () => {
@@ -701,12 +694,12 @@ describe('When validating an online Catch Certificate', () => {
                     "rfmo": "General Fisheries Commission for the Mediterranean (GFCM)",
                     "exclusiveEconomicZones": [
                       {
-                        "officialCountryName": "Nigeria", 
-                        "isoCodeAlpha2": "NG", 
-                        "isoCodeAlpha3": "NGA", 
+                        "officialCountryName": "Nigeria",
+                        "isoCodeAlpha2": "NG",
+                        "isoCodeAlpha3": "NGA",
                         "isoNumericCode": "566"
-                      }, 
-                      { 
+                      },
+                      {
                         "officialCountryName": "France",
                         "isoCodeAlpha2": "FR",
                         "isoCodeAlpha3": "FRA",
@@ -3365,12 +3358,12 @@ describe('When updating a landing within an online Catch Certificate', () => {
     rfmo: "General Fisheries Commission for the Mediterranean (GFCM)",
     exclusiveEconomicZones: [
       {
-        officialCountryName: "Nigeria", 
-        isoCodeAlpha2: "NG", 
-        isoCodeAlpha3: "NGA", 
+        officialCountryName: "Nigeria",
+        isoCodeAlpha2: "NG",
+        isoCodeAlpha3: "NGA",
         isoNumericCode: "566"
-      }, 
-      { 
+      },
+      {
         officialCountryName: "France",
         isoCodeAlpha2: "FR",
         isoCodeAlpha3: "FRA",
