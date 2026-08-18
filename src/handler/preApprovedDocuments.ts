@@ -13,7 +13,7 @@ export const preApprovalDocumentRoutes = (server: Hapi.Server) =>
       options: { security: true },
       handler: async (req, h) => {
         try {
-          const preApprovedDocument = await getPreApprovedDocumentByDocumentNumber(req.params.documentNumber);
+          const preApprovedDocument = await getPreApprovedDocumentByDocumentNumber(req.params.documentNumber as string);
           if (preApprovedDocument) {
             logger.info(`[GET-PREAPPROVED-DOCUMENT][${req.params.documentNumber}][SUCCESS]`);
             return h.response(preApprovedDocument).code(200);
@@ -36,7 +36,7 @@ export const preApprovalDocumentRoutes = (server: Hapi.Server) =>
           const user = req.headers["x-admin-user"];
           if (user) {
             const userString = Array.isArray(user) ? user[0] : user;
-            await preApproveDocumentFromMongo(req.params.documentNumber, userString);
+            await preApproveDocumentFromMongo(req.params.documentNumber as string, userString);
             logger.info(`[PREAPPROVE-DOCUMENT][${req.params.documentNumber}][SUCCESS]`);
             return h.response().code(204);
           }
