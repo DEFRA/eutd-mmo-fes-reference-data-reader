@@ -1,0 +1,26 @@
+# Shared FES infra — run first from any app: docker compose -f docker-compose.deps.yml up -d --wait
+# Creates the fes-shared-net network other apps join.
+
+services:
+  mongo:
+    image: mongo:7.0
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "127.0.0.1:27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fes-shared
+
+volumes:
+  mongo-data:
+
+networks:
+  fes-shared:
+    name: fes-shared-net
+    driver: bridge

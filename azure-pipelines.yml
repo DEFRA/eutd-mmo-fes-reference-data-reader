@@ -16,8 +16,8 @@ parameters:
   - name: deployAppConfigOnly
     displayName: "Deploy App Settings Only"
     type: boolean
-    default: false 
-    
+    default: false
+
 trigger:
   branches:
     include:

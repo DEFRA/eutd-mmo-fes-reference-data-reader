@@ -1,7 +1,6 @@
 import moment from 'moment';
 import { ApplicationConfig } from '../../../src/config';
 import { FailedOnlineCertificates } from '../../../src/landings/types/query';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { IDefraValidationCatchCertificate } from 'mmo-shared-reference-data';
 import {
   insertPsDefraValidationReport,
@@ -20,16 +19,10 @@ import {
 } from '../../../src/landings/types/defraValidation';
 
 import * as SUT from '../../../src/landings/persistence/defraValidation';
-
-const mongoose = require('mongoose');
-
-let mongoServer;
-const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-  await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+  await connectTestMongo();
 });
 
 afterEach(async () => {
@@ -38,8 +31,7 @@ afterEach(async () => {
 })
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  await disconnectTestMongo();
 });
 
 const sampleReport = (certificateId: string, status: string, requestedByAdmin: boolean, landingId?: string, validationPass?: boolean, lastUpdated?: string, isUnblocked?: boolean, documentType?: string, processed?: boolean) => ({
@@ -149,7 +141,7 @@ describe('insertPsDefraValidationReport', () => {
 
     await insertPsDefraValidationReport(report1);
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     await insertPsDefraValidationReport(report2);
 
     const result: any = await DefraValidationReportData.find().lean();
@@ -228,10 +220,10 @@ describe('insertSdDefraValidationReport', () => {
     };
 
     await insertSdDefraValidationReport(report1);
-    
+
     // Add a small delay to ensure different timestamps
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     await insertSdDefraValidationReport(report2);
 
     const result: any = await DefraValidationReportData.find().lean();
@@ -310,10 +302,10 @@ describe('insertCcDefraValidationReport', () => {
     };
 
     await insertCcDefraValidationReport(report1);
-    
+
     // Add a small delay to ensure different timestamps
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     await insertCcDefraValidationReport(report2);
 
     const result: any = await DefraValidationReportData.find().lean();
