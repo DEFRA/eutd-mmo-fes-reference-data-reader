@@ -15,8 +15,11 @@ Expert software engineer for the MMO FES Reference Data Reader service. Reads th
 
 This skill supports the **§4 working framework** in [copilot-instructions.md](../../copilot-instructions.md) — it does not replace it. Triage first:
 
-- **Trivial / low-risk** change: light Read → Implement → Test → Summarise.
-- **Non-trivial** work (new feature, transformation/schema/persistence/integration change, anything affecting data correctness): it must go through planning and user approval before implementation — normally coordinated by the [Orchestrator](../../agents/reference-data-reader-orchestrator.agent.md) and [Planner](../../agents/reference-data-reader-planner.agent.md) agents. Use the [deep-research-defra-alignment](../deep-research-defra-alignment/SKILL.md) skill for the Research (§4.2) stage when something is genuinely uncertain.
+- **Trivial** change: light Read → Implement → Test → Summarise.
+- **Standard** work (a normal transformation/mapping or persistence change, or fix, with no new architecture, external integration, or security surface): a lightweight inline plan (authored by the Developer, no heavyweight Planner) plus user approval before implementation.
+- **Complex** work (new architecture, a new external integration, schema changes affecting the SR/Trade API contract, scheduled-job changes, a security surface): full planning and user approval before implementation — normally coordinated by the [Orchestrator](../../agents/reference-data-reader-orchestrator.agent.md) and [Planner](../../agents/reference-data-reader-planner.agent.md) agents.
+
+Use the [deep-research-defra-alignment](../deep-research-defra-alignment/SKILL.md) skill for the single, risk-scoped Research (§4.2) pass when something is genuinely uncertain.
 
 ## When to Use
 
