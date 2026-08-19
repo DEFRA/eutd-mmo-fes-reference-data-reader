@@ -46,7 +46,7 @@ resources:
       endpoint: DEFRA
       type: github
       # ref: refs/heads/main
-      ref: feature/FI0-11218
+      ref: refs/heads/main
 
 extends:
   template: /includes/app-deployment.yaml@MMOPipelineCommon

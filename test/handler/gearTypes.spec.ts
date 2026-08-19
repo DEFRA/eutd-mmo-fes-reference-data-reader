@@ -13,7 +13,7 @@ let server;
 
 beforeAll(async () => {
   server = Hapi.server({
-    port: 9025,
+    port: 9016,
     host: 'localhost',
   });
 
