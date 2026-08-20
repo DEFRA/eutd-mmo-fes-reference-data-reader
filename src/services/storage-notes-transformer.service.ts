@@ -337,10 +337,18 @@ export default class StorageNotesTransformerService {
     if (catchData.certificateNumber) {
       let localReference = 'CATCH_CERTIFICATE_LOCAL_REFERENCE';
 
-      if (validateUKPSNumberFormat(catchData.certificateNumber)) {
-        localReference = 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE'
+      if (catchData.certificateType === 'non_uk' && catchData.entryDocumentType) {
+        // non-UK: use explicit document type rather than format heuristics
+        if (catchData.entryDocumentType === 'processingStatement') {
+          localReference = 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE';
+        } else if (catchData.entryDocumentType === 'storageNotes') {
+          localReference = 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE';
+        }
+        // 'catchCertificate' keeps the default CATCH_CERTIFICATE_LOCAL_REFERENCE
+      } else if (validateUKPSNumberFormat(catchData.certificateNumber)) {
+        localReference = 'CATCH_PROCESSING_STATEMENT_LOCAL_REFERENCE';
       } else if (validateUKSDNumberFormat(catchData.certificateNumber)) {
-        localReference = 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE'
+        localReference = 'CATCH_NON_MANIPULATION_DOCUMENT_LOCAL_REFERENCE';
       }
 
       notes.push({
