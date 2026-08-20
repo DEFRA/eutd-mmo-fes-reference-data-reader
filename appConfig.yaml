@@ -35,6 +35,18 @@ appSettings:
     value: '#{{ boomiUrl }}'
     type: config
 
+  - key: BOOMI_APIM_TENANT_ID
+    value: '#{{ boomiApimTenantId }}'
+    type: config
+
+  - key: BOOMI_APIM_CLIENT_ID
+    value: '#{{ boomiApimClientId }}'
+    type: config
+
+  - key: BOOMI_APIM_AUTH_SCOPE
+    value: '#{{ boomiApimAuthScope }}'
+    type: config
+
   - key: BUSINESS_CONTINUITY_KEY
     value: '#{{ businessContinuityKey }}'
     type: config
@@ -113,6 +125,10 @@ appSettings:
     stagingValue: '#{{ internalAdminFrontendStgBaseUrl }}'
     slotSetting: true
 
+  - key: MANAGED_IDENTITY_CLIENT_ID
+    value: '#{{ managedIdentityClientId }}'
+    type: config
+
   - key: MAXIMUM_DEFRA_VALIDATION_REPORT_BATCH_SIZE
     value: '1000'
     type: config
@@ -137,9 +153,9 @@ appSettings:
     value: 'REF-BOOMI-USER'
     type: secret
 
-  - key: REF_BOOMI_API_OAUTH_CLIENT_ID
-    value: 'REF-BOOMI-API-OAUTH-CLIENT-ID'
-    type: secret
+  # - key: REF_BOOMI_API_OAUTH_CLIENT_ID
+  #   value: 'REF-BOOMI-API-OAUTH-CLIENT-ID'
+  #   type: secret
 
   - key: REF_BOOMI_API_OAUTH_CLIENT_SECRET
     value: 'REF-BOOMI-API-OAUTH-CLIENT-SECRET'

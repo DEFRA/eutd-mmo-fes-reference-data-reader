@@ -115,7 +115,7 @@ describe('/v1/commodities/search', () => {
         stateLabel: 'fresh',
         presentationLabel: 'whole'
       }
-      ]);
+    ]);
   });
 
   it('should return empty array if species is not found', async () => {
@@ -126,7 +126,7 @@ describe('/v1/commodities/search', () => {
 
   it.each([
     ['speciesCode', '/v1/commodities/search?speciesCode=ALB&speciesCode=NOTEXIST&state=FRE&presentation=WHL'],
-    ['state',       '/v1/commodities/search?speciesCode=ALB&state=FRE&state=FRO&presentation=WHL'],
+    ['state', '/v1/commodities/search?speciesCode=ALB&state=FRE&state=FRO&presentation=WHL'],
     ['presentation', '/v1/commodities/search?speciesCode=ALB&state=FRE&presentation=WHL&presentation=GUH'],
   ])('should use the first %s when passed as an array', async (_param, url) => {
     const response = await server.inject({ method: 'GET', url });
@@ -150,7 +150,7 @@ describe('/v1/species/search-exact', () => {
 
   let mockGetSpeciesData: jest.SpyInstance;
 
-  beforeEach(()=>{
+  beforeEach(() => {
     mockReq = {
       method: 'GET',
       url: '/v1/species/search-exact?faoCode=ALB&faoName=Albacore&scientificName=Thunnus+alalunga',
@@ -228,7 +228,7 @@ describe('/v1/species/search-exact', () => {
 
   it('should return if query species is found', async () => {
     const response = await server.inject(mockReq);
-    expect(response.result).toEqual({"faoCode": "ALB", "faoName": "Albacore", "scientificName": "Thunnus alalunga"});
+    expect(response.result).toEqual({ "faoCode": "ALB", "faoName": "Albacore", "scientificName": "Thunnus alalunga" });
   });
 
   it('should return null if species is not found', async () => {

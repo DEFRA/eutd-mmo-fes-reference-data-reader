@@ -48,7 +48,7 @@ export const certificateRoutes = (server: Hapi.Server) => server.route([
     options: { security: true },
     handler: async (req, h) => {
       const query = req.query;
-      const pdfReference = query.pdfReference
+      const pdfReference = query.pdfReference as string
 
       if (pdfReference) {
         try {
