@@ -153,9 +153,9 @@ appSettings:
     value: 'REF-BOOMI-USER'
     type: secret
 
-  - key: REF_BOOMI_API_OAUTH_CLIENT_ID
-    value: 'REF-BOOMI-API-OAUTH-CLIENT-ID'
-    type: secret
+  # - key: REF_BOOMI_API_OAUTH_CLIENT_ID
+  #   value: 'REF-BOOMI-API-OAUTH-CLIENT-ID'
+  #   type: secret
 
   - key: REF_BOOMI_API_OAUTH_CLIENT_SECRET
     value: 'REF-BOOMI-API-OAUTH-CLIENT-SECRET'
