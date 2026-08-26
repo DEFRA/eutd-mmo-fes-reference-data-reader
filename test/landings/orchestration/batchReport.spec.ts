@@ -1,9 +1,7 @@
 const _ = require('lodash')
 import moment from 'moment'
 
-const mongoose = require('mongoose');
-
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 
 import { generateIndex, BoomiService } from 'mmo-shared-reference-data'
 import * as cache from '../../../src/data/cache'
@@ -90,19 +88,12 @@ const createCefas = (rssNumber: string, catches: ICatchTestItem[]) => ({
 
 describe('all reporting functions', () => {
 
-  let mongoServer;
-
-  const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
-
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+    await connectTestMongo();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
   });
 
   describe('the investigation function', () => {

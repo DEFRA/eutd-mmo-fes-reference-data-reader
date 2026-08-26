@@ -1,22 +1,15 @@
-const mongoose = require('mongoose');
 
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../helpers/mongoTestConnection';
 import { IExtendedValidationData, RawLandingsModel, SalesNotesModel } from '../../src/landings/types/extendedValidationData';
 const Service = require('../../src/landings/extendedValidationDataService');
 
 
-let mongoServer;
-const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
-
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+    await connectTestMongo();
   });
 
 afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
 });
 
 beforeEach(async () => {

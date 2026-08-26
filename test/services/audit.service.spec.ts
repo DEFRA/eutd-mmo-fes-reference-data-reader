@@ -1,7 +1,5 @@
-const mongoose = require('mongoose');
 
-
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectTestMongo, disconnectTestMongo } from '../helpers/mongoTestConnection';
 import { DocumentModel } from '../../src/landings/types/document'
 import { DocumentStatuses } from '../../src/landings/types/document';
 import { AddAudit } from '../../src/services/audit.service';
@@ -9,19 +7,14 @@ import { IAuditEvent, AuditEventTypes } from '../../src/landings/types/auditEven
 
 describe('add audit event', () => {
 
-  let mongoServer;
   const documentNumber = "GBR-TEST-AFJ";
-  const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
 
   beforeAll(async () => {
-      mongoServer = await MongoMemoryServer.create();
-      const mongoUri = mongoServer.getUri();
-      await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+      await connectTestMongo();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await disconnectTestMongo();
   });
 
   beforeEach(async () => {

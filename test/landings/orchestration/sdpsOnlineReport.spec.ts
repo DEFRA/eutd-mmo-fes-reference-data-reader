@@ -2,11 +2,10 @@ import {generateForeignCatchCertOnlineValidationReport} from "../../../src/landi
 import * as DataTransformations from "../../../src/landings/transformations/transformations";
 import * as ForeignCatches from "../../../src/landings/query/sdpsQuery";
 import * as Persistence from "../../../src/landings/persistence/storeDocProcStat";
-const mongoose = require('mongoose');
+import { connectTestMongo, disconnectTestMongo } from '../../helpers/mongoTestConnection';
 
 import {FailedOnlineCertificates} from "../../../src/landings/types/query";
 import {BlockingStatusModel} from "../../../src/landings/types/systemBlock";
-import {MongoMemoryServer} from "mongodb-memory-server";
 import {DocumentModel} from "../../../src/landings/types/document"
 import {
     preApproveDocumentFromMongo
@@ -14,19 +13,13 @@ import {
 import {PreApprovedDocuments as preApprovedMongooseDoc} from "../../../src/landings/types/preApprovedDocument";
 
 describe('When validating an online ps or sd', () => {
-    let mongoServer;
-
-    const opts = { connectTimeoutMS:60000, socketTimeoutMS:600000, serverSelectionTimeoutMS:60000 }
 
     beforeAll(async () => {
-        mongoServer = await MongoMemoryServer.create();
-        const mongoUri = mongoServer.getUri();
-        await mongoose.connect(mongoUri, opts).catch(err => {console.log(err)});
+        await connectTestMongo();
     });
 
     afterAll(async () => {
-        await mongoose.disconnect();
-        await mongoServer.stop();
+        await disconnectTestMongo();
     });
 
     beforeEach(async () => {

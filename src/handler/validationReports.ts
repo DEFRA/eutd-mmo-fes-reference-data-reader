@@ -22,15 +22,15 @@ export const validationReportsRoutes = (server: Hapi.Server) => {
           const qparams = req.query;
           const params = req.params;
           let reportData: any = [];
-          const reportType: string = params.reportType?.toLowerCase();
+          const reportType: string = (params.reportType as string)?.toLowerCase();
           const fromDate: moment.Moment = moment.utc(qparams.fromdate).startOf('day');
           const toDate: moment.Moment = moment.utc(qparams.todate).endOf('day');
           const asOfDate: moment.Moment = getAsOfDate(qparams.asofdate);
           const areas: string[] = getAreaData(qparams);
-          const ext: string = params.ext;
-          const documentNumber: string = getScalarParam(qparams.documentNumber);
-          const exporter: string = getScalarParam(qparams.exporter);
-          const pln: string = getScalarParam(qparams.pln);
+          const ext: string = params.ext as string;
+          const documentNumber: string = getScalarParam(qparams.documentNumber as string);
+          const exporter: string = getScalarParam(qparams.exporter as string);
+          const pln: string = getScalarParam(qparams.pln as string);
 
           if (!isValidReportType(reportType))
             return h.response('invalid report').code(404)
