@@ -639,7 +639,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.CATCH_CERTIFICATE_SUBMITTED + '-GBR-2020-CC-1BC924FCF'
     };
@@ -1123,7 +1123,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.CATCH_CERTIFICATE_SUBMITTED + '-GBR-2020-CC-1BC924FCF'
     };
@@ -1416,7 +1416,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: Shared.CertificateStatus.VOID,
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.CATCH_CERTIFICATE_VOIDED + '-GBR-2020-CC-1BC924FCF'
     };
@@ -1639,7 +1639,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: Shared.CertificateStatus.VOID,
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.CATCH_CERTIFICATE_VOIDED + '-GBR-2020-CC-1BC924FCF'
     };
@@ -2121,7 +2121,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.CATCH_CERTIFICATE_SUBMITTED + '-GBR-2020-CC-1BC924FCF'
     };
@@ -2608,7 +2608,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.PROCESSING_STATEMENT_SUBMITTED + '-GBR-2023-PS-6D2C91A0A'
     };
@@ -2657,7 +2657,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "BLOCKED",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.PROCESSING_STATEMENT_SUBMITTED + '-GBR-2023-PS-6D2C91A0A'
     };
@@ -3009,7 +3009,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.PROCESSING_STATEMENT_SUBMITTED + '-GBR-2023-PS-6D2C91A0A'
     };
@@ -3058,7 +3058,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "BLOCKED",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.PROCESSING_STATEMENT_SUBMITTED + '-GBR-2023-PS-6D2C91A0A'
     };
@@ -3242,7 +3242,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: Shared.CertificateStatus.VOID,
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.PROCESSING_STATEMENT_VOIDED + '-GBR-2023-PS-6D2C91A0A'
     };
@@ -3716,7 +3716,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.STORAGE_DOCUMENT_SUBMITTED + "-GBR-2023-SD-74EA9D198"
     };
@@ -3734,7 +3734,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "BLOCKED",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.STORAGE_DOCUMENT_SUBMITTED + "-GBR-2023-SD-74EA9D198"
     };
@@ -4118,7 +4118,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.STORAGE_DOCUMENT_SUBMITTED + "-GBR-2023-SD-74EA9D198"
     };
@@ -4136,7 +4136,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "BLOCKED",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.STORAGE_DOCUMENT_SUBMITTED + "-GBR-2023-SD-74EA9D198"
     };
@@ -4293,7 +4293,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: Shared.CertificateStatus.VOID,
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.STORAGE_DOCUMENT_VOIDED + '-GBR-2023-SD-74EA9D198'
     };
@@ -4781,7 +4781,7 @@ describe('azureTradeQueueEnabled Feature flag turned on', () => {
         SchemaVersion: 2,
         Type: "Internal",
         Status: "COMPLETE",
-        TimestampUtc: expect.any(String)
+        TimestampUtc: expect.any(Number)
       },
       subject: Shared.MessageLabel.CATCH_CERTIFICATE_SUBMITTED + '-GBR-2020-CC-1BC924FCF'
     };
