@@ -362,9 +362,11 @@ export function toDefraSdStorageFacility(sdStorageFacility): CertificateStorageF
 
 const handleEmptyValue = (value) => isEmpty(value) ? undefined : value;
 
-export function toTransportation(transportation: any): CertificateTransport | undefined {
+export function toTransportation(transportation: any, includeExportDate = true): CertificateTransport | undefined {
    if (transportation === undefined || transportation === null)
       return undefined;
+
+   const exportDate = includeExportDate ? { exportDate: transportation.exportDate } : {};
 
    switch (transportation.vehicle) {
       case TRANSPORT_VEHICLE_TRUCK:
@@ -374,7 +376,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             nationality: transportation.nationalityOfVehicle,
             registration: transportation.registrationNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate,
+            ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
@@ -388,7 +390,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             modeofTransport: transportation.vehicle,
             billNumber: transportation.railwayBillNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate,
+            ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
@@ -403,7 +405,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             flightNumber: transportation.flightNumber,
             containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate,
+            ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             airwaybillNumber: handleEmptyValue(transportation.airwayBillNumber),
             countryofDeparture: transportation.departureCountry,
@@ -419,7 +421,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
             flag: transportation.flagState,
             containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate,
+            ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.departureCountry,
             whereDepartsFrom: transportation.departurePort,
@@ -431,7 +433,7 @@ export function toTransportation(transportation: any): CertificateTransport | un
          return {
             modeofTransport: transportation.vehicle,
             exportLocation: transportation.departurePlace,
-            exportDate: transportation.exportDate,
+            ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
             countryofDeparture: transportation.countryofDeparture,
             whereDepartsFrom: transportation.departurePort,
