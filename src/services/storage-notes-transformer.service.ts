@@ -332,7 +332,7 @@ export default class StorageNotesTransformerService {
   }
 
   private static isProcessingStatementReference(catchData: any): boolean {
-    return catchData.certificateType === 'non_uk' && catchData.entryDocumentType === 'processingStatement'
+    return ['non_uk', 'uk'].includes(catchData.certificateType) && catchData.entryDocumentType === 'processingStatement'
       || validateUKPSNumberFormat(catchData.certificateNumber);
   }
 
