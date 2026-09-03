@@ -396,12 +396,13 @@ describe('StorageNotesTransformerService', () => {
         expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('030243');
       });
 
-      it('should ignore entryDocumentType when a UK NMD catch certificate reference is not a processing statement number', () => {
-        const exportDataWithCatchCertificateCatch = {
+      it('should use an 8 digit commodity code when a UK NMD catch is marked as based on a processing statement', () => {
+        const exportDataWithProcessingStatementCatch = {
           ...baseExportData,
           catches: [{
             ...baseExportData.catches[0],
             certificateNumber: 'GBR-2025-CC-001',
+            certificateType: 'uk',
             entryDocumentType: 'processingStatement',
             commodityCode: '03024310'
           }]
@@ -410,13 +411,13 @@ describe('StorageNotesTransformerService', () => {
         const result = StorageNotesTransformerService.generateStorageNotesPayload(
           documentNumber,
           createdAt,
-          exportDataWithCatchCertificateCatch
+          exportDataWithProcessingStatementCatch
         );
 
         const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
         const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
-        expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('030243');
+        expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('03024310');
       });
 
       it('should handle empty catches array', () => {
