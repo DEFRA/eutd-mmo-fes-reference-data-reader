@@ -352,6 +352,73 @@ describe('StorageNotesTransformerService', () => {
         expect(tradeLineItem.ApplicableSPSClassification.SystemID.value).toBe('CN');
       });
 
+      it('should use an 8 digit commodity code when the NMD is based on a processing statement', () => {
+        const exportDataWithProcessingStatementCatch = {
+          ...baseExportData,
+          catches: [{
+            ...baseExportData.catches[0],
+            certificateNumber: 'GBR-2025-PS-ABC123456',
+            commodityCode: '03024310'
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithProcessingStatementCatch
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+
+        expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('03024310');
+      });
+
+      it('should use a 6 digit commodity code when the NMD is based on a catch certificate', () => {
+        const exportDataWithCatchCertificateCatch = {
+          ...baseExportData,
+          catches: [{
+            ...baseExportData.catches[0],
+            certificateNumber: 'GBR-2025-CC-001',
+            commodityCode: '03024310'
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithCatchCertificateCatch
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+
+        expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('030243');
+      });
+
+      it('should ignore entryDocumentType when a UK NMD catch certificate reference is not a processing statement number', () => {
+        const exportDataWithCatchCertificateCatch = {
+          ...baseExportData,
+          catches: [{
+            ...baseExportData.catches[0],
+            certificateNumber: 'GBR-2025-CC-001',
+            entryDocumentType: 'processingStatement',
+            commodityCode: '03024310'
+          }]
+        };
+
+        const result = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithCatchCertificateCatch
+        );
+
+        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+        const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
+
+        expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('030243');
+      });
+
       it('should handle empty catches array', () => {
         const exportDataWithNoCatches = { ...baseExportData, catches: [] };
 
