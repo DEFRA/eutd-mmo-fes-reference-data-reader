@@ -327,8 +327,13 @@ export default class StorageNotesTransformerService {
         value: type === 'arrival' ? ctch.netWeightFisheryProductArrival : ctch.netWeightFisheryProductDeparture
       },
       AdditionalInformationSPSNote: this.buildAdditionalNotes(ctch),
-      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commodityCode)
+      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commodityCode, !this.isProcessingStatementReference(ctch))
     }));
+  }
+
+  private static isProcessingStatementReference(catchData: any): boolean {
+    return catchData.certificateType === 'non_uk' && catchData.entryDocumentType === 'processingStatement'
+      || validateUKPSNumberFormat(catchData.certificateNumber);
   }
 
   private static buildAdditionalNotes(catchData: any): any[] {
