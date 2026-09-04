@@ -373,7 +373,9 @@ export default class StorageNotesTransformerService {
         value: catchData.certificateType === 'non_uk' ? catchData.issuingCountry?.isoCodeAlpha2 : 'GB'
       },
       SubjectCode: {
-        value: 'CATCH_ISSUING_COUNTRY'
+        value: this.isProcessingStatementReference(catchData)
+          ? 'CATCH_PROCESSING_STATEMENT_ISSUING_COUNTRY'
+          : 'CATCH_ISSUING_COUNTRY'
       }
     });
 
