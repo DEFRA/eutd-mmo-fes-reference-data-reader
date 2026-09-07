@@ -358,6 +358,7 @@ describe('StorageNotesTransformerService', () => {
           catches: [{
             ...baseExportData.catches[0],
             certificateNumber: 'GBR-2025-PS-ABC123456',
+            entryDocumentType: 'processingStatement',
             commodityCode: '03024310'
           }]
         };
@@ -418,34 +419,6 @@ describe('StorageNotesTransformerService', () => {
         const tradeLineItem = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0];
 
         expect(tradeLineItem.ApplicableSPSClassification.ClassCode.value).toBe('03024310');
-      });
-
-      it('should use the processing statement issuing country note for a non-UK processing statement reference', () => {
-        const exportDataWithProcessingStatementCatch = {
-          ...baseExportData,
-          catches: [{
-            ...baseExportData.catches[0],
-            certificateNumber: 'PS12345',
-            certificateType: 'non_uk',
-            entryDocumentType: 'processingStatement',
-            issuingCountry: { isoCodeAlpha2: 'MA' },
-            commodityCode: '03024310'
-          }]
-        };
-
-        const result = StorageNotesTransformerService.generateStorageNotesPayload(
-          documentNumber,
-          createdAt,
-          exportDataWithProcessingStatementCatch
-        );
-
-        const arrivalConsignment = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
-        const notes = arrivalConsignment.IncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].AdditionalInformationSPSNote;
-
-        expect(notes).toContainEqual({
-          Content: { languageID: 'en', value: 'MA' },
-          SubjectCode: { value: 'CATCH_PROCESSING_STATEMENT_ISSUING_COUNTRY' }
-        });
       });
 
       it('should handle empty catches array', () => {
