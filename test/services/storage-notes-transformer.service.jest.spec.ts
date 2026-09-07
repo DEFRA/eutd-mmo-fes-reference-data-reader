@@ -358,6 +358,7 @@ describe('StorageNotesTransformerService', () => {
           catches: [{
             ...baseExportData.catches[0],
             certificateNumber: 'GBR-2025-PS-ABC123456',
+            entryDocumentType: 'processingStatement',
             commodityCode: '03024310'
           }]
         };
