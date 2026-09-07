@@ -327,13 +327,8 @@ export default class StorageNotesTransformerService {
         value: type === 'arrival' ? ctch.netWeightFisheryProductArrival : ctch.netWeightFisheryProductDeparture
       },
       AdditionalInformationSPSNote: this.buildAdditionalNotes(ctch),
-      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commodityCode, !this.isProcessingStatementReference(ctch))
+      ApplicableSPSClassification: getApplicationSPSClassification(ctch.commodityCode, ctch.entryDocumentType !== 'processingStatement')
     }));
-  }
-
-  private static isProcessingStatementReference(catchData: any): boolean {
-    return ['non_uk', 'uk'].includes(catchData.certificateType) && catchData.entryDocumentType === 'processingStatement'
-      || validateUKPSNumberFormat(catchData.certificateNumber);
   }
 
   private static buildAdditionalNotes(catchData: any): any[] {
@@ -373,9 +368,7 @@ export default class StorageNotesTransformerService {
         value: catchData.certificateType === 'non_uk' ? catchData.issuingCountry?.isoCodeAlpha2 : 'GB'
       },
       SubjectCode: {
-        value: this.isProcessingStatementReference(catchData)
-          ? 'CATCH_PROCESSING_STATEMENT_ISSUING_COUNTRY'
-          : 'CATCH_ISSUING_COUNTRY'
+        value: 'CATCH_ISSUING_COUNTRY'
       }
     });
 
