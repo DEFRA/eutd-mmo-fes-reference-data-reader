@@ -74,6 +74,9 @@
     "utf8-bytes": "0.0.1"
   },
   "overrides": {
+    "nodemon": {
+      "brace-expansion": "^2.0.1"
+    },
     "brace-expansion": "2.0.3",
     "flatted": "^3.4.2",
     "fast-xml-parser": "^5.10.0",

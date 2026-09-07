@@ -1,12 +1,14 @@
 import { toDefraTradeCc } from '../../../src/landings/transformations/defraTradeValidation';
 
 jest.mock('../../../src/landings/transformations/defraValidation', () => ({
-  toTransportation: jest.fn((t) => {
+  toTransportation: jest.fn((t, includeExportDate = true) => {
     if (!t) return undefined;
+    const { exportDate, ...transportation } = t;
+
     return {
-      ...t,
+      ...transportation,
       pointOfDestination: t.pointOfDestination,
-      exportDate: t.exportDate
+      ...(includeExportDate && { exportDate })
     };
   }),
   toDefraSdStorageFacility: jest.fn(() => ({}))
@@ -27,6 +29,7 @@ describe('toDefraTradeCc transportation selection', () => {
     expect(result.transportation).toBeDefined();
     expect(result.transportation?.vehicle).toBe('vessel');
     expect(result.transportation?.departurePlace).toBe('A');
+    expect(result.transportation?.exportDate).toBeUndefined();
   });
 
   it('falls back to transportations array when single missing', () => {
