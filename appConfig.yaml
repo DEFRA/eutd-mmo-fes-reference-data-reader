@@ -67,6 +67,10 @@ appSettings:
     value: '#{{ DEFRA-TRADE-API-BASE-URL }}'
     type: config
 
+  - key: MDM_APPROVED_FOOD_ESTABLISHMENTS_BASE_URL
+    value: '#{{ MDM-APPROVED-FOOD-ESTABLISHMENTS-BASE-URL }}'
+    type: config
+
   - key: DEFRA_TRADE_API_GET_COUNTRIES_URI
     value: '#{{ tradeApimGetCountriesUri }}'
     type: config
