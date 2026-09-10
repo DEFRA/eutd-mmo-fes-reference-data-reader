@@ -1,0 +1,128 @@
+[
+  {
+    "id": "EST-PROC-001",
+    "approvalNumber": {
+      "content": "TEST-0000-PP",
+      "identificationScheme": {
+        "identifier": "GB-FSA",
+        "name": "FSA Establishment Register",
+        "agencyName": "Food Standards Agency"
+      }
+    },
+    "tradingName": "TEST-DATA Processing Plant (Do Not Use)",
+    "source": "FSA",
+    "competentAuthority": "Food Standards Agency",
+    "address": {
+      "identification": "PROC-ADDR-001",
+      "postCode": {
+        "code": "TE5 7ST"
+      },
+      "line1": "1 Test Street",
+      "line2": "Fixture District",
+      "line3": "Synthetic Borough",
+      "line4": "Example County",
+      "cityName": "Test City",
+      "country": {
+        "identifier": "GB",
+        "identificationSchemeAgency": {
+          "identifier": "ISO-3166-1"
+        },
+        "countryName": "United Kingdom",
+        "countrySubDivision": {
+          "identifier": "GB-ENG"
+        },
+        "countrySubDivisionName": "England"
+      }
+    },
+    "country": "GB",
+    "countryOfApproval": "United Kingdom",
+    "approvals": [
+      {
+        "section": {
+          "code": "A.VIII",
+          "name": "Fishery Products"
+        },
+        "activityType": {
+          "code": "PP",
+          "name": "Processing Plant",
+          "euCode": null,
+          "euName": null
+        },
+        "pairKey": "A.VIII:PP",
+        "general": false,
+        "processing": true,
+        "storage": false
+      }
+    ],
+    "sections": [
+      "A.VIII"
+    ],
+    "capabilities": [
+      "processing"
+    ],
+    "extractDate": "2026-09-10"
+  },
+  {
+    "id": "EST-STOR-001",
+    "approvalNumber": {
+      "content": "TEST-0000-CS",
+      "identificationScheme": {
+        "identifier": "GB-FSA",
+        "name": "FSA Establishment Register",
+        "agencyName": "Food Standards Agency"
+      }
+    },
+    "tradingName": "TEST-DATA Cold Storage (Do Not Use)",
+    "source": "FSA",
+    "competentAuthority": "Food Standards Agency",
+    "address": {
+      "identification": "STOR-ADDR-001",
+      "postCode": {
+        "code": "TE5 7DA"
+      },
+      "line1": "2 Fixture Avenue",
+      "line2": "Mock Wharf",
+      "line3": "Placeholder Town",
+      "line4": "Sample Region",
+      "cityName": "Demo City",
+      "country": {
+        "identifier": "GB",
+        "identificationSchemeAgency": {
+          "identifier": "ISO-3166-1"
+        },
+        "countryName": "United Kingdom",
+        "countrySubDivision": {
+          "identifier": "GB-ENG"
+        },
+        "countrySubDivisionName": "England"
+      }
+    },
+    "country": "GB",
+    "countryOfApproval": "United Kingdom",
+    "approvals": [
+      {
+        "section": {
+          "code": "A.0",
+          "name": "General Cold Stores"
+        },
+        "activityType": {
+          "code": "CS",
+          "name": "Cold Store",
+          "euCode": null,
+          "euName": null
+        },
+        "pairKey": "A.0:CS",
+        "general": true,
+        "processing": false,
+        "storage": true
+      }
+    ],
+    "sections": [
+      "A.0"
+    ],
+    "capabilities": [
+      "storage"
+    ],
+    "extractDate": "2026-09-10"
+  }
+]

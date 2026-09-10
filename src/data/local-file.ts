@@ -6,6 +6,7 @@ import { IExporterBehaviour } from '../landings/types/appConfig/exporterBehaviou
 import { IVesselOfInterest, IWeighting } from '../landings/types/appConfig/risking';
 import { IVessel } from '../landings/types/appConfig/vessels';
 import { GearRecord } from '../interfaces/gearTypes.interface';
+import { Establishment } from '../interfaces/approvedFoodEstablishments.interface';
 
 export const getSpeciesDataFromFile = async (speciesFilePath: string): Promise<any[]> => {
   try {
@@ -51,6 +52,15 @@ export const getCountriesDataFromFile = (countriesPath: string): any[] => {
     return JSON.parse(fs.readFileSync(countriesPath, 'utf-8'));
   } catch (e) {
     logger.error('Could not load countries data from file', countriesPath);
+    throw new Error(e);
+  }
+};
+
+export const getApprovedFoodEstablishmentsFromFile = (approvedFoodEstablishmentsPath: string): Establishment[] => {
+  try {
+    return JSON.parse(fs.readFileSync(approvedFoodEstablishmentsPath, 'utf-8'));
+  } catch (e) {
+    logger.error('Could not load approved food establishments data from file', approvedFoodEstablishmentsPath);
     throw new Error(e);
   }
 };

@@ -9,7 +9,8 @@ import {
   getExporterBehaviourFromCSV,
   getSpeciesAliasesFromFile,
   getGearTypesDataFromCSV,
-  getEuMemberStatesFromCSV
+  getEuMemberStatesFromCSV,
+  getApprovedFoodEstablishmentsFromFile
 } from "../../src/data/local-file";
 
 describe('get conversion factors ', () => {
@@ -403,4 +404,42 @@ describe('get EU member states from CSV', () => {
     expect(result.every(country => country === country.trim())).toBe(true);
   });
 
+});
+
+describe('get approved food establishments from file', () => {
+
+  let mockLoggerError;
+
+  beforeEach(() => {
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should throw and log an error if file does not exist', () => {
+    const filePath = 'pathToNonExistingFile';
+
+    try {
+      getApprovedFoodEstablishmentsFromFile(filePath);
+    }
+    catch (e) {
+      expect(e.message).toContain('no such file or directory');
+      expect(mockLoggerError).toHaveBeenCalledWith('Could not load approved food establishments data from file', filePath);
+    }
+  });
+
+  it('should return an array of approved food establishments', () => {
+    const filePath = `${__dirname}/../../data/approvedFoodEstablishments.json`;
+
+    const result = getApprovedFoodEstablishmentsFromFile(filePath);
+
+    expect(result).toBeInstanceOf(Array);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({
+      id: expect.any(String),
+      approvals: expect.any(Array)
+    });
+  });
 });

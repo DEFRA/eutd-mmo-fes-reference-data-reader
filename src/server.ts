@@ -36,6 +36,7 @@ import { rfmoRoutes } from './handler/rfmo';
 import { euUpgradeRoutes } from './handler/euUpgrade';
 import { catchSubmissionRoutes } from './handler/catchSubmission';
 import { euMemberStatesRoutes } from './handler/euMemberStates';
+import { approvedFoodEstablishmentsRoutes } from './handler/approvedFoodEstablishments';
 
 const Joi = require('joi');
 
@@ -231,4 +232,5 @@ const setupRoutes = server => {
   euUpgradeRoutes(server);
   catchSubmissionRoutes(server);
   euMemberStatesRoutes(server);
+  approvedFoodEstablishmentsRoutes(server);
 }

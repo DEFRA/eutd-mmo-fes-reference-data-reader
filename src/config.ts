@@ -27,6 +27,7 @@ export class ApplicationConfig {
   public defraTradeApiOauthTokenUrl: string;
   public defraTradeApiAPIMHeaderName: string;
   public defraTradeApiAPIMHeaderValue: string;
+  public mdmApprovedFoodEstablishmentsBaseUrl: string;
   public refServiceBasicAuthUser: string;
   public refServiceBasicAuthPassword: string;
   public cosmosDBRawConnectionUri: string
@@ -102,6 +103,7 @@ export class ApplicationConfig {
     ApplicationConfig.prototype.defraTradeApiOauthTokenUrl = env.DEFRA_TRADE_API_OAUTH_TOKEN_URL;
     ApplicationConfig.prototype.defraTradeApiAPIMHeaderName = env.DEFRA_TRADE_API_APIM_HEADER_NAME;
     ApplicationConfig.prototype.defraTradeApiAPIMHeaderValue = env.DEFRA_TRADE_API_APIM_HEADER_VALUE;
+    ApplicationConfig.prototype.mdmApprovedFoodEstablishmentsBaseUrl = env.MDM_APPROVED_FOOD_ESTABLISHMENTS_BASE_URL;
 
     // azure Service Bus Queue
     ApplicationConfig.prototype.azureQueueUrl = env.AZURE_QUEUE_CONNECTION_STRING;

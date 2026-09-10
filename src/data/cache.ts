@@ -2,6 +2,7 @@ import moment from 'moment';
 import * as blob from './blob-storage';
 import * as file from './local-file';
 import * as CountriesApi from './countries-api';
+import * as ApprovedFoodEstablishmentsApi from './approved-food-establishments-api';
 
 import logger from '../logger';
 import appConfig from '../config';
@@ -19,6 +20,7 @@ import { IEodRule, IEodSetting, vesselSizeGroup } from '../landings/types/appCon
 import { getEodSettings } from '../landings/persistence/eodSettings';
 import { CacheType } from '../handler/types';
 import { GearRecord } from '../interfaces/gearTypes.interface';
+import { Establishment } from '../interfaces/approvedFoodEstablishments.interface';
 
 let VESSELS: IVessel[] = [];
 let VESSELS_IDX = (pln: string) => undefined;
@@ -42,6 +44,8 @@ let EOD_SETTINGS: IEodSetting[] = [];
 let GEAR_TYPES: GearRecord[] = [];
 let RFMO_AREAS: any[] = [];
 let EU_MEMBER_STATES: string[] = [];
+let PROCESSING_PLANTS: Establishment[] = [];
+let STORAGE_FACILITIES: Establishment[] = [];
 
 export const loadLocalFishCountriesAndSpecies = async () => {
   logger.info('Loading data from local files in dev mode');
@@ -58,10 +62,12 @@ export const loadLocalFishCountriesAndSpecies = async () => {
   const gearTypes = await loadGearTypesDataFromLocalFile();
   const rfmos = await loadRfmosDataFromLocalFile();
   const euMemberStates = await loadEuMemberStatesFromLocalFile();
+  const processingPlants = await loadProcessingPlantsFromLocalFile();
+  const storageFacilities = await loadStorageFacilitiesFromLocalFile();
 
-  logger.info(`Finished reading data from local file system, previously species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates});
-  logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
+  logger.info(`Finished reading data from local file system, previously species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}, processingPlants: ${PROCESSING_PLANTS.length}, storageFacilities: ${STORAGE_FACILITIES.length}`);
+  updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates, processingPlants, storageFacilities});
+  logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}, processingPlants: ${PROCESSING_PLANTS.length}, storageFacilities: ${STORAGE_FACILITIES.length}`);
 
   logger.info("Start setting the blocking rules");
   seedBlockingRules();
@@ -126,9 +132,12 @@ export const loadProdFishCountriesAndSpecies = async () => {
     logger.debug('[LOAD-PROD-CONFIG] loadEuMemberStatesData');
     const euMemberStates = await loadEuMemberStatesData(blobStorageConnStr);
 
-    logger.info(`[LOAD-PROD-CONFIG] Finished reading data, previously species: ${SPECIES.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
-    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates});
-    logger.info(`[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
+    logger.debug('[LOAD-PROD-CONFIG] loadApprovedFoodEstablishments');
+    const { processingPlants, storageFacilities } = await loadApprovedFoodEstablishments();
+
+    logger.info(`[LOAD-PROD-CONFIG] Finished reading data, previously species: ${SPECIES.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}, processingPlants: ${PROCESSING_PLANTS.length}, storageFacilities: ${STORAGE_FACILITIES.length}`);
+    updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates, processingPlants, storageFacilities});
+    logger.info(`[LOAD-PROD-CONFIG] Finished loading data into cache, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}, processingPlants: ${PROCESSING_PLANTS.length}, storageFacilities: ${STORAGE_FACILITIES.length}`);
 
     logger.info(`[LOAD-PROD-CONFIG] Finished reading vessels of interest, previously: ${VESSELS_OF_INTEREST.length}`);
     updateVesselsOfInterestCache(vesselsOfInterest);
@@ -264,6 +273,8 @@ export const getGearTypes = (): GearRecord[] => { return GEAR_TYPES };
 export const getRfmos = (): any[] => { return RFMO_AREAS };
 
 export const getEuMemberStates = (): string[] => { return EU_MEMBER_STATES };
+export const getProcessingPlants = (): Establishment[] => PROCESSING_PLANTS;
+export const getStorageFacilities = (): Establishment[] => STORAGE_FACILITIES;
 
 const mapConversionFactors = (factors: IConversionFactor[]): IConversionFactor[] => {
   return factors.map(factorData => {
@@ -288,7 +299,9 @@ export const updateCache = ({
   commodityCodes,
   gearTypes,
   rfmos,
-  euMemberStates
+  euMemberStates,
+  processingPlants,
+  storageFacilities
 }: CacheType) => {
   if (species) {
     SPECIES = species;
@@ -328,6 +341,14 @@ export const updateCache = ({
 
   if (euMemberStates) {
     EU_MEMBER_STATES = euMemberStates;
+  }
+
+  if (processingPlants) {
+    PROCESSING_PLANTS = processingPlants;
+  }
+
+  if (storageFacilities) {
+    STORAGE_FACILITIES = storageFacilities;
   }
 }
 
@@ -657,3 +678,47 @@ export const loadEuMemberStatesData = async (blobConnStr: string): Promise<strin
     throw new Error(`[BLOB-STORAGE-LOAD-ERROR][EU-MEMBER-STATES] ${e}`);
   }
 };
+
+export const loadProcessingPlantsFromLocalFile = async (establishmentsFilePath?: string): Promise<Establishment[]> => {
+  const path = establishmentsFilePath || `${__dirname}/../../data/approvedFoodEstablishments.json`;
+  try {
+    const establishments = file.getApprovedFoodEstablishmentsFromFile(path);
+    return establishments.filter((establishment) => {
+      const hasSectionAndCapability = establishment.sections?.includes('A.VIII')
+        && establishment.capabilities?.includes('processing');
+      const hasProcessingApproval = establishment.approvals?.some((approval) =>
+        approval.pairKey === 'A.VIII:PP'
+        || (approval.section?.code === 'A.VIII' && approval.activityType?.code === 'PP')
+      );
+
+      return Boolean(hasSectionAndCapability || hasProcessingApproval);
+    });
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot load approved food establishments file from local file system, path: ${path}`);
+    return [];
+  }
+};
+
+export const loadStorageFacilitiesFromLocalFile = async (establishmentsFilePath?: string): Promise<Establishment[]> => {
+  const path = establishmentsFilePath || `${__dirname}/../../data/approvedFoodEstablishments.json`;
+  try {
+    const establishments = file.getApprovedFoodEstablishmentsFromFile(path);
+    return establishments.filter((establishment) =>
+      establishment.approvals?.some((approval) =>
+        approval.pairKey === 'A.0:CS'
+        || (approval.section?.code === 'A.0' && approval.activityType?.code === 'CS')
+      )
+    );
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot load approved food establishments file from local file system, path: ${path}`);
+    return [];
+  }
+};
+
+export const loadApprovedFoodEstablishments = async (): Promise<{
+  processingPlants: Establishment[];
+  storageFacilities: Establishment[];
+}> =>
+  ApprovedFoodEstablishmentsApi.loadApprovedFoodEstablishments();
