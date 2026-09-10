@@ -679,9 +679,43 @@ export const loadEuMemberStatesData = async (blobConnStr: string): Promise<strin
   }
 };
 
-export const loadProcessingPlantsFromLocalFile = async (): Promise<Establishment[]> => [];
+export const loadProcessingPlantsFromLocalFile = async (establishmentsFilePath?: string): Promise<Establishment[]> => {
+  const path = establishmentsFilePath || `${__dirname}/../../data/approvedFoodEstablishments.json`;
+  try {
+    const establishments = file.getApprovedFoodEstablishmentsFromFile(path);
+    return establishments.filter((establishment) => {
+      const hasSectionAndCapability = establishment.sections?.includes('A.VIII')
+        && establishment.capabilities?.includes('processing');
+      const hasProcessingApproval = establishment.approvals?.some((approval) =>
+        approval.pairKey === 'A.VIII:PP'
+        || (approval.section?.code === 'A.VIII' && approval.activityType?.code === 'PP')
+      );
 
-export const loadStorageFacilitiesFromLocalFile = async (): Promise<Establishment[]> => [];
+      return Boolean(hasSectionAndCapability || hasProcessingApproval);
+    });
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot load approved food establishments file from local file system, path: ${path}`);
+    return [];
+  }
+};
+
+export const loadStorageFacilitiesFromLocalFile = async (establishmentsFilePath?: string): Promise<Establishment[]> => {
+  const path = establishmentsFilePath || `${__dirname}/../../data/approvedFoodEstablishments.json`;
+  try {
+    const establishments = file.getApprovedFoodEstablishmentsFromFile(path);
+    return establishments.filter((establishment) =>
+      establishment.approvals?.some((approval) =>
+        approval.pairKey === 'A.0:CS'
+        || (approval.section?.code === 'A.0' && approval.activityType?.code === 'CS')
+      )
+    );
+  } catch (e) {
+    logger.error(e);
+    logger.error(`Cannot load approved food establishments file from local file system, path: ${path}`);
+    return [];
+  }
+};
 
 export const loadApprovedFoodEstablishments = async (): Promise<{
   processingPlants: Establishment[];

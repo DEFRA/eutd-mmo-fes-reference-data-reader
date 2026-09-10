@@ -287,6 +287,30 @@ const gearTypesData: any[] = mockGearTypesData
 const rfmosData: any[] = mockRfmosData;
 const processingPlantsData: Establishment[] = [{ id: 'proc-1', tradingName: 'Plant One' }];
 const storageFacilitiesData: Establishment[] = [{ id: 'store-1', tradingName: 'Storage One' }];
+const approvedFoodEstablishmentsData: Establishment[] = [
+  {
+    id: 'proc-1',
+    tradingName: 'Plant One',
+    sections: ['A.VIII'],
+    capabilities: ['processing'],
+    approvals: [{
+      pairKey: 'A.VIII:PP',
+      section: { code: 'A.VIII' },
+      activityType: { code: 'PP' }
+    }]
+  },
+  {
+    id: 'store-1',
+    tradingName: 'Storage One',
+    sections: ['A.0'],
+    capabilities: ['storage'],
+    approvals: [{
+      pairKey: 'A.0:CS',
+      section: { code: 'A.0' },
+      activityType: { code: 'CS' }
+    }]
+  }
+];
 
 describe('when in production mode', () => {
   let mockLoadAllSpecies: jest.SpyInstance;
@@ -669,8 +693,8 @@ describe('when in development mode', () => {
     mockSeedBlockingRules.mockResolvedValue(undefined);
     mockLoadGearTypesData.mockResolvedValue(gearTypesData);
     mockGetRfmosData.mockResolvedValue(rfmosData);
-    mockLoadProcessingPlantsFromLocalFile.mockResolvedValue([]);
-    mockLoadStorageFacilitiesFromLocalFile.mockResolvedValue([]);
+    mockLoadProcessingPlantsFromLocalFile.mockResolvedValue([approvedFoodEstablishmentsData[0]]);
+    mockLoadStorageFacilitiesFromLocalFile.mockResolvedValue([approvedFoodEstablishmentsData[1]]);
   });
 
   afterEach(() => {
@@ -738,7 +762,7 @@ describe('when in development mode', () => {
       expect(mockLoadApprovedFoodEstablishments).not.toHaveBeenCalled();
 
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0, processingPlants: 0, storageFacilities: 0');
-      expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1, processingPlants: 0, storageFacilities: 0');
+      expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1, processingPlants: 1, storageFacilities: 1');
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(4, 'Start setting the blocking rules');
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(5, 'Finished saving the blocking rules');
       expect(mockLoggerInfo).toHaveBeenNthCalledWith(6, 'Start setting the vessels of interest, previously vessels of interest: 0');
@@ -831,7 +855,10 @@ describe('when in development mode', () => {
     expect(mockLoadApprovedFoodEstablishments).not.toHaveBeenCalled();
 
     expect(mockLoggerInfo).toHaveBeenNthCalledWith(2, 'Finished reading data from local file system, previously species: 0, seasonalFish: 0, countries: 0, factors: 0, speciesAliases: 0, commodityCodes: 0, processingPlants: 0, storageFacilities: 0');
-    expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1, processingPlants: 0, storageFacilities: 0');
+    expect(mockLoggerInfo).toHaveBeenNthCalledWith(3, 'Finished loading data into cache from local file system, currently species: 1, seasonalFish: 1, countries: 6, factors: 0, speciesAliases: 7, commodityCodes: 1, processingPlants: 1, storageFacilities: 1');
+
+    expect(SUT.getProcessingPlants()).toHaveLength(1);
+    expect(SUT.getStorageFacilities()).toHaveLength(1);
   });
 
 });
@@ -2551,6 +2578,98 @@ describe('loadCountriesDataFromLocalFile', () => {
     expect(result).toStrictEqual([]);
   });
 
+});
+
+describe('loadProcessingPlantsFromLocalFile', () => {
+
+  let mockGetApprovedFoodEstablishmentsFromFile: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
+
+  beforeEach(() => {
+    mockGetApprovedFoodEstablishmentsFromFile = jest.spyOn(file, 'getApprovedFoodEstablishmentsFromFile');
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('will call getApprovedFoodEstablishmentsFromFile with provided path', async () => {
+    const customPath = '/tmp/custom-approved-food-establishments.json';
+    mockGetApprovedFoodEstablishmentsFromFile.mockReturnValue(approvedFoodEstablishmentsData);
+
+    await SUT.loadProcessingPlantsFromLocalFile(customPath);
+
+    expect(mockGetApprovedFoodEstablishmentsFromFile).toHaveBeenCalledWith(customPath);
+  });
+
+  it('will return only processing plant records', async () => {
+    mockGetApprovedFoodEstablishmentsFromFile.mockReturnValue(approvedFoodEstablishmentsData);
+
+    const result = await SUT.loadProcessingPlantsFromLocalFile();
+
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('proc-1');
+    expect(result.some((record) => record.id === 'store-1')).toBe(false);
+  });
+
+  it('will log an error and return [] when file helper throws', async () => {
+    const error = new Error('something went wrong');
+    mockGetApprovedFoodEstablishmentsFromFile.mockImplementation(() => {
+      throw error;
+    });
+
+    const result = await SUT.loadProcessingPlantsFromLocalFile();
+
+    expect(mockLoggerError).toHaveBeenCalledWith(error);
+    expect(result).toStrictEqual([]);
+  });
+});
+
+describe('loadStorageFacilitiesFromLocalFile', () => {
+
+  let mockGetApprovedFoodEstablishmentsFromFile: jest.SpyInstance;
+  let mockLoggerError: jest.SpyInstance;
+
+  beforeEach(() => {
+    mockGetApprovedFoodEstablishmentsFromFile = jest.spyOn(file, 'getApprovedFoodEstablishmentsFromFile');
+    mockLoggerError = jest.spyOn(logger, 'error');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('will call getApprovedFoodEstablishmentsFromFile with provided path', async () => {
+    const customPath = '/tmp/custom-approved-food-establishments.json';
+    mockGetApprovedFoodEstablishmentsFromFile.mockReturnValue(approvedFoodEstablishmentsData);
+
+    await SUT.loadStorageFacilitiesFromLocalFile(customPath);
+
+    expect(mockGetApprovedFoodEstablishmentsFromFile).toHaveBeenCalledWith(customPath);
+  });
+
+  it('will return only storage facility records', async () => {
+    mockGetApprovedFoodEstablishmentsFromFile.mockReturnValue(approvedFoodEstablishmentsData);
+
+    const result = await SUT.loadStorageFacilitiesFromLocalFile();
+
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('store-1');
+    expect(result.some((record) => record.id === 'proc-1')).toBe(false);
+  });
+
+  it('will log an error and return [] when file helper throws', async () => {
+    const error = new Error('something went wrong');
+    mockGetApprovedFoodEstablishmentsFromFile.mockImplementation(() => {
+      throw error;
+    });
+
+    const result = await SUT.loadStorageFacilitiesFromLocalFile();
+
+    expect(mockLoggerError).toHaveBeenCalledWith(error);
+    expect(result).toStrictEqual([]);
+  });
 });
 
 describe('loadSpeciesAliasesFromLocalFile', () => {
