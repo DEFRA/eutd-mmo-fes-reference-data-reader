@@ -382,7 +382,7 @@ export function toTransportation(transportation: any, includeExportDate = true):
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
-            containerId: handleEmptyValue(transportation.containerIdentificationNumber),
+            containerId: handleEmptyValue(transportation.containerNumber || transportation.containerNumbers),
             pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_TRAIN:
@@ -396,14 +396,14 @@ export function toTransportation(transportation: any, includeExportDate = true):
             whereDepartsFrom: transportation.departurePort,
             departureDate: transportation.departureDate,
             placeOfUnloading: transportation.placeOfUnloading,
-            containerId: handleEmptyValue(transportation.containerIdentificationNumber),
+            containerId: handleEmptyValue(transportation.containerNumber || transportation.containerNumbers),
             pointOfDestination: transportation.pointOfDestination
          }
       case TRANSPORT_VEHICLE_PLANE:
          return {
             modeofTransport: transportation.vehicle,
             flightNumber: transportation.flightNumber,
-            containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
+            containerId: transportation.containerNumber ? transportation.containerNumber : transportation.containerNumbers,
             exportLocation: transportation.departurePlace,
             ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),
@@ -419,7 +419,7 @@ export function toTransportation(transportation: any, includeExportDate = true):
             modeofTransport: TRANSPORT_VEHICLE_VESSEL,
             name: transportation.vesselName,
             flag: transportation.flagState,
-            containerId: transportation.containerNumbers ? transportation.containerNumbers : transportation.containerNumber,
+            containerId: transportation.containerNumber ? transportation.containerNumber : transportation.containerNumbers,
             exportLocation: transportation.departurePlace,
             ...exportDate,
             freightbillNumber: handleEmptyValue(transportation.freightBillNumber),

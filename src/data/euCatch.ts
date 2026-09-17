@@ -284,43 +284,37 @@ export const buildSupportingDocumentReferences = (catches: any[]): any[] => {
   return references;
 }
 
-export const createUtilizedSPSTransportEquipments = (utilizedSPSTransportEquipments: any, transport: any, delimiter: any = ' ') => {
-  // Handle containerNumbers (comma-separated string from multiple containers)
-  if (transport?.containerIdentificationNumber) {
-    const containerArray = transport.containerIdentificationNumber.split(delimiter).map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-    const containerNumbers = containerArray.map((containerNumber: string) => ({
-      ID: {
-        schemeID: 'container_number',
-        value: containerNumber
-      }
-    }));
-    return [...utilizedSPSTransportEquipments, ...containerNumbers];
+export const createUtilizedSPSTransportEquipments = (utilizedSPSTransportEquipments: any, transport: any) => {
+  // Priority: containerNumber (current data) > containerIdentificationNumber > containerNumbers (legacy data)
+  // This ensures we handle both new and legacy data formats
+  const containerData = transport?.containerNumber || transport?.containerIdentificationNumber || transport?.containerNumbers;
+  if (!containerData) {
+    return utilizedSPSTransportEquipments;
   }
 
-  // Fallback to single containerNumber for backwards compatibility
-  if (transport?.containerNumber) {
-    const containerNumberArray = transport.containerNumber.split(delimiter).map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-    return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
-      ID: {
-        schemeID: 'container_number',
-        value: containerNumber
-      }
-    }))];
+  // Auto-detect delimiter from actual data: check if comma or space exists
+  // This flexibly handles both comma-separated (NMD) and space-separated (CC) formats
+  // regardless of the passed delimiter parameter
+  let detectedDelimiter: any;
+  if (containerData.includes(',')) {
+    detectedDelimiter = ',';
+  } else if (containerData.includes(' ')) {
+    detectedDelimiter = ' ';
   }
 
-  // Fallback for containerNumbers for backwards compatibility with non-manipulation documents
-  if (transport?.containerNumbers) {
-    const containerNumberArray = transport.containerNumbers.split(delimiter).map((cn: string) => cn.trim()).filter((cn: string) => cn.length > 0);
-    return [...utilizedSPSTransportEquipments, ...containerNumberArray.map((containerNumber: string) => ({
-      ID: {
-        schemeID: 'container_number',
-        value: containerNumber
-      }
-    }))];
-  }
+  const containerArray = containerData
+    .split(detectedDelimiter)
+    .map((cn: string) => cn.trim())
+    .filter((cn: string) => cn.length > 0);
 
+  const containerNumbers = containerArray.map((containerNumber: string) => ({
+    ID: {
+      schemeID: 'container_number',
+      value: containerNumber
+    }
+  }));
 
-  return utilizedSPSTransportEquipments;
+  return [...utilizedSPSTransportEquipments, ...containerNumbers];
 }
 
 export const getApplicationSPSClassification = (commoditityCode: string = '', truncate: boolean = true) => ({
