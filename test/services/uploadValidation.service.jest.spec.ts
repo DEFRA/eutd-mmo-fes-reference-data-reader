@@ -431,6 +431,80 @@ describe('uploadValidation.service', () => {
       expect(result.errors).toContain('error.startDate.date.base');
     });
 
+    it('should return no startDate base error when startDate is 01/01/2000', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '01/01/2000',
+          landingDate: '02/01/2000',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).not.toContain('error.startDate.date.base');
+    });
+
+    it('should return a startDate base error when startDate is before 01/01/2000', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '31/12/1999',
+          landingDate: '01/01/2000',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.startDate.date.base');
+    });
+
+    it('should return a startDate base error when startDate has year 0226', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '11/06/0226',
+          landingDate: '01/01/2000',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.startDate.date.base');
+    });
+
+    it('should return a startDate base error when startDate is tomorrow', () => {
+      const tomorrow = moment.utc().add(1, 'day').format('DD/MM/YYYY');
+
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: tomorrow,
+          landingDate: tomorrow,
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.startDate.date.future');
+    });
+
+    it('should return no startDate base error when startDate is today', () => {
+      const today = moment.utc().format('DD/MM/YYYY');
+
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: today,
+          landingDate: today,
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).not.toContain('error.startDate.date.base');
+    });
+
     it('should return an error if the landingDate is missing', () => {
       const result = SUT.validateDateForLanding(
         {
@@ -462,6 +536,48 @@ describe('uploadValidation.service', () => {
         {
           ...uploadedLanding,
           landingDate: 'invalid-date',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.dateLanded.date.base');
+    });
+
+    it('should return no landingDate errors when landingDate is 01/01/2000', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '01/01/2000',
+          landingDate: '01/01/2000',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toStrictEqual([]);
+    });
+
+    it('should return a landingDate base error when landingDate is before 01/01/2000', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '01/01/2000',
+          landingDate: '31/12/1999',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.dateLanded.date.base');
+    });
+
+    it('should return a landingDate base error when landingDate has year 0226', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '01/01/2000',
+          landingDate: '11/06/0226',
           errors: []
         },
         landingLimitDaysInFuture
@@ -701,6 +817,64 @@ describe('uploadValidation.service', () => {
         key: 'error.dateLanded.date.max',
         params: expect.anything()
       });
+    });
+
+    it('should only return one startDate error when startDate format is invalid', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: 'invalid-date',
+          landingDate: moment.utc().format('DD/MM/YYYY'),
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors.filter(error => error === 'error.startDate.date.base')).toHaveLength(1);
+    });
+
+    it('should only return one landingDate error when landingDate format is invalid', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: moment.utc().format('DD/MM/YYYY'),
+          landingDate: 'invalid-date',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors.filter(error => error === 'error.dateLanded.date.base')).toHaveLength(1);
+    });
+
+    it('should not run cross-field date ordering when startDate fails new minimum range check', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '31/12/1999',
+          landingDate: '30/12/1999',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.startDate.date.base');
+      expect(result.errors).not.toContain('error.startDate.date.max');
+    });
+
+    it('should not run cross-field date ordering when landingDate fails new minimum range check', () => {
+      const result = SUT.validateDateForLanding(
+        {
+          ...uploadedLanding,
+          startDate: '01/01/2000',
+          landingDate: '31/12/1999',
+          errors: []
+        },
+        landingLimitDaysInFuture
+      );
+
+      expect(result.errors).toContain('error.dateLanded.date.base');
+      expect(result.errors).not.toContain('error.startDate.date.max');
     });
 
     describe('should return errors when both dates have issues', () => {
@@ -1084,6 +1258,52 @@ describe('uploadValidation.service', () => {
 
       expect(result.errors).toStrictEqual([]);
 
+    });
+
+    it.each([
+      {
+        scenario: 'landing date is before minimum date (31/12/1999)',
+        landingDate: '31/12/1999',
+        errors: ['error.dateLanded.date.base']
+      },
+      {
+        scenario: 'landing date is invalid historical date (11/06/0226)',
+        landingDate: '11/06/0226',
+        errors: ['error.dateLanded.date.base']
+      },
+      {
+        scenario: 'landing date exceeds future limit',
+        landingDate: moment.utc().add(8, 'days').format('DD/MM/YYYY'),
+        errors: [{ key: 'error.dateLanded.date.max', params: [7] }]
+      }
+    ])('should not add vessel invalid error when $scenario', ({ landingDate, errors }) => {
+      const result = SUT.validateVesselForLanding(
+        {
+          ...uploadedLanding,
+          landingDate,
+          vesselPln: 'PD110',
+          errors
+        }
+      );
+
+      expect(mockVesselSearch).not.toHaveBeenCalled();
+      expect(result.errors).toStrictEqual(errors);
+      expect(result.errors).not.toContain('error.vesselPln.any.invalid');
+    });
+
+    it('should not add vessel invalid error when landing date format is unparseable', () => {
+      const result = SUT.validateVesselForLanding(
+        {
+          ...uploadedLanding,
+          landingDate: '2020/01/01',
+          vesselPln: 'PD110',
+          errors: ['error.dateLanded.date.base']
+        }
+      );
+
+      expect(mockVesselSearch).not.toHaveBeenCalled();
+      expect(result.errors).toStrictEqual(['error.dateLanded.date.base']);
+      expect(result.errors).not.toContain('error.vesselPln.any.invalid');
     });
 
 
