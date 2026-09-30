@@ -19,6 +19,7 @@ import { ICountry } from "mmo-shared-reference-data";
 import ApplicationConfig from "../config";
 const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
 const isoCountryCodeRegex = /^[A-Z]{2,3}$/;
+const minimumLandingDate = moment.utc('01/01/2000', ['DD/MM/YYYY', 'D/M/YYYY'], true);
 
 export const validateLandings = async (products: IProduct[], landingLimitDaysInFuture: number, landings: IUploadedLanding[]): Promise<IUploadedLanding[]> => {
   const seasonalRestrictions = getSeasonalFish();
@@ -66,19 +67,28 @@ export const validateDateForLanding = (
   landing: IUploadedLanding,
   landingLimitDaysInFuture: number
 ): IUploadedLanding => {
+  const startDate = moment.utc(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
+  const landingDate = moment.utc(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
+
   // Validate start date exists
   if (!landing.startDate) {
     landing.errors.push('error.startDate.date.missing');
-  } else if (!moment(landing.startDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).isValid()) {
+  } else if (!startDate.isValid()) {
     landing.errors.push('error.startDate.date.base');
+  } else if (startDate.isBefore(minimumLandingDate, 'day')) {
+    landing.errors.push('error.startDate.date.base');
+  } else if (startDate.isAfter(moment.utc(), 'day')) {
+    landing.errors.push('error.startDate.date.future');
   }
 
   // Validate landing date exists
   if (!landing.landingDate) {
     landing.errors.push('error.dateLanded.date.missing');
-  } else if (!moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).isValid()) {
+  } else if (!landingDate.isValid()) {
     landing.errors.push('error.dateLanded.date.base');
-  } else if (moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true).utc().isAfter(moment.utc().add(landingLimitDaysInFuture, 'days'))) {
+  } else if (landingDate.isBefore(minimumLandingDate, 'day')) {
+    landing.errors.push('error.dateLanded.date.base');
+  } else if (landingDate.isAfter(moment.utc().add(landingLimitDaysInFuture, 'days'), 'day')) {
     landing.errors.push({ key: 'error.dateLanded.date.max', params: [landingLimitDaysInFuture] });
   }
 
@@ -144,6 +154,14 @@ export const validateVesselForLanding = (landing: IUploadedLanding): IUploadedLa
   }
 
   const landingDate = moment(landing.landingDate, ['DD/MM/YYYY', 'D/M/YYYY'], true);
+  const hasLandingDateError = landing.errors.some(error => {
+    const errorKey = typeof error === 'string' ? error : error.key;
+    return errorKey.startsWith('error.dateLanded.');
+  });
+
+  if (hasLandingDateError) {
+    return landing;
+  }
 
   if (landingDate.isValid()) {
     const vessels: IVessel[] = vesselSearch(landing.vesselPln, landingDate.toISOString());
