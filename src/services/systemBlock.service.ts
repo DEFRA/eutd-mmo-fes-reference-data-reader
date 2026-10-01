@@ -6,7 +6,7 @@ export const getBlockingStatus = async (name: string) : Promise<boolean> => {
     return data ? data.status : false;
 };
 
-export const seedBlockingRules = async (): Promise<any> => {
+export const seedBlockingRules = async (): Promise<void> => {
     const rules = [
         {name: ValidationRules.THREE_C, status: true},
         {name: ValidationRules.THREE_D, status: true},

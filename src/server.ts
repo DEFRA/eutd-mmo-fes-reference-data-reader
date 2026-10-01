@@ -36,6 +36,7 @@ import { rfmoRoutes } from './handler/rfmo';
 import { euUpgradeRoutes } from './handler/euUpgrade';
 import { catchSubmissionRoutes } from './handler/catchSubmission';
 import { euMemberStatesRoutes } from './handler/euMemberStates';
+import { approvedFoodEstablishmentsRoutes } from './handler/approvedFoodEstablishments';
 
 const Joi = require('joi');
 
@@ -67,11 +68,6 @@ export class Server {
         loadEodSettings()
       ]);
 
-      if (!inTest) {
-        scheduleFishCountriesAndSpeciesJob();
-        scheduleVesselsJob();
-      }
-
       Server.instance = new Hapi.Server({
         port: Number.parseInt(config.port)
       });
@@ -81,11 +77,16 @@ export class Server {
       Server.instance.validator(Joi);
 
       if (!config.inDev && !inTest) {
+        scheduleFishCountriesAndSpeciesJob();
+        scheduleVesselsJob();
+
         await Server.instance.register(require('@hapi/basic'));
         Server.instance.auth.strategy('simple', 'basic', { validate });
         Server.instance.auth.default('simple');
       }
+
       setupRoutes(Server.instance);
+
       await Server.instance.start();
       logger.info('Server successfully started on port ' + config.port);
     } catch (e) {
@@ -172,7 +173,7 @@ const staticRoutesWithoutAuth = server => {
         description: 'Just a sanity check',
         tags: ['api']
       },
-      handler: async (_request, _h) => {
+      handler: (_request, _h) => {
         return 'Server is successfully running - please use one of the API endpoints';
       }
     },
@@ -184,7 +185,7 @@ const staticRoutesWithoutAuth = server => {
         description: 'Health check',
         tags: ['api', 'health']
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         return h.response({ status: 'UP' });
       }
     },
@@ -196,7 +197,7 @@ const staticRoutesWithoutAuth = server => {
         description: 'Version',
         tags: ['api', 'version']
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         return h.response({
           gitHash: fs.readFileSync(__dirname + '/../githash', 'utf8')
         });
@@ -231,4 +232,5 @@ const setupRoutes = server => {
   euUpgradeRoutes(server);
   catchSubmissionRoutes(server);
   euMemberStatesRoutes(server);
+  approvedFoodEstablishmentsRoutes(server);
 }
