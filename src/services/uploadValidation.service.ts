@@ -21,7 +21,7 @@ const gearCodeRegex = /^[a-zA-Z]{2,3}$/;
 const isoCountryCodeRegex = /^[A-Z]{2,3}$/;
 const minimumLandingDate = moment.utc('01/01/2000', ['DD/MM/YYYY', 'D/M/YYYY'], true);
 
-export const validateLandings = async (products: IProduct[], landingLimitDaysInFuture: number, landings: IUploadedLanding[]): Promise<IUploadedLanding[]> => {
+export const validateLandings = (products: IProduct[], landingLimitDaysInFuture: number, landings: IUploadedLanding[]): Promise<IUploadedLanding[]> => {
   const seasonalRestrictions = getSeasonalFish();
 
   const validateProduct = (landing: IUploadedLanding) =>
