@@ -92,7 +92,7 @@ export const updateCertificateEuCatchStatus = async (documentNumber: string, sta
 
   logger.info(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][UPDATE][${JSON.stringify(update)}]`);
 
-  updateCcDefraValidationReport(documentNumber, catchSubmission);
+  void updateCcDefraValidationReport(documentNumber, catchSubmission);
 }
 
 export interface Catch {
