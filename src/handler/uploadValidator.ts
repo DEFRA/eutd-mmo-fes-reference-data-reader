@@ -11,13 +11,13 @@ export const uploadValidatorRoutes = (server : Hapi.Server) => {
     {
       method: 'POST',
       path: '/v1/upload/landings/validate',
-      handler : async (req: Hapi.Request, h: ResponseToolkit) => {
+      handler : (req: Hapi.Request, h: ResponseToolkit) => {
         logger.info('[UPLOAD-LANDINGS][VALIDATE]');
 
         try {
           const { products, landingLimitDaysInFuture, landings } = req.payload as UploadValidatorPayload
 
-          const result = await validateLandings( products, landingLimitDaysInFuture, landings);
+          const result = validateLandings(products, landingLimitDaysInFuture, landings);
 
           return h.response(result);
         }
