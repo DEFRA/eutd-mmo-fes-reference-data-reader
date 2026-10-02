@@ -165,6 +165,8 @@
   },
   "allowScripts": {
     "dtrace-provider@0.8.8": true,
-    "protobufjs@7.6.5": true
+    "protobufjs@7.6.5": true,
+    "@parcel/watcher@2.6.0": true,
+    "unrs-resolver@1.12.2": true
   }
 }
