@@ -229,6 +229,10 @@ export default class CatchCertificateTransformerService {
           languageID: 'en',
           value: exporter?.townCity || ''
         },
+        PostcodeCode: {
+          languageID: 'en',
+          value: exporter?.postcode || ''
+        },
         CountryID: {
           value: countryID?.isoCodeAlpha2 || 'GB'
         },
