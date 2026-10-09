@@ -19,7 +19,7 @@ const expected: ICountry[] = [
     isoNumericCode: '300',
   },
   {
-    officialCountryName: 'United Kingdom of Great Britain and Northern Ireland',
+    officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
     isoCodeAlpha2: 'GB',
     isoCodeAlpha3: 'GBR',
     isoNumericCode: '826',
