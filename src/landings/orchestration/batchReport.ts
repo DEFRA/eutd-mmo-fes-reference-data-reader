@@ -234,8 +234,7 @@ export async function catchCertInvestigationReport(
     //
     // Refresh these landings
     //
-    for (const { rssNumber, dateLanded } of missingLandings) {
-
+    await Promise.all(missingLandings.map(async ({ rssNumber, dateLanded }) => {
       try {
         logger.info(`[BATCH-REPORT][CATCH-CERT-INVESTIGATION-REPORT][REFRESH-LANDINGS] for [${rssNumber}-${dateLanded}]`)
         const res = await fetchLandings(rssNumber, dateLanded)
@@ -243,7 +242,7 @@ export async function catchCertInvestigationReport(
       } catch (e) {
         logger.error({err:e}, `[BATCH-REPORT][CATCH-CERT-INVESTIGATION-REPORT][REFRESH-LANDINGS]ERROR for [${rssNumber}-${dateLanded}] ${e}`)
       }
-    }
+    }));
 
     //
     // Get the updated landings (after the refresh)

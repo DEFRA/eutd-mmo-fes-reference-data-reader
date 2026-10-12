@@ -4,10 +4,10 @@ export const updateIgnoreFlagName = async () => {
   const catchCerts = await CatchCertService.getAllCatchCertsWithProducts();
 
   const certsToUpdate = catchCerts.filter(hasProductsToUpdate);
-  certsToUpdate.forEach((cert) => {
+  await Promise.all(certsToUpdate.map(async cert => {
     const newProducts = updateProducts(cert);
-    CatchCertService.upsertProductsByIgnore(newProducts, cert.documentNumber);
-  });
+    await CatchCertService.upsertProductsByIgnore(newProducts, cert.documentNumber);
+  }));
 };
 
 export const hasLandingsToUpdate = (product: any): boolean =>

@@ -16,7 +16,7 @@ export const vesselRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         try {
           const query = request.query;
           const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
@@ -53,7 +53,7 @@ export const vesselRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         try {
           const vessels = mingo.find(getVesselsData(), {});
 
@@ -91,7 +91,7 @@ export const vesselRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         try {
           const query = request.query;
           const vesselPln = query.vesselPln;
@@ -134,7 +134,7 @@ export const vesselRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         try {
           const query = request.query;
           const vesselPln = Array.isArray(query.vesselPln) ? query.vesselPln[0] : query.vesselPln;
