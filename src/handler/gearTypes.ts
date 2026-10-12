@@ -12,7 +12,7 @@ export const gearTypeRoutes = (server: Hapi.Server) => {
         security: true,
       },
 
-      handler: async (req, h) => {
+      handler: (req, h) => {
         try {
           const gearTypes: GearRecord[] = getGearTypes();
           const gearCategories = [
@@ -31,7 +31,7 @@ export const gearTypeRoutes = (server: Hapi.Server) => {
       options: {
         security: true,
       },
-      handler: async (req, h) => {
+      handler: (req, h) => {
         try {
           const gearTypes: GearRecord[] = getGearTypes();
           const gearCategory = req.params.gearCategory;
