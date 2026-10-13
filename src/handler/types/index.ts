@@ -1,5 +1,4 @@
 import { IConversionFactor, ICountry } from 'mmo-shared-reference-data';
-import { Establishment } from '../../interfaces/approvedFoodEstablishments.interface';
 
 export type CacheType = {
   species: any[] | undefined;
@@ -12,6 +11,4 @@ export type CacheType = {
   gearTypes?: any[];
   rfmos?: any[];
   euMemberStates?: string[];
-  processingPlants?: Establishment[];
-  storageFacilities?: Establishment[];
 };
