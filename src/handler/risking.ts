@@ -76,7 +76,7 @@ export const riskingRoutes = (server: Server) => {
       options: {
         security: true
       },
-      handler: async (request: Request, h: ResponseToolkit) => {
+      handler: (request: Request, h: ResponseToolkit) => {
         try {
           const query = request.query;
           const searchTerm = query.searchTerm as string;

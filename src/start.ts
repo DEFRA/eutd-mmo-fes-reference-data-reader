@@ -2,13 +2,9 @@ import { Server } from './server';
 import appConfig, { ApplicationConfig } from './config';
 
 
-const start = () => {
+const start = async (): Promise<void> => {
   ApplicationConfig.loadEnv(process.env);
-  Server.start(appConfig);
+  await Server.start(appConfig);
 }
 
-try {
-  start();
-} catch (e) {
-  console.error(e);
-}
+void start().catch(e => console.error(e));

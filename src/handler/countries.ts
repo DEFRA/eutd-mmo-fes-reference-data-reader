@@ -11,7 +11,7 @@ export const countriesRoutes = (server: Hapi.Server) => {
         options: {
           security: true,
         },
-        handler: async (request: Hapi.Request, h: ResponseToolkit) => {
+        handler: (request: Hapi.Request, h: ResponseToolkit) => {
           try {
             return h.response(getCountries()).code(200);
           } catch (e) {
