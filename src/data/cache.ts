@@ -57,14 +57,14 @@ export const loadLocalFishCountriesAndSpecies = async () => {
   const speciesToggle = await getSpeciesToggle();
   const gearTypes = await loadGearTypesDataFromLocalFile();
   const rfmos = await loadRfmosDataFromLocalFile();
-  const euMemberStates = await loadEuMemberStatesFromLocalFile();
+  const euMemberStates = loadEuMemberStatesFromLocalFile();
 
   logger.info(`Finished reading data from local file system, previously species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
   updateCache({species, allSpecies, seasonalFish, countries, factors, speciesAliases, commodityCodes, gearTypes, rfmos, euMemberStates});
   logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
   logger.info("Start setting the blocking rules");
-  seedBlockingRules();
+  void seedBlockingRules();
   logger.info("Finished saving the blocking rules");
 
   logger.info(`Start setting the vessels of interest, previously vessels of interest: ${VESSELS_OF_INTEREST.length}`);
@@ -154,7 +154,7 @@ export const loadFishCountriesAndSpecies = async () =>
 export const loadVessels = async () => {
   let vessels = undefined;
   if (appConfig.inDev) {
-    vessels = await loadVesselsDataFromLocalFile();
+    vessels = loadVesselsDataFromLocalFile();
   } else {
     const blobStorageConnStr = appConfig.blobStorageConnection;
     vessels = await loadVesselsData(blobStorageConnStr);
@@ -535,7 +535,7 @@ export const loadSpeciesDataFromLocalFile = async (speciesFilePath?: string): Pr
   }
 }
 
-export const loadVesselsDataFromLocalFile = async (vesselFilePath?: string): Promise<IVessel[] | undefined> => {
+export const loadVesselsDataFromLocalFile = (vesselFilePath?: string): IVessel[] | undefined => {
   const path = vesselFilePath || `${__dirname}/../../data/vessels.json`;
   try {
     return file.getVesselsDataFromFile(path);
@@ -640,10 +640,10 @@ export const loadRfmosDataFromLocalFile = async (rfmosFilePath?: string): Promis
   }
 }
 
-export const loadEuMemberStatesFromLocalFile = async (euMemberStatesFilePath?: string): Promise<string[] | undefined> => {
+export const loadEuMemberStatesFromLocalFile = (euMemberStatesFilePath?: string): string[] | undefined => {
   const path = euMemberStatesFilePath || `${__dirname}/../../data/eumemberstates.csv`;
   try {
-    return await file.getEuMemberStatesFromCSV(path);
+    return file.getEuMemberStatesFromCSV(path);
   } catch (e) {
     logger.error(e);
     logger.error(`Cannot load EU member states file from local file system, path: ${path}`);
