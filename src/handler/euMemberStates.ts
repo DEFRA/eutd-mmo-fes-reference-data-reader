@@ -11,7 +11,7 @@ export const euMemberStatesRoutes = (server: Hapi.Server) => {
         security: true,
       },
 
-      handler: async (req, h) => {
+      handler: (req, h) => {
         try {
           const euMemberStates = getEuMemberStates();
           return h.response(euMemberStates).code(200);
