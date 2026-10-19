@@ -92,11 +92,11 @@ appSettings:
     type: config
 
   - key: DYNAMICS_365_CRM_OAUTH_CLIENT_ID
-    value: 'DYNAMICS-365-CRM-OAUTH-CLIENT-ID'
-    type: secret
+    value: '#{{ ServicePrincipalAppId }}'
+    type: config
 
   - key: DYNAMICS_365_CRM_OAUTH_CLIENT_SECRET
-    value: 'DYNAMICS-365-CRM-OAUTH-CLIENT-SECRET'
+    value: 'SERVICE-PRINCIPAL-SECRET'
     type: secret
 
   - key: DYNAMICS_365_CRM_OAUTH_SCOPE
