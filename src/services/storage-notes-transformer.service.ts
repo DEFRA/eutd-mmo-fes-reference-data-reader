@@ -11,7 +11,8 @@ export default class StorageNotesTransformerService {
   public static generateStorageNotesPayload(
     documentNumber: string,
     createdAt: Date,
-    exportData: any
+    exportData: any,
+    euCatchOperatorId: string = ''
   ): any {
     logger.info(`[STORAGE-NOTES-TRANSFORMER][GENERATING-PAYLOAD][${documentNumber}]`);
 
@@ -19,7 +20,7 @@ export default class StorageNotesTransformerService {
       CreateCatchNonManipulationDocumentRequest: {
         CatchNonManipulationDocument: {
           SPSExchangedDocument: this.buildNonManipulationExchangedDocument(documentNumber, createdAt, exportData),
-          SPSArrivalConsignment: this.buildConsignment(exportData, 'arrival'),
+          SPSArrivalConsignment: this.buildConsignment(exportData, 'arrival', euCatchOperatorId),
           SPSDepartureConsignment: this.buildConsignment(exportData, 'departure')
         }
       }
@@ -94,7 +95,7 @@ export default class StorageNotesTransformerService {
     };
   }
 
-  private static buildConsignment(exportData: any, type: 'arrival' | 'departure'): any {
+  private static buildConsignment(exportData: any, type: 'arrival' | 'departure', euCatchOperatorId: string = ''): any {
     const field: any = {};
 
     if (type === 'arrival') {
@@ -110,7 +111,7 @@ export default class StorageNotesTransformerService {
         }
       };
 
-      field.ConsignorSPSParty = this.buildConsignorParty(exportData);
+      field.ConsignorSPSParty = this.buildConsignorParty(exportData, euCatchOperatorId);
       field.ConsigneeReceiptSPSLocation = this.buildConsigneeReceiptLocation(exportData?.arrivalTransport);
       field.ConsigneeSPSParty = this.buildConsigneeParty(exportData);
 
@@ -264,12 +265,19 @@ export default class StorageNotesTransformerService {
     };
   }
 
-  private static buildConsignorParty(exportData: any): any {
+  private static buildConsignorParty(exportData: any, euCatchOperatorId: string): any {
     const exporterDetails = exportData?.exporterDetails || {};
+    const hasAccountId = typeof exporterDetails.accountId === 'string' && exporterDetails.accountId.trim().length > 0;
 
     return {
       ID: {
-        value: ''
+        ...(hasAccountId && {
+          schemeID: 'operator_activity_id',
+          schemeName: 'Operator activity ID',
+          schemeAgencyID: 'ec_sante_traces',
+          schemeAgencyName: 'European commission - DG SANTE - Traces'
+        }),
+        value: euCatchOperatorId
       },
       Name: {
         languageID: 'en',
@@ -279,6 +287,22 @@ export default class StorageNotesTransformerService {
         name: 'Consignor (Exporter)',
         value: 'EX'
       },
+      ...(hasAccountId && {
+        TypeCode: [
+          {
+            listID: 'operator_activity_type',
+            listName: 'Operator activity type',
+            name: 'Exporter',
+            value: 'EXPORTER'
+          },
+          {
+            listID: 'classification_section_code',
+            listName: 'classification section code',
+            name: 'CATCH fishery products',
+            value: 'CFFPY'
+          }
+        ]
+      }),
       SpecifiedSPSAddress: {
         LineOne: {
           languageID: 'en',

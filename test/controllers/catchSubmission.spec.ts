@@ -6,6 +6,7 @@ import ProcessingStatementTransformerService from '../../src/services/processing
 import StorageNotesTransformerService from '../../src/services/storage-notes-transformer.service';
 import { DocumentModel } from '../../src/landings/types/document';
 import { updateCertificateEuCatchStatus } from '../../src/landings/persistence/catchCert';
+import { getEuCatchOperatorId } from '../../src/data/euCatch';
 
 jest.mock('mmo-shared-reference-data');
 jest.mock('../../src/logger');
@@ -14,13 +15,19 @@ jest.mock('../../src/services/processing-statement-transformer.service');
 jest.mock('../../src/services/storage-notes-transformer.service');
 jest.mock('../../src/landings/types/document');
 jest.mock('../../src/landings/persistence/catchCert');
+jest.mock('../../src/data/euCatch', () => ({
+  getEuCatchOperatorId: jest.fn(),
+}));
 
 describe('CATCH Submission Controller (FI0-10312)', () => {
   let mockSendDocumentToBoomi: jest.SpyInstance;
   let mockLoggerInfo: jest.SpyInstance;
   let mockLoggerError: jest.SpyInstance;
+  let mockLoggerWarn: jest.SpyInstance;
   let mockGenerateCatchPayload: jest.SpyInstance;
   let mockFindOne: jest.Mock;
+  let mockUpdateCertificateEuCatchStatus: jest.Mock;
+  let mockGetEuCatchOperatorId: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -28,9 +35,12 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     mockSendDocumentToBoomi = jest.spyOn(BoomiService, 'sendDocumentToBoomi');
     mockLoggerInfo = logger.info as jest.Mock;
     mockLoggerError = logger.error as jest.Mock;
+    mockLoggerWarn = logger.warn as jest.Mock;
     mockGenerateCatchPayload = jest.spyOn(CatchCertificateTransformerService, 'generateCatchPayload');
     mockFindOne = DocumentModel.findOne as jest.Mock;
     mockUpdateCertificateEuCatchStatus = updateCertificateEuCatchStatus as jest.Mock;
+    mockGetEuCatchOperatorId = getEuCatchOperatorId as jest.Mock;
+    mockGetEuCatchOperatorId.mockResolvedValue('');
   });
 
   afterEach(() => {
@@ -71,6 +81,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         exporterDetails: {
           exporterFullName: 'Test Exporter Ltd',
           exporterCompanyName: 'Test Company',
+          accountId: 'account-123',
           addressOne: 'Test Address',
           townCity: 'Test City',
           postcode: 'TE5 T12',
@@ -146,7 +157,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
         mockRawPayload.documentNumber,
         '2025-01-05T16:59:29.190Z',
-        mockCertificateFromDB.exportData
+        mockCertificateFromDB.exportData,
+        ''
       );
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
@@ -192,6 +204,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
 
       await submitDocumentToBoomi(voidPayload);
+
+      expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
@@ -362,6 +376,123 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         expect.stringContaining('[SUCCESS]')
       );
     });
+
+    it('should resolve eu catch operator id and pass it to catch transformer on submit', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockGetEuCatchOperatorId.mockResolvedValueOnce('EU-OP-123');
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockGetEuCatchOperatorId).toHaveBeenCalledWith('account-123');
+      expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
+        mockRawPayload.documentNumber,
+        '2025-01-05T16:59:29.190Z',
+        mockCertificateFromDB.exportData,
+        'EU-OP-123'
+      );
+    });
+
+    it('should pass empty eu catch operator id when lookup returns empty string for catch submit', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockGetEuCatchOperatorId.mockResolvedValueOnce('');
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
+        mockRawPayload.documentNumber,
+        '2025-01-05T16:59:29.190Z',
+        mockCertificateFromDB.exportData,
+        ''
+      );
+    });
+
+    it('should skip eu catch operator lookup when accountId is missing for catch submit', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      const certificateWithoutAccountId = {
+        ...mockCertificateFromDB,
+        exportData: {
+          ...mockCertificateFromDB.exportData,
+          exporterDetails: {
+            ...mockCertificateFromDB.exportData.exporterDetails,
+            accountId: undefined,
+          },
+        },
+      };
+
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(certificateWithoutAccountId),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
+        mockRawPayload.documentNumber,
+        '2025-01-05T16:59:29.190Z',
+        certificateWithoutAccountId.exportData,
+        ''
+      );
+    });
+
+    it('should continue catch submit with empty eu catch operator id when lookup rejects and log non-sensitive warning', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+      const lookupError = new TypeError('Do not expose this message');
+
+      mockGetEuCatchOperatorId.mockRejectedValueOnce(lookupError);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
+        mockRawPayload.documentNumber,
+        '2025-01-05T16:59:29.190Z',
+        mockCertificateFromDB.exportData,
+        ''
+      );
+      expect(mockLoggerWarn).toHaveBeenCalledWith(
+        '[DOCUMENT-SUBMISSION][EU-CATCH-OPERATOR-ID][LOOKUP-FAILED][TypeError]'
+      );
+
+      const warnMessage = mockLoggerWarn.mock.calls[0][0] as string;
+      expect(warnMessage).not.toContain('account-123');
+      expect(warnMessage).not.toContain('EU-OP-123');
+      expect(warnMessage).not.toContain('Do not expose this message');
+    });
   });
 
   describe('submitDocumentToBoomi - Processing Statement (FI0-10647)', () => {
@@ -415,6 +546,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
           catches: [],
           exporterDetails: {
             exporterFullName: 'Test Exporter',
+            accountId: 'ps-account-123',
           },
         },
       };
@@ -428,6 +560,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       mockFindOne.mockReturnValue({
         lean: jest.fn().mockResolvedValue(mockCertificateWithValidProducts),
       });
+      mockGetEuCatchOperatorId.mockResolvedValueOnce('EU-OP-PS-1');
       mockGenerateProcessingStatementPayload.mockReturnValueOnce(
         mockTransformedPSPayload
       );
@@ -435,12 +568,147 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
       await submitDocumentToBoomi(mockPSPayload);
 
-      expect(mockGenerateProcessingStatementPayload).toHaveBeenCalled();
+      expect(mockGetEuCatchOperatorId).toHaveBeenCalledWith('ps-account-123');
+      expect(mockGenerateProcessingStatementPayload).toHaveBeenCalledWith(
+        mockPSPayload.documentNumber,
+        mockCertificateWithValidProducts.createdAt,
+        expect.objectContaining({
+          exporterDetails: mockCertificateWithValidProducts.exportData.exporterDetails,
+        }),
+        'EU-OP-PS-1'
+      );
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockTransformedPSPayload,
         { documentType: 'PROCESSINGSTATEMENT' },
         'catchSubmit'
       );
+    });
+
+    it('should pass empty eu catch operator id when lookup returns empty string for processing statement submit', async () => {
+      const mockCertificate = {
+        documentNumber: 'GBR-2025-PS-TEST123',
+        status: 'COMPLETE',
+        createdAt: new Date('2025-01-05T16:59:29.190Z'),
+        exportData: {
+          products: [],
+          catches: [],
+          exporterDetails: {
+            exporterFullName: 'Test Exporter',
+            accountId: 'ps-account-123',
+          },
+        },
+      };
+
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockGetEuCatchOperatorId.mockResolvedValueOnce('');
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificate),
+      });
+      mockGenerateProcessingStatementPayload.mockReturnValueOnce(mockTransformedPSPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockPSPayload);
+
+      expect(mockGenerateProcessingStatementPayload).toHaveBeenCalledWith(
+        mockPSPayload.documentNumber,
+        mockCertificate.createdAt,
+        expect.objectContaining({
+          exporterDetails: mockCertificate.exportData.exporterDetails,
+        }),
+        ''
+      );
+    });
+
+    it('should skip eu catch operator lookup when accountId is missing for processing statement submit', async () => {
+      const mockCertificate = {
+        documentNumber: 'GBR-2025-PS-TEST123',
+        status: 'COMPLETE',
+        createdAt: new Date('2025-01-05T16:59:29.190Z'),
+        exportData: {
+          products: [],
+          catches: [],
+          exporterDetails: {
+            exporterFullName: 'Test Exporter',
+          },
+        },
+      };
+
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificate),
+      });
+      mockGenerateProcessingStatementPayload.mockReturnValueOnce(mockTransformedPSPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockPSPayload);
+
+      expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockGenerateProcessingStatementPayload).toHaveBeenCalledWith(
+        mockPSPayload.documentNumber,
+        mockCertificate.createdAt,
+        expect.objectContaining({
+          exporterDetails: mockCertificate.exportData.exporterDetails,
+        }),
+        ''
+      );
+    });
+
+    it('should continue processing statement submit with empty eu catch operator id when lookup rejects and log non-sensitive warning', async () => {
+      const mockCertificate = {
+        documentNumber: 'GBR-2025-PS-TEST123',
+        status: 'COMPLETE',
+        createdAt: new Date('2025-01-05T16:59:29.190Z'),
+        exportData: {
+          products: [],
+          catches: [],
+          exporterDetails: {
+            exporterFullName: 'Test Exporter',
+            accountId: 'ps-account-123',
+          },
+        },
+      };
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+      const lookupError = new TypeError('Do not expose this message');
+
+      mockGetEuCatchOperatorId.mockRejectedValueOnce(lookupError);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificate),
+      });
+      mockGenerateProcessingStatementPayload.mockReturnValueOnce(mockTransformedPSPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockPSPayload);
+
+      expect(mockGenerateProcessingStatementPayload).toHaveBeenCalledWith(
+        mockPSPayload.documentNumber,
+        mockCertificate.createdAt,
+        expect.objectContaining({
+          exporterDetails: mockCertificate.exportData.exporterDetails,
+        }),
+        ''
+      );
+      expect(mockLoggerWarn).toHaveBeenCalledWith(
+        '[DOCUMENT-SUBMISSION][EU-CATCH-OPERATOR-ID][LOOKUP-FAILED][TypeError]'
+      );
+
+      const warnMessage = mockLoggerWarn.mock.calls[0][0] as string;
+      expect(warnMessage).not.toContain('ps-account-123');
+      expect(warnMessage).not.toContain('EU-OP-PS-1');
+      expect(warnMessage).not.toContain('Do not expose this message');
     });
 
     it('should allow submission with products that have caughtBy array', async () => {
@@ -655,6 +923,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
       await submitDocumentToBoomi(voidPayload);
 
+      expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
         { documentType: "PROCESSINGSTATEMENT" },
@@ -693,6 +963,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         exporterDetails: {
           exporterFullName: 'Test Storage Exporter Ltd',
           exporterCompanyName: 'Storage Company',
+          accountId: 'sd-account-123',
           addressOne: 'Storage Address',
           townCity: 'Storage City',
           postcode: 'ST1 2AG',
@@ -789,7 +1060,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
           facilityStorage: mockStorageDocumentFromDB.exportData.facilityStorage,
           transport: mockStorageDocumentFromDB.exportData.transportation,
           arrivalTransport: mockStorageDocumentFromDB.exportData.arrivalTransportation,
-        })
+        }),
+        ''
       );
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
@@ -830,6 +1102,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
 
       await submitDocumentToBoomi(voidPayload);
 
+      expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
         { documentType: 'NMDOCUMENT' },
@@ -867,7 +1141,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         mockSDWithEmptyCatches.createdAt,
         expect.objectContaining({
           catches: [],
-        })
+        }),
+        ''
       );
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalled();
@@ -901,7 +1176,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         mockSDWithoutCatches.createdAt,
         expect.objectContaining({
           catches: [],
-        })
+        }),
+        ''
       );
     });
 
@@ -1025,6 +1301,41 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       );
     });
 
+    it('should continue storage document submit with empty eu catch operator id when lookup rejects and log non-sensitive warning', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+      const lookupError = new TypeError('Do not expose this message');
+
+      mockGetEuCatchOperatorId.mockRejectedValueOnce(lookupError);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockStorageDocumentFromDB),
+      });
+      mockGenerateStorageNotesPayload.mockReturnValueOnce(mockTransformedSDPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockSDPayload);
+
+      expect(mockGenerateStorageNotesPayload).toHaveBeenCalledWith(
+        mockSDPayload.documentNumber,
+        mockStorageDocumentFromDB.createdAt,
+        expect.objectContaining({
+          exporterDetails: mockStorageDocumentFromDB.exportData.exporterDetails,
+        }),
+        ''
+      );
+      expect(mockLoggerWarn).toHaveBeenCalledWith(
+        '[DOCUMENT-SUBMISSION][EU-CATCH-OPERATOR-ID][LOOKUP-FAILED][TypeError]'
+      );
+
+      const warnMessage = mockLoggerWarn.mock.calls[0][0] as string;
+      expect(warnMessage).not.toContain('sd-account-123');
+      expect(warnMessage).not.toContain('EU-SD-OP-1');
+      expect(warnMessage).not.toContain('Do not expose this message');
+    });
+
     it('should correctly transform transportation fields', async () => {
       const mockResponse = {
         status: 'OK',
@@ -1046,7 +1357,68 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         expect.objectContaining({
           transport: mockStorageDocumentFromDB.exportData.transportation,
           arrivalTransport: mockStorageDocumentFromDB.exportData.arrivalTransportation,
-        })
+        }),
+        ''
+      );
+    });
+
+    it('should resolve eu catch operator id and pass it to storage notes transformer on submit', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockGetEuCatchOperatorId.mockResolvedValueOnce('EU-SD-OP-1');
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockStorageDocumentFromDB),
+      });
+      mockGenerateStorageNotesPayload.mockReturnValueOnce(mockTransformedSDPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockSDPayload);
+
+      expect(mockGetEuCatchOperatorId).toHaveBeenCalledWith('sd-account-123');
+      expect(mockGenerateStorageNotesPayload).toHaveBeenCalledWith(
+        mockSDPayload.documentNumber,
+        mockStorageDocumentFromDB.createdAt,
+        expect.any(Object),
+        'EU-SD-OP-1'
+      );
+    });
+
+    it('should skip eu catch operator lookup when accountId is missing for storage notes submit', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      const storageDocumentWithoutAccountId = {
+        ...mockStorageDocumentFromDB,
+        exportData: {
+          ...mockStorageDocumentFromDB.exportData,
+          exporterDetails: {
+            ...mockStorageDocumentFromDB.exportData.exporterDetails,
+            accountId: undefined,
+          },
+        },
+      };
+
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(storageDocumentWithoutAccountId),
+      });
+      mockGenerateStorageNotesPayload.mockReturnValueOnce(mockTransformedSDPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockSDPayload);
+
+      expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockGenerateStorageNotesPayload).toHaveBeenCalledWith(
+        mockSDPayload.documentNumber,
+        storageDocumentWithoutAccountId.createdAt,
+        expect.any(Object),
+        ''
       );
     });
 
