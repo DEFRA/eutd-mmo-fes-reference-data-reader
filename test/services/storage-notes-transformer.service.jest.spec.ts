@@ -81,6 +81,250 @@ describe('StorageNotesTransformerService', () => {
       expect(document).toHaveProperty('SPSDepartureConsignment');
     });
 
+    it('should set arrival consignor ID from euCatchOperatorId and keep departure consignor ID empty', () => {
+      const result = StorageNotesTransformerService.generateStorageNotesPayload(
+        documentNumber,
+        createdAt,
+        baseExportData,
+        'EU-OP-SD-1'
+      );
+
+      const document = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument;
+      expect(document.SPSArrivalConsignment.ConsignorSPSParty.ID.value).toBe('EU-OP-SD-1');
+      expect(document.SPSDepartureConsignment.ConsignorSPSParty.ID?.value ?? '').toBe('');
+    });
+
+    it('should keep arrival consignor ID empty when euCatchOperatorId is omitted', () => {
+      const result = StorageNotesTransformerService.generateStorageNotesPayload(
+        documentNumber,
+        createdAt,
+        baseExportData
+      );
+
+      const document = result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument;
+      expect(document.SPSArrivalConsignment.ConsignorSPSParty.ID.value).toBe('');
+    });
+
+    describe('SPSArrivalConsignment ConsignorSPSParty metadata', () => {
+      const organisationExporterDetails = {
+        exporterCompanyName: 'Organisation Exporter Ltd',
+        exporterAddressOne: '11 Quay Road',
+        townCity: 'Grimsby',
+        exporterPostcode: 'DN31 1AB',
+        country: 'United Kingdom'
+      };
+
+      const getArrivalConsignment = (exportData: any, euCatchOperatorId?: string) => {
+        const result = euCatchOperatorId === undefined
+          ? StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, exportData)
+          : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, exportData, euCatchOperatorId);
+
+        return result.CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument.SPSArrivalConsignment;
+      };
+
+      it('should include full consignor metadata and preserve EX role and address when accountId is present', () => {
+        const exportDataWithAccountId = {
+          ...baseExportData,
+          exporterDetails: {
+            ...organisationExporterDetails,
+            accountId: 'ACC-123'
+          }
+        };
+
+        const arrivalConsignment = getArrivalConsignment(exportDataWithAccountId, 'EU-OP-100');
+
+        expect(arrivalConsignment.ConsignorSPSParty).toEqual({
+          ID: {
+            schemeID: 'operator_activity_id',
+            schemeName: 'Operator activity ID',
+            schemeAgencyID: 'ec_sante_traces',
+            schemeAgencyName: 'European commission - DG SANTE - Traces',
+            value: 'EU-OP-100'
+          },
+          Name: {
+            languageID: 'en',
+            value: 'Organisation Exporter Ltd'
+          },
+          RoleCode: {
+            name: 'Consignor (Exporter)',
+            value: 'EX'
+          },
+          TypeCode: [
+            {
+              listID: 'operator_activity_type',
+              listName: 'Operator activity type',
+              name: 'Exporter',
+              value: 'EXPORTER'
+            },
+            {
+              listID: 'classification_section_code',
+              listName: 'classification section code',
+              name: 'CATCH fishery products',
+              value: 'CFFPY'
+            }
+          ],
+          SpecifiedSPSAddress: {
+            LineOne: {
+              languageID: 'en',
+              value: '11 Quay Road'
+            },
+            CityName: {
+              languageID: 'en',
+              value: 'Grimsby'
+            },
+            PostcodeCode: {
+              languageID: 'en',
+              value: 'DN31 1AB'
+            },
+            CountryID: {
+              value: 'GB'
+            },
+            CountryName: {
+              languageID: 'en',
+              value: 'United Kingdom'
+            }
+          }
+        });
+      });
+
+      it('should keep metadata and set ID value to empty string when accountId is present and euCatchOperatorId is empty', () => {
+        const exportDataWithAccountId = {
+          ...baseExportData,
+          exporterDetails: {
+            ...organisationExporterDetails,
+            accountId: 'ACC-123'
+          }
+        };
+
+        const arrivalConsignmentExplicitEmpty = getArrivalConsignment(exportDataWithAccountId, '');
+        const arrivalConsignmentDefaultEmpty = getArrivalConsignment(exportDataWithAccountId);
+
+        for (const consignment of [arrivalConsignmentExplicitEmpty, arrivalConsignmentDefaultEmpty]) {
+          expect(consignment.ConsignorSPSParty.ID.value).toBe('');
+          expect(consignment.ConsignorSPSParty.ID.schemeID).toBe('operator_activity_id');
+          expect(consignment.ConsignorSPSParty.TypeCode).toEqual([
+            {
+              listID: 'operator_activity_type',
+              listName: 'Operator activity type',
+              name: 'Exporter',
+              value: 'EXPORTER'
+            },
+            {
+              listID: 'classification_section_code',
+              listName: 'classification section code',
+              name: 'CATCH fishery products',
+              value: 'CFFPY'
+            }
+          ]);
+        }
+      });
+
+      it('should keep exact legacy consignor node when accountId is missing while preserving supplied operator ID value', () => {
+        const exportDataWithoutAccountId = {
+          ...baseExportData,
+          exporterDetails: {
+            ...organisationExporterDetails
+          }
+        };
+
+        const arrivalConsignment = getArrivalConsignment(exportDataWithoutAccountId, 'EU-OP-PASSTHROUGH');
+
+        expect(arrivalConsignment.ConsignorSPSParty).toEqual({
+          ID: {
+            value: 'EU-OP-PASSTHROUGH'
+          },
+          Name: {
+            languageID: 'en',
+            value: 'Organisation Exporter Ltd'
+          },
+          RoleCode: {
+            name: 'Consignor (Exporter)',
+            value: 'EX'
+          },
+          SpecifiedSPSAddress: {
+            LineOne: {
+              languageID: 'en',
+              value: '11 Quay Road'
+            },
+            CityName: {
+              languageID: 'en',
+              value: 'Grimsby'
+            },
+            PostcodeCode: {
+              languageID: 'en',
+              value: 'DN31 1AB'
+            },
+            CountryID: {
+              value: 'GB'
+            },
+            CountryName: {
+              languageID: 'en',
+              value: 'United Kingdom'
+            }
+          }
+        });
+        expect(arrivalConsignment.ConsignorSPSParty).not.toHaveProperty('TypeCode');
+        expect(arrivalConsignment.ConsignorSPSParty.ID).toEqual({ value: 'EU-OP-PASSTHROUGH' });
+      });
+
+      it('should keep exact legacy consignor node when accountId is empty or whitespace', () => {
+        const testExporters = [
+          {
+            ...organisationExporterDetails,
+            accountId: ''
+          },
+          {
+            ...organisationExporterDetails,
+            accountId: '   '
+          }
+        ];
+
+        for (const exporterDetails of testExporters) {
+          const arrivalConsignment = getArrivalConsignment({
+            ...baseExportData,
+            exporterDetails
+          }, 'EU-OP-NONBLANK');
+
+          expect(arrivalConsignment.ConsignorSPSParty).not.toHaveProperty('TypeCode');
+          expect(arrivalConsignment.ConsignorSPSParty.ID).toEqual({ value: 'EU-OP-NONBLANK' });
+        }
+      });
+
+      it('should keep arrival consignee and departure consignment unchanged when accountId metadata is added', () => {
+        const exportDataBaseline = {
+          ...baseExportData,
+          exporterDetails: {
+            ...organisationExporterDetails
+          }
+        };
+
+        const exportDataWithAccountId = {
+          ...baseExportData,
+          exporterDetails: {
+            ...organisationExporterDetails,
+            accountId: 'ACC-123'
+          }
+        };
+
+        const baseline = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataBaseline,
+          'EU-OP-COMPARE'
+        ).CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument;
+
+        const withMetadata = StorageNotesTransformerService.generateStorageNotesPayload(
+          documentNumber,
+          createdAt,
+          exportDataWithAccountId,
+          'EU-OP-COMPARE'
+        ).CreateCatchNonManipulationDocumentRequest.CatchNonManipulationDocument;
+
+        expect(withMetadata.SPSArrivalConsignment.ConsigneeSPSParty).toEqual(baseline.SPSArrivalConsignment.ConsigneeSPSParty);
+        expect(withMetadata.SPSDepartureConsignment).toEqual(baseline.SPSDepartureConsignment);
+      });
+    });
+
     it('should build exchanged document with correct name', () => {
       const result = StorageNotesTransformerService.generateStorageNotesPayload(
         documentNumber,

@@ -10,7 +10,8 @@ export default class ProcessingStatementTransformerService {
   public static generateProcessingStatementPayload(
     documentNumber: string,
     createdAt: Date,
-    exportData: any
+    exportData: any,
+    euCatchOperatorId: string = ''
   ): any {
     logger.info(`[PS-TRANSFORMER][GENERATING-PAYLOAD][${documentNumber}]`);
 
@@ -19,7 +20,7 @@ export default class ProcessingStatementTransformerService {
         CreateCatchProcessingStatementRequest: {
           SPSCertificate: {
             SPSExchangedDocument: this.buildExchangedDocument(documentNumber, createdAt, exportData),
-            SPSConsignment: this.buildConsignment(exportData)
+            SPSConsignment: this.buildConsignment(exportData, euCatchOperatorId)
           }
         }
       };
@@ -110,10 +111,10 @@ export default class ProcessingStatementTransformerService {
     };
   }
 
-  private static buildConsignment(exportData: any): any {
+  private static buildConsignment(exportData: any, euCatchOperatorId: string): any {
     return {
       ConsignorSPSParty: this.buildConsignorParty(exportData),
-      ConsigneeSPSParty: this.buildConsigneeParty(exportData.exporterDetails),
+      ConsigneeSPSParty: this.buildConsigneeParty(exportData.exporterDetails, euCatchOperatorId),
       ExportSPSCountry: this.buildExportCountry(),
       LoadingBaseportSPSLocation: this.buildLoadingLocation(),
       ImportSPSCountry: this.buildImportCountry(exportData.exportedTo),
@@ -167,15 +168,39 @@ export default class ProcessingStatementTransformerService {
     };
   }
 
-  private static buildConsigneeParty({ exporterCompanyName, addressOne, townCity, postcode }: any): any {
+  private static buildConsigneeParty({ exporterCompanyName, addressOne, townCity, postcode, accountId }: any, euCatchOperatorId: string): any {
+    const hasAccountId = typeof accountId === 'string' && accountId.trim().length > 0;
+
     return {
       ID: {
-        value: ''
+        ...(hasAccountId && {
+          schemeID: 'operator_activity_id',
+          schemeName: 'Operator activity ID',
+          schemeAgencyID: 'ec_sante_traces',
+          schemeAgencyName: 'European commission - DG SANTE - Traces'
+        }),
+        value: euCatchOperatorId
       },
       Name: {
         languageID: 'en',
         value: exporterCompanyName || ''
       },
+      ...(hasAccountId && {
+        TypeCode: [
+          {
+            listID: 'operator_activity_type',
+            listName: 'Operator activity type',
+            name: 'Exporter',
+            value: 'EXPORTER'
+          },
+          {
+            listID: 'classification_section_code',
+            listName: 'classification section code',
+            name: 'CATCH fishery products',
+            value: 'CFFPY'
+          }
+        ]
+      }),
       RoleCode: {
         value: 'CN'
       },

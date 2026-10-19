@@ -7,6 +7,7 @@ import { DocumentModel, DocumentStatuses, IDocument } from '../landings/types/do
 import { getDocumentType } from './dataHub';
 import StorageNotesTransformerService from '../services/storage-notes-transformer.service';
 import { ICatchStatus } from './euUpgrade';
+import { getEuCatchOperatorId } from '../data/euCatch';
 
 // Catch Certificate payload structure
 export interface ICatchSubmissionPayload {
@@ -66,6 +67,24 @@ const fetchDocumentData = async (documentNumber: string, docType: string): Promi
 const getDocumentNumberForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.documentNumber || 'UNKNOWN';
 const getOperationsForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.operation || 'submit';
 const getResourceType = (operation: "submit" | "void") => operation === 'void' ? 'catchVoid' : 'catchSubmit';
+const resolveEuCatchOperatorId = async (exportData: any): Promise<string> => {
+  const accountId = exportData?.exporterDetails?.accountId;
+
+  logger.info(`[DOCUMENT-SUBMISSION][EU-CATCH-OPERATOR-ID][START][ACCOUNT-ID:${accountId}]`);
+  if (!accountId) {
+    return '';
+  }
+
+  try {
+    return await getEuCatchOperatorId(accountId);
+  } catch (error: unknown) {
+    const errorCategory = error instanceof Error ? error.name : 'UnknownError';
+
+    logger.warn(`[DOCUMENT-SUBMISSION][EU-CATCH-OPERATOR-ID][LOOKUP-FAILED][${errorCategory}]`);
+    return '';
+  }
+};
+
 const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCertificateRequest' | 'CancelProcessingStatementRequest') => {
   return {
     [key]: {
@@ -101,7 +120,8 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
   const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelCatchCertificateRequest') : CatchCertificateTransformerService.generateCatchPayload(
       documentNumber,
       createdAt,
-      exportData
+      exportData,
+      await resolveEuCatchOperatorId(exportData)
     );
 
   const resourceType = getResourceType(operation);
@@ -133,7 +153,8 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
   const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelProcessingStatementRequest') : ProcessingStatementTransformerService.generateProcessingStatementPayload(
       documentNumber,
       createdAt,
-      transformedExportData
+      transformedExportData,
+      await resolveEuCatchOperatorId(exportData)
     );
   const resourceType = getResourceType(operation);
   const params = { documentType: "PROCESSINGSTATEMENT" };
@@ -165,7 +186,7 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
         }
       }
     }
-  } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
+  } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData, await resolveEuCatchOperatorId(exportData));
   const resourceType = getResourceType(operation);
   const params = { documentType: operation === 'void' ? "NMDOCUMENT" : "NONMANIPULATIONDOCUMENT" };
   await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'storageDocument', operation);
