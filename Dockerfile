@@ -58,6 +58,16 @@ COPY --from=development --chown=node:node /app/dist/ /app/dist/
 COPY --chown=node:node data/ /app/data/
 RUN echo $GIT_HASH > githash
 
+# Intermediate CA missing from the DEFRA parent image; staged by pipeline-common, may be DER or PEM
+USER root
+COPY certificates/intermediate-ca.crt /tmp/intermediate-ca.crt
+RUN node -e "const fs=require('fs');const c=new (require('crypto').X509Certificate)(fs.readFileSync('/tmp/intermediate-ca.crt'));if(!c.ca||new Date(c.validTo)<new Date()){console.error('Invalid intermediate CA certificate');process.exit(1)}fs.writeFileSync('/usr/local/share/ca-certificates/intermediate-ca.crt',c.toString())" \
+  && update-ca-certificates \
+  && cat "$NODE_EXTRA_CA_CERTS" /usr/local/share/ca-certificates/intermediate-ca.crt > /etc/ssl/node-extra-ca.pem \
+  && chmod 644 /usr/local/share/ca-certificates/intermediate-ca.crt /etc/ssl/node-extra-ca.pem \
+  && rm /tmp/intermediate-ca.crt
+ENV NODE_EXTRA_CA_CERTS=/etc/ssl/node-extra-ca.pem
+
 # Again, be explict about the permissions we want for this stage
 USER node
 WORKDIR /app

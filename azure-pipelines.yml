@@ -55,3 +55,4 @@ extends:
     deployToSecondaryRegion: ${{ parameters.deployToSecondaryRegion }}
     skipPRE1: ${{ parameters.skipPRE1 }}
     deployAppConfigOnly: ${{ parameters.deployAppConfigOnly }}
+    intermediateCertificate: 'cert/CSC-Internal-Issuing-CA.crt'
