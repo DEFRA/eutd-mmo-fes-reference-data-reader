@@ -114,6 +114,191 @@ describe('EU Upgrade Handler (FI0-10355 Scenario 3)', () => {
       expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
     });
 
+    it('should accept SubmitCatchResponse with OperatorIdentifier and call controller', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              ID: 'WS_REQUEST_ID',
+              Message: 'request-id-with-operator',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: {
+                    DateTime: '2026-01-07T15:56:26.311+01:00',
+                  },
+                  OperatorIdentifier: 'OP-123456',
+                  StatusCode: {
+                    '@name': 'Issued (Validated)',
+                    text: '70',
+                  },
+                  ReasonInformation: 'Message has been successfully processed',
+                  fesDocNumber: 'GBR-2026-CC-3530192AB',
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        '@name': 'Certificate (Catch Certificate)',
+                        text: '16',
+                      },
+                      RelationshipTypeCode: {
+                        '@name': 'Document reference, internal (Document reference, internal)',
+                        text: 'CAW',
+                      },
+                      ID: {
+                        text: 'CATCH.CC.GB.2026.0000021',
+                      },
+                      AttachmentBinaryObject: {
+                        '@format': 'url',
+                        '@mimeCode': 'text/url',
+                        '@uri': 'https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000021',
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockResolvedValueOnce(undefined);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+    });
+
+    it('should accept SubmitCatchResponse with empty OperatorIdentifier and call controller', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              ID: 'WS_REQUEST_ID',
+              Message: 'request-id-with-empty-operator',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: {
+                    DateTime: '2026-01-07T15:56:26.311+01:00',
+                  },
+                  OperatorIdentifier: '',
+                  StatusCode: {
+                    '@name': 'Issued (Validated)',
+                    text: '70',
+                  },
+                  ReasonInformation: 'Message has been successfully processed',
+                  fesDocNumber: 'GBR-2026-CC-3530192AB',
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        '@name': 'Certificate (Catch Certificate)',
+                        text: '16',
+                      },
+                      RelationshipTypeCode: {
+                        '@name': 'Document reference, internal (Document reference, internal)',
+                        text: 'CAW',
+                      },
+                      ID: {
+                        text: 'CATCH.CC.GB.2026.0000021',
+                      },
+                      AttachmentBinaryObject: {
+                        '@format': 'url',
+                        '@mimeCode': 'text/url',
+                        '@uri': 'https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000021',
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockResolvedValueOnce(undefined);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+    });
+
+    it('should accept SubmitCatchResponse without OperatorIdentifier and call controller', async () => {
+      const payload = {
+        Envelope: {
+          Header: {
+            Message: {
+              ID: 'WS_REQUEST_ID',
+              Message: 'request-id-without-operator',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  IssueDateTime: {
+                    DateTime: '2026-01-07T15:56:26.311+01:00',
+                  },
+                  StatusCode: {
+                    '@name': 'Issued (Validated)',
+                    text: '70',
+                  },
+                  ReasonInformation: 'Message has been successfully processed',
+                  fesDocNumber: 'GBR-2026-CC-3530192AB',
+                  ReferenceSPSReferencedDocument: [
+                    {
+                      TypeCode: {
+                        '@name': 'Certificate (Catch Certificate)',
+                        text: '16',
+                      },
+                      RelationshipTypeCode: {
+                        '@name': 'Document reference, internal (Document reference, internal)',
+                        text: 'CAW',
+                      },
+                      ID: {
+                        text: 'CATCH.CC.GB.2026.0000021',
+                      },
+                      AttachmentBinaryObject: {
+                        '@format': 'url',
+                        '@mimeCode': 'text/url',
+                        '@uri': 'https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000021',
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockResolvedValueOnce(undefined);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/v1/eu-upgrade',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(mockProcessEuUpgradeCallback).toHaveBeenCalledWith(payload);
+    });
+
     it('should successfully process EU upgrade callback with success response', async () => {
       const payload = {
         Envelope: {
