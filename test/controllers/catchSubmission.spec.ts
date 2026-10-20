@@ -6,7 +6,7 @@ import ProcessingStatementTransformerService from '../../src/services/processing
 import StorageNotesTransformerService from '../../src/services/storage-notes-transformer.service';
 import { DocumentModel } from '../../src/landings/types/document';
 import { updateCertificateEuCatchStatus } from '../../src/landings/persistence/catchCert';
-import { getEuCatchOperatorId } from '../../src/data/euCatch';
+import { getEuCatchOperatorId, updateEuCatchOperatorId } from '../../src/data/euCatch';
 
 jest.mock('mmo-shared-reference-data');
 jest.mock('../../src/logger');
@@ -17,6 +17,7 @@ jest.mock('../../src/landings/types/document');
 jest.mock('../../src/landings/persistence/catchCert');
 jest.mock('../../src/data/euCatch', () => ({
   getEuCatchOperatorId: jest.fn(),
+  updateEuCatchOperatorId: jest.fn(),
 }));
 
 describe('CATCH Submission Controller (FI0-10312)', () => {
@@ -28,6 +29,8 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
   let mockFindOne: jest.Mock;
   let mockUpdateCertificateEuCatchStatus: jest.Mock;
   let mockGetEuCatchOperatorId: jest.Mock;
+  let mockUpdateEuCatchOperatorId: jest.Mock;
+  let mockProcessEuUpgradeCallback: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,6 +44,10 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
     mockUpdateCertificateEuCatchStatus = updateCertificateEuCatchStatus as jest.Mock;
     mockGetEuCatchOperatorId = getEuCatchOperatorId as jest.Mock;
     mockGetEuCatchOperatorId.mockResolvedValue('');
+    mockUpdateEuCatchOperatorId = updateEuCatchOperatorId as jest.Mock;
+    mockUpdateEuCatchOperatorId.mockResolvedValue(true);
+    mockProcessEuUpgradeCallback = jest.spyOn(BoomiService, 'processEuUpgradeCallback');
+    mockProcessEuUpgradeCallback.mockReturnValue({ documentNumber: 'GBR-2025-CC-TEST123' });
   });
 
   afterEach(() => {
@@ -206,6 +213,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(voidPayload);
 
       expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
@@ -402,6 +410,99 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       );
     });
 
+    it('should update CRM operator id for catch submit when accountId and OperatorIdentifier are present', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2025-CC-TEST123',
+        OperatorIdentifier: 'OP-CC-123'
+      });
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('account-123', 'OP-CC-123');
+    });
+
+    it('should not update CRM operator id for catch submit when OperatorIdentifier is whitespace-only', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2025-CC-TEST123',
+        OperatorIdentifier: '   '
+      });
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
+    });
+
+    it('should continue catch submit when CRM update returns false and persist status first', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2025-CC-TEST123',
+        OperatorIdentifier: 'OP-CC-123'
+      });
+      mockUpdateEuCatchOperatorId.mockResolvedValueOnce(false);
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await expect(submitDocumentToBoomi(mockRawPayload)).resolves.toBeUndefined();
+      expect(mockUpdateCertificateEuCatchStatus).toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('account-123', 'OP-CC-123');
+      expect(mockUpdateCertificateEuCatchStatus.mock.invocationCallOrder[0]).toBeLessThan(
+        mockUpdateEuCatchOperatorId.mock.invocationCallOrder[0]
+      );
+    });
+
+    it('should continue catch submit when CRM update throws and persist status first', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2025-CC-TEST123',
+        OperatorIdentifier: 'OP-CC-123'
+      });
+      mockUpdateEuCatchOperatorId.mockRejectedValueOnce(new Error('CRM timeout'));
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificateFromDB),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await expect(submitDocumentToBoomi(mockRawPayload)).resolves.toBeUndefined();
+      expect(mockUpdateCertificateEuCatchStatus).toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('account-123', 'OP-CC-123');
+    });
+
     it('should pass empty eu catch operator id when lookup returns empty string for catch submit', async () => {
       const mockResponse = {
         status: 'OK',
@@ -453,6 +554,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(mockRawPayload);
 
       expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
       expect(mockGenerateCatchPayload).toHaveBeenCalledWith(
         mockRawPayload.documentNumber,
         '2025-01-05T16:59:29.190Z',
@@ -622,6 +724,41 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         }),
         ''
       );
+    });
+
+    it('should update CRM operator id for processing statement submit when accountId and OperatorIdentifier are present', async () => {
+      const mockCertificate = {
+        documentNumber: 'GBR-2025-PS-TEST123',
+        status: 'COMPLETE',
+        createdAt: new Date('2025-01-05T16:59:29.190Z'),
+        exportData: {
+          products: [],
+          catches: [],
+          exporterDetails: {
+            exporterFullName: 'Test Exporter',
+            accountId: 'ps-account-123',
+          },
+        },
+      };
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2025-PS-TEST123',
+        OperatorIdentifier: 'OP-PS-123'
+      });
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockCertificate),
+      });
+      mockGenerateProcessingStatementPayload.mockReturnValueOnce(mockTransformedPSPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockPSPayload);
+
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('ps-account-123', 'OP-PS-123');
     });
 
     it('should skip eu catch operator lookup when accountId is missing for processing statement submit', async () => {
@@ -924,6 +1061,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(voidPayload);
 
       expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
@@ -1078,6 +1216,28 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       );
     });
 
+    it('should update CRM operator id for storage document submit when accountId and OperatorIdentifier are present', async () => {
+      const mockResponse = {
+        status: 'OK',
+        statusCode: '202',
+        message: 'Accepted for processing',
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2025-SD-TEST123',
+        OperatorIdentifier: 'OP-SD-123'
+      });
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockStorageDocumentFromDB),
+      });
+      mockGenerateStorageNotesPayload.mockReturnValueOnce(mockTransformedSDPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce(mockResponse);
+
+      await submitDocumentToBoomi(mockSDPayload);
+
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('sd-account-123', 'OP-SD-123');
+    });
+
     it('should use catchVoid resourceType for void operation', async () => {
       const voidPayload = { ...mockSDPayload, operation: 'void' as const };
       const mockVoidPayload = {
@@ -1103,6 +1263,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(voidPayload);
 
       expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
 
       expect(mockSendDocumentToBoomi).toHaveBeenCalledWith(
         mockVoidPayload,
@@ -1414,6 +1575,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(mockSDPayload);
 
       expect(mockGetEuCatchOperatorId).not.toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
       expect(mockGenerateStorageNotesPayload).toHaveBeenCalledWith(
         mockSDPayload.documentNumber,
         storageDocumentWithoutAccountId.createdAt,
