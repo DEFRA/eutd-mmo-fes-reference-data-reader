@@ -7,7 +7,7 @@ import { DocumentModel, DocumentStatuses, IDocument } from '../landings/types/do
 import { getDocumentType } from './dataHub';
 import StorageNotesTransformerService from '../services/storage-notes-transformer.service';
 import { ICatchStatus } from './euUpgrade';
-import { getEuCatchOperatorId } from '../data/euCatch';
+import { getEuCatchOperatorId, updateEuCatchOperatorId } from '../data/euCatch';
 
 // Catch Certificate payload structure
 export interface ICatchSubmissionPayload {
@@ -67,6 +67,47 @@ const fetchDocumentData = async (documentNumber: string, docType: string): Promi
 const getDocumentNumberForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.documentNumber || 'UNKNOWN';
 const getOperationsForToBoomi = (rawPayload: IRawDocumentSubmissionPayload) => rawPayload.operation || 'submit';
 const getResourceType = (operation: "submit" | "void") => operation === 'void' ? 'catchVoid' : 'catchSubmit';
+
+const hasMeaningfulValue = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
+
+const toOperatorIdentifier = (statusData: IEuUpgradeResponse): string | undefined => {
+  const operatorIdentifier = (statusData as unknown as Record<string, unknown>)?.OperatorIdentifier;
+
+  if (!hasMeaningfulValue(operatorIdentifier)) {
+    return undefined;
+  }
+
+  return operatorIdentifier;
+};
+
+const tryUpdateEuCatchOperatorId = async (
+  operation: 'submit' | 'void',
+  accountId: unknown,
+  statusData: IEuUpgradeResponse,
+): Promise<void> => {
+  if (operation !== 'submit') {
+    return;
+  }
+
+  if (!hasMeaningfulValue(accountId)) {
+    return;
+  }
+
+  const operatorIdentifier = toOperatorIdentifier(statusData);
+
+  if (!operatorIdentifier) {
+    return;
+  }
+
+  try {
+    const updated = await updateEuCatchOperatorId(accountId, operatorIdentifier);
+    logger.info(`[EU-CATCH-CRM][UPDATE-OPERATOR][SUBMISSION][OUTCOME][${updated ? 'UPDATED' : 'NOT-UPDATED'}]`);
+  } catch (error: unknown) {
+    const errorCategory = error instanceof Error ? error.name : 'UnknownError';
+    logger.warn(`[EU-CATCH-CRM][UPDATE-OPERATOR][SUBMISSION][ERROR][${errorCategory}]`);
+  }
+};
+
 const resolveEuCatchOperatorId = async (exportData: any): Promise<string> => {
   const accountId = exportData?.exporterDetails?.accountId;
 
@@ -98,6 +139,23 @@ const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCerti
 }
 
 
+const sendPayloadAndUpdate = async (
+  documentNumber: string,
+  transformedPayload: any,
+  params: any,
+  resourceType: any,
+  typeLabel: string,
+  operation: 'submit' | 'void',
+  accountId: unknown,
+) => {
+  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
+  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
+
+  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await tryUpdateEuCatchOperatorId(operation, accountId, statusData);
+}
+
+
 async function handleCatchCertificateSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
   logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][TRANSFORMING-CC-TO-UN-CEFACT]`);
   const transformedPayload = (operation === 'void') ? generateVoidCatchPayload(catchSubmission?.reference, 'CancelCatchCertificateRequest') : CatchCertificateTransformerService.generateCatchPayload(
@@ -109,9 +167,7 @@ async function handleCatchCertificateSubmission(documentNumber: string, createdA
 
   const resourceType = getResourceType(operation);
   const params = { documentType: "CATCHCERTIFICATE" };
-  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
-  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
-  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'catchCert', operation, exportData?.exporterDetails?.accountId);
 }
 
 async function handleProcessingStatementSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
@@ -143,9 +199,7 @@ async function handleProcessingStatementSubmission(documentNumber: string, creat
     );
   const resourceType = getResourceType(operation);
   const params = { documentType: "PROCESSINGSTATEMENT" };
-  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
-  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
-  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'processingStatement', operation, exportData?.exporterDetails?.accountId);
 }
 
 async function handleStorageNotesSubmission(documentNumber: string, createdAt: Date, exportData: any, operation: 'submit' | 'void', catchSubmission: ICatchStatus | undefined) {
@@ -176,9 +230,7 @@ async function handleStorageNotesSubmission(documentNumber: string, createdAt: D
   } : StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData, await resolveEuCatchOperatorId(exportData));
   const resourceType = getResourceType(operation);
   const params = { documentType: operation === 'void' ? "NMDOCUMENT" : "NONMANIPULATIONDOCUMENT" };
-  const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
-  const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
-  await updateCertificateEuCatchStatus(documentNumber, statusData);
+  await sendPayloadAndUpdate(documentNumber, transformedPayload, params, resourceType, 'storageDocument', operation, exportData?.exporterDetails?.accountId);
 }
 
 export const buildDocumentPayload = async (documentNumber: string): Promise<any> => {
@@ -278,7 +330,6 @@ export const submitDocumentToBoomi = async (
     } else if (docType === 'storageDocument') {
       await handleStorageNotesSubmission(documentNumber, createdAt, exportData, operation, catchSubmission);
     }
-
   } catch (error) {
     logger.error(`[DOCUMENT-SUBMISSION][${documentNumber}][TYPE:${docType}][ERROR][${error.message}][OPERATION:${operation}]`);
 
