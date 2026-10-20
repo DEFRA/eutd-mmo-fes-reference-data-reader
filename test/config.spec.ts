@@ -45,4 +45,28 @@ describe('ApplicationConfig.loadEnv', () => {
     });
     expect(ApplicationConfig.prototype.dynamics365CrmTimeoutMs).toBe(10000);
   });
+
+  it('defaults ENABLE_CRM_OPERATOR_ACTIVITY_ID to true when unset', () => {
+    ApplicationConfig.loadEnv(baseEnv);
+
+    expect(ApplicationConfig.prototype.enableCrmOperatorActivityId).toBe(true);
+  });
+
+  it("disables CRM operator activity only when ENABLE_CRM_OPERATOR_ACTIVITY_ID is exact string 'false'", () => {
+    ApplicationConfig.loadEnv({
+      ...baseEnv,
+      ENABLE_CRM_OPERATOR_ACTIVITY_ID: 'false'
+    });
+
+    expect(ApplicationConfig.prototype.enableCrmOperatorActivityId).toBe(false);
+  });
+
+  it('keeps CRM operator activity enabled when ENABLE_CRM_OPERATOR_ACTIVITY_ID is true', () => {
+    ApplicationConfig.loadEnv({
+      ...baseEnv,
+      ENABLE_CRM_OPERATOR_ACTIVITY_ID: 'true'
+    });
+
+    expect(ApplicationConfig.prototype.enableCrmOperatorActivityId).toBe(true);
+  });
 });
