@@ -65,7 +65,7 @@ describe('CatchCertificateTransformerService', () => {
           listID: 'classification_section_code',
           listName: 'classification section code',
           name: 'CATCH fishery products',
-          value: 'CFFPY'
+          value: 'CFFP'
         }
       ]);
     });
@@ -158,7 +158,7 @@ describe('CatchCertificateTransformerService', () => {
           listID: 'classification_section_code',
           listName: 'classification section code',
           name: 'CATCH fishery products',
-          value: 'CFFPY'
+          value: 'CFFP'
         }
       ]);
     });
@@ -1197,7 +1197,7 @@ describe('CatchCertificateTransformerService', () => {
           listID: 'classification_section_code',
           listName: 'classification section code',
           name: 'CATCH fishery products',
-          value: 'CFFPY'
+          value: 'CFFP'
         }
       ]);
       expect(consignor.Name.value).toBe('Ocean Exports Inc');
