@@ -33,6 +33,7 @@ export class ApplicationConfig {
   public dynamics365CrmOauthClientSecret: string;
   public dynamics365CrmOauthScope: string;
   public dynamics365CrmOauthTokenUrl: string;
+  public enableCrmOperatorActivityId: boolean;
   public defraTradeApiAPIMHeaderName: string;
   public defraTradeApiAPIMHeaderValue: string;
   public refServiceBasicAuthUser: string;
@@ -129,6 +130,7 @@ export class ApplicationConfig {
     ApplicationConfig.prototype.dynamics365CrmOauthClientSecret = env.DYNAMICS_365_CRM_OAUTH_CLIENT_SECRET;
     ApplicationConfig.prototype.dynamics365CrmOauthScope = env.DYNAMICS_365_CRM_OAUTH_SCOPE;
     ApplicationConfig.prototype.dynamics365CrmOauthTokenUrl = env.DYNAMICS_365_CRM_OAUTH_TOKEN_URL;
+    ApplicationConfig.prototype.enableCrmOperatorActivityId = env.ENABLE_CRM_OPERATOR_ACTIVITY_ID !== 'false';
     ApplicationConfig.prototype.defraTradeApiAPIMHeaderName = env.DEFRA_TRADE_API_APIM_HEADER_NAME;
     ApplicationConfig.prototype.defraTradeApiAPIMHeaderValue = env.DEFRA_TRADE_API_APIM_HEADER_VALUE;
 
