@@ -250,8 +250,10 @@ export const buildDocumentPayload = async (documentNumber: string): Promise<any>
     throw new Error(`No exportData found for document number: ${documentNumber}`);
   }
 
+  const euCatchOperatorId = await resolveEuCatchOperatorId(exportData);
+
   if (docType === 'catchCert') {
-    return CatchCertificateTransformerService.generateCatchPayload(documentNumber, createdAt, exportData);
+    return CatchCertificateTransformerService.generateCatchPayload(documentNumber, createdAt, exportData, euCatchOperatorId);
   }
 
   if (docType === 'processingStatement') {
@@ -273,7 +275,7 @@ export const buildDocumentPayload = async (documentNumber: string): Promise<any>
       personResponsibleForConsignment: exportData.personResponsibleForConsignment,
       pointOfDestination: exportData.pointOfDestination,
     };
-    return ProcessingStatementTransformerService.generateProcessingStatementPayload(documentNumber, createdAt, transformedExportData);
+    return ProcessingStatementTransformerService.generateProcessingStatementPayload(documentNumber, createdAt, transformedExportData, euCatchOperatorId);
   }
 
   if (docType === 'storageDocument') {
@@ -292,7 +294,7 @@ export const buildDocumentPayload = async (documentNumber: string): Promise<any>
       transport: exportData.transportation,
       arrivalTransport: exportData.arrivalTransportation
     };
-    return StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData);
+    return StorageNotesTransformerService.generateStorageNotesPayload(documentNumber, createdAt, transformedExportData, euCatchOperatorId);
   }
 
   throw new Error(`Unsupported document type: ${docType}`);
