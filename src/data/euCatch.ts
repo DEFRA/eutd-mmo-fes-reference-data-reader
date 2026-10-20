@@ -184,6 +184,9 @@ export const updateEuCatchOperatorId = async (accountId: string, euCatchOperator
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
+        params: {
+          'api-version': appConfig.dynamics365CrmApiVersion,
+        },
         timeout: appConfig.dynamics365CrmTimeoutMs,
         validateStatus: () => true
       }
