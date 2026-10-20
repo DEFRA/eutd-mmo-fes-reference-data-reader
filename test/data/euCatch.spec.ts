@@ -7,7 +7,13 @@ describe('getEuCatchOperatorId', () => {
   const defaultCrmUrl = 'https://crm.example/operator';
   const apiVersion = 'v9.2';
 
-  const loadSut = async (overrides?: { tokenUrl?: string; crmUrl?: string; crmTimeoutMs?: number; inDev?: boolean }) => {
+  const loadSut = async (overrides?: {
+    tokenUrl?: string;
+    crmUrl?: string;
+    crmTimeoutMs?: number;
+    inDev?: boolean;
+    enableCrmOperatorActivityId?: boolean;
+  }) => {
     jest.resetModules();
 
     jest.doMock('../../src/data/cache', () => ({
@@ -43,7 +49,8 @@ describe('getEuCatchOperatorId', () => {
         dynamics365CrmOauthClientId: clientId,
         dynamics365CrmOauthClientSecret: clientSecret,
         dynamics365CrmOauthScope: scope,
-        dynamics365CrmOauthTokenUrl: overrides?.tokenUrl || defaultTokenUrl
+        dynamics365CrmOauthTokenUrl: overrides?.tokenUrl || defaultTokenUrl,
+        enableCrmOperatorActivityId: overrides?.enableCrmOperatorActivityId ?? true
       }
     }));
 
@@ -101,6 +108,14 @@ describe('getEuCatchOperatorId', () => {
       },
       timeout: 10000
     }));
+  });
+
+  it('returns empty string and performs no token or CRM calls when feature flag is disabled', async () => {
+    const { sut, axiosMock } = await loadSut({ enableCrmOperatorActivityId: false });
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(axiosMock.post).not.toHaveBeenCalled();
+    expect(axiosMock.get).not.toHaveBeenCalled();
   });
 
   it('uses configured timeout for both token POST and CRM GET calls', async () => {
@@ -494,7 +509,14 @@ describe('updateEuCatchOperatorId', () => {
   const defaultSendUrl = 'https://crm.example/operator/update';
   const apiVersion = 'v9.2';
 
-  const loadSut = async (overrides?: { tokenUrl?: string; crmUrl?: string; sendUrl?: string; crmTimeoutMs?: number; inDev?: boolean }) => {
+  const loadSut = async (overrides?: {
+    tokenUrl?: string;
+    crmUrl?: string;
+    sendUrl?: string;
+    crmTimeoutMs?: number;
+    inDev?: boolean;
+    enableCrmOperatorActivityId?: boolean;
+  }) => {
     jest.resetModules();
 
     jest.doMock('../../src/data/cache', () => ({
@@ -531,7 +553,8 @@ describe('updateEuCatchOperatorId', () => {
         dynamics365CrmOauthClientId: clientId,
         dynamics365CrmOauthClientSecret: clientSecret,
         dynamics365CrmOauthScope: scope,
-        dynamics365CrmOauthTokenUrl: overrides?.tokenUrl || defaultTokenUrl
+        dynamics365CrmOauthTokenUrl: overrides?.tokenUrl || defaultTokenUrl,
+        enableCrmOperatorActivityId: overrides?.enableCrmOperatorActivityId ?? true
       }
     }));
 
@@ -588,6 +611,14 @@ describe('updateEuCatchOperatorId', () => {
         validateStatus: expect.any(Function)
       })
     );
+  });
+
+  it('returns false and performs no token or CRM calls when feature flag is disabled', async () => {
+    const { sut, axiosMock } = await loadSut({ enableCrmOperatorActivityId: false });
+
+    await expect(sut.updateEuCatchOperatorId(accountId, euCatchOperatorId)).resolves.toBe(false);
+    expect(axiosMock.post).not.toHaveBeenCalled();
+    expect(axiosMock.get).not.toHaveBeenCalled();
   });
 
   it('returns false when CRM send returns 500 Failed', async () => {

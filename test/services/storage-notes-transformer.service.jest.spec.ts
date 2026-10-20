@@ -160,7 +160,7 @@ describe('StorageNotesTransformerService', () => {
               listID: 'classification_section_code',
               listName: 'classification section code',
               name: 'CATCH fishery products',
-              value: 'CFFPY'
+              value: 'CFFP'
             }
           ],
           SpecifiedSPSAddress: {
@@ -213,7 +213,7 @@ describe('StorageNotesTransformerService', () => {
               listID: 'classification_section_code',
               listName: 'classification section code',
               name: 'CATCH fishery products',
-              value: 'CFFPY'
+              value: 'CFFP'
             }
           ]);
         }

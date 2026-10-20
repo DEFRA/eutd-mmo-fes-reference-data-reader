@@ -57,6 +57,8 @@ const getSanitisedErrorMetadata = (error: unknown): { category: string; code: st
   };
 };
 
+const isCrmOperatorActivityEnabled = (): boolean => appConfig.enableCrmOperatorActivityId !== false;
+
 const getEuCatchOAuthToken = async (): Promise<string> => {
   if (!isHttpsUrl(appConfig.dynamics365CrmOauthTokenUrl)) {
     logger.warn('[EU-CATCH-CRM][TOKEN][INVALID-CONFIG][OAUTH-TOKEN-URL-NON-HTTPS]');
@@ -103,6 +105,11 @@ const getEuCatchOAuthToken = async (): Promise<string> => {
 
 export const getEuCatchOperatorId = async (accountId: string): Promise<string> => {
   try {
+    if (!isCrmOperatorActivityEnabled()) {
+      logger.info('[EU-CATCH-CRM][GET-OPERATOR-ID][DISABLED-BY-FLAG]');
+      return '';
+    }
+
     if (!isHttpsUrl(appConfig.dynamics365CrmUrl)) {
       logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][INVALID-CONFIG][CRM-URL-NON-HTTPS]');
       return '';
@@ -152,12 +159,18 @@ export const getEuCatchOperatorId = async (accountId: string): Promise<string> =
 
 export const updateEuCatchOperatorId = async (accountId: string, euCatchOperatorId: string): Promise<boolean> => {
   try {
-    logger.info('[EU-CATCH-CRM][UPDATE-OPERATOR][STARTED]');
+
+    if (!isCrmOperatorActivityEnabled()) {
+      logger.info('[EU-CATCH-CRM][UPDATE-OPERATOR][DISABLED-BY-FLAG]');
+      return false;
+    }
 
     if (!isHttpsUrl(appConfig.dynamics365CrmSendUrl)) {
       logger.warn('[EU-CATCH-CRM][UPDATE-OPERATOR][INVALID-CONFIG][CRM-SEND-URL-NON-HTTPS]');
       return false;
     }
+
+    logger.info('[EU-CATCH-CRM][UPDATE-OPERATOR][STARTED]');
 
     const accessToken = await getEuCatchOAuthToken();
     const response = await axios.post<IEuCatchCrmResponse>(
