@@ -104,6 +104,8 @@ const getEuCatchOAuthToken = async (): Promise<string> => {
 };
 
 export const getEuCatchOperatorId = async (accountId: string): Promise<string> => {
+  logger.info('[EU-CATCH-CRM][GET-OPERATOR-ID][STARTED]');
+
   try {
     if (!isCrmOperatorActivityEnabled()) {
       logger.info('[EU-CATCH-CRM][GET-OPERATOR-ID][DISABLED-BY-FLAG]');
@@ -128,8 +130,8 @@ export const getEuCatchOperatorId = async (accountId: string): Promise<string> =
       validateStatus: () => true
     });
 
-    if (response.status !== 200) {
-      logger.warn(`[EU-CATCH-CRM][GET-OPERATOR-ID][NON-200][STATUS][${response.status}]`);
+    if (response?.status !== 200) {
+      logger.warn(`[EU-CATCH-CRM][GET-OPERATOR-ID][NON-200][STATUS][${response?.status}]`);
       return '';
     }
 
@@ -146,7 +148,7 @@ export const getEuCatchOperatorId = async (accountId: string): Promise<string> =
       return '';
     }
 
-    logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD]');
+    logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][' + JSON.stringify(response.data) + ']');
     return '';
   } catch (error) {
     const errorMetadata = getSanitisedErrorMetadata(error);

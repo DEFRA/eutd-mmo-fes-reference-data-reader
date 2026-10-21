@@ -90,13 +90,13 @@ describe('getEuCatchOperatorId', () => {
       }
     });
 
-      axiosMock.get.mockResolvedValue({
-        status: 200,
-        data: {
-          status: 'Succeeded',
-          euCatchOperatorId: 'operator-abc'
-        }
-      });
+    axiosMock.get.mockResolvedValue({
+      status: 200,
+      data: {
+        status: 'Succeeded',
+        euCatchOperatorId: 'operator-abc'
+      }
+    });
 
     const result = await sut.getEuCatchOperatorId(accountId);
 
@@ -154,7 +154,7 @@ describe('getEuCatchOperatorId', () => {
     const { sut, axiosMock } = await loadSut();
 
     axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
-      axiosMock.get.mockResolvedValue({ status: 200, data: { status: 'Failed', euCatchOperatorId: 'operator-abc' } });
+    axiosMock.get.mockResolvedValue({ status: 200, data: { status: 'Failed', euCatchOperatorId: 'operator-abc' } });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
   });
@@ -163,10 +163,20 @@ describe('getEuCatchOperatorId', () => {
     const { sut, axiosMock, loggerMock } = await loadSut();
 
     axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
-      axiosMock.get.mockResolvedValue({ status: 503, data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' } });
+    axiosMock.get.mockResolvedValue({ status: 503, data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' } });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
     expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][NON-200][STATUS][503]');
+  });
+
+  it('returns undefined for non-200 CRM response', async () => {
+    const { sut, axiosMock, loggerMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
+    axiosMock.get.mockResolvedValue(null);
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][NON-200][STATUS][undefined]');
   });
 
   it('returns empty string on CRM network error', async () => {
@@ -181,6 +191,33 @@ describe('getEuCatchOperatorId', () => {
     );
   });
 
+  it('handles a null CRM error without exposing error details', async () => {
+    const { sut, axiosMock, loggerMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
+    axiosMock.get.mockRejectedValue(null);
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      '[EU-CATCH-CRM][GET-OPERATOR-ID][ERROR][CATEGORY][GENERAL][CODE][N/A][STATUS][N/A]'
+    );
+  });
+
+  it.each([
+    ['error code without Axios flag', { code: 'ECONNRESET' }, 'ECONNRESET', 'N/A'],
+    ['response status without Axios flag', { response: { status: 502 } }, 'UNKNOWN', '502']
+  ])('logs sanitised metadata for %s', async (_description, error, code, status) => {
+    const { sut, axiosMock, loggerMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
+    axiosMock.get.mockRejectedValue(error);
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      `[EU-CATCH-CRM][GET-OPERATOR-ID][ERROR][CATEGORY][HTTP][CODE][${code}][STATUS][${status}]`
+    );
+  });
+
   it('returns empty string when token request fails', async () => {
     const { sut, axiosMock, loggerMock } = await loadSut();
 
@@ -191,6 +228,44 @@ describe('getEuCatchOperatorId', () => {
     expect(loggerMock.warn).toHaveBeenCalledWith(
       '[EU-CATCH-CRM][GET-OPERATOR-ID][ERROR][CATEGORY][GENERAL][CODE][N/A][STATUS][N/A]'
     );
+  });
+
+  it.each([
+    ['undefined token response', undefined],
+    ['token response without data', {}],
+    ['token data without access token', { data: {} }]
+  ])('does not call CRM when there is %s', async (_description, tokenResponse) => {
+    const { sut, axiosMock, loggerMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue(tokenResponse);
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(axiosMock.get).not.toHaveBeenCalled();
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][TOKEN][INVALID-RESPONSE][MISSING-ACCESS-TOKEN]');
+  });
+
+  it('uses the zero expiry fallback when expires_in is missing', async () => {
+    const { sut, axiosMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123' } });
+    axiosMock.get.mockResolvedValue({
+      status: 200,
+      data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' }
+    });
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('operator-abc');
+  });
+
+  it('uses the zero expiry fallback when expires_in is zero', async () => {
+    const { sut, axiosMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 0 } });
+    axiosMock.get.mockResolvedValue({
+      status: 200,
+      data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' }
+    });
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('operator-abc');
   });
 
   it('sends a form-encoded token body and does not send Authorization header to token endpoint', async () => {
@@ -324,7 +399,31 @@ describe('getEuCatchOperatorId', () => {
     axiosMock.get.mockResolvedValue({ status: 200, data: { foo: 'bar' } });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD]');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][{\"foo\":\"bar\"}]');
+  });
+
+  it('returns empty string when a successful CRM response has no data', async () => {
+    const { sut, axiosMock, loggerMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
+    axiosMock.get.mockResolvedValue({ status: 200 });
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      '[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][undefined]'
+    );
+  });
+
+  it('logs null CRM response data for a malformed successful payload', async () => {
+    const { sut, axiosMock, loggerMock } = await loadSut();
+
+    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 3600 } });
+    axiosMock.get.mockResolvedValue({ status: 200, data: null });
+
+    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      '[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][null]'
+    );
   });
 
   it('returns empty string when token response has missing access token and does not cache invalid token', async () => {
@@ -462,7 +561,7 @@ describe('getEuCatchOperatorId', () => {
     });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD]');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][{\"status\":\"Succeeded\",\"euCatchOperatorId\":\"\"}]');
   });
 
   it('prefers euCatchOperatorId when both euCatchOperatorId and obsolete id are present', async () => {
@@ -494,7 +593,7 @@ describe('getEuCatchOperatorId', () => {
     });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD]');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][{\"status\":\"Succeeded\",\"id\":\"operator-obsolete\"}]');
   });
 });
 
@@ -621,38 +720,42 @@ describe('updateEuCatchOperatorId', () => {
     expect(axiosMock.get).not.toHaveBeenCalled();
   });
 
-  it('returns false when CRM send returns 500 Failed', async () => {
+  it.each([
+    {
+      description: 'a 500 Failed response',
+      response: { status: 500, data: { status: 'Failed', message: 'Unexpected error on updating organisation' } },
+      warning: '[EU-CATCH-CRM][UPDATE-OPERATOR][FAILED-STATUS]'
+    },
+    {
+      description: 'other non-200 statuses',
+      response: { status: 429, data: { status: 'Failed' } },
+      warning: '[EU-CATCH-CRM][UPDATE-OPERATOR][NON-200][STATUS][429]'
+    },
+    {
+      description: 'a malformed 200 payload',
+      response: { status: 200, data: { status: 'Succeeded' } },
+      warning: '[EU-CATCH-CRM][UPDATE-OPERATOR][MALFORMED-200-PAYLOAD]'
+    },
+    {
+      description: 'a 200 response without data',
+      response: { status: 200 },
+      warning: '[EU-CATCH-CRM][UPDATE-OPERATOR][MALFORMED-200-PAYLOAD]'
+    },
+    {
+      description: 'a 500 response without a Failed status',
+      response: { status: 500, data: { status: 'Updated' } },
+      warning: '[EU-CATCH-CRM][UPDATE-OPERATOR][NON-200][STATUS][500]'
+    }
+  ])('returns false for $description', async ({ response, warning }) => {
     const { sut, axiosMock, loggerMock } = await loadSut();
 
     axiosMock.post
       .mockResolvedValueOnce({ data: { access_token: 'token-123', expires_in: 3600 } })
-      .mockResolvedValueOnce({ status: 500, data: { status: 'Failed', message: 'Unexpected error on updating organisation' } });
+      .mockResolvedValueOnce(response);
 
     await expect(sut.updateEuCatchOperatorId(accountId, euCatchOperatorId)).resolves.toBe(false);
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][UPDATE-OPERATOR][FAILED-STATUS]');
+    expect(loggerMock.warn).toHaveBeenCalledWith(warning);
     expect(axiosMock.post).toHaveBeenCalledTimes(2);
-  });
-
-  it('returns false for other non-200 statuses', async () => {
-    const { sut, axiosMock, loggerMock } = await loadSut();
-
-    axiosMock.post
-      .mockResolvedValueOnce({ data: { access_token: 'token-123', expires_in: 3600 } })
-      .mockResolvedValueOnce({ status: 429, data: { status: 'Failed' } });
-
-    await expect(sut.updateEuCatchOperatorId(accountId, euCatchOperatorId)).resolves.toBe(false);
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][UPDATE-OPERATOR][NON-200][STATUS][429]');
-  });
-
-  it('returns false for malformed 200 payload', async () => {
-    const { sut, axiosMock, loggerMock } = await loadSut();
-
-    axiosMock.post
-      .mockResolvedValueOnce({ data: { access_token: 'token-123', expires_in: 3600 } })
-      .mockResolvedValueOnce({ status: 200, data: { status: 'Succeeded' } });
-
-    await expect(sut.updateEuCatchOperatorId(accountId, euCatchOperatorId)).resolves.toBe(false);
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][UPDATE-OPERATOR][MALFORMED-200-PAYLOAD]');
   });
 
   it('returns false on send network error and attempts send exactly once', async () => {
@@ -815,5 +918,200 @@ describe('updateEuCatchOperatorId', () => {
     expect(allLogLines).not.toContain(sensitiveOperatorId);
     expect(allLogLines).not.toContain(sensitiveToken);
     expect(allLogLines).not.toContain(sensitiveSecret);
+  });
+});
+
+describe('euCatch data helpers', () => {
+  const loadEuCatchModule = async () => {
+    jest.resetModules();
+
+    const getCountries = jest.fn(() => []);
+    const getCommodities = jest.fn(() => []);
+
+    jest.doMock('../../src/data/cache', () => ({ getCountries }));
+    jest.doMock('../../src/controllers/species', () => ({ getCommodities }));
+    jest.doMock('axios', () => ({
+      __esModule: true,
+      default: { post: jest.fn(), get: jest.fn() }
+    }));
+    jest.doMock('../../src/config', () => ({
+      __esModule: true,
+      default: { inDev: false }
+    }));
+    jest.doMock('../../src/logger', () => ({
+      __esModule: true,
+      default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+    }));
+
+    return {
+      sut: await import('../../src/data/euCatch'),
+      getCountries,
+      getCommodities
+    };
+  };
+
+  it('builds transport document references with empty identifiers and skips invalid entries', async () => {
+    const { sut } = await loadEuCatchModule();
+
+    const references = sut.buildTransportDocumentReferences([
+      { vehicle: 'containerVessel', vesselName: '', transportDocuments: [{}] },
+      { vehicle: 'train', railwayBillNumber: '', transportDocuments: [{}] },
+      { vehicle: 'truck', registrationNumber: '', transportDocuments: [{}] },
+      { vehicle: 'plane', flightNumber: '', transportDocuments: [{}] },
+      { vehicle: 'unknown', transportDocuments: [{}] },
+      { vehicle: 'truck', transportDocuments: null },
+      undefined
+    ]);
+
+    expect(references).toHaveLength(4);
+    expect(references.map(({ ID, Information }) => [ID.value, Information.value])).toEqual([
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', '']
+    ]);
+    expect(sut.buildTransportDocumentReferences(null as never)).toEqual([]);
+  });
+
+  it('builds supporting references from documents and skips missing document lists', async () => {
+    const { sut } = await loadEuCatchModule();
+
+    expect(sut.buildSupportingDocumentReferences([
+      { supportingDocuments: ['SUPPORT-123'] },
+      { supportingDocuments: null },
+      null
+    ])).toEqual([
+      {
+        TypeCode: { value: '916' },
+        RelationshipTypeCode: {
+          name: 'Mutually defined reference number (Supporting document)',
+          value: 'ZZZ'
+        },
+        ID: { schemeID: 'GB', value: 'SUPPORT-123' }
+      }
+    ]);
+    expect(sut.buildSupportingDocumentReferences(null as never)).toEqual([]);
+  });
+
+  it.each([
+    ['truck', { vehicle: 'truck', registrationNumber: 'REG-123' }, 'REG-123'],
+    ['train', { vehicle: 'train', railwayBillNumber: 'RAIL-123' }, 'RAIL-123'],
+    ['plane', { vehicle: 'plane', flightNumber: 'FLIGHT-123' }, 'FLIGHT-123'],
+    ['direct landing', { vehicle: 'directLanding', imoNumber: 1234567 }, '1234567'],
+    ['direct landing without IMO number', { vehicle: 'directLanding' }, ''],
+    ['unrecognised vehicle', { vehicle: 'other' }, ''],
+    ['missing transport', undefined, '']
+  ])('returns the transport ID for %s', async (_description, transport, expected) => {
+    const { sut } = await loadEuCatchModule();
+
+    expect(sut.getTransportId(transport)).toBe(expected);
+  });
+
+  it('maps scheme agencies for truck and direct landing transports', async () => {
+    const { sut, getCountries } = await loadEuCatchModule();
+    getCountries.mockReturnValue([
+      { officialCountryName: 'France', isoCodeAlpha2: 'FR' }
+    ]);
+
+    expect(sut.getSchemeAgencyID({
+      vehicle: 'truck',
+      nationalityOfVehicle: 'France'
+    })).toBe('FR');
+    expect(sut.getSchemeAgencyID({
+      vehicle: 'truck',
+      nationalityOfVehicle: 'Unknown'
+    })).toBe('GB');
+    expect(sut.getSchemeAgencyID({ vehicle: 'directLanding', flag: 'GBR' })).toBe('GB');
+    expect(sut.getSchemeAgencyID({ vehicle: 'train' })).toBeUndefined();
+
+    expect(sut.getSchemeAgencyName({
+      vehicle: 'truck',
+      nationalityOfVehicle: 'France'
+    })).toBe('France');
+    expect(sut.getSchemeAgencyName({ vehicle: 'directLanding', flag: 'GBR' }))
+      .toBe('United Kingdom of Great Britain and Northern Ireland (the)');
+    expect(sut.getSchemeAgencyName({ vehicle: 'train' })).toBeUndefined();
+  });
+
+  it('creates carriage movements for road and vessel transport', async () => {
+    const { sut } = await loadEuCatchModule();
+
+    const truckMovement = sut.createMainCarriageSPSTransportMovement({
+      vehicle: 'truck',
+      registrationNumber: 'REG-123',
+      nationalityOfVehicle: 'France'
+    });
+    expect(truckMovement.ID.value).toBe('REG-123');
+    expect(truckMovement.ID.schemeAgencyID).toBe('GB');
+    expect(truckMovement.ModeCode).toEqual({ name: 'Road transport', value: '3' });
+    expect(truckMovement.UsedSPSTransportMeans).toBeUndefined();
+
+    const vesselMovement = sut.createMainCarriageSPSTransportMovement({
+      vehicle: 'containerVessel',
+      vesselName: 'MV Example'
+    });
+    expect(vesselMovement.ID.value).toBe('');
+    expect(vesselMovement.ModeCode).toEqual({ name: 'Maritime transport', value: '1' });
+    expect(vesselMovement.UsedSPSTransportMeans.Name.value).toBe('MV Example');
+  });
+
+  it('adds container equipment using each supported input field and delimiter', async () => {
+    const { sut } = await loadEuCatchModule();
+    const existingEquipment = [{ ID: { schemeID: 'existing', value: 'KEEP' } }];
+
+    expect(sut.createUtilizedSPSTransportEquipments(
+      existingEquipment,
+      { containerIdentificationNumber: 'CONT-1, CONT-2,, ' },
+      ','
+    )).toEqual([
+      ...existingEquipment,
+      { ID: { schemeID: 'container_number', value: 'CONT-1' } },
+      { ID: { schemeID: 'container_number', value: 'CONT-2' } }
+    ]);
+    expect(sut.createUtilizedSPSTransportEquipments(
+      existingEquipment,
+      { containerNumber: 'CONT-3 CONT-4' }
+    )).toHaveLength(3);
+    expect(sut.createUtilizedSPSTransportEquipments(
+      existingEquipment,
+      { containerNumbers: 'CONT-5 CONT-6' }
+    )).toHaveLength(3);
+    expect(sut.createUtilizedSPSTransportEquipments(existingEquipment, {})).toBe(existingEquipment);
+  });
+
+  it('validates certificate numbers and maps country codes', async () => {
+    const { sut } = await loadEuCatchModule();
+
+    expect(sut.validateUKPSNumberFormat('GBR-2024-PS-ABC123XYZ')).toBe(true);
+    expect(sut.validateUKPSNumberFormat('GBR-2024-SD-ABC123XYZ')).toBe(false);
+    expect(sut.validateUKSDNumberFormat('GBR-2024-SD-ABC123XYZ')).toBe(true);
+    expect(sut.validateUKSDNumberFormat('invalid')).toBe(false);
+    expect(sut.getCountryISO2('GBR')).toBe('GB');
+    expect(sut.getCountryISO2('unknown')).toBeUndefined();
+  });
+
+  it('creates signatory authentication dates in ISO format', async () => {
+    const { sut } = await loadEuCatchModule();
+    const createdAt = new Date('2024-01-02T03:04:05.000Z');
+
+    const result = sut.getSignatorySPSAuthentication(createdAt);
+
+    expect(result).toHaveLength(2);
+    expect(result[0].ActualDateTime.DateTime.value).toBe('2024-01-02T03:04:05.000Z');
+    expect(result[1].ActualDateTime.DateTime.value).toBe('2024-01-02T03:04:05.000Z');
+  });
+
+  it('uses the default truncated commodity code and commodity description', async () => {
+    const { sut, getCommodities } = await loadEuCatchModule();
+    getCommodities.mockReturnValue([{ code: '0301234567', description: 'Atlantic cod' }]);
+
+    const result = sut.getApplicationSPSClassification('0301234567');
+
+    expect(result.ClassCode.value).toBe('030123');
+    expect(result.ClassName.value).toBe('Atlantic cod');
+
+    const emptyResult = sut.getApplicationSPSClassification();
+    expect(emptyResult.ClassCode.value).toBe('');
+    expect(emptyResult.ClassName.value).toBe('');
   });
 });
