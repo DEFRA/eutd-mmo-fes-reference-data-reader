@@ -28,7 +28,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         interface Species {
           faoName: string,
           scientificName: string,
@@ -79,7 +79,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         const species = getSpeciesData('uk');
         const agg = new mingo.Aggregator([
           {
@@ -108,7 +108,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         const species = getSpeciesData('uk');
         useOperators(OperatorType.PIPELINE, { $group });
 
@@ -145,7 +145,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         try {
           const query = request.query;
           useOperators(OperatorType.PIPELINE, { $match, $group });
@@ -245,7 +245,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         // speciesCode=COD&state=FRE&presentation=FIL
         const query = request.query;
 
@@ -268,7 +268,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         return h.response(getCommodities());
       }
     },
@@ -278,7 +278,7 @@ export const speciesRoutes = (server: Hapi.Server) => {
       options: {
         security: true
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         try {
           ///v1/species/search-exact?faoCode=COD&faoName=Atlantic+cod&scientificName=Gadus+morhua
           const query = request.query;

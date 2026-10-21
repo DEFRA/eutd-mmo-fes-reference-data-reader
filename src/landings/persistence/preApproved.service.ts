@@ -21,7 +21,7 @@ export const preApproveDocumentFromMongo = async (documentNumber: string, user: 
     return await preApproveDocument(documentNumber, exportData, user);
 };
 
-const preApproveDocument = async (documentNumber: string, exportData: string, user: string) => {
+const preApproveDocument = (documentNumber: string, exportData: string, user: string) => {
     const hashedCertificate = hashIt(exportData);
 
     return PreApprovedDocuments.findOneAndUpdate(
@@ -30,7 +30,7 @@ const preApproveDocument = async (documentNumber: string, exportData: string, us
         },
         { documentNumber, certificateData: hashedCertificate, preApprovedBy: user },
         { upsert: true, new: true }
-    )
+    ).exec();
 };
 
 export const getPreApprovedDocumentByDocumentNumber = async (documentNumber: string) => {

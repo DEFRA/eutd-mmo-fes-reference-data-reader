@@ -618,7 +618,7 @@ describe('when in development mode', () => {
     mockGetRfmosData = jest.spyOn(SUT, 'loadRfmosDataFromLocalFile');
 
     mockLoadAllSpecies.mockResolvedValue(allSpeciesData);
-    mockLoadVesselsDataFromLocalFile.mockResolvedValue(vesselData);
+    mockLoadVesselsDataFromLocalFile.mockReturnValue(vesselData);
     mockLoadSpeciesDataFromLocalFile.mockResolvedValue(speciesData);
     mockLoadSeasonalFishData.mockResolvedValue(seasonalFishData);
     mockLoadCountries.mockReturnValue(countriesData);

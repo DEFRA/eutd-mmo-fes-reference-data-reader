@@ -19,7 +19,7 @@ const expected: ICountry[] = [
     isoNumericCode: '300',
   },
   {
-    officialCountryName: 'United Kingdom of Great Britain and Northern Ireland',
+    officialCountryName: 'United Kingdom of Great Britain and Northern Ireland (the)',
     isoCodeAlpha2: 'GB',
     isoCodeAlpha3: 'GBR',
     isoNumericCode: '826',
@@ -72,7 +72,7 @@ describe('When getting countries data', () => {
 
           expect(countries.filter(country => country.officialCountryName === "Spain")[0]).toEqual(expected[0]);
           expect(countries.filter(country => country.officialCountryName === "Greece")[0]).toEqual(expected[1]);
-          expect(countries.filter(country => country.officialCountryName === "United Kingdom of Great Britain and Northern Ireland")[0]).toEqual(expected[2]);
+          expect(countries.filter(country => country.officialCountryName === "United Kingdom of Great Britain and Northern Ireland (the)")[0]).toEqual(expected[2]);
           expect(countries.filter(country => country.officialCountryName === "Brazil")[0]).toEqual(expected[3]);
       });
     });
