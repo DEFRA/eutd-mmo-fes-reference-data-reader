@@ -124,7 +124,7 @@ appSettings:
     type: config
 
   - key: ENABLE_CRM_OPERATOR_ACTIVITY_ID
-    value: 'true'
+    value: 'false'
     type: config
 
   - key: EOD_RULES_MIGRATION
