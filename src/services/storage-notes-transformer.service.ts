@@ -272,8 +272,8 @@ export default class StorageNotesTransformerService {
     return {
       ID: {
         ...(hasAccountId && {
-          schemeID: 'operator_activity_id',
-          schemeName: 'Operator activity ID',
+          schemeID: 'operator_internal_activity_id',
+          schemeName: 'Operator internal activity ID',
           schemeAgencyID: 'ec_sante_traces',
           schemeAgencyName: 'European commission - DG SANTE - Traces'
         }),
