@@ -113,8 +113,8 @@ describe('ProcessingStatementTransformerService', () => {
       const consignee = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
 
       expect(consignee.ID).toEqual({
-        schemeID: 'operator_activity_id',
-        schemeName: 'Operator activity ID',
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
         schemeAgencyID: 'ec_sante_traces',
         schemeAgencyName: 'European commission - DG SANTE - Traces',
         value: 'EU-OP-PS-1'
@@ -159,8 +159,8 @@ describe('ProcessingStatementTransformerService', () => {
       const consignee = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
 
       expect(consignee.ID).toEqual({
-        schemeID: 'operator_activity_id',
-        schemeName: 'Operator activity ID',
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
         schemeAgencyID: 'ec_sante_traces',
         schemeAgencyName: 'European commission - DG SANTE - Traces',
         value: ''

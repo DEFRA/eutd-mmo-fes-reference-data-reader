@@ -47,8 +47,8 @@ describe('CatchCertificateTransformerService', () => {
       expect(
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
       ).toMatchObject({
-        schemeID: 'operator_activity_id',
-        schemeName: 'Operator activity ID',
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
         schemeAgencyID: 'ec_sante_traces',
         schemeAgencyName: 'European commission - DG SANTE - Traces',
       });
@@ -139,8 +139,8 @@ describe('CatchCertificateTransformerService', () => {
       expect(
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
       ).toEqual({
-        schemeID: 'operator_activity_id',
-        schemeName: 'Operator activity ID',
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
         schemeAgencyID: 'ec_sante_traces',
         schemeAgencyName: 'European commission - DG SANTE - Traces',
         value: ''
@@ -1176,8 +1176,8 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty;
 
       expect(consignor.ID).toEqual({
-        schemeID: 'operator_activity_id',
-        schemeName: 'Operator activity ID',
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
         schemeAgencyID: 'ec_sante_traces',
         schemeAgencyName: 'European commission - DG SANTE - Traces',
         value: 'EU-OP-CC-2'
