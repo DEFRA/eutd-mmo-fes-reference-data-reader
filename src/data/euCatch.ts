@@ -148,7 +148,7 @@ export const getEuCatchOperatorId = async (accountId: string): Promise<string> =
       return '';
     }
 
-    logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][' + JSON.stringify(response.data) + ']');
+    logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]');
     return '';
   } catch (error) {
     const errorMetadata = getSanitisedErrorMetadata(error);
