@@ -399,7 +399,7 @@ describe('getEuCatchOperatorId', () => {
     axiosMock.get.mockResolvedValue({ status: 200, data: { foo: 'bar' } });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][{\"foo\":\"bar\"}]');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]');
   });
 
   it('returns empty string when a successful CRM response has no data', async () => {
@@ -410,7 +410,7 @@ describe('getEuCatchOperatorId', () => {
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      '[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][undefined]'
+      '[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]'
     );
   });
 
@@ -422,7 +422,7 @@ describe('getEuCatchOperatorId', () => {
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      '[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][null]'
+      '[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]'
     );
   });
 
@@ -561,7 +561,7 @@ describe('getEuCatchOperatorId', () => {
     });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][{\"status\":\"Succeeded\",\"euCatchOperatorId\":\"\"}]');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]');
   });
 
   it('prefers euCatchOperatorId when both euCatchOperatorId and obsolete id are present', async () => {
@@ -593,7 +593,7 @@ describe('getEuCatchOperatorId', () => {
     });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('');
-    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][MALFORMED-200-PAYLOAD][{\"status\":\"Succeeded\",\"id\":\"operator-obsolete\"}]');
+    expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]');
   });
 });
 
