@@ -135,8 +135,8 @@ describe('StorageNotesTransformerService', () => {
 
         expect(arrivalConsignment.ConsignorSPSParty).toEqual({
           ID: {
-            schemeID: 'operator_activity_id',
-            schemeName: 'Operator activity ID',
+            schemeID: 'operator_internal_activity_id',
+            schemeName: 'Operator internal activity ID',
             schemeAgencyID: 'ec_sante_traces',
             schemeAgencyName: 'European commission - DG SANTE - Traces',
             value: 'EU-OP-100'
@@ -201,7 +201,7 @@ describe('StorageNotesTransformerService', () => {
 
         for (const consignment of [arrivalConsignmentExplicitEmpty, arrivalConsignmentDefaultEmpty]) {
           expect(consignment.ConsignorSPSParty.ID.value).toBe('');
-          expect(consignment.ConsignorSPSParty.ID.schemeID).toBe('operator_activity_id');
+          expect(consignment.ConsignorSPSParty.ID.schemeID).toBe('operator_internal_activity_id');
           expect(consignment.ConsignorSPSParty.TypeCode).toEqual([
             {
               listID: 'operator_activity_type',
