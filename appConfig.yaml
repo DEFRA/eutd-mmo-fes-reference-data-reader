@@ -87,8 +87,44 @@ appSettings:
     value: '#{{ DEFRA-TRADE-API-OAUTH-TOKEN-URL }}'
     type: config
 
+  - key: DYNAMICS_365_CRM_API_VERSION
+    value: '#{{ DYNAMICS_365_CRM_API_VERSION }}'
+    type: config
+
+  - key: DYNAMICS_365_CRM_OAUTH_CLIENT_ID
+    value: '#{{ ServicePrincipalAppId }}'
+    type: config
+
+  - key: DYNAMICS_365_CRM_OAUTH_CLIENT_SECRET
+    value: 'SERVICE-PRINCIPAL-SECRET'
+    type: secret
+
+  - key: DYNAMICS_365_CRM_OAUTH_SCOPE
+    value: '#{{ DYNAMICS_365_CRM_OAUTH_SCOPE }}'
+    type: config
+
+  - key: DYNAMICS_365_CRM_OAUTH_TOKEN_URL
+    value: '#{{ DYNAMICS_365_CRM_OAUTH_TOKEN_URL }}'
+    type: config
+
+  - key: DYNAMICS_365_CRM_SEND_URL
+    value: '#{{ DYNAMICS_365_CRM_SEND_URL }}'
+    type: config
+
+  - key: DYNAMICS_365_CRM_TIMEOUT_MS
+    value: '10000'
+    type: config
+
+  - key: DYNAMICS_365_CRM_URL
+    value: '#{{ DYNAMICS_365_CRM_URL }}'
+    type: config
+
   - key: ENABLE_CHIP_REPORTING
     value: 'true'
+    type: config
+
+  - key: ENABLE_CRM_OPERATOR_ACTIVITY_ID
+    value: 'false'
     type: config
 
   - key: EOD_RULES_MIGRATION

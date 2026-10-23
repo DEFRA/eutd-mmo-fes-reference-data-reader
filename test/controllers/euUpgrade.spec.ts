@@ -9,16 +9,25 @@ import {
 } from 'mmo-shared-reference-data';
 import { updateCertificateEuCatchStatus } from '../../src/landings/persistence/catchCert';
 import logger from '../../src/logger';
+import { DocumentModel, DocumentStatuses } from '../../src/landings/types/document';
+import { updateEuCatchOperatorId } from '../../src/data/euCatch';
 
 jest.mock('mmo-shared-reference-data');
 jest.mock('../../src/landings/persistence/catchCert');
 jest.mock('../../src/logger');
+jest.mock('../../src/landings/types/document');
+jest.mock('../../src/data/euCatch', () => ({
+  updateEuCatchOperatorId: jest.fn(),
+}));
 
 describe('EU Upgrade Controller (FI0-10355 Scenario 3)', () => {
   let mockProcessEuUpgradeCallback: jest.SpyInstance;
   let mockUpdateCertificateStatus: jest.SpyInstance;
   let mockLoggerInfo: jest.SpyInstance;
   let mockLoggerError: jest.SpyInstance;
+  let mockLoggerWarn: jest.SpyInstance;
+  let mockFindOne: jest.Mock;
+  let mockUpdateEuCatchOperatorId: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -30,6 +39,22 @@ describe('EU Upgrade Controller (FI0-10355 Scenario 3)', () => {
     mockUpdateCertificateStatus = updateCertificateEuCatchStatus as jest.Mock;
     mockLoggerInfo = logger.info as jest.Mock;
     mockLoggerError = logger.error as jest.Mock;
+    mockLoggerWarn = logger.warn as jest.Mock;
+    mockFindOne = DocumentModel.findOne as jest.Mock;
+    mockUpdateEuCatchOperatorId = updateEuCatchOperatorId as jest.Mock;
+    mockUpdateEuCatchOperatorId.mockResolvedValue(true);
+
+    mockFindOne.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        status: DocumentStatuses.Complete,
+        exportData: {
+          exporterDetails: {
+            accountId: 'account-123'
+          }
+        }
+      })
+    });
   });
 
   afterEach(() => {
@@ -119,6 +144,160 @@ describe('EU Upgrade Controller (FI0-10355 Scenario 3)', () => {
       expect(mockLoggerInfo).toHaveBeenCalledWith(
         expect.stringContaining('[EU-UPGRADE][CALLBACK][SUCCESS]'),
       );
+    });
+
+    it('should update CRM operator id when document is found, status is not VOID, and OperatorIdentifier is present', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: {
+            Message: {
+              severity: 'debugging',
+              ID: 'WS_REQUEST_ID',
+              Message: 'request-id-123',
+            },
+          },
+          Body: {
+            SubmitCatchResponse: {
+              SPSAcknowledgement: {
+                SPSAcknowledgementDocument: {
+                  fesDocNumber: 'GBR-2023-CC-TEST123',
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        euCatchStatus: 'SUCCESS',
+        OperatorIdentifier: 'OP-CB-123'
+      });
+
+      await processEuUpgradeCallback(callbackData as never);
+
+      expect(mockUpdateCertificateStatus).toHaveBeenCalledWith(
+        'GBR-2023-CC-TEST123',
+        expect.objectContaining({ documentNumber: 'GBR-2023-CC-TEST123' })
+      );
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('account-123', 'OP-CB-123');
+    });
+
+    it('should skip CRM update when document status is VOID', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: { Message: { ID: 'WS_REQUEST_ID', Message: 'request-id-void' } },
+          Body: {}
+        },
+      };
+
+      mockFindOne.mockReturnValueOnce({
+        lean: jest.fn().mockResolvedValue({
+          documentNumber: 'GBR-2023-CC-TEST123',
+          status: DocumentStatuses.Void,
+          exportData: { exporterDetails: { accountId: 'account-123' } }
+        })
+      });
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        euCatchStatus: 'SUCCESS',
+        OperatorIdentifier: 'OP-CB-123'
+      });
+
+      await processEuUpgradeCallback(callbackData as never);
+
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
+    });
+
+    it('should skip CRM update when accountId is missing or OperatorIdentifier is blank/whitespace', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: { Message: { ID: 'WS_REQUEST_ID', Message: 'request-id-missing' } },
+          Body: {}
+        },
+      };
+
+      mockFindOne.mockReturnValueOnce({
+        lean: jest.fn().mockResolvedValue({
+          documentNumber: 'GBR-2023-CC-TEST123',
+          status: DocumentStatuses.Complete,
+          exportData: { exporterDetails: {} }
+        })
+      });
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        euCatchStatus: 'SUCCESS',
+        OperatorIdentifier: '   '
+      });
+
+      await processEuUpgradeCallback(callbackData as never);
+
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
+    });
+
+    it('should continue when CRM update returns false and keep persistence behavior', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: { Message: { ID: 'WS_REQUEST_ID', Message: 'request-id-false' } },
+          Body: {}
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        euCatchStatus: 'SUCCESS',
+        OperatorIdentifier: 'OP-CB-123'
+      });
+      mockUpdateEuCatchOperatorId.mockResolvedValueOnce(false);
+
+      await expect(processEuUpgradeCallback(callbackData as never)).resolves.toBeUndefined();
+      expect(mockUpdateCertificateStatus).toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('account-123', 'OP-CB-123');
+    });
+
+    it('should continue when CRM update throws and keep persistence behavior', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: { Message: { ID: 'WS_REQUEST_ID', Message: 'request-id-throw' } },
+          Body: {}
+        },
+      };
+
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        euCatchStatus: 'SUCCESS',
+        OperatorIdentifier: 'OP-CB-123'
+      });
+      mockUpdateEuCatchOperatorId.mockRejectedValueOnce(new Error('CRM timeout'));
+
+      await expect(processEuUpgradeCallback(callbackData as never)).resolves.toBeUndefined();
+      expect(mockUpdateCertificateStatus).toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).toHaveBeenCalledWith('account-123', 'OP-CB-123');
+      expect(mockLoggerWarn).toHaveBeenCalledWith(
+        '[EU-UPGRADE][CALLBACK][CRM-UPDATE][ERROR][Error]'
+      );
+    });
+
+    it('should preserve behavior when document lookup returns missing record', async () => {
+      const callbackData = {
+        Envelope: {
+          Header: { Message: { ID: 'WS_REQUEST_ID', Message: 'request-id-not-found' } },
+          Body: {}
+        },
+      };
+
+      mockFindOne.mockReturnValueOnce({
+        lean: jest.fn().mockResolvedValue(null)
+      });
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({
+        documentNumber: 'GBR-2023-CC-TEST123',
+        euCatchStatus: 'SUCCESS',
+        OperatorIdentifier: 'OP-CB-123'
+      });
+
+      await expect(processEuUpgradeCallback(callbackData as never)).resolves.toBeUndefined();
+      expect(mockUpdateCertificateStatus).toHaveBeenCalled();
+      expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
     });
 
     it('should successfully process a FAILURE callback with error message', async () => {

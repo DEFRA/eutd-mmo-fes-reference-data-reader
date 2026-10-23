@@ -18,6 +18,151 @@ describe('CatchCertificateTransformerService', () => {
   });
 
   describe('generateCatchPayload', () => {
+    it('should set consignor ID from euCatchOperatorId when provided', () => {
+      const documentNumber = 'GBR-2025-CC-IDTEST';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {
+          accountId: 'acc-123',
+          exporterCompanyName: 'Test Exporter Ltd',
+          country: 'United Kingdom'
+        },
+        exportedFrom: 'Dover Port',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'Calais Port',
+        transportations: [{ vehicle: 'truck' }],
+        products: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData,
+        'EU-OP-CC-1'
+      );
+
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID.value
+      ).toBe('EU-OP-CC-1');
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).toMatchObject({
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
+        schemeAgencyID: 'ec_sante_traces',
+        schemeAgencyName: 'European commission - DG SANTE - Traces',
+      });
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.TypeCode
+      ).toEqual([
+        {
+          listID: 'operator_activity_type',
+          listName: 'Operator activity type',
+          name: 'Exporter',
+          value: 'EXPORTER'
+        },
+        {
+          listID: 'classification_section_code',
+          listName: 'classification section code',
+          name: 'CATCH fishery products',
+          value: 'CFFP'
+        }
+      ]);
+    });
+
+    it('should keep consignor ID empty when euCatchOperatorId is omitted', () => {
+      const documentNumber = 'GBR-2025-CC-IDTEST2';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {
+          exporterCompanyName: 'Test Exporter Ltd',
+          country: 'United Kingdom'
+        },
+        exportedFrom: 'Dover Port',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'Calais Port',
+        transportations: [{ vehicle: 'truck' }],
+        products: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID.value
+      ).toBe('');
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).toEqual({ value: '' });
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.TypeCode
+      ).toBeUndefined();
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).not.toHaveProperty('schemeID');
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).not.toHaveProperty('schemeName');
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).not.toHaveProperty('schemeAgencyID');
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).not.toHaveProperty('schemeAgencyName');
+    });
+
+    it('should add scheme metadata and TypeCode when accountId exists and euCatchOperatorId defaults to empty', () => {
+      const documentNumber = 'GBR-2025-CC-IDTEST3';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {
+          accountId: 'acc-124',
+          exporterCompanyName: 'Test Exporter Ltd',
+          country: 'United Kingdom'
+        },
+        exportedFrom: 'Dover Port',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'Calais Port',
+        transportations: [{ vehicle: 'truck' }],
+        products: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData
+      );
+
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.ID
+      ).toEqual({
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
+        schemeAgencyID: 'ec_sante_traces',
+        schemeAgencyName: 'European commission - DG SANTE - Traces',
+        value: ''
+      });
+      expect(
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty.TypeCode
+      ).toEqual([
+        {
+          listID: 'operator_activity_type',
+          listName: 'Operator activity type',
+          name: 'Exporter',
+          value: 'EXPORTER'
+        },
+        {
+          listID: 'classification_section_code',
+          listName: 'classification section code',
+          name: 'CATCH fishery products',
+          value: 'CFFP'
+        }
+      ]);
+    });
+
     it('should generate complete catch payload with all fields', () => {
       const documentNumber = 'GBR-2025-CC-TEST123';
       const createdAt = new Date('2025-12-01');
@@ -987,12 +1132,79 @@ describe('CatchCertificateTransformerService', () => {
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty;
 
       expect(consignor.ID.value).toBe('');
+      expect(consignor.ID).toEqual({ value: '' });
       expect(consignor.Name.value).toBe('Ocean Exports Inc');
       expect(consignor.RoleCode.value).toBe('CZ');
+      expect(consignor.RoleCode.name).toBe('Consignor (Exporter)');
+      expect(consignor.TypeCode).toBeUndefined();
       expect(consignor.SpecifiedSPSAddress.LineOne.value).toBe('789 Maritime Avenue');
       expect(consignor.SpecifiedSPSAddress.CityName.value).toBe('Southampton');
       expect(consignor.SpecifiedSPSAddress.CountryName.value).toBe('United Kingdom of Great Britain and Northern Ireland');
       expect(consignor.SpecifiedSPSAddress.CountryID.value).toBe('This is the UK');
+    });
+
+    it('should include scheme fields and TypeCode when exporter accountId is present', () => {
+      mockGetCountries.mockReturnValue([{
+        officialCountryName: 'United Kingdom',
+        isoCodeAlpha2: 'GB'
+      }]);
+
+      const documentNumber = 'GBR-2025-CC-PARTY002';
+      const createdAt = new Date('2025-12-01');
+      const exportData = {
+        exporterDetails: {
+          accountId: 'acc-125',
+          exporterCompanyName: 'Ocean Exports Inc',
+          addressOne: '789 Maritime Avenue',
+          townCity: 'Southampton',
+          country: 'United Kingdom'
+        },
+        exportedFrom: 'UK',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'France',
+        transportations: [{}]
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        documentNumber,
+        createdAt,
+        exportData,
+        'EU-OP-CC-2'
+      );
+
+      const consignor =
+        result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty;
+
+      expect(consignor.ID).toEqual({
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
+        schemeAgencyID: 'ec_sante_traces',
+        schemeAgencyName: 'European commission - DG SANTE - Traces',
+        value: 'EU-OP-CC-2'
+      });
+      expect(consignor.RoleCode).toEqual({
+        name: 'Consignor (Exporter)',
+        value: 'CZ'
+      });
+      expect(consignor.TypeCode).toEqual([
+        {
+          listID: 'operator_activity_type',
+          listName: 'Operator activity type',
+          name: 'Exporter',
+          value: 'EXPORTER'
+        },
+        {
+          listID: 'classification_section_code',
+          listName: 'classification section code',
+          name: 'CATCH fishery products',
+          value: 'CFFP'
+        }
+      ]);
+      expect(consignor.Name.value).toBe('Ocean Exports Inc');
+      expect(consignor.SpecifiedSPSAddress.LineOne.value).toBe('789 Maritime Avenue');
+      expect(consignor.SpecifiedSPSAddress.CityName.value).toBe('Southampton');
+      expect(consignor.SpecifiedSPSAddress.CountryName.value).toBe('United Kingdom');
+      expect(consignor.SpecifiedSPSAddress.CountryID.value).toBe('GB');
     });
 
     it('should handle missing exporter details', () => {
