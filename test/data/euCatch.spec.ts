@@ -244,28 +244,21 @@ describe('getEuCatchOperatorId', () => {
     expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][TOKEN][INVALID-RESPONSE][MISSING-ACCESS-TOKEN]');
   });
 
-  it('uses the zero expiry fallback when expires_in is missing', async () => {
+  it.each([
+    ['missing', { access_token: 'token-123' }],
+    ['zero', { access_token: 'token-123', expires_in: 0 }],
+    ['positive', { access_token: 'token-123', expires_in: 3600 }]
+  ])('does not depend on expires_in when it is %s', async (_description, tokenData) => {
     const { sut, axiosMock } = await loadSut();
 
-    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123' } });
+    axiosMock.post.mockResolvedValue({ data: tokenData });
     axiosMock.get.mockResolvedValue({
       status: 200,
       data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' }
     });
 
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('operator-abc');
-  });
-
-  it('uses the zero expiry fallback when expires_in is zero', async () => {
-    const { sut, axiosMock } = await loadSut();
-
-    axiosMock.post.mockResolvedValue({ data: { access_token: 'token-123', expires_in: 0 } });
-    axiosMock.get.mockResolvedValue({
-      status: 200,
-      data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' }
-    });
-
-    await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('operator-abc');
+    expect(axiosMock.post).toHaveBeenCalledTimes(1);
   });
 
   it('sends a form-encoded token body and does not send Authorization header to token endpoint', async () => {
@@ -367,29 +360,25 @@ describe('getEuCatchOperatorId', () => {
     expect(loggerMock.warn).toHaveBeenCalledWith('[EU-CATCH-CRM][GET-OPERATOR-ID][INVALID-CONFIG][CRM-URL-NON-HTTPS]');
   });
 
-  it('reuses token before expiry and refreshes it after expiry', async () => {
-    const nowSpy = jest.spyOn(Date, 'now');
-    let nowValue = 1_000_000;
-    nowSpy.mockImplementation(() => nowValue);
-
+  it('requests a fresh token for every call and uses it on the CRM request', async () => {
     const { sut, axiosMock } = await loadSut();
 
     axiosMock.post
-      .mockResolvedValueOnce({ data: { access_token: 'token-1', expires_in: 120 } })
-      .mockResolvedValueOnce({ data: { access_token: 'token-2', expires_in: 120 } });
+      .mockResolvedValueOnce({ data: { access_token: 'token-1', expires_in: 3600 } })
+      .mockResolvedValueOnce({ data: { access_token: 'token-2', expires_in: 3600 } })
+      .mockResolvedValueOnce({ data: { access_token: 'token-3', expires_in: 3600 } });
 
     axiosMock.get.mockResolvedValue({ status: 200, data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' } });
 
     await sut.getEuCatchOperatorId(accountId);
-    expect(axiosMock.post).toHaveBeenCalledTimes(1);
-
-    nowValue = 1_010_000;
     await sut.getEuCatchOperatorId(accountId);
-    expect(axiosMock.post).toHaveBeenCalledTimes(1);
-
-    nowValue = 1_070_000;
     await sut.getEuCatchOperatorId(accountId);
-    expect(axiosMock.post).toHaveBeenCalledTimes(2);
+
+    expect(axiosMock.post).toHaveBeenCalledTimes(3);
+    expect(axiosMock.get).toHaveBeenCalledTimes(3);
+    ['token-1', 'token-2', 'token-3'].forEach((token, index) => {
+      expect(axiosMock.get.mock.calls[index][1].headers.Authorization).toEqual(expect.stringContaining(token));
+    });
   });
 
   it('returns empty string and warns for malformed successful payload', async () => {
@@ -426,7 +415,7 @@ describe('getEuCatchOperatorId', () => {
     );
   });
 
-  it('returns empty string when token response has missing access token and does not cache invalid token', async () => {
+  it('returns empty string when token response has a blank access token and requests a new token on the next call', async () => {
     const { sut, axiosMock, loggerMock } = await loadSut();
 
     axiosMock.post
@@ -836,11 +825,12 @@ describe('updateEuCatchOperatorId', () => {
     );
   });
 
-  it('reuses cached token between get and update calls', async () => {
+  it('requests a separate token for get and update calls', async () => {
     const { sut, axiosMock } = await loadSut();
 
     axiosMock.post
-      .mockResolvedValueOnce({ data: { access_token: 'shared-token', expires_in: 3600 } })
+      .mockResolvedValueOnce({ data: { access_token: 'get-token', expires_in: 3600 } })
+      .mockResolvedValueOnce({ data: { access_token: 'update-token', expires_in: 3600 } })
       .mockResolvedValueOnce({ status: 200, data: { status: 'Updated' } });
 
     axiosMock.get.mockResolvedValue({ status: 200, data: { status: 'Succeeded', euCatchOperatorId: 'operator-abc' } });
@@ -848,7 +838,12 @@ describe('updateEuCatchOperatorId', () => {
     await expect(sut.getEuCatchOperatorId(accountId)).resolves.toBe('operator-abc');
     await expect(sut.updateEuCatchOperatorId(accountId, euCatchOperatorId)).resolves.toBe(true);
 
-    expect(axiosMock.post).toHaveBeenCalledTimes(2);
+    expect(axiosMock.post).toHaveBeenCalledTimes(3);
+    expect(axiosMock.post).toHaveBeenNthCalledWith(1, defaultTokenUrl, expect.any(String), expect.any(Object));
+    expect(axiosMock.post).toHaveBeenNthCalledWith(2, defaultTokenUrl, expect.any(String), expect.any(Object));
+    expect(axiosMock.get.mock.calls[0][1].headers.Authorization).toEqual(expect.stringContaining('get-token'));
+    expect(axiosMock.post.mock.calls[2][0]).toBe(defaultSendUrl);
+    expect(axiosMock.post.mock.calls[2][2].headers.Authorization).toEqual(expect.stringContaining('update-token'));
   });
 
   it('uses validateStatus that always returns true on update send call', async () => {
