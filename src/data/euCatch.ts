@@ -16,8 +16,6 @@ type IEuCatchCrmResponse = {
   euCatchOperatorId?: string;
 };
 
-let euCatchOAuthTokenCache: { accessToken: string; expiresAtMs: number } | undefined;
-
 type IAxiosErrorLike = {
   isAxiosError?: boolean;
   code?: string;
@@ -65,10 +63,6 @@ const getEuCatchOAuthToken = async (): Promise<string> => {
     throw new Error('EU_CATCH_TOKEN_URL_MUST_BE_HTTPS');
   }
 
-  if (euCatchOAuthTokenCache && Date.now() < euCatchOAuthTokenCache.expiresAtMs) {
-    return euCatchOAuthTokenCache.accessToken;
-  }
-
   const tokenRequest = {
     client_id: appConfig.dynamics365CrmOauthClientId,
     client_secret: appConfig.dynamics365CrmOauthClientSecret,
@@ -94,13 +88,7 @@ const getEuCatchOAuthToken = async (): Promise<string> => {
     throw new Error('EU_CATCH_MISSING_ACCESS_TOKEN');
   }
 
-  const expiresInSeconds = Number(tokenResponse?.data?.expires_in) || 0;
-  euCatchOAuthTokenCache = {
-    accessToken,
-    expiresAtMs: Date.now() + (expiresInSeconds * 1000) - 60_000
-  };
-
-  return euCatchOAuthTokenCache.accessToken;
+  return accessToken;
 };
 
 export const getEuCatchOperatorId = async (accountId: string): Promise<string> => {
