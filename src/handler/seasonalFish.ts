@@ -11,7 +11,7 @@ export const seasonalFishRoutes = (server: Hapi.Server) => {
         security: true
       },
 
-      handler: async (req, h) => {
+      handler: (req, h) => {
         try {
           const seasonalFish = getSeasonalFish()
           return h.response(seasonalFish).code(200)

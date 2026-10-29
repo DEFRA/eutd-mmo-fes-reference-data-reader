@@ -51,19 +51,19 @@ export const certificateRoutes = (server: Hapi.Server) => server.route([
       const pdfReference = query.pdfReference
 
       if (pdfReference) {
+        const pdfRef = String(Array.isArray(pdfReference) ? pdfReference[0] : pdfReference);
         try {
-          const pdfRef = Array.isArray(pdfReference) ? pdfReference[0] : pdfReference;
           const certificate = await getCertificateByPdfReference(pdfRef)
           if (certificate) {
-            logger.info(`[GET-CERTIFICATE][${pdfReference}][SUCCESS]`)
+            logger.info(`[GET-CERTIFICATE][${pdfRef}][SUCCESS]`)
             return h.response(certificate).type('application/json')
           }
           else {
-            logger.info(`[GET-CERTIFICATE][${pdfReference}][NOT-FOUND]`)
+            logger.info(`[GET-CERTIFICATE][${pdfRef}][NOT-FOUND]`)
             return h.response().code(404)
           }
         } catch (e) {
-          logger.error({ err: e }, `[GET-CERTIFICATE][${pdfReference}][ERROR] ${e}`)
+          logger.error({ err: e }, `[GET-CERTIFICATE][${pdfRef}][ERROR] ${e}`)
           return h.response().code(500)
         }
       }
@@ -87,17 +87,18 @@ export const certificateRoutes = (server: Hapi.Server) => server.route([
     },
     handler: async (req, h) => {
       const parameters = req.params;
-      if (parameters.documentNumber) {
+      const documentNumber = parameters.documentNumber as string;
+      if (documentNumber) {
         try {
           const user = req.headers["x-admin-user"];
 
           const payload = req.payload as StatusPayload
           switch (true) {
-            case (payloadValidForVoid(payload)): return await markCertificateAsVoided(parameters.documentNumber, payload, user, h);
-            case (payloadValidForInvestigate(payload)): return await markCertificateAsInvestigated(parameters.documentNumber, user, payload.investigationStatus, h);
+            case (payloadValidForVoid(payload)): return await markCertificateAsVoided(documentNumber, payload, user, h);
+            case (payloadValidForInvestigate(payload)): return await markCertificateAsInvestigated(documentNumber, user, payload.investigationStatus, h);
           }
         } catch (e) {
-            logger.info(`[UPDATING-CERTIFICATE][${parameters.documentNumber}][ERROR][${e.stack || e}]`)
+            logger.info(`[UPDATING-CERTIFICATE][${documentNumber}][ERROR][${e.stack || e}]`)
             return h.response(e.message).code(500);
         }
       }

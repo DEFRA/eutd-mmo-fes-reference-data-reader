@@ -618,7 +618,7 @@ describe('when in development mode', () => {
     mockGetRfmosData = jest.spyOn(SUT, 'loadRfmosDataFromLocalFile');
 
     mockLoadAllSpecies.mockResolvedValue(allSpeciesData);
-    mockLoadVesselsDataFromLocalFile.mockResolvedValue(vesselData);
+    mockLoadVesselsDataFromLocalFile.mockReturnValue(vesselData);
     mockLoadSpeciesDataFromLocalFile.mockResolvedValue(speciesData);
     mockLoadSeasonalFishData.mockResolvedValue(seasonalFishData);
     mockLoadCountries.mockReturnValue(countriesData);
@@ -670,6 +670,27 @@ describe('when in development mode', () => {
   });
 
   describe('loadFishCountriesAndSpecies', () => {
+
+    it('should wait for the blocking rules to be seeded before logging they have been saved', async () => {
+      let seededWhenLogged: boolean | undefined;
+      let seeded = false;
+      mockSeedBlockingRules.mockImplementation(() => new Promise<void>(resolve => setTimeout(() => { seeded = true; resolve(); }, 10)));
+      mockLoggerInfo.mockImplementation((message: string) => {
+        if (message === 'Finished saving the blocking rules') seededWhenLogged = seeded;
+      });
+
+      await SUT.loadFishCountriesAndSpecies();
+
+      expect(seededWhenLogged).toBe(true);
+
+      SUT.updateWeightingCache({ exporterWeight: 0, vesselWeight: 0, speciesWeight: 0, threshold: 0 });
+    });
+
+    it('should reject when seeding the blocking rules fails', async () => {
+      mockSeedBlockingRules.mockRejectedValue(new Error('seed failed'));
+
+      await expect(SUT.loadFishCountriesAndSpecies()).rejects.toThrow('seed failed');
+    });
 
     it('should call all data related methods', async () => {
 

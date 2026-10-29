@@ -10,7 +10,7 @@ export const rfmoRoutes = (server: Hapi.Server) => {
       options: {
         security: true,
       },
-      handler: async (req, h) => {
+      handler: (req, h) => {
         try {
           const rfmos = getRfmos();
           const rfmoFullText = [

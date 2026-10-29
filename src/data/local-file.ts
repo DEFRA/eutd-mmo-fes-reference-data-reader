@@ -139,7 +139,7 @@ export const getRfmosDataFromCSV = async (rfmosFilePath: string): Promise<any[]>
   }
 };
 
-export const getEuMemberStatesFromCSV = async (euMemberStatesFilePath: string): Promise<string[]> => {
+export const getEuMemberStatesFromCSV = (euMemberStatesFilePath: string): string[] => {
   try {
     const fileContent = fs.readFileSync(euMemberStatesFilePath, 'utf-8');
     // CSV has one country per line, split and filter empty lines

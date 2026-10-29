@@ -172,7 +172,7 @@ const staticRoutesWithoutAuth = server => {
         description: 'Just a sanity check',
         tags: ['api']
       },
-      handler: async (_request, _h) => {
+      handler: (_request, _h) => {
         return 'Server is successfully running - please use one of the API endpoints';
       }
     },
@@ -184,7 +184,7 @@ const staticRoutesWithoutAuth = server => {
         description: 'Health check',
         tags: ['api', 'health']
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         return h.response({ status: 'UP' });
       }
     },
@@ -196,7 +196,7 @@ const staticRoutesWithoutAuth = server => {
         description: 'Version',
         tags: ['api', 'version']
       },
-      handler: async (request, h) => {
+      handler: (request, h) => {
         return h.response({
           gitHash: fs.readFileSync(__dirname + '/../githash', 'utf8')
         });

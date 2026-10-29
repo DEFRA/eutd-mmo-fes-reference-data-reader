@@ -13,7 +13,7 @@ export const conversionFactorRoutes = (server: Hapi.Server) => {
             options: {
               security: true
             },
-            handler: async (request: Hapi.Request, h: ResponseToolkit) => {
+            handler: (request: Hapi.Request, h: ResponseToolkit) => {
                 const query = request.query;
                 const products = qs.parse(query).products;
 

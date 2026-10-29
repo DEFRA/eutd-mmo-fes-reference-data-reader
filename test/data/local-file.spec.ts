@@ -367,16 +367,21 @@ describe('get EU member states from CSV', () => {
     jest.restoreAllMocks();
   });
 
-  it('should throw and log an error if file does not exist', async () => {
+  it('should throw and log an error if file does not exist', () => {
     const filePath = 'pathToNonExistingFile';
 
-    try {
-      await getEuMemberStatesFromCSV(filePath);
-    }
-    catch (e) {
-      expect(e.message).toContain('no such file or directory');
-      expect(mockLoggerError).toHaveBeenCalledWith('Could not load EU member states data from file', filePath);
-    }
+    expect(() => getEuMemberStatesFromCSV(filePath)).toThrow('no such file or directory');
+    expect(mockLoggerError).toHaveBeenCalledWith('Could not load EU member states data from file', filePath);
+  });
+
+  it('should synchronously return an array of EU member state country names', () => {
+    const filePath = `${__dirname}/../../data/eumemberstates.csv`;
+
+    const result = getEuMemberStatesFromCSV(filePath);
+
+    expect(result).not.toBeInstanceOf(Promise);
+    expect(result).toBeInstanceOf(Array);
+    expect(result.length).toBeGreaterThan(0);
   });
 
   it('should return an array of EU member state country names', async () => {

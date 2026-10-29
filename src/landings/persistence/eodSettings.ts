@@ -33,8 +33,9 @@ const seedEodRule = async (setting: IEodSetting) => {
 
     for (const vesselSize of setting.vesselSizes) {
       if (addDefaultRules(rules, vesselSize)) {
+        // sequential: each call pulls then pushes on the same document
         for (const defaultRule of defaultRules) {
-          await createEodRules(config.cloudRoleName, setting.da, undefined, { ...defaultRule, vesselSize, changedFrom: null, changedTo: defaultRule.numberOfDays.toString() });
+          await createEodRules(config.cloudRoleName, setting.da, undefined, { ...defaultRule, vesselSize, changedFrom: null, changedTo: defaultRule.numberOfDays.toString() }); // NOSONAR
         }
       }
     }
@@ -109,8 +110,7 @@ export const seedEodRules = async (): Promise<void> => {
   if (config.eodRulesMigration) {
     const eodSettings: IEodSetting[] = await getEodSettings();
 
-    for (const setting of eodSettings)
-      await seedEodRule(setting);
+    await Promise.all(eodSettings.map(seedEodRule));
   }
 }
 
