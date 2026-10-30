@@ -21,7 +21,7 @@ import { CacheType } from '../handler/types';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 
 let VESSELS: IVessel[] = [];
-let VESSELS_IDX = (pln: string) => undefined;
+let VESSELS_IDX = (_pln: string) => undefined;
 let SPECIES: any[] = [];
 let COMMODITY_CODES: any[] = [];
 let ALLSPECIES: any[] = [];

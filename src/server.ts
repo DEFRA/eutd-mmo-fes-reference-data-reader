@@ -67,10 +67,8 @@ export class Server {
         loadEodSettings()
       ]);
 
-      if (!inTest) {
-        scheduleFishCountriesAndSpeciesJob();
-        scheduleVesselsJob();
-      }
+      scheduleFishCountriesAndSpeciesJob();
+      scheduleVesselsJob();
 
       Server.instance = new Hapi.Server({
         port: Number.parseInt(config.port)

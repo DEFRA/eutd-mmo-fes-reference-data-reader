@@ -55,6 +55,9 @@ mockSeedEodSettings.mockResolvedValue(undefined);
 const mockLoadEodSettings = jest.spyOn(cache, 'loadEodSettings');
 mockLoadEodSettings.mockResolvedValue(undefined);
 
+const mockCronSchedule = jest.spyOn(require('node-cron'), 'schedule');
+mockCronSchedule.mockImplementation(() => undefined);
+
 beforeAll(async () => {
   ApplicationConfig.loadEnv({
     PORT: '9008',
