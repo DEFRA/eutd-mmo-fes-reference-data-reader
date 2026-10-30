@@ -54,9 +54,9 @@ export const fetchSalesNote = (rssNumber: string, dateLanded: string) => {
     const isVesselOver10Meters = vesselDetails.vesselLength >= 10;
 
     BoomiService.getLandingData(dateLanded, rssNumber, 'salesNotes')
-      .then((salesNotes: any[]) => {
-        void _saveSalesNoteData(salesNotes, isVesselOver10Meters ? 'OVER10' : 'UNDER10', rssNumber, dateLanded)
-      })
+      .then((salesNotes: any[]) =>
+        _saveSalesNoteData(salesNotes, isVesselOver10Meters ? 'OVER10' : 'UNDER10', rssNumber, dateLanded)
+      )
       .catch(e => {
         logger.error(`[LANDINGS][FETCH-SALES-NOTE-${isVesselOver10Meters ? 'OVER10' : 'UNDER10'}][ERROR][${rssNumber}-${dateLanded}][${e.stack || e}]`)
       });
@@ -89,7 +89,8 @@ export const _fetchLandingsVesselsOver10Meters = async (rssNumber: string, dateL
 
     fetchSalesNote(rssNumber, dateLanded);
 
-    void _saveRawLandingData(landings, 'OVER10', rssNumber, dateLanded);
+    _saveRawLandingData(landings, 'OVER10', rssNumber, dateLanded)
+      .catch(e => logger.error(`[LANDINGS][SAVE-RAW-LANDING-OVER10][ERROR][${rssNumber}-${dateLanded}][${e.stack || e}]`));
 
     return domainLandings;
   }
@@ -110,7 +111,8 @@ export const _fetchLandingsVesselsUnder10Meters = async (rssNumber: string, date
       return [];
     }
 
-    void _saveRawLandingData(landings, 'UNDER10', rssNumber, dateLanded);
+    _saveRawLandingData(landings, 'UNDER10', rssNumber, dateLanded)
+      .catch(e => logger.error(`[LANDINGS][SAVE-RAW-LANDING-UNDER10][ERROR][${rssNumber}-${dateLanded}][${e.stack || e}]`));
 
     const domainLandings = catchRecordingToLandings(landings, rssNumber, getToLiveWeightFactor);
 

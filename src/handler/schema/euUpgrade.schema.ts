@@ -31,6 +31,7 @@ export const euUpgradeCallbackSchema = Joi.object({
             IssueDateTime: Joi.object({
               DateTime: Joi.string().required(),
             }).required(),
+            OperatorIdentifier: Joi.string().allow('').optional(),
             StatusCode: Joi.object({
               '@name': Joi.string().required(),
               text: Joi.string().required(),

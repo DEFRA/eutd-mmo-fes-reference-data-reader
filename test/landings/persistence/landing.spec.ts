@@ -549,6 +549,41 @@ describe('clearElogs', () => {
 
     });
 
+    it('and not issue a deleteMany when there are no landing declarations', async () => {
+
+      const catchRec: ILanding = {source: LandingSources.CatchRecording, rssNumber: 'rss2', dateTimeLanded: '2019-12-12T23:30:00.000Z', items: []};
+
+      await Service.clearElogs([catchRec]);
+
+      expect(mockDeleteMany).not.toHaveBeenCalled();
+
+    });
+
+    it('and wait for every deleteMany to complete before resolving', async () => {
+
+      const landingDec1: ILanding = {source: LandingSources.LandingDeclaration, rssNumber: 'rss1', dateTimeLanded: '2019-12-11T23:30:00.000Z', items: []};
+      const landingDec2: ILanding = {source: LandingSources.LandingDeclaration, rssNumber: 'rss2', dateTimeLanded: '2019-12-12T23:30:00.000Z', items: []};
+
+      let completed = 0;
+      mockDeleteMany.mockImplementation(() => new Promise(resolve => setTimeout(() => { completed++; resolve(null); }, 10)));
+
+      await Service.clearElogs([landingDec1, landingDec2]);
+
+      expect(mockDeleteMany).toHaveBeenCalledTimes(2);
+      expect(completed).toBe(2);
+
+    });
+
+    it('and propagate an error when a deleteMany fails', async () => {
+
+      const landingDec: ILanding = {source: LandingSources.LandingDeclaration, rssNumber: 'rss1', dateTimeLanded: '2019-12-11T23:30:00.000Z', items: []};
+
+      mockDeleteMany.mockRejectedValue(new Error('delete failed'));
+
+      await expect(Service.clearElogs([landingDec])).rejects.toThrow('delete failed');
+
+    });
+
   });
 
   describe('should delete elogs from mongo', () => {
