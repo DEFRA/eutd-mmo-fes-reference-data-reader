@@ -1114,6 +1114,7 @@ describe('CatchCertificateTransformerService', () => {
           exporterCompanyName: 'Ocean Exports Inc',
           addressOne: '789 Maritime Avenue',
           townCity: 'Southampton',
+          postcode: 'SO14 2AQ',
           country: 'United Kingdom of Great Britain and Northern Ireland'
         },
         exportedFrom: 'UK',
@@ -1131,6 +1132,7 @@ describe('CatchCertificateTransformerService', () => {
       const consignor =
         result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty;
 
+      expect(consignor.SpecifiedSPSAddress.PostcodeCode).toEqual({ languageID: 'en', value: 'SO14 2AQ' });
       expect(consignor.ID.value).toBe('');
       expect(consignor.ID).toEqual({ value: '' });
       expect(consignor.Name.value).toBe('Ocean Exports Inc');
