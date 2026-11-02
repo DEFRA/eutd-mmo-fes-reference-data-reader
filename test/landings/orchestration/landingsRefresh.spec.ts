@@ -437,6 +437,33 @@ describe('_fetchLandingsVesselsOver10Meters', () => {
     expect(resolved).toBe(true);
   });
 
+  it('will log the error and still return the landings if saving the raw landings fails', async () => {
+    const landings = ['landing 1', 'landing 2'];
+
+    mockGetLandingData.mockResolvedValueOnce(landings);
+    mockGetLandingData.mockResolvedValueOnce(['note 1']);
+    mockSaveLandings.mockRejectedValueOnce(new Error('save failed'));
+    mockMapCefas.mockImplementation(_ => `${_} - mapped`);
+
+    const output = await SUT._fetchLandingsVesselsOver10Meters(rssNumber, dateLanded);
+    await new Promise(setImmediate);
+
+    expect(output).toEqual(['landing 1 - mapped', 'landing 2 - mapped']);
+    expect(mockLogError).toHaveBeenCalledWith(expect.stringContaining(`[LANDINGS][SAVE-RAW-LANDING-OVER10][ERROR][${rssNumber}-${dateLanded}][Error: save failed`));
+  });
+
+  it('will log the error if saving the sales notes fails', async () => {
+    mockGetLandingData.mockResolvedValueOnce(['landing 1']);
+    mockGetLandingData.mockResolvedValueOnce(['note 1']);
+    mockSaveSalesNotes.mockRejectedValueOnce(new Error('save failed'));
+    mockMapCefas.mockImplementation(_ => `${_} - mapped`);
+
+    await SUT._fetchLandingsVesselsOver10Meters(rssNumber, dateLanded);
+    await new Promise(setImmediate);
+
+    expect(mockLogError).toHaveBeenCalledWith(expect.stringContaining(`[LANDINGS][FETCH-SALES-NOTE-OVER10][ERROR][${rssNumber}-${dateLanded}][Error: save failed`));
+  });
+
 });
 
 describe('_fetchLandingsVesselsUnder10Meters', () => {
@@ -705,6 +732,33 @@ describe('_fetchLandingsVesselsUnder10Meters', () => {
     expect(mockSaveSalesNotes).not.toHaveBeenCalled();
 
     expect(output).toEqual(['catch 1 - mapped', 'catch 2 - mapped']);
+  });
+
+  it('will log the error and still return the landings if saving the raw landings fails', async () => {
+    const landings = ['catch 1', 'catch 2'];
+
+    mockGetCatchActivity.mockResolvedValueOnce(landings);
+    mockGetLandingData.mockResolvedValue(['note 1']);
+    mockSaveLandings.mockRejectedValueOnce(new Error('save failed'));
+    mockMapCatch.mockImplementation((landings) => landings.map(_ => `${_} - mapped`));
+
+    const output = await SUT._fetchLandingsVesselsUnder10Meters(rssNumber, dateLanded);
+    await new Promise(setImmediate);
+
+    expect(output).toEqual(['catch 1 - mapped', 'catch 2 - mapped']);
+    expect(mockLogError).toHaveBeenCalledWith(expect.stringContaining(`[LANDINGS][SAVE-RAW-LANDING-UNDER10][ERROR][${rssNumber}-${dateLanded}][Error: save failed`));
+  });
+
+  it('will log the error if saving the sales notes fails', async () => {
+    mockGetCatchActivity.mockResolvedValueOnce(['catch 1']);
+    mockGetLandingData.mockResolvedValue(['note 1']);
+    mockSaveSalesNotes.mockRejectedValueOnce(new Error('save failed'));
+    mockMapCatch.mockImplementation((landings) => landings.map(_ => `${_} - mapped`));
+
+    await SUT._fetchLandingsVesselsUnder10Meters(rssNumber, dateLanded);
+    await new Promise(setImmediate);
+
+    expect(mockLogError).toHaveBeenCalledWith(expect.stringContaining(`[LANDINGS][FETCH-SALES-NOTE-UNDER10][ERROR][${rssNumber}-${dateLanded}][Error: save failed`));
   });
 
 });

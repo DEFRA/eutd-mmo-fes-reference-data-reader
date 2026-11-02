@@ -81,6 +81,172 @@ describe('ProcessingStatementTransformerService', () => {
       expect(certificate).toHaveProperty('SPSConsignment');
     });
 
+    it('should set consignee ID from euCatchOperatorId when provided', () => {
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        baseExportData,
+        'EU-OP-PS-1'
+      );
+
+      expect(
+        result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty.ID.value
+      ).toBe('EU-OP-PS-1');
+    });
+
+    it('should add consignee operator metadata when exporter accountId is present', () => {
+      const exportDataWithAccountId = {
+        ...baseExportData,
+        exporterDetails: {
+          ...baseExportData.exporterDetails,
+          accountId: 'account-123'
+        }
+      };
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithAccountId,
+        'EU-OP-PS-1'
+      );
+
+      const consignee = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
+
+      expect(consignee.ID).toEqual({
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
+        schemeAgencyID: 'ec_sante_traces',
+        schemeAgencyName: 'European commission - DG SANTE - Traces',
+        value: 'EU-OP-PS-1'
+      });
+
+      expect(consignee.TypeCode).toEqual([
+        {
+          listID: 'operator_activity_type',
+          listName: 'Operator activity type',
+          name: 'Exporter',
+          value: 'EXPORTER'
+        },
+        {
+          listID: 'classification_section_code',
+          listName: 'classification section code',
+          name: 'CATCH fishery products',
+          value: 'CFFP'
+        }
+      ]);
+
+      expect(consignee.RoleCode).toEqual({ value: 'CN' });
+      expect(consignee.Name.value).toBe('Test Exporter Ltd');
+      expect(consignee.SpecifiedSPSAddress.LineOne.value).toBe('123 Export Street');
+    });
+
+    it('should keep metadata when accountId is present and operator id is explicitly empty', () => {
+      const exportDataWithAccountId = {
+        ...baseExportData,
+        exporterDetails: {
+          ...baseExportData.exporterDetails,
+          accountId: 'account-123'
+        }
+      };
+
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataWithAccountId,
+        ''
+      );
+
+      const consignee = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
+
+      expect(consignee.ID).toEqual({
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
+        schemeAgencyID: 'ec_sante_traces',
+        schemeAgencyName: 'European commission - DG SANTE - Traces',
+        value: ''
+      });
+
+      expect(consignee.TypeCode).toEqual([
+        {
+          listID: 'operator_activity_type',
+          listName: 'Operator activity type',
+          name: 'Exporter',
+          value: 'EXPORTER'
+        },
+        {
+          listID: 'classification_section_code',
+          listName: 'classification section code',
+          name: 'CATCH fishery products',
+          value: 'CFFP'
+        }
+      ]);
+    });
+
+    it('should leave consignee node unchanged when exporter accountId is missing or empty', () => {
+      const exportDataMissingAccount = {
+        ...baseExportData,
+        exporterDetails: {
+          ...baseExportData.exporterDetails
+        }
+      };
+      delete exportDataMissingAccount.exporterDetails.accountId;
+
+      const exportDataEmptyAccount = {
+        ...baseExportData,
+        exporterDetails: {
+          ...baseExportData.exporterDetails,
+          accountId: '   '
+        }
+      };
+
+      const resultMissingAccount = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataMissingAccount,
+        'EU-OP-PS-NOACC'
+      );
+
+      const resultEmptyAccount = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        exportDataEmptyAccount,
+        'EU-OP-PS-EMPTYACC'
+      );
+
+      const consigneeMissingAccount = resultMissingAccount.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
+      const consigneeEmptyAccount = resultEmptyAccount.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
+
+      expect(consigneeMissingAccount.ID).toEqual({ value: 'EU-OP-PS-NOACC' });
+      expect(consigneeMissingAccount.ID).not.toHaveProperty('schemeID');
+      expect(consigneeMissingAccount).not.toHaveProperty('TypeCode');
+      expect(consigneeMissingAccount.RoleCode).toEqual({ value: 'CN' });
+      expect(consigneeMissingAccount.Name.value).toBe('Test Exporter Ltd');
+      expect(consigneeMissingAccount.SpecifiedSPSAddress.LineOne.value).toBe('123 Export Street');
+      expect(consigneeMissingAccount.SpecifiedSPSAddress.CityName.value).toBe('London');
+      expect(consigneeMissingAccount.SpecifiedSPSAddress.PostcodeCode.value).toBe('E1 1AA');
+
+      expect(consigneeEmptyAccount.ID).toEqual({ value: 'EU-OP-PS-EMPTYACC' });
+      expect(consigneeEmptyAccount.ID).not.toHaveProperty('schemeID');
+      expect(consigneeEmptyAccount).not.toHaveProperty('TypeCode');
+      expect(consigneeEmptyAccount.RoleCode).toEqual({ value: 'CN' });
+      expect(consigneeEmptyAccount.Name.value).toBe('Test Exporter Ltd');
+      expect(consigneeEmptyAccount.SpecifiedSPSAddress.LineOne.value).toBe('123 Export Street');
+      expect(consigneeEmptyAccount.SpecifiedSPSAddress.CityName.value).toBe('London');
+      expect(consigneeEmptyAccount.SpecifiedSPSAddress.PostcodeCode.value).toBe('E1 1AA');
+    });
+
+    it('should keep consignee ID empty when euCatchOperatorId is omitted', () => {
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        baseExportData
+      );
+
+      expect(
+        result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty.ID.value
+      ).toBe('');
+    });
+
     it('should build exchanged document with correct document number', () => {
       const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
         documentNumber,

@@ -280,7 +280,7 @@ export const reportCcSubmitted = async (ccValidationData: ICcQueryResult[]): Pro
       if (catchCertificate.exportData?.exporterDetails === undefined) {
         logger.error(`[REPORT-CC-SUBMITTED][FAIL][${certificateId}][NO-EXPORTER-DETAILS]`);
       } else {
-        await Promise.all(ccValidationData.map(async landing => {
+        await Promise.all(ccValidationData.map(async (landing) => {
           landing.hasSalesNote = await updateLandings(landing);
         }));
 
@@ -338,7 +338,7 @@ const buildCcReport = (
 };
 
 const enrichWithSalesNotes = async (ccValidationData: ICcQueryResult[]) => {
-  await Promise.all(ccValidationData.map(async landing => {
+  await Promise.all(ccValidationData.map(async (landing) => {
     const requestedDate = moment.utc(landing.dateLanded);
     const requestedDateISO = requestedDate.format('YYYY-MM-DD');
 

@@ -22,6 +22,7 @@ import {
 import {
   DocumentStatuses
 } from '../../../src/landings/types/document';
+import * as DefraValidationPersistence from '../../../src/landings/persistence/defraValidation';
 
 
 describe('that we can read catch certificates in bulk', () => {
@@ -1848,6 +1849,55 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
       expect(results[0].catchSubmission).toBeDefined();
       expect(results[0].catchSubmission.status).toBe('PENDING');
       expect(results[0].catchSubmission.message).toBe('Processing in progress');
+    });
+
+    it('should update the defra validation report with the catch status', async () => {
+      const mockUpdateReport = jest.spyOn(DefraValidationPersistence, 'updateCcDefraValidationReport').mockResolvedValue(undefined);
+
+      await new DocumentModel({
+        __t: "catchCert",
+        documentNumber: "GBR-2023-CC-REPORT123",
+        status: "COMPLETE",
+        createdAt: "2023-07-10T08:26:06.939Z",
+        createdBy: "Bob",
+        createdByEmail: "foo@foo.com",
+        exportData: { products: [] }
+      }).save();
+
+      await updateCertificateEuCatchStatus('GBR-2023-CC-REPORT123', {
+        documentNumber: 'GBR-2023-CC-REPORT123',
+        euCatchStatus: 'PENDING' as const,
+        euCatchStatusMessage: 'Processing in progress'
+      });
+
+      expect(mockUpdateReport).toHaveBeenCalledTimes(1);
+      expect(mockUpdateReport).toHaveBeenCalledWith('GBR-2023-CC-REPORT123', expect.objectContaining({ status: 'PENDING' }));
+
+      mockUpdateReport.mockRestore();
+    });
+
+    it('should propagate an error when updating the defra validation report fails', async () => {
+      const mockUpdateReport = jest.spyOn(DefraValidationPersistence, 'updateCcDefraValidationReport').mockRejectedValue(new Error('report update failed'));
+
+      await new DocumentModel({
+        __t: "catchCert",
+        documentNumber: "GBR-2023-CC-REPORTFAIL",
+        status: "COMPLETE",
+        createdAt: "2023-07-10T08:26:06.939Z",
+        createdBy: "Bob",
+        createdByEmail: "foo@foo.com",
+        exportData: { products: [] }
+      }).save();
+
+      await expect(
+        updateCertificateEuCatchStatus('GBR-2023-CC-REPORTFAIL', {
+          documentNumber: 'GBR-2023-CC-REPORTFAIL',
+          euCatchStatus: 'PENDING' as const,
+          euCatchStatusMessage: 'Processing in progress'
+        })
+      ).rejects.toThrow('report update failed');
+
+      mockUpdateReport.mockRestore();
     });
 
     it('should throw an error when certificate is not found', async () => {

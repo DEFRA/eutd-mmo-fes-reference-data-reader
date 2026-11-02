@@ -472,7 +472,8 @@ describe('Catch Certificate Submission', () => {
     expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalledWith(
       'GBR-2025-CC-TEST002',
       expect.any(Date),
-      mockDocumentNoCaughtBy.exportData
+      mockDocumentNoCaughtBy.exportData,
+      ''
     );
   });
 
@@ -515,7 +516,8 @@ describe('Catch Certificate Submission', () => {
     expect(CatchCertificateTransformerService.generateCatchPayload).toHaveBeenCalledWith(
       'GBR-2025-CC-TEST003',
       expect.any(Date),
-      mockDocumentNoProducts.exportData
+      mockDocumentNoProducts.exportData,
+      ''
     );
   });
 });
@@ -765,12 +767,13 @@ describe('Processing Statement Submission', () => {
       operation: 'submit'
     });
 
-    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalledWith(
+    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenLastCalledWith(
       'GBR-2025-PS-TEST001',
       expect.any(Date),
       expect.objectContaining({
         products: []
-      })
+      }),
+      ''
     );
   });
 
@@ -807,12 +810,13 @@ describe('Processing Statement Submission', () => {
       operation: 'submit'
     });
 
-    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenCalledWith(
+    expect(ProcessingStatementTransformerService.generateProcessingStatementPayload).toHaveBeenLastCalledWith(
       'GBR-2025-PS-TEST001',
       expect.any(Date),
       expect.objectContaining({
         catches: []
-      })
+      }),
+      ''
     );
   });
 });

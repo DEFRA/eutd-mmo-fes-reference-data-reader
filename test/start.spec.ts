@@ -1,47 +1,61 @@
-describe('application startup', () => {
-  let startServer: jest.Mock;
-  let loadEnvironment: jest.Mock;
+const flushPromises = () => new Promise(setImmediate);
+
+describe('start', () => {
+
+  let mockStart: jest.Mock;
+  let mockLoadEnv: jest.Mock;
+  let mockConsoleError: jest.SpyInstance;
 
   beforeEach(() => {
     jest.resetModules();
-    startServer = jest.fn().mockResolvedValue(undefined);
-    loadEnvironment = jest.fn();
+    mockStart = jest.fn();
+    mockLoadEnv = jest.fn();
+    mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    jest.doMock('../src/server', () => ({
-      Server: { start: startServer },
-    }));
+    jest.doMock('../src/server', () => ({ Server: { start: mockStart } }));
     jest.doMock('../src/config', () => ({
       __esModule: true,
       default: { port: '3000' },
-      ApplicationConfig: { loadEnv: loadEnvironment },
+      ApplicationConfig: { loadEnv: mockLoadEnv }
     }));
   });
 
   afterEach(() => {
     jest.dontMock('../src/server');
     jest.dontMock('../src/config');
+    mockConsoleError.mockRestore();
   });
 
-  it('loads the environment and starts the server', () => {
-    jest.isolateModules(() => {
-      require('../src/start');
-    });
+  it('will load the environment and start the server', async () => {
+    mockStart.mockResolvedValue(undefined);
 
-    expect(loadEnvironment).toHaveBeenCalledWith(process.env);
-    expect(startServer).toHaveBeenCalledWith({ port: '3000' });
+    require('../src/start');
+    await flushPromises();
+
+    expect(mockLoadEnv).toHaveBeenCalledWith(process.env);
+    expect(mockStart).toHaveBeenCalledWith({ port: '3000' });
+    expect(mockConsoleError).not.toHaveBeenCalled();
   });
 
-  it('logs startup failures', async () => {
-    const startupError = new Error('Startup failed');
-    startServer.mockRejectedValue(startupError);
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+  it('will log an error rather than leaving an unhandled rejection when the server fails to start', async () => {
+    const error = new Error('start failed');
+    mockStart.mockRejectedValue(error);
 
-    jest.isolateModules(() => {
-      require('../src/start');
-    });
-    await new Promise<void>(resolve => setImmediate(resolve));
+    require('../src/start');
+    await flushPromises();
 
-    expect(consoleError).toHaveBeenCalledWith(startupError);
-    consoleError.mockRestore();
+    expect(mockConsoleError).toHaveBeenCalledWith(error);
   });
+
+  it('will log an error when loading the environment fails', async () => {
+    const error = new Error('env failed');
+    mockLoadEnv.mockImplementation(() => { throw error; });
+
+    require('../src/start');
+    await flushPromises();
+
+    expect(mockStart).not.toHaveBeenCalled();
+    expect(mockConsoleError).toHaveBeenCalledWith(error);
+  });
+
 });

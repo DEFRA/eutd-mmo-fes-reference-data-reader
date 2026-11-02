@@ -53,6 +53,41 @@ describe('updateIgnoreFlagName', () => {
 
 });
 
+describe('updateIgnoreFlagName waiting for updates', () => {
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const certWithIgnoredLanding = (documentNumber: string) => ({
+    documentNumber,
+    exportData: { products: [{ caughtBy: [{ vessel: 'WIRON 5', _ignore: true }] }] }
+  });
+
+  it('will wait for every upsert to complete before resolving', async () => {
+    jest.spyOn(CatchCertPersistance, 'getAllCatchCertsWithProducts')
+      .mockResolvedValue([certWithIgnoredLanding('cert1'), certWithIgnoredLanding('cert2')] as any);
+
+    let completed = 0;
+    const mockUpsert = jest.spyOn(CatchCertPersistance, 'upsertProductsByIgnore')
+      .mockImplementation(() => new Promise<void>(resolve => setTimeout(() => { completed++; resolve(); }, 10)));
+
+    await Service.updateIgnoreFlagName();
+
+    expect(mockUpsert).toHaveBeenCalledTimes(2);
+    expect(completed).toBe(2);
+  });
+
+  it('will reject when an upsert fails', async () => {
+    jest.spyOn(CatchCertPersistance, 'getAllCatchCertsWithProducts')
+      .mockResolvedValue([certWithIgnoredLanding('cert1')] as any);
+    jest.spyOn(CatchCertPersistance, 'upsertProductsByIgnore').mockRejectedValue(new Error('upsert failed'));
+
+    await expect(Service.updateIgnoreFlagName()).rejects.toThrow('upsert failed');
+  });
+
+});
+
 describe('updateCaughtBy', () => {
 
   it('will rename the _ignore flag to vesselOverriddenByAdmin', () => {

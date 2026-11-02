@@ -21,7 +21,7 @@ import { CacheType } from '../handler/types';
 import { GearRecord } from '../interfaces/gearTypes.interface';
 
 let VESSELS: IVessel[] = [];
-let VESSELS_IDX = (pln: string) => undefined;
+let VESSELS_IDX = (_pln: string) => undefined;
 let SPECIES: any[] = [];
 let COMMODITY_CODES: any[] = [];
 let ALLSPECIES: any[] = [];
@@ -64,7 +64,7 @@ export const loadLocalFishCountriesAndSpecies = async () => {
   logger.info(`Finished loading data into cache from local file system, currently species: ${SPECIES.length}, seasonalFish: ${SEASONALFISH.length}, countries: ${COUNTRIES.length}, factors: ${CONVERSION_FACTORS.length}, speciesAliases: ${Object.keys(SPECIES_ALIASES).length}, commodityCodes: ${COMMODITY_CODES.length}`);
 
   logger.info("Start setting the blocking rules");
-  void seedBlockingRules();
+  await seedBlockingRules();
   logger.info("Finished saving the blocking rules");
 
   logger.info(`Start setting the vessels of interest, previously vessels of interest: ${VESSELS_OF_INTEREST.length}`);

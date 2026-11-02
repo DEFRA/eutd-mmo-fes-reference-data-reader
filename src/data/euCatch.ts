@@ -1,6 +1,211 @@
 import { ICountry } from "mmo-shared-reference-data";
+import axios from 'axios';
+import querystring from 'node:querystring';
 import { getCountries } from "./cache";
 import { getCommodities } from "../controllers/species";
+import appConfig from '../config';
+import logger from '../logger';
+
+type IDynamics365OAuthResponse = {
+  access_token: string;
+  expires_in: number;
+};
+
+type IEuCatchCrmResponse = {
+  status?: string;
+  euCatchOperatorId?: string;
+};
+
+type IAxiosErrorLike = {
+  isAxiosError?: boolean;
+  code?: string;
+  response?: {
+    status?: number;
+  };
+};
+
+const isHttpsUrl = (value: string): boolean => {
+  if (appConfig.inDev) {
+    return true;
+  }
+
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const getSanitisedErrorMetadata = (error: unknown): { category: string; code: string; status: string } => {
+  const axiosError = error as IAxiosErrorLike;
+  const status = axiosError?.response?.status;
+
+  if (axiosError?.isAxiosError || axiosError?.code || status) {
+    return {
+      category: 'HTTP',
+      code: axiosError?.code || 'UNKNOWN',
+      status: typeof status === 'number' ? `${status}` : 'N/A'
+    };
+  }
+
+  return {
+    category: 'GENERAL',
+    code: 'N/A',
+    status: 'N/A'
+  };
+};
+
+const isCrmOperatorActivityEnabled = (): boolean => appConfig.enableCrmOperatorActivityId !== false;
+
+const getEuCatchOAuthToken = async (): Promise<string> => {
+  if (!isHttpsUrl(appConfig.dynamics365CrmOauthTokenUrl)) {
+    logger.warn('[EU-CATCH-CRM][TOKEN][INVALID-CONFIG][OAUTH-TOKEN-URL-NON-HTTPS]');
+    throw new Error('EU_CATCH_TOKEN_URL_MUST_BE_HTTPS');
+  }
+
+  const tokenRequest = {
+    client_id: appConfig.dynamics365CrmOauthClientId,
+    client_secret: appConfig.dynamics365CrmOauthClientSecret,
+    scope: appConfig.dynamics365CrmOauthScope,
+    grant_type: 'client_credentials'
+  };
+
+  const tokenResponse = await axios.post<IDynamics365OAuthResponse>(
+    appConfig.dynamics365CrmOauthTokenUrl,
+    querystring.stringify(tokenRequest),
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      timeout: appConfig.dynamics365CrmTimeoutMs
+    }
+  );
+
+  const accessToken = tokenResponse?.data?.access_token?.trim();
+
+  if (!accessToken) {
+    logger.warn('[EU-CATCH-CRM][TOKEN][INVALID-RESPONSE][MISSING-ACCESS-TOKEN]');
+    throw new Error('EU_CATCH_MISSING_ACCESS_TOKEN');
+  }
+
+  return accessToken;
+};
+
+export const getEuCatchOperatorId = async (accountId: string): Promise<string> => {
+  logger.info('[EU-CATCH-CRM][GET-OPERATOR-ID][STARTED]');
+
+  try {
+    if (!isCrmOperatorActivityEnabled()) {
+      logger.info('[EU-CATCH-CRM][GET-OPERATOR-ID][DISABLED-BY-FLAG]');
+      return '';
+    }
+
+    if (!isHttpsUrl(appConfig.dynamics365CrmUrl)) {
+      logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][INVALID-CONFIG][CRM-URL-NON-HTTPS]');
+      return '';
+    }
+
+    const accessToken = await getEuCatchOAuthToken();
+    const response = await axios.get<IEuCatchCrmResponse>(appConfig.dynamics365CrmUrl, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+      params: {
+        'api-version': appConfig.dynamics365CrmApiVersion,
+        accountId
+      },
+      timeout: appConfig.dynamics365CrmTimeoutMs,
+      validateStatus: () => true
+    });
+
+    if (response?.status !== 200) {
+      logger.warn(`[EU-CATCH-CRM][GET-OPERATOR-ID][NON-200][STATUS][${response?.status}]`);
+      return '';
+    }
+
+    const responseStatus = response?.data?.status;
+    const operatorId = response?.data?.euCatchOperatorId;
+
+    if (responseStatus === 'Succeeded' && operatorId) {
+      logger.info('[EU-CATCH-CRM][GET-OPERATOR-ID][SUCCESS]');
+      return operatorId;
+    }
+
+    if (responseStatus === 'Failed') {
+      logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][FAILED-STATUS]');
+      return '';
+    }
+
+    logger.warn('[EU-CATCH-CRM][GET-OPERATOR-ID][EMPTY-OPERATOR-ID]');
+    return '';
+  } catch (error) {
+    const errorMetadata = getSanitisedErrorMetadata(error);
+    logger.warn(
+      `[EU-CATCH-CRM][GET-OPERATOR-ID][ERROR][CATEGORY][${errorMetadata.category}][CODE][${errorMetadata.code}][STATUS][${errorMetadata.status}]`
+    );
+    return '';
+  }
+}
+
+export const updateEuCatchOperatorId = async (accountId: string, euCatchOperatorId: string): Promise<boolean> => {
+  try {
+
+    if (!isCrmOperatorActivityEnabled()) {
+      logger.info('[EU-CATCH-CRM][UPDATE-OPERATOR][DISABLED-BY-FLAG]');
+      return false;
+    }
+
+    if (!isHttpsUrl(appConfig.dynamics365CrmSendUrl)) {
+      logger.warn('[EU-CATCH-CRM][UPDATE-OPERATOR][INVALID-CONFIG][CRM-SEND-URL-NON-HTTPS]');
+      return false;
+    }
+
+    logger.info('[EU-CATCH-CRM][UPDATE-OPERATOR][STARTED]');
+
+    const accessToken = await getEuCatchOAuthToken();
+    const response = await axios.post<IEuCatchCrmResponse>(
+      appConfig.dynamics365CrmSendUrl,
+      {
+        accountId,
+        euCatchOperatorId
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          'api-version': appConfig.dynamics365CrmApiVersion,
+        },
+        timeout: appConfig.dynamics365CrmTimeoutMs,
+        validateStatus: () => true
+      }
+    );
+
+    if (response.status === 200 && response?.data?.status === 'Updated') {
+      return true;
+    }
+
+    if (response.status === 500 && response?.data?.status === 'Failed') {
+      logger.warn('[EU-CATCH-CRM][UPDATE-OPERATOR][FAILED-STATUS]');
+      return false;
+    }
+
+    if (response.status !== 200) {
+      logger.warn(`[EU-CATCH-CRM][UPDATE-OPERATOR][NON-200][STATUS][${response.status}]`);
+      return false;
+    }
+
+    logger.warn('[EU-CATCH-CRM][UPDATE-OPERATOR][MALFORMED-200-PAYLOAD]');
+    return false;
+  } catch (error) {
+    const errorMetadata = getSanitisedErrorMetadata(error);
+    logger.warn(
+      `[EU-CATCH-CRM][UPDATE-OPERATOR][ERROR][CATEGORY][${errorMetadata.category}][CODE][${errorMetadata.code}][STATUS][${errorMetadata.status}]`
+    );
+    return false;
+  }
+};
 
 export const IssuerSPSParty = {
   Name: {

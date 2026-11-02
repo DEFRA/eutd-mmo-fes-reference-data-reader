@@ -97,7 +97,7 @@ export const clearElogs = async (landings: ILanding[]) => {
   const landingDecs = landings.filter((l: ILanding) => l.source === LandingSources.LandingDeclaration);
 
   await Promise.all(
-    landingDecs.map(async (landing) => {
+    landingDecs.map((landing) => {
       const searchDate = landing.dateTimeLanded;
 
       return LandingModel.deleteMany(

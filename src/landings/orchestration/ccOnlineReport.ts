@@ -151,9 +151,10 @@ export async function runUpdateForOtherLandings(rawValidatedCertificates: ICcQue
 
   logger.info(`[ONLINE-VALIDATION-REPORT][OTHER-CC-TO-UPDATE][${validatedCertificates.length}]`);
 
-  await Promise.all(validatedCertificates.map(async certificate => {
-    logger.info(`[ONLINE-VALIDATION-REPORT][OTHER-CC-TO-UPDATING][${certificate.documentNumber}]`);
-    await reportCcLandingUpdate(certificate.landings);
-    await runUpdateForLandings(certificate.landings, certificate.documentNumber);
-  }));
+  // certificates are deliberately processed in order as each update depends on the persisted state of the previous one
+  for (const landing in validatedCertificates) {
+    logger.info(`[ONLINE-VALIDATION-REPORT][OTHER-CC-TO-UPDATING][${validatedCertificates[landing].documentNumber}]`);
+    await reportCcLandingUpdate(validatedCertificates[landing].landings); // NOSONAR
+    await runUpdateForLandings(validatedCertificates[landing].landings, validatedCertificates[landing].documentNumber); // NOSONAR
+  }
 }

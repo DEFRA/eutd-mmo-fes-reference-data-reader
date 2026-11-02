@@ -12,3 +12,4 @@ junit.xml
 service_bus
 /.env
 .vscode/mcp.json
+certificates/
