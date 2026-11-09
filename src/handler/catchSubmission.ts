@@ -73,8 +73,8 @@ export const catchSubmissionRoutes = (server: Hapi.Server) => {
 
           return h.response().code(200);
         } catch (e) {
-          logger.error(
-            `[DOCUMENT-SUBMISSION][ENDPOINT][ERROR][DOCUMENT:${documentNumber}][${e.message}][${e.stack}]`
+          logger.warn(
+            `[DOCUMENT-SUBMISSION][ENDPOINT][FAILED][DOCUMENT:${documentNumber}][${e.message}]`
           );
 
           return h.response().code(500);

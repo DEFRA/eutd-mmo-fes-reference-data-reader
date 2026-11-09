@@ -73,7 +73,7 @@ export const upsertExportPayload = async (documentNumber: string, products: Prod
  * Used by FI0-10355 EU upgrade callback
  */
 export const updateCertificateEuCatchStatus = async (documentNumber: string, statusData: IEuUpgradeResponse): Promise<void> => {
-  const query = { status:  { $in: [ DocumentStatuses.Complete, DocumentStatuses.Void ] }, documentNumber: documentNumber };
+  const query: any = { status:  { $in: [ DocumentStatuses.Complete, DocumentStatuses.Void ] }, documentNumber: documentNumber };
 
   // Build the update object with catchStatus fields
   const catchSubmission = toBackEndCatchSubmission(statusData);
@@ -84,9 +84,27 @@ export const updateCertificateEuCatchStatus = async (documentNumber: string, sta
     new: true
   };
 
+  if (statusData.euCatchStatus === 'FAILURE') {
+    const existing: any = await DocumentModel.findOne(query, { status: 1, catchSubmission: 1 }).lean();
+
+    if (existing) {
+      // A failed void must stay visible, but a later failure (e.g. duplicate after timeout) must not overwrite a successful submit.
+      if (existing.status !== DocumentStatuses.Void) {
+        query['catchSubmission.status'] = { $ne: 'SUCCESS' };
+      }
+      // Keep the CATCH reference so a failed attempt does not stop a later void.
+      catchSubmission.reference ??= existing.catchSubmission?.reference;
+    }
+  }
+
   const result = await DocumentModel.findOneAndUpdate(query, update, options);
 
   if (!result) {
+    if (query['catchSubmission.status'] && await DocumentModel.exists({ documentNumber, status: DocumentStatuses.Complete })) {
+      logger.warn(`[PERSISTENCE][UPDATE-EU-CATCH-STATUS][DOCUMENT-NUMBER][${documentNumber}][FAILURE-IGNORED][SUCCESS-PRESERVED]`);
+      return;
+    }
+
     throw new Error(`Certificate not found: ${documentNumber}`);
   }
 
