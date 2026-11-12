@@ -1958,8 +1958,67 @@ describe('MongoMemoryServer - Wrapper to run inMemory Database', () => {
       expect(results[0].catchSubmission.reference).toBe('EU.CATCH.CC.9999999999');
       expect(results[0].catchSubmission.code).toBe('70');
     });
-  });
 
+    describe('when a FAILURE arrives for a document that was already submitted', () => {
+      const failure = {
+        documentNumber: 'GBR-2023-CC-DUP',
+        euCatchStatus: 'FAILURE' as const,
+        faultCode: 'S:Client',
+        faultString: 'Document number already taken'
+      };
+
+      const save = (status: string, catchSubmission: any) => new DocumentModel({
+        __t: 'catchCert',
+        documentNumber: 'GBR-2023-CC-DUP',
+        status,
+        createdAt: '2023-07-10T08:26:06.939Z',
+        createdBy: 'Bob',
+        createdByEmail: 'foo@foo.com',
+        exportData: { products: [] },
+        catchSubmission
+      }).save();
+
+      it('keeps an existing SUCCESS and does not throw', async () => {
+        await save('COMPLETE', { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000006' });
+
+        await expect(updateCertificateEuCatchStatus('GBR-2023-CC-DUP', failure)).resolves.toBeUndefined();
+
+        const results: any = await DocumentModel.find();
+        expect(results[0].catchSubmission.status).toBe('SUCCESS');
+        expect(results[0].catchSubmission.reference).toBe('CATCH.CC.GB.2026.0000006');
+        expect(results[0].catchSubmission.faultString).toBeUndefined();
+      });
+
+      it('overwrites a previous FAILURE', async () => {
+        await save('COMPLETE', { status: 'FAILURE', faultString: 'old' });
+
+        await updateCertificateEuCatchStatus('GBR-2023-CC-DUP', failure);
+
+        const results: any = await DocumentModel.find();
+        expect(results[0].catchSubmission.faultString).toBe('Document number already taken');
+      });
+
+      it('records a failed void and keeps the CATCH reference', async () => {
+        await save('VOID', { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000006' });
+
+        await updateCertificateEuCatchStatus('GBR-2023-CC-DUP', failure);
+
+        const results: any = await DocumentModel.find();
+        expect(results[0].catchSubmission.status).toBe('FAILURE');
+        expect(results[0].catchSubmission.reference).toBe('CATCH.CC.GB.2026.0000006');
+      });
+
+      it('lets a SUCCESS replace a previous FAILURE', async () => {
+        await save('COMPLETE', { status: 'FAILURE', faultString: 'old' });
+
+        await updateCertificateEuCatchStatus('GBR-2023-CC-DUP', { documentNumber: 'GBR-2023-CC-DUP', euCatchStatus: 'SUCCESS', euCatchReferenceNumber: 'CATCH.CC.GB.2026.0000009' });
+
+        const results: any = await DocumentModel.find();
+        expect(results[0].catchSubmission.status).toBe('SUCCESS');
+        expect(results[0].catchSubmission.reference).toBe('CATCH.CC.GB.2026.0000009');
+      });
+    });
+  });
 
   describe('fetching catch certificates for landings', () => {
 

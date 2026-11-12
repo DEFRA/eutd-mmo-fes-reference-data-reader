@@ -244,7 +244,7 @@ describe('Catch Certificate Submission', () => {
       conservation: { method: 'frozen' }
     },
     catchSubmission: {
-      status: "SUCCESS",
+      status: "FAILURE",
       reference: "CATCH.CC.GB.2026.0000006",
       uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
       timestamp: "2026-01-06T16:09:16.982+01:00",
@@ -543,7 +543,7 @@ describe('Processing Statement Submission', () => {
       personResponsibleForConsignment: 'John Doe'
     },
     catchSubmission: {
-      status: "SUCCESS",
+      status: "FAILURE",
       reference: "CATCH.PS.GB.2026.0000006",
       uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
       timestamp: "2026-01-06T16:09:16.982+01:00",
