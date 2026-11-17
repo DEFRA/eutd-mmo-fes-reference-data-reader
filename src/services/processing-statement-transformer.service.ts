@@ -138,6 +138,10 @@ export default class ProcessingStatementTransformerService {
   private static buildConsignorParty({ plantName, plantAddressOne, plantTownCity, plantPostcode }: any): any {
     return {
       ID: {
+        schemeID: 'operator_internal_activity_id',
+        schemeName: 'Operator internal activity ID',
+        schemeAgencyID: 'ec_sante_traces',
+        schemeAgencyName: 'European commission - DG SANTE - Traces',
         value: ''
       },
       Name: {

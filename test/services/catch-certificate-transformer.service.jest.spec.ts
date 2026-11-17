@@ -3732,7 +3732,7 @@ describe('CatchCertificateTransformerService', () => {
       expect(productItem.NatureIdentificationSPSCargo.TypeCode.value).toBe('12');
       expect(productItem.IncludedSPSTradeLineItem[0].Description.value).toBe('Fresh hake');
       expect(productItem.IncludedSPSTradeLineItem[0].CommonName.value).toBe('Merluccius merluccius');
-      expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('750');
+      expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure).toBeUndefined();
       expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification[0].ClassCode.value).toBe('030441');
       expect(productItem.IncludedSPSTradeLineItem[0].ApplicableSPSClassification[1].ClassCode.value).toBe('COD');
     });
@@ -3787,13 +3787,13 @@ describe('CatchCertificateTransformerService', () => {
       const productsIncludedSPSConsignmentItem = items[1];
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].SequenceNumeric.format).toBe("1");
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].SequenceNumeric.value).toBe(1);
-      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('200');
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[0].NetWeightMeasure).toBeUndefined();
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].SequenceNumeric.format).toBe("2");
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].SequenceNumeric.value).toBe(2);
-      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].NetWeightMeasure.value).toBe('300');
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[1].NetWeightMeasure).toBeUndefined();
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].SequenceNumeric.format).toBe("3");
       expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].SequenceNumeric.value).toBe(3);
-      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].NetWeightMeasure.value).toBe('150');
+      expect(productsIncludedSPSConsignmentItem.IncludedSPSTradeLineItem[2].NetWeightMeasure).toBeUndefined();
     });
 
     it('should add notes for all EEZ zones', () => {
@@ -3946,7 +3946,7 @@ describe('CatchCertificateTransformerService', () => {
           .IncludedSPSConsignmentItem;
 
       const productItem = items[1];
-      expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure.value).toBe('0');
+      expect(productItem.IncludedSPSTradeLineItem[0].NetWeightMeasure).toBeUndefined();
     });
 
     it('should handle rfmo when getRfmos returns null', () => {

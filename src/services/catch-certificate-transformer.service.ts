@@ -402,10 +402,6 @@ export default class CatchCertificateTransformerService {
           CommonName: {
             value: product.scientificName || ''
           },
-          NetWeightMeasure: {
-            unitCode: 'KGM',
-            value: catchItem.weight?.toString() || '0'
-          },
           AdditionalInformationSPSNote: this.buildTypeCode12AdditionalInformationSPSNote(catchItem),
           ApplicableSPSClassification: [
             {
