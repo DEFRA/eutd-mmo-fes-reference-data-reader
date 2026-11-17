@@ -104,7 +104,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       },
       catchSubmission: {
-        status: "SUCCESS",
+        status: "FAILURE",
         reference: "CATCH.CC.GB.2026.0000006",
         uri: "https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/catch-certificate/CATCH.CC.GB.2026.0000006",
         timestamp: "2026-01-06T16:09:16.982+01:00",
@@ -452,6 +452,73 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
       await submitDocumentToBoomi(mockRawPayload);
 
       expect(mockUpdateEuCatchOperatorId).not.toHaveBeenCalled();
+    });
+
+    it('should skip submit without calling Boomi when the document is already registered at CATCH', async () => {
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ ...mockCertificateFromDB, catchSubmission: { status: 'FAILURE', message: 'ALREADY-REGISTERED-AT-CATCH' } }),
+      });
+
+      await expect(submitDocumentToBoomi(mockRawPayload)).resolves.toBeUndefined();
+
+      expect(mockSendDocumentToBoomi).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['faultString', { faultString: 'Document number already taken' }],
+      ['validation error', { validationErrors: [{ errorId: 'E1', errorMessage: 'The document number has already been used', errorField: 'ID' }] }]
+    ])('should mark a duplicate-number fault in the %s as already registered at CATCH', async (_name, fault) => {
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ ...mockCertificateFromDB, catchSubmission: { status: 'FAILURE' } }),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce({});
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({ documentNumber: 'GBR-2025-CC-TEST123', euCatchStatus: 'FAILURE', ...fault });
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockUpdateCertificateEuCatchStatus).toHaveBeenCalledWith(
+        'GBR-2025-CC-TEST123',
+        expect.objectContaining({ euCatchStatus: 'FAILURE', euCatchStatusMessage: 'ALREADY-REGISTERED-AT-CATCH' })
+      );
+    });
+
+    it('should not mark other failures as already registered', async () => {
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ ...mockCertificateFromDB, catchSubmission: { status: 'FAILURE' } }),
+      });
+      mockGenerateCatchPayload.mockReturnValueOnce(mockTransformedPayload);
+      mockSendDocumentToBoomi.mockResolvedValueOnce({});
+      mockProcessEuUpgradeCallback.mockReturnValueOnce({ documentNumber: 'GBR-2025-CC-TEST123', euCatchStatus: 'FAILURE', faultString: 'Invalid commodity code' });
+
+      await submitDocumentToBoomi(mockRawPayload);
+
+      expect(mockUpdateCertificateEuCatchStatus).toHaveBeenCalledWith(
+        'GBR-2025-CC-TEST123',
+        expect.not.objectContaining({ euCatchStatusMessage: 'ALREADY-REGISTERED-AT-CATCH' })
+      );
+    });
+
+    it('should skip submit without calling Boomi when the document was already submitted successfully', async () => {
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ ...mockCertificateFromDB, catchSubmission: { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000006' } }),
+      });
+
+      await expect(submitDocumentToBoomi(mockRawPayload)).resolves.toBeUndefined();
+
+      expect(mockSendDocumentToBoomi).not.toHaveBeenCalled();
+      expect(mockUpdateCertificateEuCatchStatus).not.toHaveBeenCalled();
+    });
+
+    it('should still send a void for a document that was submitted successfully', async () => {
+      mockFindOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ ...mockCertificateFromDB, catchSubmission: { status: 'SUCCESS', reference: 'CATCH.CC.GB.2026.0000006' } }),
+      });
+      mockSendDocumentToBoomi.mockResolvedValueOnce({ status: 'OK' });
+
+      await submitDocumentToBoomi({ documentNumber: 'GBR-2025-CC-TEST123', operation: 'void' });
+
+      expect(mockSendDocumentToBoomi).toHaveBeenCalled();
     });
 
     it('should continue catch submit when CRM update returns false and persist status first', async () => {
@@ -1138,7 +1205,7 @@ describe('CATCH Submission Controller (FI0-10312)', () => {
         },
       },
       catchSubmission: {
-        status: 'SUCCESS',
+        status: 'FAILURE',
         reference: 'CATCH.SD.GB.2026.0000007',
         uri: 'https://webgate.acceptance.ec.europa.eu/tracesnt/certificate/storage-document/CATCH.SD.GB.2026.0000007',
         timestamp: '2026-01-06T16:09:16.982+01:00',

@@ -139,6 +139,14 @@ const generateVoidCatchPayload = (documentNumber: string, key: 'CancelCatchCerti
 }
 
 
+// Wording taken from the reported CATCH fault "Document number already taken"; the exact fault text is unconfirmed.
+const DUPLICATE_DOCUMENT_FAULT = /already\s+(been\s+)?(taken|exists?|used|registered)|already\s+in\s+use/i;
+export const ALREADY_REGISTERED_AT_CATCH = 'ALREADY-REGISTERED-AT-CATCH';
+
+const isDuplicateDocumentFault = (statusData: IEuUpgradeResponse): boolean =>
+  [statusData.faultString, ...(statusData.validationErrors ?? []).map(e => e.errorMessage)]
+    .some(text => hasMeaningfulValue(text) && DUPLICATE_DOCUMENT_FAULT.test(text));
+
 const sendPayloadAndUpdate = async (
   documentNumber: string,
   transformedPayload: any,
@@ -150,6 +158,12 @@ const sendPayloadAndUpdate = async (
 ) => {
   const response: IEuUpgradeCallback = await BoomiService.sendDocumentToBoomi(transformedPayload, params, resourceType);
   const statusData: IEuUpgradeResponse = BoomiService.processEuUpgradeCallback(response);
+
+  // A duplicate-number fault means an earlier attempt already created the document at CATCH, so resending cannot succeed.
+  if (operation === 'submit' && statusData?.euCatchStatus === 'FAILURE' && isDuplicateDocumentFault(statusData)) {
+    logger.warn(`[DOCUMENT-SUBMISSION][${documentNumber}][DUPLICATE-DOCUMENT-NUMBER-FAULT]`);
+    statusData.euCatchStatusMessage = ALREADY_REGISTERED_AT_CATCH;
+  }
 
   await updateCertificateEuCatchStatus(documentNumber, statusData);
   await tryUpdateEuCatchOperatorId(operation, accountId, statusData);
@@ -321,6 +335,16 @@ export const submitDocumentToBoomi = async (
 
     if (!exportData) {
       throw new Error(`No exportData found for document number: ${documentNumber}`);
+    }
+
+    if (operation === 'submit' && catchSubmission?.status === 'SUCCESS') {
+      logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][SKIPPED][ALREADY-SUBMITTED-SUCCESSFULLY]`);
+      return;
+    }
+
+    if (operation === 'submit' && catchSubmission?.message === ALREADY_REGISTERED_AT_CATCH) {
+      logger.warn(`[DOCUMENT-SUBMISSION][${documentNumber}][SKIPPED][ALREADY-REGISTERED-AT-CATCH]`);
+      return;
     }
 
     logger.info(`[DOCUMENT-SUBMISSION][${documentNumber}][DATA-EXTRACTED][TYPE:${docType}]`);
