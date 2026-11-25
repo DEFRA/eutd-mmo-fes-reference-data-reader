@@ -1,0 +1,38 @@
+{
+  "schema": "ai-attribution-file/2",
+  "path": "test/services/catch-certificate-transformer.service.jest.spec.ts",
+  "added": 19,
+  "counts": {
+    "aiCompletion": 0,
+    "aiChat": 0,
+    "aiAgent": 19,
+    "aiModified": 0,
+    "pasted": 0,
+    "typed": 0,
+    "untracked": 0
+  },
+  "ranges": {
+    "ai-agent": "166-174,176-180,182,184-187"
+  },
+  "ai": [
+    [166, "a", "a62364e7", 0],
+    [167, "a", "332b2b4f", 0],
+    [168, "a", "601b7c34", 0],
+    [169, "a", "ddf1e011", 0],
+    [170, "a", "d00c8a90", 0],
+    [171, "a", "63055e30", 0],
+    [172, "a", "0b6f3cf3", 0],
+    [173, "a", "c512eb6b", 0],
+    [174, "a", "18c85973", 0],
+    [176, "a", "6051e918", 0],
+    [177, "a", "d4bdca8b", 0],
+    [178, "a", "cf3677c8", 0],
+    [179, "a", "45d44e05", 0],
+    [180, "a", "abac18e5", 0],
+    [182, "a", "cf4fe5ee", 0],
+    [184, "a", "6a677573", 0],
+    [185, "a", "0df69c92", 0],
+    [186, "a", "1a07e218", 0],
+    [187, "a", "322b81c9", 0]
+  ]
+}

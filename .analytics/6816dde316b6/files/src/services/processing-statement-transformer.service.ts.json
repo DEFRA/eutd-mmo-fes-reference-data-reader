@@ -1,0 +1,21 @@
+{
+  "schema": "ai-attribution-file/2",
+  "path": "src/services/processing-statement-transformer.service.ts",
+  "added": 2,
+  "counts": {
+    "aiCompletion": 0,
+    "aiChat": 0,
+    "aiAgent": 2,
+    "aiModified": 0,
+    "pasted": 0,
+    "typed": 0,
+    "untracked": 0
+  },
+  "ranges": {
+    "ai-agent": "178-179"
+  },
+  "ai": [
+    [178, "a", "003f22cf", 0],
+    [179, "a", "e784aeac", 0]
+  ]
+}
