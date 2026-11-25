@@ -235,6 +235,20 @@ describe('ProcessingStatementTransformerService', () => {
       expect(consigneeEmptyAccount.SpecifiedSPSAddress.PostcodeCode.value).toBe('E1 1AA');
     });
 
+    it.each([undefined, null])('should not throw and should use the individual consignee shape when exporterDetails is %s', (exporterDetails) => {
+      const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
+        documentNumber,
+        createdAt,
+        { ...baseExportData, exporterDetails } as any
+      );
+
+      const consignee = result.CreateCatchProcessingStatementRequest.SPSCertificate.SPSConsignment.ConsigneeSPSParty;
+
+      expect(consignee.ID).toEqual({ value: '' });
+      expect(consignee).not.toHaveProperty('TypeCode');
+      expect(consignee.RoleCode).toEqual({ value: 'CN' });
+    });
+
     it('should keep consignee ID empty when euCatchOperatorId is omitted', () => {
       const result = ProcessingStatementTransformerService.generateProcessingStatementPayload(
         documentNumber,

@@ -1,0 +1,30 @@
+{
+  "schema": "ai-attribution-file/2",
+  "path": "test/services/processing-statement-transformer.service.jest.spec.ts",
+  "added": 11,
+  "counts": {
+    "aiCompletion": 0,
+    "aiChat": 0,
+    "aiAgent": 11,
+    "aiModified": 0,
+    "pasted": 0,
+    "typed": 0,
+    "untracked": 0
+  },
+  "ranges": {
+    "ai-agent": "238-243,245,247-250"
+  },
+  "ai": [
+    [238, "a", "bd0328d7", 0],
+    [239, "a", "4e469489", 0],
+    [240, "a", "6a1ca944", 0],
+    [241, "a", "87d8643b", 0],
+    [242, "a", "4a15d2d7", 0],
+    [243, "a", "abac18e5", 0],
+    [245, "a", "776aabb2", 0],
+    [247, "a", "1b7d2587", 0],
+    [248, "a", "36955a0c", 0],
+    [249, "a", "aabeb684", 0],
+    [250, "a", "322b81c9", 0]
+  ]
+}

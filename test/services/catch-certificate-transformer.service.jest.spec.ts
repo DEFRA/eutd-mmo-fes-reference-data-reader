@@ -163,6 +163,29 @@ describe('CatchCertificateTransformerService', () => {
       ]);
     });
 
+    it.each([undefined, null])('should not throw and should use the individual consignor shape when exporterDetails is %s', (exporterDetails) => {
+      const exportData = {
+        exporterDetails,
+        exportedFrom: 'Dover Port',
+        exportedTo: { isoCodeAlpha2: 'FR', officialCountryName: 'France' },
+        pointOfDestination: 'Calais Port',
+        transportations: [{ vehicle: 'truck' }],
+        products: []
+      };
+
+      const result = CatchCertificateTransformerService.generateCatchPayload(
+        'GBR-2025-CC-NOEXPORTER',
+        new Date('2025-12-01'),
+        exportData as any
+      );
+
+      const consignor = result.CreateCatchCertificateRequest.SPSCertificate.SPSConsignment.ConsignorSPSParty;
+
+      expect(consignor.ID).toEqual({ value: '' });
+      expect(consignor).not.toHaveProperty('TypeCode');
+      expect(consignor.RoleCode).toEqual({ name: 'Consignor (Exporter)', value: 'CZ' });
+    });
+
     it('should generate complete catch payload with all fields', () => {
       const documentNumber = 'GBR-2025-CC-TEST123';
       const createdAt = new Date('2025-12-01');

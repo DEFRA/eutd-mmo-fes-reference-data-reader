@@ -175,7 +175,8 @@ export default class ProcessingStatementTransformerService {
     };
   }
 
-  private static buildConsigneeParty({ exporterCompanyName, addressOne, townCity, postcode, accountId }: any, euCatchOperatorId: string): any {
+  private static buildConsigneeParty(exporterDetails: any, euCatchOperatorId: string): any {
+    const { exporterCompanyName, addressOne, townCity, postcode, accountId } = exporterDetails ?? {};
     const hasAccountId = typeof accountId === 'string' && accountId.trim().length > 0;
 
     return {
